@@ -1,0 +1,29 @@
+.DS_Store
+**/.DS_Store
+
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+node_modules/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+
+# Keep lightweight QA ECC audit records. Keep bulky raw attachments local unless
+# they are intentionally curated and referenced from an evidence index.
+.ecc/test-runs/**/evidence/screenshots/
+.ecc/test-runs/**/evidence/videos/
+.ecc/test-runs/**/evidence/traces/
+.ecc/test-runs/**/evidence/har/
+.ecc/runs/**/artifacts/screenshots/
+.ecc/runs/**/artifacts/logs/
+

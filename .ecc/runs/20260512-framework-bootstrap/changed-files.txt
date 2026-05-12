@@ -1,0 +1,14 @@
+AGENTS.md
+.ecc/framework-state.json
+.ecc/runs/20260512-framework-bootstrap/
+.ecc/templates/
+docs/exec-plans/active/
+docs/memory/
+docs/testing/automation-candidates.md
+scripts/ecc_task_run.py
+scripts/qa_test_run.py
+skills/ecc-task-subagent-workflow/SKILL.md
+skills/project-bootstrap/SKILL.md
+skills/memory-governance/SKILL.md
+skills/finish-branch/SKILL.md
+skills/grill-me/SKILL.md

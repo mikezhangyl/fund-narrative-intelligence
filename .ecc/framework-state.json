@@ -1,0 +1,16 @@
+{
+  "framework": "merged-ecc-superpower-memory",
+  "installed_at": "2026-05-12",
+  "project": "fund-narrative-intelligence",
+  "mode": "full_scaffold_progressive_activation",
+  "default_skills": [
+    "project-bootstrap",
+    "ecc-task-subagent-workflow",
+    "memory-governance"
+  ],
+  "current_phase": "project_bootstrap",
+  "latest_run": "20260512-framework-bootstrap",
+  "qa_mode": "optional_library",
+  "automation_ready": false,
+  "next_step": "define product goal, first deliverable, initial stack assumptions, and whether the first implementation task needs a worktree"
+}

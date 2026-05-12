@@ -1,0 +1,53 @@
+{
+  "status": "passed",
+  "tests": [
+    {
+      "command": "python scripts/ecc_task_run.py validate --run-dir .ecc/runs/20260512-framework-bootstrap --require-task-artifacts",
+      "status": "passed"
+    },
+    {
+      "command": "python -m json.tool .ecc/framework-state.json",
+      "status": "passed"
+    },
+    {
+      "command": "python -m json.tool .ecc/runs/20260512-framework-bootstrap/artifacts/generated-files-manifest.json",
+      "status": "passed"
+    },
+    {
+      "command": "python -m py_compile scripts/ecc_task_run.py scripts/qa_test_run.py",
+      "status": "passed"
+    },
+    {
+      "command": "ecc_task_run negative gate: quality_agent_required true without quality artifacts",
+      "status": "passed"
+    },
+    {
+      "command": "ecc_task_run init flags: --review-only --no-quality-agent-required and default --review-only",
+      "status": "passed"
+    },
+    {
+      "command": "ecc_task_run default validate rejects malformed required Quality Agent artifacts",
+      "status": "passed"
+    },
+    {
+      "command": "generated-files-manifest checksum and size verification",
+      "status": "passed"
+    },
+    {
+      "command": "ecc_task_run rejects Quality Agent status/review_id/fix_required semantic mismatches",
+      "status": "passed"
+    },
+    {
+      "command": "ecc_task_run rejects missing manifest paths and checksum/size/mtime mismatches",
+      "status": "passed"
+    },
+    {
+      "command": "qa_test_run negative gate: automation_ready true without verified flows",
+      "status": "passed"
+    },
+    {
+      "command": "install grill-me skill and rerun framework validators",
+      "status": "passed"
+    }
+  ]
+}

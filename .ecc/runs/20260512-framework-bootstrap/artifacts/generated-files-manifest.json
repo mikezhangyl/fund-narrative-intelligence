@@ -1,0 +1,203 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "project-rules",
+      "path": "AGENTS.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "c3a7ccfe233d1d62719911876c8e7c08d1dc8b20a4cdcfea32f427e8fef8dad0",
+      "mtime_epoch": 1778574532,
+      "size_bytes": 2580,
+      "summary": "Project-local merged ECC operating mode."
+    },
+    {
+      "type": "framework-state",
+      "path": ".ecc/framework-state.json",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "2635a54f55099c87d7cd7cfad2abee428d5cec5eab41c2071d30f1fcfaefe1b3",
+      "mtime_epoch": 1778574747,
+      "size_bytes": 580,
+      "summary": "Machine-readable framework state."
+    },
+    {
+      "type": "execution-plan",
+      "path": "docs/exec-plans/active/project-bootstrap.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "35f3b8e3cc53b0fdadc52c9c1a76a85461d6972f968dcbd16c3f8a62d7915936",
+      "mtime_epoch": 1778574600,
+      "size_bytes": 1410,
+      "summary": "Bootstrap execution plan."
+    },
+    {
+      "type": "memory-doc",
+      "path": "docs/memory/project-context.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "b6217f0930ac50c185d63e2283ae20f74a4c4c2fa9f972b3902338e8cc70d52f",
+      "mtime_epoch": 1778574601,
+      "size_bytes": 620,
+      "summary": "Project context memory baseline."
+    },
+    {
+      "type": "memory-doc",
+      "path": "docs/memory/architecture-decisions.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "974ee82fbfdc41fe36cd3b053e8c2a7987229771deba5fb6082d281602c19b09",
+      "mtime_epoch": 1778574601,
+      "size_bytes": 726,
+      "summary": "Initial architecture decision record."
+    },
+    {
+      "type": "skill",
+      "path": "skills/project-bootstrap/SKILL.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "b80ba26b5ab7fe1e6c2791261db8458c080e1d3a942c73f8cc2552a4bc03c048",
+      "mtime_epoch": 1778574648,
+      "size_bytes": 1109,
+      "summary": "Project bootstrap entry skill."
+    },
+    {
+      "type": "skill",
+      "path": "skills/memory-governance/SKILL.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "75ec3ff22cb88597d407c836421c5477e3cbf5b2916d4be282e6c426204e1a24",
+      "mtime_epoch": 1778574648,
+      "size_bytes": 1085,
+      "summary": "Memory governance skill."
+    },
+    {
+      "type": "skill",
+      "path": "skills/finish-branch/SKILL.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "0e2f801bb04c091943f9b0208c13d38647be8034a71246e5527f12d50e7f5764",
+      "mtime_epoch": 1778574649,
+      "size_bytes": 773,
+      "summary": "Finish branch discipline skill."
+    },
+    {
+      "type": "skill",
+      "path": "skills/ecc-task-subagent-workflow/SKILL.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "09faf570144dbea7f80bfce3050d3f23d8839b2fdb3c3fa39fdbabb33af0b094",
+      "mtime_epoch": 1778597744,
+      "size_bytes": 13418,
+      "summary": "Workflow skill documents explicit quality-agent init flags, conditional quality colocation checks, and validator integrity gates."
+    },
+    {
+      "type": "script",
+      "path": "scripts/ecc_task_run.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "c47db766610002884651cfcb283632b60eb2303714a37f5f71dbdba19ed977ca",
+      "mtime_epoch": 1778597737,
+      "size_bytes": 25215,
+      "summary": "Task run helper validates explicit quality-agent init flags, Quality Agent semantic consistency, and manifest artifact integrity."
+    },
+    {
+      "type": "script",
+      "path": "scripts/qa_test_run.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "7a355d8c8b7da42954a5f21c55e3f6dfb80c1fa9cff035382515fead997828b5",
+      "mtime_epoch": 1778575674,
+      "size_bytes": 6588,
+      "summary": "QA test run validator now checks basic phase gates."
+    },
+    {
+      "type": "testing-doc",
+      "path": "docs/testing/automation-candidates.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "1feab5d3b1695ee249a4052bd9fa97584ecb7d2ae015f9a0eeb1fb789fd9ebc9",
+      "mtime_epoch": 1778575674,
+      "size_bytes": 268,
+      "summary": "Removed misleading placeholder P1 automation candidate."
+    },
+    {
+      "type": "run-state",
+      "path": ".ecc/runs/20260512-framework-bootstrap/run-state.json",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "69f0e70b38c58eb0e5bdeeba7aac9bd54c24f32cffe2abc78b2776087215acf0",
+      "mtime_epoch": 1778574747,
+      "size_bytes": 730,
+      "summary": "Run state for framework bootstrap correction."
+    },
+    {
+      "type": "changed-files",
+      "path": ".ecc/runs/20260512-framework-bootstrap/changed-files.txt",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "44710ebc5db068e4f7f37097cd2d42eff84eed41ba060c08d6bc90af9a6a6352",
+      "mtime_epoch": 1778599301,
+      "size_bytes": 380,
+      "summary": "Run changed-files ledger updated for framework and validator fixes."
+    },
+    {
+      "type": "task-handoff",
+      "path": ".ecc/runs/20260512-framework-bootstrap/task-handoff.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "0eed8436c594d1e6fe4d176f2131ed2a9f92da84a366dccf71f110da528e7615",
+      "mtime_epoch": 1778599301,
+      "size_bytes": 2982,
+      "summary": "Task handoff reconciled with explicit no-quality init flag, semantic quality gates, and manifest integrity gates."
+    },
+    {
+      "type": "task-agent-commands",
+      "path": ".ecc/runs/20260512-framework-bootstrap/task-agent/commands.jsonl",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "b82749e69fa03622938a536b9d4858abaf403e8ac35787443c33d59104702cf2",
+      "mtime_epoch": 1778599301,
+      "size_bytes": 2947,
+      "summary": "Command log now records explicit --no-quality-agent-required init, semantic quality gate checks, and manifest integrity verification."
+    },
+    {
+      "type": "task-agent-test-results",
+      "path": ".ecc/runs/20260512-framework-bootstrap/task-agent/test-results.json",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "6511db822782e632e6a93f1aacf265e3392d9bfa57ee96e8074c2328e8d18b85",
+      "mtime_epoch": 1778599301,
+      "size_bytes": 1667,
+      "summary": "Verification results include quality flag behavior, malformed required quality artifact rejection, Quality Agent semantic rejection, and manifest integrity rejection."
+    },
+    {
+      "type": "skill",
+      "path": "skills/grill-me/SKILL.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Project-local optional productivity skill for stress-testing plans and designs.",
+      "checksum_sha256": "74147eb6010a65957efef2b9e0f0b3ff935c1def7fc117697151b1d0f3610556",
+      "mtime_epoch": 1778599240,
+      "size_bytes": 635
+    }
+  ],
+  "manifest_note": "This manifest intentionally excludes its own checksum to avoid self-referential hash churn."
+}
