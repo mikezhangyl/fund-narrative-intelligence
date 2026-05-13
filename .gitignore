@@ -5,6 +5,9 @@
 .env.*
 !.env.example
 
+.venv/
+*.egg-info/
+
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -15,6 +18,9 @@ node_modules/
 dist/
 build/
 coverage/
+.coverage
+.coverage.*
+outputs/
 playwright-report/
 test-results/
 
@@ -26,4 +32,3 @@ test-results/
 .ecc/test-runs/**/evidence/har/
 .ecc/runs/**/artifacts/screenshots/
 .ecc/runs/**/artifacts/logs/
-

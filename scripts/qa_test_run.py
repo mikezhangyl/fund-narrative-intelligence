@@ -7,7 +7,6 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-
 TEST_RUN_ROOT = Path(".ecc/test-runs")
 
 REQUIRED_FILES = (

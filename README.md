@@ -1,0 +1,140 @@
+# Fund Narrative Intelligence
+
+Fund Narrative Intelligence is a report-first system for analyzing what market narratives a fund is exposed to through its holdings, then evaluating those narratives with evidence and signal-backed scoring.
+
+V1 is mock-provider first. It does not require real API credentials and does not produce investment advice or buy/sell signals.
+
+## Quick Start
+
+List available mock fixtures:
+
+```bash
+python -m src.main --list-fixtures
+```
+
+Run the V1 acceptance command:
+
+```bash
+python -m src.main --fund-code 000001
+```
+
+Run all mock fixtures:
+
+```bash
+python -m src.main --run-all-fixtures
+```
+
+Run the live Eastmoney smoke set:
+
+```bash
+python -m src.main --run-real-smoke
+```
+
+Generated artifacts:
+
+```text
+outputs/fund_000001_raw.json
+outputs/fund_000001_scoring.json
+outputs/fund_000001_report.md
+outputs/fund_000001_report.html
+```
+
+Run tests:
+
+```bash
+python -m pytest -q
+```
+
+Install development tooling:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+Run quality gates:
+
+```bash
+python -m ruff check .
+python -m coverage run -m pytest -q
+python -m coverage report
+python -m compileall -q src tests scripts
+```
+
+## Current Scope
+
+- Python CLI.
+- Local mock providers and JSON fixtures.
+- Narrative registry loading.
+- Stock-to-narrative mapping.
+- Fund narrative aggregation.
+- Mapping coverage and registry-term fallback mapping for unmapped holdings.
+- Signal decay and five-dimension scoring.
+- Markdown report generation and structured HTML report generation.
+- Controlled errors for missing fixtures or invalid provider payloads.
+
+## Mock Scenario Fixtures
+
+| Fund Code | Scenario | Expected Primary Narrative | Expected Stage |
+| --- | --- | --- | --- |
+| `000001` | AI infrastructure validation | AI Infrastructure | `strengthening` |
+| `000002` | AI power crowding | AI Power Demand | `crowded` |
+| `000003` | EV pressure and counter evidence | EV Price War | `dead` |
+
+## Provider Modes
+
+`mock` is the default provider mode.
+
+```bash
+python -m src.main --fund-code 000001 --provider-mode mock
+```
+
+`real` is accepted for interface testing, but V1 deliberately degrades to mock and records a `provider_fallback` event because real providers are not implemented yet.
+
+```bash
+python -m src.main --fund-code 000001 --provider-mode real
+```
+
+`eastmoney` tries the no-key Eastmoney/Tiantian Fund mobile holdings endpoint for fund holdings. Registry, stock narrative mapping, evidence, and signal fixtures still come from local V1 data.
+
+```bash
+python -m src.main --fund-code 161725 --provider-mode eastmoney
+```
+
+If the Eastmoney request fails, the provider records a `provider_fallback` event and falls back to local mock fixtures when a matching fixture exists.
+
+## Real Provider Status
+
+The first real provider adapter is `eastmoney`, covering fund holdings only. It normalizes Eastmoney fields such as stock code, stock name, holding percentage, holding change, industry, and public holding date into the same V1 fund-holdings contract used by mock providers.
+
+## Real Fund Smoke Set
+
+| Fund Code | Scenario | Expected Primary Narrative |
+| --- | --- | --- |
+| `161725` | Baijiu consumption | Premium Baijiu Consumption |
+| `320007` | Semiconductor | Semiconductor Capex Cycle |
+| `003096` | Healthcare | Healthcare Innovation |
+| `003834` | New energy | New Energy Equipment |
+| `001475` | Defense | Defense Aerospace |
+| `000991` | Real estate chain | Real Estate Stabilization |
+
+The smoke command writes:
+
+```text
+outputs/real_fund_smoke_summary.json
+outputs/real_fund_smoke_summary.md
+```
+
+The smoke summary is per-fund isolated: if one live provider call fails, the summary still records that fund as `failed`, keeps the remaining fund checks running, and exits non-zero when any fund fails or misses the coverage threshold.
+
+## Report Output
+
+Each run writes both Markdown and HTML. The HTML report is rendered from structured scoring data with headings, sections, holdings tables, narrative dimension tables, evidence lists, and a disclaimer.
+
+Reports also include mapping coverage so real-provider runs make clear how much of a fund's holdings are explained by current registry and mapping fixtures.
+
+Narrative sections include deterministic interpretation notes for lifecycle stage, risk pressure, and confidence. These notes are explanatory only and do not produce allocation or trading recommendations.
+
+## Product Docs
+
+- [Product thesis](docs/product/fund-narrative-intelligence-system.html)
+- [V1 implementation spec](docs/product/v1-implementation-spec.md)
