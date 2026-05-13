@@ -10,3 +10,4 @@
 - [report-interpretation.md](./report-interpretation.md)
 - [real-fund-expansion.md](./real-fund-expansion.md)
 - [quality-baseline.md](./quality-baseline.md)
+- [real-fund-scoring-calibration.md](./real-fund-scoring-calibration.md)

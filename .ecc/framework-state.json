@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260513-quality-baseline",
+  "latest_run": "20260513-real-fund-scoring-calibration",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "review real-fund smoke reports, then improve sector-specific scoring signals or add another real provider layer"
+  "next_step": "calibrate real-fund smoke scoring so sector narratives produce differentiated lifecycle stages"
 }

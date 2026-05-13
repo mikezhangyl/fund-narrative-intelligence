@@ -161,11 +161,11 @@ V1 stages are heuristic and versioned by `scoring_model_version`.
 | Stage | V1 Rule |
 | --- | --- |
 | `emerging` | `momentum_score >= 60`, `earnings_score < 60`, evidence density low or medium, counter risk `< 60`. |
-| `strengthening` | `sustainability_score >= 60`, `momentum_score >= 60`, counter risk `< 60`, valuation risk `< 75`. |
+| `strengthening` | `sustainability_score >= 60`, `momentum_score >= 60`, counter risk `< 60`, valuation risk `< 75`; or `sustainability_score >= 55`, earnings `>= 65`, momentum `>= 60`, counter risk `< 60`, valuation risk `< 75`. |
 | `expanding` | `sustainability_score >= 70`, earnings and capital both `>= 60`, counter risk `< 60`. |
 | `crowded` | valuation risk `>= 75` and capital or momentum `>= 65`, while counter risk `< 65`. |
 | `diverging` | support signals remain visible but counter risk `>= 60`, or earnings score `< 50` while capital or momentum `>= 60`. |
-| `weakening` | `sustainability_score < 50` and momentum `< 50`, or counter risk `>= 70`. |
+| `weakening` | `sustainability_score < 50` and momentum `< 50`, counter risk `>= 70`, `sustainability_score < 50` with counter risk `>= 60`, or `sustainability_score < 45` with earnings `< 45`. |
 | `dead` | `sustainability_score < 35`, momentum `< 35`, and no meaningful positive fresh evidence. |
 
 If multiple rules match, V1 applies this precedence:

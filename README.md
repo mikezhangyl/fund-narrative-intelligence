@@ -108,14 +108,14 @@ The first real provider adapter is `eastmoney`, covering fund holdings only. It 
 
 ## Real Fund Smoke Set
 
-| Fund Code | Scenario | Expected Primary Narrative |
-| --- | --- | --- |
-| `161725` | Baijiu consumption | Premium Baijiu Consumption |
-| `320007` | Semiconductor | Semiconductor Capex Cycle |
-| `003096` | Healthcare | Healthcare Innovation |
-| `003834` | New energy | New Energy Equipment |
-| `001475` | Defense | Defense Aerospace |
-| `000991` | Real estate chain | Real Estate Stabilization |
+| Fund Code | Scenario | Expected Primary Narrative | Calibrated Stage |
+| --- | --- | --- | --- |
+| `161725` | Baijiu consumption | Premium Baijiu Consumption | `diverging` |
+| `320007` | Semiconductor | Semiconductor Capex Cycle | `strengthening` |
+| `003096` | Healthcare | Healthcare Innovation | `diverging` |
+| `003834` | New energy | New Energy Equipment | `weakening` |
+| `001475` | Defense | Defense Aerospace | `strengthening` |
+| `000991` | Real estate chain | Real Estate Stabilization | `weakening` |
 
 The smoke command writes:
 

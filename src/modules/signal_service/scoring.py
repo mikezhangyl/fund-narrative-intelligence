@@ -279,6 +279,10 @@ def _select_stage(
         and not has_positive_fresh_evidence
     ):
         return "dead"
+    if sustainability_score < 45 and earnings_score < 45:
+        return "weakening"
+    if sustainability_score < 50 and counter_evidence_risk_score >= 60:
+        return "weakening"
     if sustainability_score < 50 and momentum_score < 50:
         return "weakening"
     if counter_evidence_risk_score >= 70:
@@ -298,6 +302,14 @@ def _select_stage(
         and counter_evidence_risk_score < 60
     ):
         return "expanding"
+    if (
+        sustainability_score >= 55
+        and earnings_score >= 65
+        and momentum_score >= 60
+        and counter_evidence_risk_score < 60
+        and valuation_risk_score < 75
+    ):
+        return "strengthening"
     if (
         sustainability_score >= 60
         and momentum_score >= 60

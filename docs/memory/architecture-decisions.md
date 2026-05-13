@@ -107,3 +107,24 @@ Consequences:
 - Standard gates are `python -m ruff check .`, `python -m coverage run -m pytest -q`, `python -m coverage report`, and `python -m compileall -q src tests scripts`.
 - Development tool versions are pinned in the `dev` extra until the project introduces a lockfile.
 - Coverage is measured over `src`; generated outputs remain ignored.
+
+## ADR-0006: Calibrate Real-Fund Smoke Stages With Local Signals
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Use local V1 signal fixtures and deterministic scoring rules to make the fixed Eastmoney smoke set produce differentiated lifecycle stages.
+
+Rationale:
+
+- The Eastmoney adapter provides live holdings only; narrative registry, evidence, and signals are still fixture-backed in V1.
+- A smoke set where every primary narrative is `diverging` proves the pipeline runs but gives weak regression coverage over stage selection.
+- Differentiated stages make scoring regressions easier to detect without implying investment advice.
+
+Consequences:
+
+- Current real smoke baseline is `strengthening` for semiconductor and defense, `diverging` for baijiu and healthcare, and `weakening` for new energy and real estate.
+- Stage rules now include moderate-strength `strengthening` and weaker-support `weakening` paths.
+- Future real signal providers should be validated against this distribution before replacing fixture-backed signals.

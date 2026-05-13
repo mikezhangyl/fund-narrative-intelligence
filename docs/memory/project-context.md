@@ -78,7 +78,7 @@ Expected artifacts:
 ## Real Provider Smoke Result
 
 - `161725` with `--provider-mode eastmoney`: Premium Baijiu Consumption / `diverging` in the current fixture-backed mapping layer.
-- Real smoke set covers `161725`, `320007`, `003096`, `003834`, `001475`, and `000991`; latest smoke passed with minimum coverage ratio 78%.
+- Real smoke set covers `161725`, `320007`, `003096`, `003834`, `001475`, and `000991`; latest smoke passed with minimum coverage ratio 78% and calibrated stages `strengthening` / `diverging` / `weakening`.
 
 ## Deferred Scope
 

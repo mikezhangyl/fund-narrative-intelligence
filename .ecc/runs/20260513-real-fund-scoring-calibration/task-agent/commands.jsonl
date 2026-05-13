@@ -1,0 +1,9 @@
+{"command":"python -m pytest tests/test_real_fund_calibration.py tests/test_scoring.py tests/test_multi_fixture_scenarios.py -q","purpose":"Focused regression check for calibrated scoring rules and mock scenario preservation","exit_code":0,"summary":"9 passed in 0.13s."}
+{"command":"python -m src.main --run-real-smoke","purpose":"Real Eastmoney smoke after stage calibration","exit_code":0,"summary":"Six-fund smoke passed with stages: 161725 diverging, 320007 strengthening, 003096 diverging, 003834 weakening, 001475 strengthening, 000991 weakening; minimum coverage 78%."}
+{"command":"python -m src.main --fund-code 000001","purpose":"V1 acceptance command after calibration","exit_code":0,"summary":"Generated raw JSON, scoring JSON, Markdown report, and HTML report for fund 000001."}
+{"command":"python -m src.main --run-all-fixtures","purpose":"Mock fixture batch after calibration","exit_code":0,"summary":"Generated standard artifacts for 000001, 000002, and 000003."}
+{"command":"python -m ruff check .","purpose":"Lint gate","exit_code":0,"summary":"All checks passed."}
+{"command":"python -m pytest -q","purpose":"Full test suite","exit_code":0,"summary":"44 passed in 0.45s."}
+{"command":"python -m compileall -q src tests scripts","purpose":"Syntax compilation check","exit_code":0,"summary":"Compilation passed."}
+{"command":"python -m coverage run -m pytest -q && python -m coverage report","purpose":"Final coverage gate using pyproject fail_under","exit_code":0,"summary":"44 passed; total coverage 85%."}
+{"command":"python scripts/ecc_task_run.py validate --run-dir .ecc/runs/20260513-real-fund-scoring-calibration --require-task-artifacts --require-quality-artifacts","purpose":"ECC run artifact validation","exit_code":0,"summary":"Run validation passed with no findings."}

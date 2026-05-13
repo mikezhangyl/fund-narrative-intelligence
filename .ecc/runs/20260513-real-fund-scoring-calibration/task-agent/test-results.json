@@ -1,0 +1,70 @@
+{
+  "status": "passed",
+  "test_commands": [
+    {
+      "command": "python -m pytest tests/test_real_fund_calibration.py tests/test_scoring.py tests/test_multi_fixture_scenarios.py -q",
+      "exit_code": 0,
+      "summary": "9 passed in 0.13s"
+    },
+    {
+      "command": "python -m ruff check .",
+      "exit_code": 0,
+      "summary": "All checks passed"
+    },
+    {
+      "command": "python -m pytest -q",
+      "exit_code": 0,
+      "summary": "44 passed in 0.45s"
+    },
+    {
+      "command": "python -m coverage run -m pytest -q",
+      "exit_code": 0,
+      "summary": "44 passed"
+    },
+    {
+      "command": "python -m coverage report",
+      "exit_code": 0,
+      "summary": "Total coverage 85%; configured fail_under threshold passed"
+    },
+    {
+      "command": "python -m compileall -q src tests scripts",
+      "exit_code": 0,
+      "summary": "Compilation passed"
+    },
+    {
+      "command": "python -m src.main --fund-code 000001",
+      "exit_code": 0,
+      "summary": "V1 acceptance artifacts generated"
+    },
+    {
+      "command": "python -m src.main --run-all-fixtures",
+      "exit_code": 0,
+      "summary": "Mock fixture batch passed"
+    },
+    {
+      "command": "python -m src.main --run-real-smoke",
+      "exit_code": 0,
+      "summary": "Real smoke passed for six funds with three calibrated stages"
+    }
+  ],
+  "coverage": {
+    "status": "passed",
+    "total": "85%",
+    "threshold": "80%",
+    "source": "src"
+  },
+  "real_smoke_distribution": {
+    "strengthening": [
+      "320007",
+      "001475"
+    ],
+    "diverging": [
+      "161725",
+      "003096"
+    ],
+    "weakening": [
+      "003834",
+      "000991"
+    ]
+  }
+}

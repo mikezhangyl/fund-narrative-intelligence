@@ -22,7 +22,18 @@ def test_scenario_funds_produce_different_primary_stages(tmp_path):
 
     assert stages["000001"] == "strengthening"
     assert stages["000002"] == "crowded"
-    assert stages["000003"] in {"weakening", "dead"}
+    assert stages["000003"] == "dead"
+
+
+def test_reviewed_secondary_stage_after_calibration(tmp_path):
+    artifacts = run_pipeline(fund_code="000001", output_dir=tmp_path)
+    scoring = json.loads(artifacts["scoring"].read_text())
+    stages_by_narrative_id = {
+        item["narrative_id"]: item["state"]["stage"]
+        for item in scoring["all_narratives"]
+    }
+
+    assert stages_by_narrative_id["N_AI_APPS"] == "strengthening"
 
 
 def test_run_all_fixture_pipelines_generates_artifacts_for_every_fixture(tmp_path):

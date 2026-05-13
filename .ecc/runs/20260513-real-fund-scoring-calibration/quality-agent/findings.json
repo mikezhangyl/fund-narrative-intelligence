@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "findings": [],
+  "resolved_findings": [
+    {
+      "severity": "high",
+      "summary": "Mock baseline was not protected because the 000003 fixture allowed either weakening or dead.",
+      "resolution": "Updated the regression test to require 000003 to remain dead."
+    },
+    {
+      "severity": "medium",
+      "summary": "The broadened strengthening rule changed the N_AI_APPS secondary stage without an explicit expectation.",
+      "resolution": "Added test_reviewed_secondary_stage_after_calibration to document and lock that behavior."
+    }
+  ],
+  "residual_risks": [
+    "The deterministic calibration test scores narratives directly instead of invoking the live provider path.",
+    "The integrated real-smoke command depends on current Eastmoney holdings and may drift as public data changes.",
+    "Real-fund reports still use local V1 fixtures for signal and evidence layers."
+  ]
+}

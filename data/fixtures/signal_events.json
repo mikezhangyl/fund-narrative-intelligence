@@ -142,6 +142,16 @@
       "half_life_days": 60
     },
     {
+      "signal_id": "SIG_SEMI_MOMENTUM",
+      "narrative_id": "N_SEMI_CAPEX",
+      "signal_type": "research_mentions_up",
+      "strength": 0.55,
+      "confidence": 0.72,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 30
+    },
+    {
       "signal_id": "SIG_EV_DEMAND",
       "narrative_id": "N_EV_PRICE_WAR",
       "signal_type": "demand_slowdown",

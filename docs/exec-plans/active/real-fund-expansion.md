@@ -24,11 +24,11 @@ Implemented and locally verified.
 Latest smoke result:
 
 - `161725`: Premium Baijiu Consumption / `diverging` / 100% coverage.
-- `320007`: Semiconductor Capex Cycle / `diverging` / 95% coverage.
+- `320007`: Semiconductor Capex Cycle / `strengthening` / 95% coverage.
 - `003096`: Healthcare Innovation / `diverging` / 100% coverage.
-- `003834`: New Energy Equipment / `diverging` / 94% coverage.
-- `001475`: Defense Aerospace / `diverging` / 88% coverage.
-- `000991`: Real Estate Stabilization / `diverging` / 78% coverage.
+- `003834`: New Energy Equipment / `weakening` / 94% coverage.
+- `001475`: Defense Aerospace / `strengthening` / 88% coverage.
+- `000991`: Real Estate Stabilization / `weakening` / 78% coverage.
 
 ## Run Record
 
