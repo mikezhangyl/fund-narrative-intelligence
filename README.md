@@ -158,6 +158,8 @@ The smoke summary is per-fund isolated: if one live provider call fails, the sum
 
 When real holdings are not fully mapped, the summary JSON includes `unmapped_holdings` with stock code, stock name, industry, and weight. The Markdown summary also adds a `Mapping Gaps` section so registry expansion can be driven by concrete live-holding gaps.
 
+The summary also reports `multi_mapped_holdings` when one holding maps to multiple narratives. This is intentional diagnostic output: full coverage should not hide possible over-broad registry terms or genuinely cross-domain companies.
+
 ## Announcement Evidence Smoke
 
 The announcement smoke command validates the optional real announcement path against an A-share fund example:

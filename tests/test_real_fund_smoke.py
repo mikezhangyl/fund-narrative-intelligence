@@ -70,7 +70,37 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
                 }
             )
         )
-        raw_path.write_text("{}")
+        raw_path.write_text(
+            json.dumps(
+                {
+                    "holdings": [
+                        {
+                            "stock_code": "000001",
+                            "stock_name": "Multi Co",
+                            "industry": "测试行业",
+                            "weight": 0.05,
+                        }
+                    ],
+                    "stock_narrative_mappings": [
+                        {
+                            "stock_code": "000001",
+                            "narrative_id": "N_ONE",
+                            "method": "registry_term_rule",
+                        },
+                        {
+                            "stock_code": "000001",
+                            "narrative_id": "N_TWO",
+                            "method": "registry_term_rule",
+                        },
+                    ],
+                    "narrative_registry": [
+                        {"narrative_id": "N_ONE", "name": "Narrative One"},
+                        {"narrative_id": "N_TWO", "name": "Narrative Two"},
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
         markdown_path.write_text("# report")
         html_path.write_text("<html></html>")
         return {
@@ -103,6 +133,18 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
             "weight": 0.0403,
         }
     ]
+    assert summary["funds"][0]["multi_mapped_holding_count"] == 1
+    assert summary["funds"][0]["multi_mapped_holdings"] == [
+        {
+            "stock_code": "000001",
+            "stock_name": "Multi Co",
+            "industry": "测试行业",
+            "weight": 0.05,
+            "narratives": ["Narrative One", "Narrative Two"],
+            "narrative_ids": ["N_ONE", "N_TWO"],
+            "methods": ["registry_term_rule"],
+        }
+    ]
     assert (tmp_path / "real_fund_smoke_summary.json").exists()
     assert (tmp_path / "real_fund_smoke_summary.md").exists()
 
@@ -113,6 +155,8 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
     assert "## Mapping Gaps" in summary_markdown
     assert "002572" in summary_markdown
     assert "索菲亚" in summary_markdown
+    assert "## Multi-Mapped Holdings" in summary_markdown
+    assert "Narrative One, Narrative Two" in summary_markdown
 
 
 def test_real_fund_smoke_summary_fails_when_coverage_is_below_threshold(tmp_path):
@@ -187,6 +231,7 @@ def test_real_fund_smoke_summary_records_runner_failures(tmp_path):
     assert summary["funds"][0]["status"] == "failed"
     assert summary["funds"][0]["coverage_passed"] is False
     assert summary["funds"][0]["primary_narrative"] is None
+    assert summary["funds"][0]["multi_mapped_holdings"] == []
     assert "temporary provider failure" in summary["funds"][0]["error"]
     assert (tmp_path / "real_fund_smoke_summary.json").exists()
     assert (tmp_path / "real_fund_smoke_summary.md").exists()

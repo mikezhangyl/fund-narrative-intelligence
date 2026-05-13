@@ -43,6 +43,7 @@ def run_real_fund_smoke(
                 _build_fund_result(
                     fund_code=fund_code,
                     scenario=spec["scenario"],
+                    raw_path=Path(artifacts["raw"]) if "raw" in artifacts else None,
                     scoring_path=Path(artifacts["scoring"]),
                     min_coverage_ratio=min_coverage_ratio,
                 )
@@ -72,6 +73,7 @@ def run_real_fund_smoke(
 def _build_fund_result(
     fund_code: str,
     scenario: str,
+    raw_path: Path | None,
     scoring_path: Path,
     min_coverage_ratio: float,
 ) -> dict[str, Any]:
@@ -88,6 +90,7 @@ def _build_fund_result(
     coverage_ratio = coverage["coverage_ratio"]
     provider_foundation = scoring.get("provider_foundation", {})
     unmapped_holdings = _summarize_unmapped_holdings(scoring["unmapped_holdings"])
+    multi_mapped_holdings = _summarize_multi_mapped_holdings(raw_path)
     return {
         "fund_code": fund_code,
         "scenario": scenario,
@@ -112,6 +115,8 @@ def _build_fund_result(
         "mapping_methods": coverage["mapping_methods"],
         "unmapped_holding_count": len(unmapped_holdings),
         "unmapped_holdings": unmapped_holdings,
+        "multi_mapped_holding_count": len(multi_mapped_holdings),
+        "multi_mapped_holdings": multi_mapped_holdings,
         "degradation_event_count": len(scoring["degradation_events"]),
         "error": None,
     }
@@ -143,6 +148,8 @@ def _build_failed_fund_result(
         "mapping_methods": {},
         "unmapped_holding_count": 0,
         "unmapped_holdings": [],
+        "multi_mapped_holding_count": 0,
+        "multi_mapped_holdings": [],
         "degradation_event_count": 1,
         "error": message,
     }
@@ -160,6 +167,63 @@ def _summarize_unmapped_holdings(
         }
         for holding in unmapped_holdings
     ]
+
+
+def _summarize_multi_mapped_holdings(raw_path: Path | None) -> list[dict[str, Any]]:
+    if raw_path is None or not raw_path.exists():
+        return []
+    raw = json.loads(raw_path.read_text(encoding="utf-8"))
+    holdings_by_code = {
+        holding["stock_code"]: holding for holding in raw.get("holdings", [])
+    }
+    registry_by_id = {
+        item["narrative_id"]: item for item in raw.get("narrative_registry", [])
+    }
+    mappings_by_stock: dict[str, list[dict[str, Any]]] = {}
+    for mapping in raw.get("stock_narrative_mappings", []):
+        stock_code = mapping.get("stock_code")
+        if not stock_code:
+            continue
+        mappings_by_stock.setdefault(str(stock_code), []).append(mapping)
+
+    results = []
+    for stock_code, mappings in sorted(mappings_by_stock.items()):
+        narrative_ids = _unique_in_order(
+            str(mapping["narrative_id"])
+            for mapping in mappings
+            if mapping.get("narrative_id")
+        )
+        if len(narrative_ids) < 2:
+            continue
+        holding = holdings_by_code.get(stock_code, {})
+        results.append(
+            {
+                "stock_code": stock_code,
+                "stock_name": holding.get("stock_name"),
+                "industry": holding.get("industry"),
+                "weight": holding.get("weight"),
+                "narratives": [
+                    registry_by_id.get(narrative_id, {}).get("name", narrative_id)
+                    for narrative_id in narrative_ids
+                ],
+                "narrative_ids": narrative_ids,
+                "methods": _unique_in_order(
+                    str(mapping.get("method", "unknown")) for mapping in mappings
+                ),
+            }
+        )
+    return results
+
+
+def _unique_in_order(values: Any) -> list[str]:
+    seen = set()
+    unique_values = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        unique_values.append(value)
+    return unique_values
 
 
 def _write_summary(summary: dict[str, Any], output_path: Path) -> None:
@@ -217,6 +281,31 @@ def _write_summary(summary: dict[str, Any], output_path: Path) -> None:
                     f"{holding['stock_name'] or '-'} | "
                     f"{holding['industry'] or '-'} | "
                     f"{_format_weight(holding['weight'])} |"
+        )
+        lines.append("")
+    multi_match_results = [
+        result for result in summary["funds"] if result["multi_mapped_holdings"]
+    ]
+    if multi_match_results:
+        lines.extend(
+            [
+                "## Multi-Mapped Holdings",
+                "",
+                "| Fund | Stock | Name | Industry | Weight | Narratives | Methods |",
+                "| --- | --- | --- | --- | ---: | --- | --- |",
+            ]
+        )
+        for result in multi_match_results:
+            for holding in result["multi_mapped_holdings"]:
+                lines.append(
+                    "| "
+                    f"{result['fund_code']} | "
+                    f"{holding['stock_code'] or '-'} | "
+                    f"{holding['stock_name'] or '-'} | "
+                    f"{holding['industry'] or '-'} | "
+                    f"{_format_weight(holding['weight'])} | "
+                    f"{', '.join(holding['narratives']) or '-'} | "
+                    f"{', '.join(holding['methods']) or '-'} |"
                 )
         lines.append("")
     (output_path / "real_fund_smoke_summary.md").write_text(

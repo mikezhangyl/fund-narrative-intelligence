@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260513-real-smoke-gap-mapping-rules",
+  "latest_run": "20260513-real-smoke-multimatch-diagnostics",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "review real-smoke multi-match mappings and consider precision diagnostics before adding broader real providers"
+  "next_step": "decide whether multi-match holdings need confidence weighting or manual review flags before broader real-provider work"
 }
