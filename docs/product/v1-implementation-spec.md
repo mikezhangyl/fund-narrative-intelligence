@@ -66,6 +66,14 @@ Current provider-layer interfaces:
 
 The empty mock providers are deliberate placeholders. They preserve V1 contracts without pretending that real quote, valuation, announcement, or news ingestion exists.
 
+Optional real-provider adapter foundation:
+
+- `CNInfoAnnouncementProvider` targets CNINFO announcement search and normalizes announcement metadata into the V1 announcement-provider contract.
+- It is not called by the default report pipeline yet.
+- It must use an injectable fetcher in tests.
+- It should infer the CNINFO market column from stock-code prefixes and reject invalid stock codes without calling the external provider.
+- Provider failures must return an `unavailable` payload and record `provider_unavailable` rather than crash orchestration.
+
 ## Degradation Strategy
 
 The pipeline should complete whenever enough data exists to produce a bounded report. Provider failure should reduce confidence and surface data quality, not crash the full run.

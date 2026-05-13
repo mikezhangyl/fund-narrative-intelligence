@@ -191,3 +191,24 @@ Consequences:
 - The diagnostics path fetches the fund holdings layer and returns provider foundation metadata only.
 - `--provider-mode real --provider-diagnostics` exposes the `provider_fallback` event.
 - Future provider work should keep this command stable as a quick source-layer sanity check.
+
+## ADR-0010: Add CNINFO Announcement Adapter As Optional Provider
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Add an optional `CNInfoAnnouncementProvider` adapter for CNINFO announcement metadata, but do not wire it into the default V1 report pipeline yet.
+
+Rationale:
+
+- Announcements are a structured intelligence source and a better first real non-holdings adapter than free-form news.
+- V1 still needs deterministic mock behavior by default.
+- The adapter should be testable with an injectable fetcher and should fail closed into an unavailable payload.
+
+Consequences:
+
+- CNINFO provider failures record `provider_unavailable` and return empty `unavailable` results.
+- The adapter can be used manually or by future orchestration work without changing the current report acceptance path.
+- Future announcement-to-evidence conversion should build on this adapter instead of scraping directly inside scoring or report code.

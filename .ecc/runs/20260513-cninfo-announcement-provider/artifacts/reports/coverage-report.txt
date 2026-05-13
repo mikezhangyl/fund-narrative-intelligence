@@ -1,0 +1,19 @@
+Name                                          Stmts   Miss Branch BrPart  Cover   Missing
+-----------------------------------------------------------------------------------------
+src/main.py                                      92     35     24      2    65%   72-77, 92-94, 107-126, 132, 145-153, 157
+src/modules/fund_analysis/aggregation.py         25      2      8      2    88%   22, 31
+src/modules/report_writer/interpretation.py      29      3     10      3    85%   50, 57, 61
+src/modules/report_writer/writer.py             123     10     34      3    90%   202-208, 229-237, 408
+src/modules/signal_service/scoring.py           113     17     54     10    79%   231, 239-243, 262->250, 287, 289, 293, 313-326, 331, 336, 346
+src/providers/base.py                            18      6      0      0    67%   12, 15, 18, 21, 24, 31
+src/providers/cninfo.py                          93     12     28      8    83%   119, 141-144, 158, 163, 168, 171, 176, 179, 191
+src/providers/eastmoney.py                       81     15     14      5    77%   112, 130, 158, 160, 168-170, 173-174, 180-192
+src/providers/factory.py                         17      3      6      1    74%   23-36
+src/providers/intelligence.py                   128      9      2      1    92%   26, 31, 36, 41, 46, 51, 60, 69, 234
+src/providers/mock.py                            44      1      4      1    96%   78
+src/providers/provenance.py                      55      6     16      4    83%   111, 115, 143, 156-158
+src/validation.py                                85     11     36     11    82%   37, 49, 57, 66, 91, 108, 135, 159, 164, 175, 177
+-----------------------------------------------------------------------------------------
+TOTAL                                          1070    130    248     51    85%
+
+13 files skipped due to complete coverage.

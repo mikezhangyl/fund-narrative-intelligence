@@ -14,3 +14,4 @@
 - [provider-evidence-foundation.md](./provider-evidence-foundation.md)
 - [evidence-provider-interfaces.md](./evidence-provider-interfaces.md)
 - [provider-diagnostics-cli.md](./provider-diagnostics-cli.md)
+- [cninfo-announcement-provider.md](./cninfo-announcement-provider.md)

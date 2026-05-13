@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "CNINFO live endpoint behavior can change.",
+    "Announcement-to-evidence conversion is not implemented yet.",
+    "The adapter is not wired into the default report pipeline.",
+    "Market-column inference is based on common A-share stock-code prefixes."
+  ]
+}

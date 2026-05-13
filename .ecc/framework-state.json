@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260513-provider-diagnostics-cli",
+  "latest_run": "20260513-cninfo-announcement-provider",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "finish provider diagnostics CLI and then move to the first real intelligence source adapter"
+  "next_step": "plan announcement-to-evidence conversion using the optional CNINFO adapter"
 }

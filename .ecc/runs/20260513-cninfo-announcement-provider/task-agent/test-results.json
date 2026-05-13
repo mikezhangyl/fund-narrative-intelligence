@@ -1,0 +1,52 @@
+{
+  "status": "passed",
+  "test_commands": [
+    {
+      "command": "python -m pytest tests/test_cninfo_provider.py -q",
+      "exit_code": 0,
+      "summary": "6 passed"
+    },
+    {
+      "command": "python -m ruff check .",
+      "exit_code": 0,
+      "summary": "All checks passed"
+    },
+    {
+      "command": "python -m pytest -q",
+      "exit_code": 0,
+      "summary": "Covered by refreshed coverage run: 61 passed in 0.71s"
+    },
+    {
+      "command": "python -m coverage run -m pytest -q",
+      "exit_code": 0,
+      "summary": "61 passed"
+    },
+    {
+      "command": "python -m coverage report",
+      "exit_code": 0,
+      "summary": "Total coverage 85%; configured fail_under threshold passed"
+    },
+    {
+      "command": "python -m compileall -q src tests scripts",
+      "exit_code": 0,
+      "summary": "Compilation passed"
+    },
+    {
+      "command": "python -m src.main --run-real-smoke",
+      "exit_code": 0,
+      "summary": "Live Eastmoney smoke passed"
+    }
+  ],
+  "coverage": {
+    "status": "passed",
+    "total": "85%",
+    "threshold": "80%",
+    "source": "src"
+  },
+  "optional_live_cninfo_probe": {
+    "status": "passed",
+    "data_quality": "fresh",
+    "announcement_count": 0,
+    "degradation_event_count": 0
+  }
+}
