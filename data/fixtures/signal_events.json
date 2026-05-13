@@ -1,0 +1,295 @@
+{
+  "version": "signals-v1",
+  "signal_events": [
+    {
+      "signal_id": "SIG_AI_INFRA_GUIDANCE",
+      "narrative_id": "N_AI_INFRA",
+      "signal_type": "guidance_raise",
+      "strength": 0.82,
+      "confidence": 0.86,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_AI_INFRA_FLOW",
+      "narrative_id": "N_AI_INFRA",
+      "signal_type": "institutional_inflow",
+      "strength": 0.72,
+      "confidence": 0.78,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_AI_INFRA_LANGUAGE",
+      "narrative_id": "N_AI_INFRA",
+      "signal_type": "research_mentions_up",
+      "strength": 0.76,
+      "confidence": 0.81,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_AI_INFRA_VALUATION",
+      "narrative_id": "N_AI_INFRA",
+      "signal_type": "valuation_extreme",
+      "strength": 0.26,
+      "confidence": 0.66,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-10",
+      "half_life_days": 60
+    },
+    {
+      "signal_id": "SIG_AI_POWER_CAPEX",
+      "narrative_id": "N_AI_POWER",
+      "signal_type": "capex_increase",
+      "strength": 0.7,
+      "confidence": 0.76,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_AI_POWER_KEYWORD",
+      "narrative_id": "N_AI_POWER",
+      "signal_type": "keyword_breakout",
+      "strength": 0.78,
+      "confidence": 0.79,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_AI_POWER_FLOW",
+      "narrative_id": "N_AI_POWER",
+      "signal_type": "institutional_inflow",
+      "strength": 0.66,
+      "confidence": 0.7,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-11",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_AI_POWER_POLICY",
+      "narrative_id": "N_AI_POWER",
+      "signal_type": "regulatory_risk",
+      "strength": 0.38,
+      "confidence": 0.72,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-11",
+      "half_life_days": 60
+    },
+    {
+      "signal_id": "SIG_AI_POWER_VALUATION",
+      "narrative_id": "N_AI_POWER",
+      "signal_type": "valuation_extreme",
+      "strength": 0.76,
+      "confidence": 0.88,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 60
+    },
+    {
+      "signal_id": "SIG_AI_POWER_RISK_EASE",
+      "narrative_id": "N_AI_POWER",
+      "signal_type": "risk_resolved",
+      "strength": 0.72,
+      "confidence": 0.72,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_AI_APPS_LANGUAGE",
+      "narrative_id": "N_AI_APPS",
+      "signal_type": "management_mentions_up",
+      "strength": 0.64,
+      "confidence": 0.74,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-09",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_AI_APPS_GUIDANCE",
+      "narrative_id": "N_AI_APPS",
+      "signal_type": "revenue_growth_up",
+      "strength": 0.48,
+      "confidence": 0.68,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-07",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_SEMI_ORDERS",
+      "narrative_id": "N_SEMI_CAPEX",
+      "signal_type": "order_growth",
+      "strength": 0.58,
+      "confidence": 0.76,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-08",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_SEMI_VALUATION",
+      "narrative_id": "N_SEMI_CAPEX",
+      "signal_type": "multiple_expansion_fast",
+      "strength": 0.34,
+      "confidence": 0.66,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-08",
+      "half_life_days": 60
+    },
+    {
+      "signal_id": "SIG_EV_DEMAND",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "signal_type": "demand_slowdown",
+      "strength": 0.82,
+      "confidence": 0.86,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_EV_MARGIN",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "signal_type": "margin_pressure",
+      "strength": 0.76,
+      "confidence": 0.84,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_EV_LANGUAGE_DECAY",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "signal_type": "language_decay",
+      "strength": 0.7,
+      "confidence": 0.78,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_EV_OUTFLOW",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "signal_type": "institutional_outflow",
+      "strength": 0.66,
+      "confidence": 0.74,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_BAIJIU_EARNINGS",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "signal_type": "margin_expansion",
+      "strength": 0.46,
+      "confidence": 0.72,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_BAIJIU_MOMENTUM",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "signal_type": "research_mentions_up",
+      "strength": 0.38,
+      "confidence": 0.68,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_BAIJIU_RISK",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "signal_type": "demand_slowdown",
+      "strength": 0.34,
+      "confidence": 0.66,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_HEALTHCARE_EARNINGS",
+      "narrative_id": "N_HEALTHCARE_INNOVATION",
+      "signal_type": "revenue_growth_up",
+      "strength": 0.44,
+      "confidence": 0.7,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_HEALTHCARE_RISK",
+      "narrative_id": "N_HEALTHCARE_INNOVATION",
+      "signal_type": "regulatory_risk",
+      "strength": 0.32,
+      "confidence": 0.66,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 60
+    },
+    {
+      "signal_id": "SIG_NEW_ENERGY_ORDERS",
+      "narrative_id": "N_NEW_ENERGY_EQUIPMENT",
+      "signal_type": "order_growth",
+      "strength": 0.5,
+      "confidence": 0.7,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_NEW_ENERGY_RISK",
+      "narrative_id": "N_NEW_ENERGY_EQUIPMENT",
+      "signal_type": "margin_pressure",
+      "strength": 0.36,
+      "confidence": 0.68,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_DEFENSE_ORDERS",
+      "narrative_id": "N_DEFENSE_AEROSPACE",
+      "signal_type": "order_growth",
+      "strength": 0.52,
+      "confidence": 0.72,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_DEFENSE_MOMENTUM",
+      "narrative_id": "N_DEFENSE_AEROSPACE",
+      "signal_type": "research_mentions_up",
+      "strength": 0.42,
+      "confidence": 0.68,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 30
+    },
+    {
+      "signal_id": "SIG_REAL_ESTATE_POLICY",
+      "narrative_id": "N_REAL_ESTATE_STABILIZATION",
+      "signal_type": "policy_support",
+      "strength": 0.5,
+      "confidence": 0.68,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-13",
+      "half_life_days": 45
+    },
+    {
+      "signal_id": "SIG_REAL_ESTATE_DEMAND",
+      "narrative_id": "N_REAL_ESTATE_STABILIZATION",
+      "signal_type": "demand_slowdown",
+      "strength": 0.44,
+      "confidence": 0.7,
+      "confidence_multiplier": 1.0,
+      "event_date": "2026-05-12",
+      "half_life_days": 45
+    }
+  ]
+}

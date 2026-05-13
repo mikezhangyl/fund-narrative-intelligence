@@ -1,0 +1,65 @@
+from src.modules.report_writer.writer import render_html_report
+
+
+def test_html_report_renders_structured_sections_without_raw_markdown():
+    scoring_payload = {
+        "metadata": {
+            "fund_code": "000001",
+            "as_of_date": "2026-05-13",
+            "data_quality": "mock",
+            "scoring_model_version": "scoring-v1",
+        },
+        "fund": {"fund_code": "000001", "fund_name": "Mock Fund"},
+        "holdings": [
+            {"stock_code": "NVDA", "stock_name": "NVIDIA", "weight": 0.12}
+        ],
+        "primary_narrative": {
+            "narrative_id": "N_AI_INFRA",
+            "name": "AI Infrastructure",
+            "normalized_exposure": 1.0,
+            "state": {
+                "stage": "strengthening",
+                "sustainability_score": 69.15,
+                "confidence": 0.65,
+                "data_quality": "mock",
+                "dimensions": {
+                    "earnings_score": {"score": 85, "confidence": 0.43},
+                    "capital_score": {"score": 78, "confidence": 0.39},
+                },
+            },
+        },
+        "secondary_narratives": [],
+        "mapping_coverage": {
+            "coverage_ratio": 1.0,
+            "covered_holding_count": 1,
+            "total_holding_count": 1,
+            "covered_weight": 0.12,
+            "total_weight": 0.12,
+            "mapping_methods": {"fixture_rule": 1},
+        },
+        "unmapped_holdings": [],
+        "supporting_evidence": [
+            {
+                "title": "Guidance raised",
+                "source": "mock",
+                "event_date": "2026-05-13",
+                "summary": "Management raised guidance.",
+            }
+        ],
+        "risk_evidence": [],
+    }
+
+    html = render_html_report(scoring_payload)
+
+    assert "<h1>Mock Fund (000001)</h1>" in html
+    assert '<section class="holdings">' in html
+    assert "<table>" in html
+    assert "<th>Stock</th>" in html
+    assert '<section class="primary-narrative">' in html
+    assert '<section class="mapping-coverage">' in html
+    assert "Mapping Coverage" in html
+    assert "<h3>AI Infrastructure</h3>" in html
+    assert "Lifecycle stage" in html
+    assert "### AI Infrastructure" not in html
+    assert "| Stock |" not in html
+    assert "不构成投资建议" in html

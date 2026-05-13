@@ -1,0 +1,70 @@
+{
+  "as_of_date": "2026-05-13",
+  "fund": {
+    "fund_code": "000002",
+    "fund_name": "Mock AI Power Crowding Fund",
+    "fund_type": "equity",
+    "currency": "USD",
+    "provider_metadata": {
+      "provider_name": "mock-fixture-provider",
+      "provider_version": "mock-v1",
+      "source_url": null,
+      "as_of_date": "2026-05-13",
+      "retrieved_at": "2026-05-13T00:00:00Z",
+      "data_quality": "mock",
+      "confidence_multiplier": 0.5
+    }
+  },
+  "holdings": [
+    {
+      "stock_code": "VST",
+      "stock_name": "Vistra",
+      "weight": 0.15
+    },
+    {
+      "stock_code": "NEE",
+      "stock_name": "NextEra Energy",
+      "weight": 0.13
+    },
+    {
+      "stock_code": "CEG",
+      "stock_name": "Constellation Energy",
+      "weight": 0.11
+    },
+    {
+      "stock_code": "ETN",
+      "stock_name": "Eaton",
+      "weight": 0.09
+    },
+    {
+      "stock_code": "PWR",
+      "stock_name": "Quanta Services",
+      "weight": 0.08
+    },
+    {
+      "stock_code": "NVDA",
+      "stock_name": "NVIDIA",
+      "weight": 0.06
+    },
+    {
+      "stock_code": "MSFT",
+      "stock_name": "Microsoft",
+      "weight": 0.05
+    },
+    {
+      "stock_code": "AMZN",
+      "stock_name": "Amazon",
+      "weight": 0.05
+    },
+    {
+      "stock_code": "AVGO",
+      "stock_name": "Broadcom",
+      "weight": 0.04
+    },
+    {
+      "stock_code": "TSM",
+      "stock_name": "Taiwan Semiconductor Manufacturing",
+      "weight": 0.04
+    }
+  ]
+}

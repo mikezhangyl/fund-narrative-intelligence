@@ -1,0 +1,23 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+FIXTURE_DIR = PROJECT_ROOT / "data" / "fixtures"
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs"
+
+VERSION_DEFAULTS = {
+    "provider_set_version": "mock-v1",
+    "narrative_registry_version": "registry-v1",
+    "signal_schema_version": "signals-v1",
+    "scoring_model_version": "scoring-v1",
+    "report_template_version": "report-v1",
+}
+
+DATA_QUALITY_CONFIDENCE = {
+    "fresh": 1.0,
+    "mock": 0.5,
+    "partial": 0.75,
+    "stale": 0.6,
+    "unavailable": 0.0,
+}

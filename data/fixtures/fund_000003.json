@@ -1,0 +1,70 @@
+{
+  "as_of_date": "2026-05-13",
+  "fund": {
+    "fund_code": "000003",
+    "fund_name": "Mock EV Pressure Fund",
+    "fund_type": "equity",
+    "currency": "USD",
+    "provider_metadata": {
+      "provider_name": "mock-fixture-provider",
+      "provider_version": "mock-v1",
+      "source_url": null,
+      "as_of_date": "2026-05-13",
+      "retrieved_at": "2026-05-13T00:00:00Z",
+      "data_quality": "mock",
+      "confidence_multiplier": 0.5
+    }
+  },
+  "holdings": [
+    {
+      "stock_code": "TSLA",
+      "stock_name": "Tesla",
+      "weight": 0.14
+    },
+    {
+      "stock_code": "BYD",
+      "stock_name": "BYD",
+      "weight": 0.13
+    },
+    {
+      "stock_code": "NIO",
+      "stock_name": "NIO",
+      "weight": 0.09
+    },
+    {
+      "stock_code": "LI",
+      "stock_name": "Li Auto",
+      "weight": 0.08
+    },
+    {
+      "stock_code": "XPEV",
+      "stock_name": "XPeng",
+      "weight": 0.07
+    },
+    {
+      "stock_code": "ALB",
+      "stock_name": "Albemarle",
+      "weight": 0.06
+    },
+    {
+      "stock_code": "PANW",
+      "stock_name": "Palo Alto Networks",
+      "weight": 0.05
+    },
+    {
+      "stock_code": "MSFT",
+      "stock_name": "Microsoft",
+      "weight": 0.05
+    },
+    {
+      "stock_code": "GOOGL",
+      "stock_name": "Alphabet",
+      "weight": 0.05
+    },
+    {
+      "stock_code": "AMZN",
+      "stock_name": "Amazon",
+      "weight": 0.04
+    }
+  ]
+}
