@@ -382,3 +382,23 @@ Consequences:
 - Each fund result includes `mapping_precision_flag_count` and `mapping_precision_flags`.
 - `real_fund_smoke_summary.md` includes a `Mapping Precision Flags` section when any fund emits flags.
 - Registry curation can be driven from one summary artifact after smoke runs.
+
+## ADR-0019: Show Precision Flag Counts In Real-Smoke CLI Output
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Print `precision_flags=<count>` for each fund in `python -m src.main --run-real-smoke` output.
+
+Rationale:
+
+- The terminal smoke output is often the first thing a developer or CI log reader sees.
+- Coverage can be 100% while precision flags still indicate registry curation work.
+- Surfacing the count keeps quick checks aligned with the richer summary artifacts.
+
+Consequences:
+
+- Existing per-fund smoke output keeps fund code, scenario, primary narrative, stage, and coverage.
+- Missing precision count fields default to `0` for compatibility.

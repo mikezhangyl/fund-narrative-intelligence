@@ -61,6 +61,7 @@ def test_main_run_real_smoke_returns_status(monkeypatch, tmp_path, capsys):
                     "primary_narrative": "Premium Baijiu Consumption",
                     "stage": "diverging",
                     "coverage_ratio": 1.0,
+                    "mapping_precision_flag_count": 2,
                 }
             ],
         }
@@ -78,6 +79,7 @@ def test_main_run_real_smoke_returns_status(monkeypatch, tmp_path, capsys):
     assert exit_code == 0
     assert "status=passed" in captured.out
     assert "coverage=100%" in captured.out
+    assert "precision_flags=2" in captured.out
 
 
 def test_main_run_real_smoke_returns_nonzero_for_failed_summary(
