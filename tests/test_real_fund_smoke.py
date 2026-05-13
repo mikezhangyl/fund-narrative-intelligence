@@ -61,6 +61,22 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
                             "weight": 0.0403,
                         }
                     ],
+                    "mapping_precision_flags": [
+                        {
+                            "type": "broad_industry_fallback",
+                            "severity": "watch",
+                            "stock_code": "600522",
+                            "stock_name": "中天科技",
+                            "industry": "通信",
+                            "weight": 0.042,
+                            "mapping_method": "registry_term_rule",
+                            "narrative_ids": ["N_SEMI_CAPEX"],
+                            "narratives": ["Semiconductor Capex Cycle"],
+                            "confidence_before": 0.52,
+                            "confidence_after": 0.48,
+                            "recommended_action": "curation_review",
+                        }
+                    ],
                     "degradation_events": [],
                     "provider_foundation": {
                         "effective_data_quality": "partial",
@@ -145,6 +161,23 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
             "methods": ["registry_term_rule"],
         }
     ]
+    assert summary["funds"][0]["mapping_precision_flag_count"] == 1
+    assert summary["funds"][0]["mapping_precision_flags"] == [
+        {
+            "type": "broad_industry_fallback",
+            "severity": "watch",
+            "stock_code": "600522",
+            "stock_name": "中天科技",
+            "industry": "通信",
+            "weight": 0.042,
+            "mapping_method": "registry_term_rule",
+            "narrative_ids": ["N_SEMI_CAPEX"],
+            "narratives": ["Semiconductor Capex Cycle"],
+            "confidence_before": 0.52,
+            "confidence_after": 0.48,
+            "recommended_action": "curation_review",
+        }
+    ]
     assert (tmp_path / "real_fund_smoke_summary.json").exists()
     assert (tmp_path / "real_fund_smoke_summary.md").exists()
 
@@ -157,6 +190,9 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
     assert "索菲亚" in summary_markdown
     assert "## Multi-Mapped Holdings" in summary_markdown
     assert "Narrative One, Narrative Two" in summary_markdown
+    assert "## Mapping Precision Flags" in summary_markdown
+    assert "broad_industry_fallback" in summary_markdown
+    assert "curation_review" in summary_markdown
 
 
 def test_real_fund_smoke_summary_fails_when_coverage_is_below_threshold(tmp_path):
@@ -210,6 +246,7 @@ def test_real_fund_smoke_summary_fails_when_coverage_is_below_threshold(tmp_path
             "weight": None,
         }
     ]
+    assert summary["funds"][0]["mapping_precision_flags"] == []
     summary_markdown = (tmp_path / "real_fund_smoke_summary.md").read_text(
         encoding="utf-8"
     )
@@ -232,6 +269,7 @@ def test_real_fund_smoke_summary_records_runner_failures(tmp_path):
     assert summary["funds"][0]["coverage_passed"] is False
     assert summary["funds"][0]["primary_narrative"] is None
     assert summary["funds"][0]["multi_mapped_holdings"] == []
+    assert summary["funds"][0]["mapping_precision_flags"] == []
     assert "temporary provider failure" in summary["funds"][0]["error"]
     assert (tmp_path / "real_fund_smoke_summary.json").exists()
     assert (tmp_path / "real_fund_smoke_summary.md").exists()

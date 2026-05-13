@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-real-smoke-registry-curation",
+  "latest_run": "20260514-real-smoke-precision-summary",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "decide whether remaining Semiconductor broad flags need a new technology/software narrative or explicit exclusions"
+  "next_step": "decide whether remaining Semiconductor broad flags need a technology/software narrative or explicit mapping exclusions"
 }

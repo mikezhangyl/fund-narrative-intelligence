@@ -91,6 +91,7 @@ def _build_fund_result(
     provider_foundation = scoring.get("provider_foundation", {})
     unmapped_holdings = _summarize_unmapped_holdings(scoring["unmapped_holdings"])
     multi_mapped_holdings = _summarize_multi_mapped_holdings(raw_path)
+    mapping_precision_flags = _summarize_mapping_precision_flags(scoring)
     return {
         "fund_code": fund_code,
         "scenario": scenario,
@@ -117,6 +118,8 @@ def _build_fund_result(
         "unmapped_holdings": unmapped_holdings,
         "multi_mapped_holding_count": len(multi_mapped_holdings),
         "multi_mapped_holdings": multi_mapped_holdings,
+        "mapping_precision_flag_count": len(mapping_precision_flags),
+        "mapping_precision_flags": mapping_precision_flags,
         "degradation_event_count": len(scoring["degradation_events"]),
         "error": None,
     }
@@ -150,6 +153,8 @@ def _build_failed_fund_result(
         "unmapped_holdings": [],
         "multi_mapped_holding_count": 0,
         "multi_mapped_holdings": [],
+        "mapping_precision_flag_count": 0,
+        "mapping_precision_flags": [],
         "degradation_event_count": 1,
         "error": message,
     }
@@ -213,6 +218,28 @@ def _summarize_multi_mapped_holdings(raw_path: Path | None) -> list[dict[str, An
             }
         )
     return results
+
+
+def _summarize_mapping_precision_flags(
+    scoring: dict[str, Any],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "type": flag.get("type"),
+            "severity": flag.get("severity"),
+            "stock_code": flag.get("stock_code"),
+            "stock_name": flag.get("stock_name"),
+            "industry": flag.get("industry"),
+            "weight": flag.get("weight"),
+            "mapping_method": flag.get("mapping_method"),
+            "narrative_ids": flag.get("narrative_ids", []),
+            "narratives": flag.get("narratives", []),
+            "confidence_before": flag.get("confidence_before"),
+            "confidence_after": flag.get("confidence_after"),
+            "recommended_action": flag.get("recommended_action"),
+        }
+        for flag in scoring.get("mapping_precision_flags", [])
+    ]
 
 
 def _unique_in_order(values: Any) -> list[str]:
@@ -308,9 +335,44 @@ def _write_summary(summary: dict[str, Any], output_path: Path) -> None:
                     f"{', '.join(holding['methods']) or '-'} |"
                 )
         lines.append("")
+    precision_flag_results = [
+        result for result in summary["funds"] if result["mapping_precision_flags"]
+    ]
+    if precision_flag_results:
+        lines.extend(
+            [
+                "## Mapping Precision Flags",
+                "",
+                "| Fund | Stock | Name | Type | Severity | Industry | Narratives | Confidence | Action |",
+                "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+            ]
+        )
+        for result in precision_flag_results:
+            for flag in result["mapping_precision_flags"]:
+                lines.append(
+                    "| "
+                    f"{result['fund_code']} | "
+                    f"{flag['stock_code'] or '-'} | "
+                    f"{flag['stock_name'] or '-'} | "
+                    f"{flag['type'] or '-'} | "
+                    f"{flag['severity'] or '-'} | "
+                    f"{flag['industry'] or '-'} | "
+                    f"{', '.join(flag['narratives']) or '-'} | "
+                    f"{_format_confidence_change(flag)} | "
+                    f"{flag['recommended_action'] or '-'} |"
+                )
+        lines.append("")
     (output_path / "real_fund_smoke_summary.md").write_text(
         "\n".join(lines), encoding="utf-8"
     )
+
+
+def _format_confidence_change(flag: dict[str, Any]) -> str:
+    before = flag.get("confidence_before")
+    after = flag.get("confidence_after")
+    if isinstance(before, int | float) and isinstance(after, int | float):
+        return f"{before:.2f} -> {after:.2f}"
+    return "-"
 
 
 def _format_weight(weight: Any) -> str:

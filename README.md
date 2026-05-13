@@ -160,6 +160,8 @@ When real holdings are not fully mapped, the summary JSON includes `unmapped_hol
 
 The summary also reports `multi_mapped_holdings` when one holding maps to multiple narratives. This is intentional diagnostic output: full coverage should not hide possible over-broad registry terms or genuinely cross-domain companies.
 
+The summary also aggregates `mapping_precision_flags` into a `Mapping Precision Flags` section so curation work items from the fixed real-smoke set are visible without opening every fund report.
+
 When a fallback registry-term match maps one holding to multiple narratives, V1 keeps all mappings but lowers their confidence from `0.52` to `0.42`, marks each mapping with `needs_review`, and writes `mapping_precision_flags` into raw/scoring JSON plus the Markdown/HTML report.
 
 When a fallback mapping is supported only by a broad industry term, V1 keeps the mapping but lowers confidence from `0.52` to `0.48`, marks it with `broad_industry_fallback`, and recommends `curation_review`. This catches cases such as a generic `电子` industry match before it is treated like a more specific stock-name or product-term match.

@@ -361,3 +361,24 @@ Consequences:
 - The real-smoke broad fallback count is reduced from 24 to 3 after adding company-level terms.
 - Remaining broad flags are currently `600522` 中天科技, `688036` 传音控股, and `688692` 达梦数据 under Semiconductor Capex mapping rules.
 - Future curation should decide whether these need a different narrative, an exclusion, or a separate technology/software narrative.
+
+## ADR-0018: Aggregate Mapping Precision Flags In Real-Smoke Summaries
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Include per-fund `mapping_precision_flags` in real-smoke summary JSON and render them in the Markdown summary.
+
+Rationale:
+
+- The fixed real-smoke set is the main regression surface for registry coverage and precision.
+- Precision flags are curation work items; burying them in individual fund reports makes follow-up slower.
+- Summary-level aggregation keeps mapping gaps, multi-mapped holdings, and broad-industry flags in one review surface.
+
+Consequences:
+
+- Each fund result includes `mapping_precision_flag_count` and `mapping_precision_flags`.
+- `real_fund_smoke_summary.md` includes a `Mapping Precision Flags` section when any fund emits flags.
+- Registry curation can be driven from one summary artifact after smoke runs.

@@ -24,3 +24,4 @@
 - [mapping-rationale-reporting.md](./mapping-rationale-reporting.md)
 - [broad-industry-mapping-flags.md](./broad-industry-mapping-flags.md)
 - [real-smoke-registry-curation.md](./real-smoke-registry-curation.md)
+- [real-smoke-precision-summary.md](./real-smoke-precision-summary.md)
