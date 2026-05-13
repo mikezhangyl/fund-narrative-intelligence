@@ -21,6 +21,7 @@ def test_pyproject_declares_reproducible_dev_tooling():
 def test_pyproject_configures_lint_and_coverage_gates():
     config = _load_pyproject()
 
+    assert config["tool"]["pytest"]["ini_options"]["pythonpath"] == ["."]
     assert config["tool"]["ruff"]["target-version"] == "py311"
     assert "src" in config["tool"]["ruff"]["src"]
     assert config["tool"]["coverage"]["run"]["branch"] is True
