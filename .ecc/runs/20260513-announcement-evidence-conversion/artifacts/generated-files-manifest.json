@@ -1,0 +1,15 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "coverage_report",
+      "path": ".ecc/runs/20260513-announcement-evidence-conversion/artifacts/reports/coverage-report.txt",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "4bc2da54f0c7b5ad9a02c8a4f355dfe0fe0b51ed7010aeadbf1daf1722dc1fa1",
+      "mtime_epoch": 1778681768,
+      "size_bytes": 1952,
+      "summary": "Final coverage report showing 85% total coverage over src and 89% coverage for the announcement evidence converter."
+    }
+  ],
+  "notes": "Generated output reports under outputs/ are ignored by git."
+}

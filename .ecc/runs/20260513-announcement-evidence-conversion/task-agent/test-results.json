@@ -1,0 +1,42 @@
+{
+  "status": "passed",
+  "test_commands": [
+    {
+      "command": "python -m pytest tests/test_announcement_evidence.py -q",
+      "exit_code": 0,
+      "summary": "5 passed"
+    },
+    {
+      "command": "python -m ruff check .",
+      "exit_code": 0,
+      "summary": "All checks passed"
+    },
+    {
+      "command": "python -m compileall -q src tests scripts",
+      "exit_code": 0,
+      "summary": "Compilation passed"
+    },
+    {
+      "command": "python -m coverage run -m pytest -q && python -m coverage report",
+      "exit_code": 0,
+      "summary": "66 passed; total coverage 85%"
+    },
+    {
+      "command": "python -m src.main --run-real-smoke",
+      "exit_code": 0,
+      "summary": "Live Eastmoney smoke passed"
+    },
+    {
+      "command": "python -m src.main --fund-code 000001",
+      "exit_code": 0,
+      "summary": "Default acceptance command passed and mock Data Source Notice remained visible"
+    }
+  ],
+  "coverage": {
+    "status": "passed",
+    "total": "85%",
+    "threshold": "80%",
+    "source": "src",
+    "announcement_converter": "89%"
+  }
+}

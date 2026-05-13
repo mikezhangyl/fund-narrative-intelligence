@@ -1,0 +1,12 @@
+{"command":"python -m pytest tests/test_announcement_evidence.py -q","purpose":"RED check for missing announcement evidence converter","exit_code":2,"summary":"Failed as expected because src.modules.evidence did not exist."}
+{"command":"python -m pytest tests/test_announcement_evidence.py -q","purpose":"Focused announcement evidence converter tests after implementation","exit_code":0,"summary":"4 passed."}
+{"command":"python -m ruff check src/modules/evidence/announcements.py tests/test_announcement_evidence.py","purpose":"Focused lint check for announcement evidence converter","exit_code":0,"summary":"All checks passed."}
+{"command":"python -m pytest tests/test_announcement_evidence.py -q","purpose":"Focused tests after adding classification branch coverage","exit_code":0,"summary":"5 passed."}
+{"command":"python -m ruff check src/modules/evidence/announcements.py tests/test_announcement_evidence.py","purpose":"Focused lint check after branch coverage test","exit_code":0,"summary":"All checks passed."}
+{"command":"python -m ruff check .","purpose":"Full lint gate","exit_code":0,"summary":"All checks passed."}
+{"command":"python -m compileall -q src tests scripts","purpose":"Syntax compilation check","exit_code":0,"summary":"Compilation passed."}
+{"command":"python -m pytest -q","purpose":"Full test suite","exit_code":0,"summary":"65 passed before final branch-coverage test."}
+{"command":"python -m coverage run -m pytest -q && python -m coverage report","purpose":"Final coverage gate using pyproject fail_under","exit_code":0,"summary":"66 passed; total coverage 85%; announcement converter coverage 89%."}
+{"command":"python -m src.main --run-real-smoke","purpose":"Live Eastmoney smoke after optional converter addition","exit_code":0,"summary":"Six-fund smoke set passed."}
+{"command":"python -m src.main --fund-code 000001","purpose":"Default acceptance pipeline and mock disclosure check","exit_code":0,"summary":"Generated raw, scoring, Markdown, and HTML artifacts; Data Source Notice still discloses mock layers."}
+{"command":"python scripts/ecc_task_run.py validate --run-dir .ecc/runs/20260513-announcement-evidence-conversion --require-task-artifacts --require-quality-artifacts","purpose":"Validate run directory completeness","exit_code":0,"summary":"Run artifact validation passed with no findings."}

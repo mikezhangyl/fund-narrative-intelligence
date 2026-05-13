@@ -74,6 +74,15 @@ Optional real-provider adapter foundation:
 - It should infer the CNINFO market column from stock-code prefixes and reject invalid stock codes without calling the external provider.
 - Provider failures must return an `unavailable` payload and record `provider_unavailable` rather than crash orchestration.
 
+Optional announcement-to-evidence conversion:
+
+- `convert_announcements_to_evidence` turns announcement metadata into V1 evidence records.
+- It maps each announcement stock code through existing stock-to-narrative mappings and emits one evidence record per mapped narrative.
+- It uses conservative deterministic title/category keyword rules for `earnings`, `orders`, `capital_flow`, `risk`, `financial_report`, `governance`, and generic `announcement` evidence types.
+- Evidence confidence is `classification_base_confidence * mapping_confidence * data_quality_confidence`.
+- The converter must not download or parse PDFs in V1. Generated summaries must state that only announcement metadata was classified.
+- Unmapped or malformed announcements must be tracked and skipped without crashing the caller.
+
 ## Degradation Strategy
 
 The pipeline should complete whenever enough data exists to produce a bounded report. Provider failure should reduce confidence and surface data quality, not crash the full run.
@@ -100,7 +109,7 @@ Reports must include a visible `Data Source Notice` whenever `provider_foundatio
 | Narrative Registry | registry fixture or store | approved narratives, hierarchy, aliases, version | no | yes | yes |
 | Stock Narrative Mapping | holdings, registry, optional evidence | stock-to-narrative mappings with weights and confidence | optional | yes | yes |
 | Fund Narrative Aggregation | holdings, stock mappings | primary and secondary narrative exposures | no | yes | yes |
-| Evidence Service | provider events, fixtures, source metadata | raw evidence records | optional for extraction | yes | yes-lite |
+| Evidence Service | provider events, fixtures, source metadata, optional announcement metadata | raw evidence records | optional for extraction | yes | yes-lite |
 | Signal Service | evidence records, signal fixtures | signal events and rolling signal states | no | yes | yes-lite |
 | Scoring Service | narrative exposures, signal states, data quality | dimension scores, sustainability score, stage, confidence | no | yes | yes |
 | Report Writer | fund, holdings, narratives, scores, evidence | Markdown and HTML reports | optional for wording | yes | yes |

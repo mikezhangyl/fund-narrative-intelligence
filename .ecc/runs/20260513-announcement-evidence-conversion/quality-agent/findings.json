@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Announcement classification uses metadata keywords only.",
+    "Generated evidence is not wired into scoring or reports yet.",
+    "Mapping coverage determines whether announcement evidence can be associated with a narrative."
+  ]
+}

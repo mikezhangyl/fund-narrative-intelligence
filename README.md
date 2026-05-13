@@ -72,6 +72,7 @@ python -m compileall -q src tests scripts
 - Local mock providers and JSON fixtures.
 - Mock intelligence layer providers for registry, mappings, evidence, signals, and reserved market/valuation/announcement/news interfaces.
 - Optional CNINFO announcement provider adapter with injectable fetcher; it is not part of the default report pipeline yet.
+- Optional announcement-to-evidence conversion layer; it classifies announcement metadata into V1 evidence records without parsing PDFs.
 - Narrative registry loading.
 - Stock-to-narrative mapping.
 - Fund narrative aggregation.

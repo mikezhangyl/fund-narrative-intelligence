@@ -212,3 +212,24 @@ Consequences:
 - CNINFO provider failures record `provider_unavailable` and return empty `unavailable` results.
 - The adapter can be used manually or by future orchestration work without changing the current report acceptance path.
 - Future announcement-to-evidence conversion should build on this adapter instead of scraping directly inside scoring or report code.
+
+## ADR-0011: Keep Announcement Evidence Conversion Metadata-Only In V1
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Add a deterministic announcement-to-evidence converter that classifies structured announcement metadata into V1 evidence records, but do not parse PDFs or wire the result into default report generation yet.
+
+Rationale:
+
+- CNINFO metadata is enough to test the source-to-evidence contract without adding PDF parsing fragility.
+- V1 should not overstate precision from announcement titles alone.
+- The converter gives future orchestration a stable boundary between source adapters and scoring/report code.
+
+Consequences:
+
+- Generated evidence confidence combines classification confidence, stock-mapping confidence, and data-quality confidence.
+- Generated summaries explicitly state that PDF content has not been parsed.
+- Unmapped or malformed announcements are tracked and skipped instead of failing the whole flow.
