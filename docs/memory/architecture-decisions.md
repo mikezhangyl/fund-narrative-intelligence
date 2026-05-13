@@ -318,3 +318,25 @@ Consequences:
 - Fixture mappings are reported as explicit stock-narrative fixture rules.
 - Registry-term fallback mappings list matched terms from stock code, stock name, or industry.
 - Multi-match fallback rationales preserve `needs_review` and `precision_flag` so ambiguous mappings remain visible in user-facing output.
+
+## ADR-0016: Flag Broad Industry-Only Fallback Mappings
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Treat single `registry_term_rule` mappings supported only by holding industry terms as lower-precision fallback mappings.
+
+Rationale:
+
+- Broad industry terms such as `电子` or `军工` are useful for coverage, but they are weaker evidence than stock-name, product, or company-specific registry terms.
+- V1 should preserve these mappings for continuity while preventing users from confusing broad sector coverage with a curated stock-level narrative relationship.
+- The mapping precision output should support later registry curation without changing the scoring pipeline shape.
+
+Consequences:
+
+- Single broad industry-only fallback confidence is lowered from `0.52` to `0.48`.
+- The mapping carries `needs_review` and `precision_flag: broad_industry_fallback`.
+- Raw/scoring JSON and reports include a `mapping_precision_flags` row with `recommended_action: curation_review`.
+- Multi-match fallback remains the higher-priority precision flag when one holding maps to multiple narratives.

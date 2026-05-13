@@ -525,6 +525,8 @@ def _render_mapping_rationales_html(scoring_payload: dict[str, Any]) -> str:
 def _format_precision_action(action: Any) -> str:
     if action == "manual_review":
         return "needs review"
+    if action == "curation_review":
+        return "curation review"
     return str(action or "-")
 
 

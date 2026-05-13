@@ -387,6 +387,66 @@ def test_pipeline_surfaces_multi_match_precision_flags(tmp_path, monkeypatch):
     assert "Mapping Rationales" in html
 
 
+def test_pipeline_surfaces_broad_industry_precision_flags(tmp_path, monkeypatch):
+    def fake_fetcher(_url: str) -> dict:
+        return {
+            "Success": True,
+            "Expansion": "2026-03-31",
+            "Datas": {
+                "fundStocks": [
+                    {
+                        "GPDM": "123456",
+                        "GPJC": "测试科技",
+                        "JZBL": "10.00",
+                        "PCTNVCHG": "0",
+                        "INDEXNAME": "电子",
+                    }
+                ]
+            },
+        }
+
+    monkeypatch.setattr(eastmoney_module, "_fetch_json", fake_fetcher)
+
+    artifacts = run_pipeline(
+        fund_code="320007",
+        provider_mode="eastmoney",
+        output_dir=tmp_path,
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+    html = artifacts["html"].read_text()
+
+    assert raw["mapping_precision_flags"] == scoring["mapping_precision_flags"]
+    assert raw["mapping_precision_flags"] == [
+        {
+            "type": "broad_industry_fallback",
+            "severity": "watch",
+            "stock_code": "123456",
+            "stock_name": "测试科技",
+            "industry": "电子",
+            "weight": 0.1,
+            "mapping_method": "registry_term_rule",
+            "narrative_ids": ["N_SEMI_CAPEX"],
+            "narratives": ["Semiconductor Capex Cycle"],
+            "confidence_before": 0.52,
+            "confidence_after": 0.48,
+            "recommended_action": "curation_review",
+        }
+    ]
+    assert raw["mapping_rationales"][0]["precision_flag"] == (
+        "broad_industry_fallback"
+    )
+    assert raw["mapping_rationales"][0]["reason"] == (
+        "Matched broad industry-only registry terms against holding industry: 电子."
+    )
+    assert "broad_industry_fallback" in markdown
+    assert "curation review" in markdown
+    assert "broad_industry_fallback" in html
+    assert "curation review" in html
+
+
 def test_report_generation_handles_unmapped_real_holdings(tmp_path):
     from src.modules.report_writer.writer import write_reports
 

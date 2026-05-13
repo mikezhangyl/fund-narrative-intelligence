@@ -114,6 +114,74 @@ def test_registry_term_fallback_maps_unmapped_industry_holdings():
     ]
 
 
+def test_broad_industry_only_fallback_is_flagged_for_curation_review():
+    holdings = [
+        {
+            "stock_code": "123456",
+            "stock_name": "测试科技",
+            "weight": 0.1,
+            "industry": "电子",
+        }
+    ]
+    registry = {
+        "N_SEMI_CAPEX": {
+            "name": "Semiconductor Capex Cycle",
+            "aliases": [],
+            "related_terms": ["电子"],
+        }
+    }
+
+    result = build_mapping_result(holdings, [], registry)
+
+    assert result["mappings"] == [
+        {
+            "stock_code": "123456",
+            "narrative_id": "N_SEMI_CAPEX",
+            "mapping_weight": 0.55,
+            "confidence": 0.48,
+            "method": "registry_term_rule",
+            "matched_terms": ["电子"],
+            "needs_review": True,
+            "precision_flag": "broad_industry_fallback",
+        }
+    ]
+    assert result["mapping_precision_flags"] == [
+        {
+            "type": "broad_industry_fallback",
+            "severity": "watch",
+            "stock_code": "123456",
+            "stock_name": "测试科技",
+            "industry": "电子",
+            "weight": 0.1,
+            "mapping_method": "registry_term_rule",
+            "narrative_ids": ["N_SEMI_CAPEX"],
+            "narratives": ["Semiconductor Capex Cycle"],
+            "confidence_before": 0.52,
+            "confidence_after": 0.48,
+            "recommended_action": "curation_review",
+        }
+    ]
+    assert result["mapping_rationales"] == [
+        {
+            "stock_code": "123456",
+            "stock_name": "测试科技",
+            "industry": "电子",
+            "narrative_id": "N_SEMI_CAPEX",
+            "narrative_name": "Semiconductor Capex Cycle",
+            "method": "registry_term_rule",
+            "confidence": 0.48,
+            "mapping_weight": 0.55,
+            "matched_terms": ["电子"],
+            "needs_review": True,
+            "precision_flag": "broad_industry_fallback",
+            "reason": (
+                "Matched broad industry-only registry terms against holding "
+                "industry: 电子."
+            ),
+        }
+    ]
+
+
 def test_multi_match_fallback_lowers_confidence_and_flags_review():
     holdings = [
         {

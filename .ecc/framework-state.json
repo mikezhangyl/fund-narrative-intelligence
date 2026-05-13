@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260513-mapping-rationale-reporting",
+  "latest_run": "20260514-broad-industry-mapping-flags",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "decide whether broad industry-only mapping rationales should trigger stricter registry curation rules"
+  "next_step": "review real-smoke broad_industry_fallback rows and decide which registry terms need company-specific replacements"
 }

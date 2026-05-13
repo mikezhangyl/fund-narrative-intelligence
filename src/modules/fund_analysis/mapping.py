@@ -4,6 +4,7 @@ from collections import Counter
 from typing import Any
 
 FALLBACK_MAPPING_CONFIDENCE = 0.52
+BROAD_INDUSTRY_FALLBACK_CONFIDENCE = 0.48
 MULTI_MATCH_FALLBACK_CONFIDENCE = 0.42
 
 
@@ -68,6 +69,13 @@ def _fallback_mappings_for_holding(
             term for term in terms if term.lower() and term.lower() in haystack
         ]
         if matched_terms:
+            precision_fields = {}
+            if _is_broad_industry_only_fallback(holding, matched_terms):
+                precision_fields = {
+                    "confidence": BROAD_INDUSTRY_FALLBACK_CONFIDENCE,
+                    "needs_review": True,
+                    "precision_flag": "broad_industry_fallback",
+                }
             matches.append(
                 {
                     "stock_code": holding["stock_code"],
@@ -76,6 +84,7 @@ def _fallback_mappings_for_holding(
                     "confidence": FALLBACK_MAPPING_CONFIDENCE,
                     "method": "registry_term_rule",
                     "matched_terms": matched_terms,
+                    **precision_fields,
                 }
             )
     if len(matches) <= 1:
@@ -98,12 +107,34 @@ def _mapping_precision_flags(
 ) -> list[dict[str, Any]]:
     holdings_by_code = {holding["stock_code"]: holding for holding in holdings}
     mappings_by_stock: dict[str, list[dict[str, Any]]] = {}
+    flags = []
     for mapping in mappings:
+        if mapping.get("precision_flag") == "broad_industry_fallback":
+            holding = holdings_by_code.get(mapping["stock_code"], {})
+            narrative_id = mapping["narrative_id"]
+            flags.append(
+                {
+                    "type": "broad_industry_fallback",
+                    "severity": "watch",
+                    "stock_code": mapping["stock_code"],
+                    "stock_name": holding.get("stock_name"),
+                    "industry": holding.get("industry"),
+                    "weight": holding.get("weight"),
+                    "mapping_method": "registry_term_rule",
+                    "narrative_ids": [narrative_id],
+                    "narratives": [
+                        registry.get(narrative_id, {}).get("name", narrative_id)
+                    ],
+                    "confidence_before": FALLBACK_MAPPING_CONFIDENCE,
+                    "confidence_after": BROAD_INDUSTRY_FALLBACK_CONFIDENCE,
+                    "recommended_action": "curation_review",
+                }
+            )
+            continue
         if mapping.get("precision_flag") != "multi_match_fallback":
             continue
         mappings_by_stock.setdefault(mapping["stock_code"], []).append(mapping)
 
-    flags = []
     for stock_code, stock_mappings in sorted(mappings_by_stock.items()):
         holding = holdings_by_code.get(stock_code, {})
         narrative_ids = [mapping["narrative_id"] for mapping in stock_mappings]
@@ -159,13 +190,23 @@ def _mapping_rationales(
                 "reason": _mapping_reason(
                     method=method,
                     matched_terms=matched_terms,
+                    precision_flag=mapping.get("precision_flag"),
                 ),
             }
         )
     return rationales
 
 
-def _mapping_reason(method: str, matched_terms: list[str]) -> str:
+def _mapping_reason(
+    method: str,
+    matched_terms: list[str],
+    precision_flag: Any,
+) -> str:
+    if precision_flag == "broad_industry_fallback" and matched_terms:
+        return (
+            "Matched broad industry-only registry terms against holding industry: "
+            f"{', '.join(matched_terms)}."
+        )
     if matched_terms:
         return (
             "Matched registry terms against stock code/name/industry: "
@@ -174,6 +215,23 @@ def _mapping_reason(method: str, matched_terms: list[str]) -> str:
     if method == "fixture_rule":
         return "Explicit fixture_rule mapping from the stock-narrative mapping fixture."
     return f"{method} mapping without term-level rationale."
+
+
+def _is_broad_industry_only_fallback(
+    holding: dict[str, Any], matched_terms: list[str]
+) -> bool:
+    stock_text = " ".join(
+        str(value)
+        for value in [
+            holding.get("stock_code", ""),
+            holding.get("stock_name", ""),
+        ]
+    ).lower()
+    industry_text = str(holding.get("industry", "")).lower()
+    return bool(matched_terms) and all(
+        term.lower() in industry_text and term.lower() not in stock_text
+        for term in matched_terms
+    )
 
 
 def _registry_terms(narrative: dict[str, Any]) -> list[str]:

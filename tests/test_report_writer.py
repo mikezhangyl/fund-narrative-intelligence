@@ -50,6 +50,18 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
                 "confidence_before": 0.52,
                 "confidence_after": 0.42,
                 "recommended_action": "manual_review",
+            },
+            {
+                "type": "broad_industry_fallback",
+                "severity": "watch",
+                "stock_code": "NVDA",
+                "stock_name": "NVIDIA",
+                "industry": "Semiconductors",
+                "weight": 0.12,
+                "narratives": ["AI Infrastructure"],
+                "confidence_before": 0.52,
+                "confidence_after": 0.48,
+                "recommended_action": "curation_review",
             }
         ],
         "mapping_rationales": [
@@ -115,6 +127,7 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "Mapping Rationales" in html
     assert "Explicit fixture_rule mapping" in html
     assert "needs review" in html
+    assert "curation review" in html
     assert "Mock 数据" in html
     assert "<h3>AI Infrastructure</h3>" in html
     assert "Lifecycle stage" in html

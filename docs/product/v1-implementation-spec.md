@@ -120,6 +120,17 @@ Required `mapping_rationales` fields:
 
 For explicit fixture mappings, `reason` should state that the mapping came from the stock-narrative mapping fixture. For `registry_term_rule` fallback mappings, `matched_terms` should list the registry aliases or related terms that matched the holding's stock code, stock name, or industry. If a fallback match maps one stock to multiple narratives, the rationale must preserve `needs_review` and `precision_flag` so users can see that the mapping is lower-confidence.
 
+V1 precision tiers:
+
+| Condition | Confidence | Precision Flag | Review Action |
+| --- | ---: | --- | --- |
+| Explicit fixture mapping | mapping fixture value | none | none |
+| Single fallback with stock-name, stock-code, product, or mixed terms | `0.52` | none | none |
+| Single fallback supported only by holding industry terms | `0.48` | `broad_industry_fallback` | `curation_review` |
+| Fallback maps one holding to multiple narratives | `0.42` | `multi_match_fallback` | `manual_review` |
+
+If multiple precision concerns apply, `multi_match_fallback` takes precedence because a multi-narrative assignment is a stronger review signal than a single broad industry-only match.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
