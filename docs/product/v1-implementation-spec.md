@@ -270,6 +270,12 @@ V1 should support a live Eastmoney smoke set:
 python -m src.main --run-real-smoke
 ```
 
+V1 should support provider diagnostics without writing report artifacts:
+
+```bash
+python -m src.main --fund-code 000001 --provider-diagnostics
+```
+
 And can explicitly try the Eastmoney holdings adapter:
 
 ```bash

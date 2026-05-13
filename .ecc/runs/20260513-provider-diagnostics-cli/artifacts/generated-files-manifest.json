@@ -1,0 +1,15 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "coverage_report",
+      "path": ".ecc/runs/20260513-provider-diagnostics-cli/artifacts/reports/coverage-report.txt",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "f301113959a159ae8e720d00d0d31ecd9613e814369e04b573da6268ceda8b18",
+      "mtime_epoch": 1778669376,
+      "size_bytes": 1806,
+      "summary": "Final coverage report showing 85% total coverage over src."
+    }
+  ],
+  "notes": "Generated output reports under outputs/ are ignored by git."
+}

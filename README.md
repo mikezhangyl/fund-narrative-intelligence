@@ -30,6 +30,12 @@ Run the live Eastmoney smoke set:
 python -m src.main --run-real-smoke
 ```
 
+Inspect provider layers without generating report artifacts:
+
+```bash
+python -m src.main --fund-code 000001 --provider-diagnostics
+```
+
 Generated artifacts:
 
 ```text

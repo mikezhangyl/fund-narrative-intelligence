@@ -170,3 +170,24 @@ Consequences:
 - `MockDataProvider` composes `MockIntelligenceProviderSet` for registry, mappings, evidence, and signals.
 - Reserved market, valuation, announcement, and news providers return stable empty mock payloads until real providers are implemented.
 - Provider foundation can use layer-provider provenance when rendering user-facing data-source disclosure.
+
+## ADR-0009: Add Provider Diagnostics CLI
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Add `python -m src.main --fund-code <code> --provider-diagnostics` to print provider foundation diagnostics as JSON without writing report artifacts.
+
+Rationale:
+
+- Provider state now spans holdings, registry, mappings, evidence, and signals.
+- Before connecting real intelligence providers, developers need a cheap way to verify which layers are mock, partial, or degraded.
+- Diagnostics should not create user-facing reports or pollute `outputs/`.
+
+Consequences:
+
+- The diagnostics path fetches the fund holdings layer and returns provider foundation metadata only.
+- `--provider-mode real --provider-diagnostics` exposes the `provider_fallback` event.
+- Future provider work should keep this command stable as a quick source-layer sanity check.

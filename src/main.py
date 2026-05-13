@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 
 from src.config import DEFAULT_OUTPUT_DIR
 from src.errors import PipelineError
-from src.orchestrator import run_all_fixture_pipelines, run_pipeline
+from src.orchestrator import (
+    inspect_provider_foundation,
+    run_all_fixture_pipelines,
+    run_pipeline,
+)
 from src.providers.mock import MockDataProvider
 from src.real_fund_smoke import run_real_fund_smoke
 
@@ -40,6 +45,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--run-real-smoke",
         action="store_true",
         help="Run the Eastmoney real-fund smoke set and write summary artifacts.",
+    )
+    parser.add_argument(
+        "--provider-diagnostics",
+        action="store_true",
+        help="Print provider foundation diagnostics as JSON without generating report artifacts.",
     )
     return parser
 
@@ -93,9 +103,31 @@ def main(argv: list[str] | None = None) -> int:
             )
         return 0 if summary["status"] == "passed" else 1
 
+    if args.provider_diagnostics:
+        if not args.fund_code:
+            parser.error("--fund-code is required with --provider-diagnostics")
+            return 2
+        try:
+            diagnostics = inspect_provider_foundation(
+                fund_code=args.fund_code,
+                provider_mode=args.provider_mode,
+            )
+        except PipelineError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        except Exception as exc:
+            print(f"Unrecoverable provider diagnostics error: {exc}", file=sys.stderr)
+            return 1
+
+        print(json.dumps(diagnostics, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
     if not args.fund_code:
         parser.error(
-            "--fund-code is required unless --list-fixtures, --run-all-fixtures, or --run-real-smoke is used"
+            "--fund-code is required unless --list-fixtures, --run-all-fixtures, --run-real-smoke, or --provider-diagnostics is used"
         )
         return 2
 

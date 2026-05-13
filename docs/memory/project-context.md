@@ -61,6 +61,7 @@ Expected artifacts:
 - CLI fixture discovery: `python -m src.main --list-fixtures`.
 - Batch fixture command: `python -m src.main --run-all-fixtures`.
 - Live Eastmoney smoke command: `python -m src.main --run-real-smoke`.
+- Provider diagnostics command: `python -m src.main --fund-code 000001 --provider-diagnostics` prints provider foundation JSON without generating report artifacts.
 - Provider payloads are validated before orchestration proceeds.
 - Real holdings adapter: `python -m src.main --fund-code 161725 --provider-mode eastmoney` tries Eastmoney/Tiantian Fund fund holdings and keeps local fixtures for all other V1 intelligence layers.
 - Provider foundation metadata separates holdings, narrative registry, stock mappings, evidence, and signals so mixed real/mock runs are marked `partial` instead of `fresh`.

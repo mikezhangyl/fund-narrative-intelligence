@@ -94,6 +94,60 @@ def test_real_provider_mode_degrades_to_mock_without_crashing(tmp_path):
     assert "provider_fallback" in html
 
 
+def test_cli_provider_diagnostics_prints_foundation_without_artifacts(tmp_path):
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--fund-code",
+        "000001",
+        "--provider-diagnostics",
+        "--output-dir",
+        str(tmp_path),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 0, result.stderr
+
+    diagnostics = json.loads(result.stdout)
+
+    assert diagnostics["fund_code"] == "000001"
+    assert diagnostics["provider_mode"] == "mock"
+    assert diagnostics["provider_foundation"]["effective_data_quality"] == "mock"
+    assert diagnostics["provider_foundation"]["disclosure_required"] is True
+    assert "Mock 数据" in diagnostics["provider_foundation"]["disclosure_message"]
+    assert not list(tmp_path.glob("*"))
+
+
+def test_cli_provider_diagnostics_shows_real_mode_fallback(tmp_path):
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--fund-code",
+        "000001",
+        "--provider-mode",
+        "real",
+        "--provider-diagnostics",
+        "--output-dir",
+        str(tmp_path),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 0, result.stderr
+
+    diagnostics = json.loads(result.stdout)
+    events = diagnostics["provider_foundation"]["degradation_events"]
+
+    assert diagnostics["provider_mode"] == "real"
+    assert diagnostics["provider_foundation"]["effective_data_quality"] == "mock"
+    assert events[0]["type"] == "provider_fallback"
+    assert "provider_fallback" in diagnostics["provider_foundation"]["disclosure_message"]
+    assert not list(tmp_path.glob("*"))
+
+
 def test_eastmoney_holdings_with_mock_intelligence_is_disclosed_as_partial(
     tmp_path, monkeypatch
 ):

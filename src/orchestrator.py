@@ -138,6 +138,34 @@ def run_all_fixture_pipelines(
     }
 
 
+def inspect_provider_foundation(
+    fund_code: str,
+    provider_mode: str = "mock",
+) -> dict[str, Any]:
+    if not fund_code.isdigit():
+        raise ValueError("fund_code must contain digits only")
+
+    provider_selection = select_data_provider(provider_mode)
+    provider = provider_selection.provider
+    fund_payload = provider.get_fund_holdings(fund_code)
+    fund = fund_payload["fund"]
+    degradation_events = [
+        *provider_selection.degradation_events,
+        *getattr(provider, "degradation_events", []),
+    ]
+    provider_foundation = provider.get_provider_foundation(
+        fund_provider_metadata=fund["provider_metadata"],
+        degradation_events=degradation_events,
+    )
+    return {
+        "fund_code": fund_code,
+        "provider_mode": provider_mode,
+        "as_of_date": fund_payload["as_of_date"],
+        "fund": fund,
+        "provider_foundation": provider_foundation,
+    }
+
+
 def _with_state(
     exposure: dict[str, Any],
     signal_events: list[dict[str, Any]],

@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Diagnostics for live provider modes may still depend on external provider availability."
+  ]
+}
