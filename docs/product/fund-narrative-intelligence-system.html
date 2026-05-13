@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fund Narrative Intelligence System - Requirements & Architecture</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --paper: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #111827;
+      --soft: #f3f4f6;
+      --code: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.65;
+    }
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 48px 28px 72px;
+    }
+    .paper {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 48px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+    }
+    h1, h2, h3 { color: var(--accent); line-height: 1.25; }
+    h1 { font-size: 34px; margin: 0 0 12px; }
+    h2 { font-size: 24px; margin: 42px 0 14px; padding-top: 8px; border-top: 1px solid var(--border); }
+    h3 { font-size: 18px; margin: 28px 0 10px; }
+    p { margin: 8px 0 14px; }
+    .subtitle { color: var(--muted); font-size: 16px; margin-bottom: 28px; }
+    .badge {
+      display: inline-block;
+      border: 1px solid var(--border);
+      background: var(--soft);
+      color: #374151;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 13px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .callout {
+      border-left: 4px solid #111827;
+      background: #f9fafb;
+      padding: 16px 18px;
+      margin: 18px 0;
+      border-radius: 10px;
+    }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+    pre {
+      background: var(--code);
+      color: #e5e7eb;
+      padding: 18px;
+      border-radius: 12px;
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      vertical-align: top;
+    }
+    th { background: #f3f4f6; text-align: left; color: #111827; }
+    ul, ol { padding-left: 22px; }
+    li { margin: 6px 0; }
+    .section-number { color: var(--muted); font-weight: 500; margin-right: 6px; }
+    .small { color: var(--muted); font-size: 13px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      background: #fff;
+    }
+    .card h3 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <article class="paper">
+      <h1>Fund Narrative Intelligence System</h1>
+      <p class="subtitle">基金重仓叙事可持续性分析系统：需求定义与架构边界</p>
+      <div>
+        <span class="badge">V1 Scope</span>
+        <span class="badge">Narrative-Centric</span>
+        <span class="badge">Evidence-Based</span>
+        <span class="badge">Report-First</span>
+        <span class="badge">Monolith-First</span>
+      </div>
+
+      <h2><span class="section-number">1.</span>系统定位不是预测涨跌，而是做基金重仓叙事体检</h2>
+      <p>系统服务于有经验的个人投资者或研究者。用户输入基金代码，系统读取基金前十大重仓股，识别基金实际押注的市场叙事，并评估这些叙事当前是否仍然成立。</p>
+      <div class="callout">
+        <strong>核心定位：</strong>这是一个 Narrative Intelligence System，而不是买卖建议系统、短线预测系统或自动投顾系统。
+      </div>
+      <p>系统回答的问题不是“这只基金明天涨不涨”，而是：</p>
+      <ul>
+        <li>这只基金真正押注的是什么市场叙事？</li>
+        <li>这些叙事是否还有资金、业绩和市场语言支撑？</li>
+        <li>叙事处于启动、强化、拥挤、分歧还是衰退阶段？</li>
+        <li>支持证据和风险证据分别是什么？</li>
+      </ul>
+
+      <h2><span class="section-number">2.</span>系统核心对象是 Narrative，而不是基金本身</h2>
+      <p>基金是入口对象，重仓股集合是分析载体，Narrative 是最终分析目标。</p>
+      <pre>Fund → Holdings → Stock → Narrative → Narrative State → Report</pre>
+      <p>这意味着系统不是简单的基金分析器，而是通过基金持仓暴露来识别市场叙事。</p>
+      <table>
+        <thead>
+          <tr><th>对象</th><th>系统角色</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Fund</td><td>用户输入入口</td></tr>
+          <tr><td>Holdings</td><td>分析载体，保留基金到股票的映射</td></tr>
+          <tr><td>Stock</td><td>Narrative 归因的最小可解释单元</td></tr>
+          <tr><td>Narrative</td><td>核心 domain object</td></tr>
+          <tr><td>Signal</td><td>影响 Narrative State 的标准化市场脉冲</td></tr>
+          <tr><td>Evidence</td><td>支撑 Signal 和 Narrative 判断的原始依据</td></tr>
+        </tbody>
+      </table>
+
+      <h2><span class="section-number">3.</span>Narrative 采用固定 Taxonomy 与动态 Narrative 双层模型</h2>
+      <p>固定 taxonomy 用于稳定分类、长期比较和数据建模；动态 Narrative 用于表达市场正在交易的真实语言。</p>
+      <pre>Canonical Taxonomy
+  ↓
+Major Narrative
+  ↓
+Sub Narrative</pre>
+      <p>示例：</p>
+      <pre>AI
+  └── AI Infrastructure
+        └── AI Power Demand</pre>
+      <p>动态 Narrative 不能由 LLM 凭空发明，必须来自市场语言，包括新闻、研报、财报电话会、公司公告、ETF 主题、社交媒体和龙头公司表述。</p>
+
+      <h2><span class="section-number">4.</span>Narrative Registry 是慢变化的核心基础设施</h2>
+      <p>Dynamic Narrative 必须实体化，进入 Narrative Registry。系统不能每次查询时临时生成 Narrative，否则无法保持历史连续性、生命周期跟踪和可回放能力。</p>
+      <pre>{
+  "narrative_id": "N_AI_POWER_001",
+  "canonical_taxonomy": "AI",
+  "name": "AI Power Demand",
+  "parent_id": "N_AI_INFRA_001",
+  "level": 2,
+  "status": "active",
+  "aliases": ["AI electricity demand", "datacenter power demand"],
+  "related_terms": ["data center", "power grid", "nuclear", "cooling"],
+  "human_review_status": "approved",
+  "first_seen_at": "2024-09-01",
+  "last_updated_at": "2026-05-13"
+}</pre>
+      <p>V1 支持层级结构，但避免进入知识图谱泥潭。只做 tree-like hierarchy、alias matching、human-approved registry，不做 Graph DB、RDF、ontology 或复杂多跳推理。</p>
+
+      <h2><span class="section-number">5.</span>系统采用 Slow Intelligence + Fast Query 架构</h2>
+      <p>Narrative 不是分钟级对象。系统不应该每次用户查询时重新理解市场，而应该维护慢变化的 intelligence layer，再用前台快速查询生成报告。</p>
+      <table>
+        <thead>
+          <tr><th>模块</th><th>建议频率</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Narrative Discovery</td><td>Weekly</td><td>扫描市场语言，生成 candidate narratives</td></tr>
+          <tr><td>Narrative Registry</td><td>Weekly / Human Review</td><td>确认、合并、拒绝候选 Narrative</td></tr>
+          <tr><td>Stock → Narrative Mapping</td><td>Weekly</td><td>慢变化映射，避免每日漂移</td></tr>
+          <tr><td>Narrative State Signals</td><td>Daily / Event-driven</td><td>刷新资金、估值、风险和热度信号</td></tr>
+          <tr><td>Fund Analysis</td><td>On-demand</td><td>用户输入基金代码后生成报告</td></tr>
+        </tbody>
+      </table>
+      <p>重大事件可以触发 deeper reassessment，例如财报、政策变化、龙头暴跌、ETF 异常流入或关键词爆发。</p>
+
+      <h2><span class="section-number">6.</span>Stock → Narrative Mapping 采用规则候选 + LLM 消歧</h2>
+      <p>系统采用 bottom-up narrative inference。先将每只股票映射到多个 Narrative，再根据基金持仓权重聚合出基金的主 Narrative 和次级 Narrative。</p>
+      <pre>Stock → Multi-level Weighted Narrative Mapping
+Fund → Aggregated Narrative Exposure</pre>
+      <p>Mapping 必须支持多层级、多权重和置信度。</p>
+      <pre>[
+  {
+    "stock": "VST",
+    "narrative": "AI Infrastructure",
+    "level": 2,
+    "weight": 0.7,
+    "confidence": 0.78
+  },
+  {
+    "stock": "VST",
+    "narrative": "AI Power Demand",
+    "level": 3,
+    "weight": 0.9,
+    "confidence": 0.84
+  }
+]</pre>
+      <p>规则负责生成候选，LLM 负责消歧、权重判断和解释。不能完全依赖 LLM，也不能完全依赖硬编码标签。</p>
+
+      <h2><span class="section-number">7.</span>Narrative Sustainability 由五个维度组成</h2>
+      <table>
+        <thead>
+          <tr><th>维度</th><th>含义</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Earnings Validation</td><td>题材是否已经转化成收入、利润、毛利率、ROE 或订单支撑</td></tr>
+          <tr><td>Capital Reinforcement</td><td>资金是否继续强化该方向，包括成交额、ETF 流入、机构资金和换手率</td></tr>
+          <tr><td>Valuation Pressure</td><td>叙事是否已被过度定价，包括估值分位和相对行业估值</td></tr>
+          <tr><td>Narrative Momentum</td><td>市场语言是否仍在强化，包括新闻、研报、公告和龙头公司表述</td></tr>
+          <tr><td>Counter Evidence Risk</td><td>反证是否增加，包括业绩不及预期、订单取消、政策收紧、库存上升和技术路线变化</td></tr>
+        </tbody>
+      </table>
+      <p>系统同时输出连续信号和离散阶段。连续信号用于计算、排序和趋势；离散阶段用于人类理解。</p>
+      <pre>Emerging → Strengthening → Expanding → Crowded → Diverging → Weakening → Dead</pre>
+      <p>Crowded 不等于看空。真正危险的是 Crowded + Counter Evidence Increasing。</p>
+
+      <h2><span class="section-number">8.</span>Evidence 是一等公民，不能只输出 LLM 结论</h2>
+      <p>系统必须保留 raw evidence 和 normalized signal 双层结构。</p>
+      <pre>Raw Market Information
+  ↓
+Evidence Extraction
+  ↓
+Normalized Signal
+  ↓
+Narrative Interpretation
+  ↓
+Narrative State</pre>
+      <p>Evidence 用于解释、调试、人工审查和未来 replay。Signal 用于评分、聚合和趋势分析。</p>
+      <pre>{
+  "evidence_id": "EV_001",
+  "narrative_id": "N_AI_POWER",
+  "type": "earnings",
+  "source": "earnings_call",
+  "title": "Company raised AI infrastructure guidance",
+  "summary": "Management raised guidance due to AI datacenter demand.",
+  "sentiment": "positive",
+  "confidence": 0.82,
+  "event_date": "2026-05-13"
+}</pre>
+
+      <h2><span class="section-number">9.</span>Signal Service 维护标准化市场脉冲，而不是 Narrative-specific 结论</h2>
+      <p>Signal 是 market primitive，不应该包含 AI、GLP-1、核电等业务语义。Narrative Service 负责在上下文中解释 Signal。</p>
+      <table>
+        <thead>
+          <tr><th>Signal Type</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>revenue_growth_up</td><td>收入增长强化</td></tr>
+          <tr><td>guidance_raise</td><td>公司上调指引</td></tr>
+          <tr><td>capex_increase</td><td>资本开支增加</td></tr>
+          <tr><td>institutional_inflow</td><td>机构资金流入</td></tr>
+          <tr><td>valuation_extreme</td><td>估值处于高风险区</td></tr>
+          <tr><td>demand_slowdown</td><td>需求放缓</td></tr>
+          <tr><td>margin_pressure</td><td>利润率承压</td></tr>
+          <tr><td>regulatory_risk</td><td>监管风险上升</td></tr>
+        </tbody>
+      </table>
+      <p>Signal Vocabulary 采用 governed evolution：Core Signals 稳定，Derived Signals 可扩展，Experimental Signals 进入候选队列，由人类确认后晋升。</p>
+
+      <h2><span class="section-number">10.</span>Signal 不是永久事实，而是有衰减的时间对象</h2>
+      <p>Signal 影响力必须随时间衰减。旧 signal 不能永久污染 Narrative State。</p>
+      <pre>{
+  "signal_id": "SIG_001",
+  "signal_type": "guidance_raise",
+  "strength": 0.82,
+  "confidence": 0.76,
+  "created_at": "2026-05-13",
+  "half_life_days": 45,
+  "decay_function": "exponential"
+}</pre>
+      <p>系统不应该直接删除旧 signal，而应该让 influence decay。Narrative 变弱不一定因为坏消息出现，也可能因为正面强化证据停止出现。</p>
+
+      <h2><span class="section-number">11.</span>Signal 分为 Signal Event 与 Signal State</h2>
+      <p>单条事件不是 Narrative 状态。Narrative 状态来自 signal over time 的积累、衰减和趋势。</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Signal Event</h3>
+          <p>原子事件。例如一次 guidance raise、一条新闻、一个公告、一次资金流入。</p>
+        </div>
+        <div class="card">
+          <h3>Signal State</h3>
+          <p>聚合后的状态。例如 7d / 30d / 90d 的 current_strength、trend、momentum。</p>
+        </div>
+      </div>
+      <p>V1 只需要 event → rolling aggregation → signal state，不需要 Kafka、streaming infra 或实时复杂事件处理。</p>
+
+      <h2><span class="section-number">12.</span>V1 采用 Monolith-First，但模块边界要清晰</h2>
+      <p>V1 不拆微服务。逻辑上分服务，部署上保持单体，避免过早分布式复杂度。</p>
+      <pre>src/
+  main.py
+  orchestrator.py
+  models/
+  modules/
+    narrative_registry/
+    signal_service/
+    evidence_service/
+    fund_analysis/
+    report_writer/
+  providers/
+  outputs/
+  docs/</pre>
+      <p>模块边界：</p>
+      <ul>
+        <li>Narrative Registry Module：维护已确认 Narrative、层级、别名、状态。</li>
+        <li>Signal Module：维护 signal vocabulary、signal events、signal states、decay。</li>
+        <li>Evidence Module：保存 raw evidence 与 source link。</li>
+        <li>Fund Analysis Module：基金持仓、股票映射、Narrative 聚合。</li>
+        <li>Report Module：生成 Markdown / HTML 报告。</li>
+      </ul>
+
+      <h2><span class="section-number">13.</span>V1 最小闭环必须严格收敛</h2>
+      <p>V1 的目标是证明“基金 → 重仓股 → Narrative → State → Evidence Report”这条链路成立，不是一步到位构建完整市场 intelligence platform。</p>
+      <pre>基金代码
+  ↓
+获取前十大重仓股
+  ↓
+股票标签与 Narrative Mapping
+  ↓
+Fund Narrative Aggregation
+  ↓
+读取当前 Signal State
+  ↓
+计算 Narrative State
+  ↓
+生成 Markdown / HTML Report</pre>
+      <h3>V1 必须做</h3>
+      <ul>
+        <li>输入基金代码。</li>
+        <li>获取或 mock 前十大重仓股。</li>
+        <li>保留 Fund → Stock 映射。</li>
+        <li>将股票映射到多层级 Narrative。</li>
+        <li>聚合基金主 Narrative 和次级 Narrative。</li>
+        <li>基于五维评分生成 Narrative State。</li>
+        <li>输出支持证据和风险证据。</li>
+        <li>生成报告，但不给买卖建议。</li>
+      </ul>
+      <h3>V1 暂不做</h3>
+      <ul>
+        <li>自动发现所有新 Narrative。</li>
+        <li>自动治理 Signal Vocabulary。</li>
+        <li>完整历史回放。</li>
+        <li>复杂知识图谱。</li>
+        <li>实时预警。</li>
+        <li>前端 workspace。</li>
+        <li>买入 / 卖出信号。</li>
+      </ul>
+
+      <h2><span class="section-number">14.</span>Deferred Capability 必须记录，而不是遗忘</h2>
+      <p>不做不是没想到，而是明确延后。项目需要保留 architecture memory。</p>
+      <pre>docs/
+  adr/
+    ADR-001-narrative-registry-model.md
+    ADR-002-signal-decay-design.md
+    ADR-003-slow-intelligence-architecture.md
+    ADR-004-monolith-first-strategy.md
+  future-capabilities/
+    auto-narrative-discovery.md
+    signal-governance.md
+    narrative-replay.md
+    alerting-system.md
+    workspace-ui.md</pre>
+      <p>每个 deferred capability 至少记录 Capability、Why Deferred、Current Limitation、Future Design Direction、Dependencies、Risk If Ignored。</p>
+
+      <h2><span class="section-number">15.</span>Human Review 是治理核心</h2>
+      <p>系统可以让 AI propose，但不能让 AI 直接改变核心 registry。</p>
+      <pre>LLM / Rules propose
+  ↓
+Candidate Narrative / Candidate Signal
+  ↓
+Similarity Check / Frequency Analysis
+  ↓
+Human Review
+  ↓
+Approve / Merge / Reject
+  ↓
+Registry Update</pre>
+      <p>需要治理的对象包括：</p>
+      <ul>
+        <li>Candidate Narrative。</li>
+        <li>Derived Signal。</li>
+        <li>Experimental Signal。</li>
+        <li>同义 Narrative 合并。</li>
+        <li>Narrative 生命周期状态变化。</li>
+      </ul>
+
+      <h2><span class="section-number">16.</span>系统必须表达不确定性和 Narrative 冲突</h2>
+      <p>系统输出的是当前市场状态解释，不是绝对真理。每个结论都应该带 confidence、evidence density、freshness 和 contradiction risk。</p>
+      <pre>{
+  "stage": "expanding",
+  "confidence": 0.68,
+  "evidence_density": "medium",
+  "counter_signal_risk": "rising"
+}</pre>
+      <p>系统必须允许同一只股票或基金暴露在多个冲突 Narrative 下。例如一只股票同时具有 growth narrative、valuation bubble narrative 和 demand slowdown narrative。</p>
+      <p>Narrative 也不应天然 bullish，应支持：</p>
+      <pre>bullish | bearish | mixed</pre>
+
+      <h2><span class="section-number">17.</span>V1 输出采用 Report-First，而不是 Workspace-First</h2>
+      <p>V1 只输出结构化报告，不做复杂 UI 工作台。但内部对象必须 workspace-ready。</p>
+      <p>报告应包含：</p>
+      <ul>
+        <li>基金基本信息。</li>
+        <li>前十大重仓股。</li>
+        <li>主 Narrative 和次级 Narrative。</li>
+        <li>Narrative 权重与置信度。</li>
+        <li>五维评分。</li>
+        <li>生命周期阶段。</li>
+        <li>Top supporting evidence。</li>
+        <li>Top risk evidence。</li>
+        <li>明确声明：不构成投资建议。</li>
+      </ul>
+      <p>报告不能信息过载。每份报告优先展示 1 个 primary narrative、2–3 个 secondary narratives、关键支持证据和关键风险证据。</p>
+
+      <h2><span class="section-number">18.</span>V1 成功标准是验证架构，而不是跑赢市场</h2>
+      <table>
+        <thead>
+          <tr><th>成功标准</th><th>判断方式</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Narrative 抽象成立</td><td>用户看到报告后认可该基金真正押注的 Narrative</td></tr>
+          <tr><td>Narrative State 像真人研究</td><td>解释合理、证据连贯、信号一致</td></tr>
+          <tr><td>Evidence 可追溯</td><td>用户能看到判断依据，而不是只看到结论</td></tr>
+          <tr><td>Multi-Narrative Aggregation 合理</td><td>能区分 AI Infrastructure、AI Application、AI Power Demand 等细分叙事</td></tr>
+          <tr><td>架构支持未来演化</td><td>未来加入 replay、alert、workspace、auto discovery 时不用推倒重来</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>V1 目标：</strong>Validate the Narrative Intelligence Architecture，不是 Beat the Market。
+      </div>
+
+      <h2><span class="section-number">19.</span>建议项目名称与核心目录</h2>
+      <p>建议项目名：</p>
+      <pre>fund-narrative-intelligence</pre>
+      <p>建议目录：</p>
+      <pre>fund-narrative-intelligence/
+  README.md
+  requirements.txt
+  .env.example
+  src/
+    main.py
+    orchestrator.py
+    config.py
+    models/
+    modules/
+      narrative_registry/
+      signal_service/
+      evidence_service/
+      fund_analysis/
+      report_writer/
+    providers/
+    prompts/
+    outputs/
+  docs/
+    adr/
+    future-capabilities/
+  tests/</pre>
+
+      <h2><span class="section-number">20.</span>核心结论</h2>
+      <p>这套系统的核心不是 Agent orchestration，也不是财经新闻摘要，而是把市场叙事结构化为可维护、可解释、可演化的 domain object。</p>
+      <p>V1 应该只做一个收敛闭环：</p>
+      <pre>Fund → Holdings → Stock Mapping → Narrative Aggregation → Signal-backed Narrative State → Evidence Report</pre>
+      <p>只要这个闭环成立，系统就具备继续扩展到 Narrative Discovery、Signal Governance、Historical Replay、Alerting 和 Workspace 的基础。</p>
+    </article>
+  </div>
+</body>
+</html>
