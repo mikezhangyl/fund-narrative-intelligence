@@ -301,6 +301,14 @@ python -m src.main --fund-code 000001 --include-cninfo-announcements --announcem
 
 This option is off by default. When enabled, raw/scoring JSON must include `announcements` and `announcement_evidence`, provider foundation must include an `announcements` layer, and reports must disclose that announcement evidence is metadata-only.
 
+V1 should also support a live announcement-evidence smoke command:
+
+```bash
+python -m src.main --run-announcement-smoke
+```
+
+The smoke command should validate an A-share fund example with Eastmoney holdings plus CNINFO announcement metadata. It must fail if CNINFO returns no announcements, if announcement metadata is not converted into evidence, if the provider foundation lacks a non-mock `Announcements` layer, or if the report data lacks a visible mixed/mock data-source notice.
+
 And can explicitly try the Eastmoney holdings adapter:
 
 ```bash
@@ -331,4 +339,5 @@ The generated artifacts must satisfy:
 - Reports include deterministic stage, risk, and confidence interpretation notes without buy/sell/hold recommendations.
 - The real-fund smoke set records coverage, primary narrative, stage, unmapped holdings, and pass/fail status.
 - The real-fund smoke set writes summary artifacts even when an individual fund fails, marking only that fund as failed and returning a non-zero exit code for the overall smoke command.
+- The announcement-evidence smoke set writes summary artifacts and returns non-zero when CNINFO metadata, evidence conversion, announcement provider disclosure, or mock/mixed data-source notice checks fail.
 - The mock-provider path is deterministic enough for repeatable tests.

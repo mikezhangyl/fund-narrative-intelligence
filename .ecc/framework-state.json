@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260513-announcement-evidence-orchestration",
+  "latest_run": "20260513-cninfo-orgid-announcement-smoke",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "review optional announcement evidence output against real A-share fund examples"
+  "next_step": "run full quality gates and live announcement smoke, then merge if clean"
 }

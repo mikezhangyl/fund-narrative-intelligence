@@ -4,6 +4,7 @@ from src.providers.cninfo import (
     CNINFO_ANNOUNCEMENT_QUERY_URL,
     CNInfoAnnouncementProvider,
     build_cninfo_announcement_payload,
+    build_cninfo_stock_selector,
     normalize_cninfo_announcement_response,
 )
 
@@ -20,8 +21,15 @@ def test_builds_cninfo_announcement_payload_for_stock_and_date_range():
     assert payload["pageNum"] == 2
     assert payload["pageSize"] == 50
     assert payload["tabName"] == "fulltext"
-    assert payload["stock"] == "000001"
+    assert payload["stock"] == "000001,gssz0000001"
     assert payload["seDate"] == "2026-01-01~2026-05-13"
+
+
+def test_builds_cninfo_stock_selector_with_exchange_org_id():
+    assert build_cninfo_stock_selector("000001") == "000001,gssz0000001"
+    assert build_cninfo_stock_selector("300750") == "300750,gssz0300750"
+    assert build_cninfo_stock_selector("600519") == "600519,gssh0600519"
+    assert build_cninfo_stock_selector("688981") == "688981,gssh0688981"
 
 
 def test_builds_cninfo_payload_with_market_column_from_stock_code():
@@ -80,7 +88,7 @@ def test_normalizes_cninfo_announcement_response():
 def test_cninfo_provider_fetches_announcements_with_injected_fetcher():
     def fake_fetcher(url: str, form_data: dict[str, object], headers: dict[str, str]):
         assert url == CNINFO_ANNOUNCEMENT_QUERY_URL
-        assert form_data["stock"] == "000001"
+        assert form_data["stock"] == "000001,gssz0000001"
         assert "User-Agent" in headers
         return {
             "announcements": [

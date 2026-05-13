@@ -110,3 +110,54 @@ def test_main_run_real_smoke_handles_controlled_error(monkeypatch, capsys):
 
     assert exit_code == 1
     assert "provider unavailable" in captured.err
+
+
+def test_main_run_announcement_smoke_returns_status(monkeypatch, tmp_path, capsys):
+    def fake_run_announcement_evidence_smoke(output_dir):
+        assert output_dir == str(tmp_path)
+        return {
+            "status": "passed",
+            "cases": [
+                {
+                    "fund_code": "161725",
+                    "scenario": "baijiu_cninfo_metadata",
+                    "announcement_count": 56,
+                    "announcement_evidence_count": 56,
+                    "data_source_notice_required": True,
+                    "effective_data_quality": "partial",
+                }
+            ],
+        }
+
+    monkeypatch.setattr(
+        main_module,
+        "run_announcement_evidence_smoke",
+        fake_run_announcement_evidence_smoke,
+    )
+
+    exit_code = main_module.main(
+        ["--run-announcement-smoke", "--output-dir", str(tmp_path)]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "Announcement evidence smoke summary:" in captured.out
+    assert "status=passed" in captured.out
+    assert "161725 baijiu_cninfo_metadata announcements=56 evidence=56" in captured.out
+
+
+def test_main_run_announcement_smoke_returns_nonzero_for_failed_summary(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setattr(
+        main_module,
+        "run_announcement_evidence_smoke",
+        lambda output_dir: {"status": "failed", "cases": []},
+    )
+
+    exit_code = main_module.main(
+        ["--run-announcement-smoke", "--output-dir", str(tmp_path)]
+    )
+
+    assert exit_code == 1

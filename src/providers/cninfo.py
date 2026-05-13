@@ -99,7 +99,7 @@ def build_cninfo_announcement_payload(
         "column": _cninfo_column_for_stock_code(normalized_stock_code),
         "tabName": "fulltext",
         "plate": "",
-        "stock": normalized_stock_code,
+        "stock": build_cninfo_stock_selector(normalized_stock_code),
         "searchkey": "",
         "secid": "",
         "category": "",
@@ -109,6 +109,14 @@ def build_cninfo_announcement_payload(
         "sortType": "",
         "isHLtitle": "true",
     }
+
+
+def build_cninfo_stock_selector(stock_code: str) -> str:
+    normalized_stock_code = _require_stock_code(stock_code)
+    org_id = _cninfo_org_id_for_stock_code(normalized_stock_code)
+    if org_id is None:
+        return normalized_stock_code
+    return f"{normalized_stock_code},{org_id}"
 
 
 def normalize_cninfo_announcement_response(
@@ -206,3 +214,12 @@ def _cninfo_column_for_stock_code(stock_code: str) -> str:
     if stock_code.startswith(("4", "8")):
         return "bj"
     return "szse"
+
+
+def _cninfo_org_id_for_stock_code(stock_code: str) -> str | None:
+    column = _cninfo_column_for_stock_code(stock_code)
+    if column == "sse":
+        return f"gssh0{stock_code}"
+    if column == "szse":
+        return f"gssz0{stock_code}"
+    return None

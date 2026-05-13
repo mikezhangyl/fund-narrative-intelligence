@@ -30,6 +30,12 @@ Run the live Eastmoney smoke set:
 python -m src.main --run-real-smoke
 ```
 
+Run the live Eastmoney + CNINFO announcement evidence smoke:
+
+```bash
+python -m src.main --run-announcement-smoke
+```
+
 Inspect provider layers without generating report artifacts:
 
 ```bash
@@ -122,6 +128,8 @@ Reports always disclose mock or degraded data in a `Data Source Notice` section.
 
 When `--include-cninfo-announcements` is enabled, reports add an `Announcements` provider layer and generated evidence summaries state that V1 classified announcement metadata only; source PDFs are not parsed.
 
+For CNINFO announcement search, V1 sends Shanghai and Shenzhen stock selectors in `code,orgId` form, such as `600519,gssh0600519` and `000001,gssz0000001`. This is covered by unit tests and by the live announcement smoke command.
+
 ## Real Provider Status
 
 The first real provider adapter is `eastmoney`, covering fund holdings only. It normalizes Eastmoney fields such as stock code, stock name, holding percentage, holding change, industry, and public holding date into the same V1 fund-holdings contract used by mock providers.
@@ -145,6 +153,23 @@ outputs/real_fund_smoke_summary.md
 ```
 
 The smoke summary is per-fund isolated: if one live provider call fails, the summary still records that fund as `failed`, keeps the remaining fund checks running, and exits non-zero when any fund fails or misses the coverage threshold.
+
+## Announcement Evidence Smoke
+
+The announcement smoke command validates the optional real announcement path against an A-share fund example:
+
+```bash
+python -m src.main --run-announcement-smoke
+```
+
+It writes:
+
+```text
+outputs/announcement_evidence_smoke_summary.json
+outputs/announcement_evidence_smoke_summary.md
+```
+
+The smoke checks that CNINFO announcements are returned, converted into evidence, represented as a non-mock `Announcements` provider layer, and paired with a visible data-source notice so mixed real/mock output is not mistaken for a fully real environment.
 
 ## Report Output
 

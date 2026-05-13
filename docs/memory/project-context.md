@@ -61,6 +61,7 @@ Expected artifacts:
 - CLI fixture discovery: `python -m src.main --list-fixtures`.
 - Batch fixture command: `python -m src.main --run-all-fixtures`.
 - Live Eastmoney smoke command: `python -m src.main --run-real-smoke`.
+- Live Eastmoney + CNINFO announcement smoke command: `python -m src.main --run-announcement-smoke`.
 - Provider diagnostics command: `python -m src.main --fund-code 000001 --provider-diagnostics` prints provider foundation JSON without generating report artifacts.
 - Optional CNINFO announcement evidence command: `python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01`.
 - Provider payloads are validated before orchestration proceeds.
@@ -69,12 +70,14 @@ Expected artifacts:
 - Mock intelligence layer providers now expose separate interfaces for registry, stock mappings, evidence, signals, and reserved market/valuation/announcement/news sources.
 - Optional `CNInfoAnnouncementProvider` exists as the first real intelligence-source adapter foundation; it is not wired into the default report pipeline.
 - Optional announcement-to-evidence conversion and orchestration exist for CNINFO-style announcement metadata; default reports do not call CNINFO unless `--include-cninfo-announcements` is set.
+- CNINFO announcement search for Shanghai and Shenzhen A-shares must send `stock` as `code,orgId`, for example `600519,gssh0600519` or `000001,gssz0000001`; using only the 6-digit code can return empty results.
 - Markdown and HTML reports include a `Data Source Notice` whenever a run uses mock data, fallback/degradation, or mixed real/mock layers.
 - HTML reports render semantic sections/tables directly from structured scoring data.
 - Mapping output includes coverage ratio, mapping method counts, and unmapped holdings.
 - Unmapped holdings can receive low-confidence `registry_term_rule` mappings from narrative registry aliases/related terms matched against stock name and industry.
 - Narrative reports include deterministic stage, risk, and confidence interpretation notes; these are explanatory and non-advisory.
 - Real-fund smoke summaries isolate failures per fund, write summary artifacts, and return non-zero when any fund fails or falls below coverage threshold.
+- Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 
 ## Mock Scenario Fixtures
 
@@ -86,6 +89,7 @@ Expected artifacts:
 
 - `161725` with `--provider-mode eastmoney`: Premium Baijiu Consumption / `diverging` in the current fixture-backed mapping layer.
 - Real smoke set covers `161725`, `320007`, `003096`, `003834`, `001475`, and `000991`; latest smoke passed with minimum coverage ratio 78% and calibrated stages `strengthening` / `diverging` / `weakening`.
+- Latest announcement-evidence probe for `161725` with CNINFO start date `2026-01-01` returned 56 announcements and 56 converted evidence records, while still disclosing the mixed Eastmoney/CNINFO + Mock intelligence foundation as `partial`.
 
 ## Deferred Scope
 

@@ -254,3 +254,24 @@ Consequences:
 - Default `python -m src.main --fund-code 000001` does not call CNINFO.
 - Optional announcement runs include `announcements`, `announcement_evidence`, and an `Announcements` provider layer in output JSON.
 - Reports disclose the announcement layer and generated evidence summaries state that PDF content was not parsed.
+
+## ADR-0013: Add CNINFO Selector Fix And Announcement Evidence Smoke
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Use CNINFO `stock` selectors in `code,orgId` form for Shanghai and Shenzhen A-shares, and add `python -m src.main --run-announcement-smoke` as a live regression check for optional announcement evidence.
+
+Rationale:
+
+- CNINFO can return zero results when the announcement query sends only the 6-digit stock code for Shanghai/Shenzhen A-shares.
+- A live optional announcement path needs more than a unit test because selector behavior and provider availability are external interface risks.
+- The user-facing mixed/mock data-source notice must remain visible whenever real CNINFO data is combined with fixture-backed intelligence layers.
+
+Consequences:
+
+- `CNInfoAnnouncementProvider` builds selectors such as `600519,gssh0600519` and `000001,gssz0000001`.
+- `python -m src.main --run-announcement-smoke` runs the `161725` Eastmoney + CNINFO path and writes `announcement_evidence_smoke_summary.json` and `.md`.
+- The smoke fails if announcements are empty, evidence conversion is empty, the `Announcements` provider layer is missing or mock, or the data-source notice does not disclose mixed/mock output.

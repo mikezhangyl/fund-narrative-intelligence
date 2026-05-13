@@ -4,6 +4,7 @@ import argparse
 import json
 import sys
 
+from src.announcement_smoke import run_announcement_evidence_smoke
 from src.config import DEFAULT_OUTPUT_DIR
 from src.errors import PipelineError
 from src.orchestrator import (
@@ -45,6 +46,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--run-real-smoke",
         action="store_true",
         help="Run the Eastmoney real-fund smoke set and write summary artifacts.",
+    )
+    parser.add_argument(
+        "--run-announcement-smoke",
+        action="store_true",
+        help="Run the Eastmoney + CNINFO announcement evidence smoke set and write summary artifacts.",
     )
     parser.add_argument(
         "--provider-diagnostics",
@@ -122,6 +128,30 @@ def main(argv: list[str] | None = None) -> int:
             )
         return 0 if summary["status"] == "passed" else 1
 
+    if args.run_announcement_smoke:
+        if args.include_cninfo_announcements:
+            parser.error("--include-cninfo-announcements is not supported with --run-announcement-smoke")
+        try:
+            summary = run_announcement_evidence_smoke(output_dir=args.output_dir)
+        except PipelineError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        except Exception as exc:
+            print(f"Unrecoverable announcement smoke error: {exc}", file=sys.stderr)
+            return 1
+
+        print("Announcement evidence smoke summary:")
+        print(f"status={summary['status']}")
+        for result in summary["cases"]:
+            print(
+                f"{result['fund_code']} {result['scenario']} "
+                f"announcements={result['announcement_count']} "
+                f"evidence={result['announcement_evidence_count']} "
+                f"notice={'yes' if result['data_source_notice_required'] else 'no'} "
+                f"quality={result['effective_data_quality']}"
+            )
+        return 0 if summary["status"] == "passed" else 1
+
     if args.provider_diagnostics:
         if args.include_cninfo_announcements:
             parser.error("--include-cninfo-announcements is not supported with --provider-diagnostics")
@@ -148,7 +178,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.fund_code:
         parser.error(
-            "--fund-code is required unless --list-fixtures, --run-all-fixtures, --run-real-smoke, or --provider-diagnostics is used"
+            "--fund-code is required unless --list-fixtures, --run-all-fixtures, --run-real-smoke, --run-announcement-smoke, or --provider-diagnostics is used"
         )
         return 2
 
