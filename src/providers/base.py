@@ -22,3 +22,10 @@ class DataProvider(Protocol):
 
     def get_signal_events(self) -> list[dict[str, Any]]:
         raise NotImplementedError
+
+    def get_provider_foundation(
+        self,
+        fund_provider_metadata: dict[str, Any],
+        degradation_events: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        raise NotImplementedError

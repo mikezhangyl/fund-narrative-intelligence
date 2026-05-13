@@ -55,6 +55,11 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
                     },
                     "unmapped_holdings": [],
                     "degradation_events": [],
+                    "provider_foundation": {
+                        "effective_data_quality": "partial",
+                        "disclosure_required": True,
+                        "disclosure_message": "混合数据源：持仓来自 Eastmoney，其余智能层使用 Mock fixtures。",
+                    },
                 }
             )
         )
@@ -80,8 +85,15 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
     assert summary["min_coverage_ratio"] == 0.8
     assert summary["funds"][0]["fund_code"] == "161725"
     assert summary["funds"][0]["coverage_ratio"] == 0.9
+    assert summary["funds"][0]["effective_data_quality"] == "partial"
+    assert summary["funds"][0]["data_source_notice_required"] is True
     assert (tmp_path / "real_fund_smoke_summary.json").exists()
     assert (tmp_path / "real_fund_smoke_summary.md").exists()
+
+    summary_markdown = (tmp_path / "real_fund_smoke_summary.md").read_text()
+    assert "Data Quality" in summary_markdown
+    assert "Notice" in summary_markdown
+    assert "partial" in summary_markdown
 
 
 def test_real_fund_smoke_summary_fails_when_coverage_is_below_threshold(tmp_path):

@@ -33,6 +33,8 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
         f"- Data quality: {metadata['data_quality']}",
         f"- Scoring model: {metadata['scoring_model_version']}",
         "",
+        *_render_data_source_notice_lines(scoring_payload),
+        "",
         "## Top Holdings",
         "",
         "| Stock | Name | Weight |",
@@ -100,6 +102,7 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
     primary = scoring_payload["primary_narrative"]
     secondary = scoring_payload["secondary_narratives"]
     secondary_html = "\n".join(_render_narrative_html(item) for item in secondary)
+    data_source_notice_html = _render_data_source_notice_html(scoring_payload)
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -114,6 +117,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
     th, td {{ border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; }}
     th {{ background: #f3f4f6; }}
     .meta, .narrative-meta {{ color: #4b5563; }}
+    .data-source-notice {{ background: #fff7ed; border: 1px solid #fed7aa; padding: 16px; }}
+    .data-source-notice p {{ margin: 8px 0; }}
     .disclaimer {{ border-left: 4px solid #111827; padding-left: 14px; }}
   </style>
 </head>
@@ -123,6 +128,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
     <h1>{escape(fund['fund_name'])} ({escape(fund['fund_code'])})</h1>
     <p class="meta">As of: {escape(metadata['as_of_date'])} | Data quality: {escape(metadata['data_quality'])} | Scoring model: {escape(metadata['scoring_model_version'])}</p>
   </header>
+
+  {data_source_notice_html}
 
   <section class="holdings">
     <h2>Top Holdings</h2>
@@ -167,6 +174,104 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
 </body>
 </html>
 """
+
+
+def _render_data_source_notice_lines(scoring_payload: dict[str, Any]) -> list[str]:
+    foundation = _provider_foundation(scoring_payload)
+    if not foundation["disclosure_required"]:
+        return []
+
+    lines = [
+        "## Data Source Notice",
+        "",
+        f"> {foundation['disclosure_message']}",
+        "",
+        "| Layer | Provider | Quality | Mock | Source |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for layer in foundation["layers"].values():
+        source = layer.get("source_url") or "-"
+        mock_label = "yes" if layer["is_mock"] else "no"
+        lines.append(
+            f"| {_layer_display_name(layer)} | {layer['provider_name']} | "
+            f"{layer['data_quality']} | {mock_label} | {source} |"
+        )
+
+    degradation_events = foundation.get("degradation_events", [])
+    if degradation_events:
+        lines.extend(["", "### Degradation Events", ""])
+        for event in degradation_events:
+            reason = event.get("reason", "")
+            event_type = event.get("type", "unknown")
+            fallback = event.get("fallback_provider_mode")
+            suffix = f" fallback={fallback}" if fallback else ""
+            lines.append(f"- `{event_type}`{suffix}: {reason}")
+    return lines
+
+
+def _render_data_source_notice_html(scoring_payload: dict[str, Any]) -> str:
+    foundation = _provider_foundation(scoring_payload)
+    if not foundation["disclosure_required"]:
+        return ""
+
+    layer_rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(_layer_display_name(layer))}</td>"
+        f"<td>{escape(layer['provider_name'])}</td>"
+        f"<td>{escape(layer['data_quality'])}</td>"
+        f"<td>{'yes' if layer['is_mock'] else 'no'}</td>"
+        f"<td>{escape(str(layer.get('source_url') or '-'))}</td>"
+        "</tr>"
+        for layer in foundation["layers"].values()
+    )
+    degradation_events = foundation.get("degradation_events", [])
+    if degradation_events:
+        event_items = "\n".join(
+            "<li>"
+            f"<code>{escape(event.get('type', 'unknown'))}</code>"
+            f"{' fallback=' + escape(event['fallback_provider_mode']) if event.get('fallback_provider_mode') else ''}: "
+            f"{escape(event.get('reason', ''))}"
+            "</li>"
+            for event in degradation_events
+        )
+        degradation_html = f"<h3>Degradation Events</h3><ul>{event_items}</ul>"
+    else:
+        degradation_html = ""
+    return f"""
+  <section class="data-source-notice">
+    <h2>Data Source Notice</h2>
+    <p>{escape(foundation['disclosure_message'])}</p>
+    <table>
+      <thead><tr><th>Layer</th><th>Provider</th><th>Quality</th><th>Mock</th><th>Source</th></tr></thead>
+      <tbody>{layer_rows}</tbody>
+    </table>
+    {degradation_html}
+  </section>
+"""
+
+
+def _provider_foundation(scoring_payload: dict[str, Any]) -> dict[str, Any]:
+    foundation = scoring_payload.get("provider_foundation")
+    if foundation:
+        return foundation
+
+    data_quality = scoring_payload.get("metadata", {}).get("data_quality", "mock")
+    disclosure_required = data_quality != "fresh"
+    return {
+        "effective_data_quality": data_quality,
+        "disclosure_required": disclosure_required,
+        "disclosure_message": (
+            "Mock 数据：本报告使用 V1 Mock fixtures，不代表完整真实环境输出。"
+            if disclosure_required
+            else "数据源为真实 provider，但仍仅用于叙事分析，不构成投资建议。"
+        ),
+        "layers": {},
+        "degradation_events": scoring_payload.get("degradation_events", []),
+    }
+
+
+def _layer_display_name(layer: dict[str, Any]) -> str:
+    return str(layer.get("display_name") or layer.get("layer") or "unknown")
 
 
 def _render_narrative_markdown(narrative: dict[str, Any]) -> str:

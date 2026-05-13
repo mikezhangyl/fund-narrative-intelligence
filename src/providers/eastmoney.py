@@ -8,6 +8,12 @@ from urllib.request import Request, urlopen
 
 from src.errors import ProviderContractError, ProviderFetchError
 from src.providers.mock import MockDataProvider
+from src.providers.provenance import (
+    PROVIDER_LAYERS,
+    build_provider_foundation,
+    layer_from_provider_metadata,
+    mock_layer,
+)
 from src.validation import validate_fund_payload
 
 EASTMONEY_HOLDINGS_URL = "https://fundmobapi.eastmoney.com/FundMNewApi/FundMNInverstPosition"
@@ -71,6 +77,22 @@ class EastmoneyFundHoldingProvider:
 
     def get_signal_events(self) -> list[dict[str, Any]]:
         return self.fallback_provider.get_signal_events()
+
+    def get_provider_foundation(
+        self,
+        fund_provider_metadata: dict[str, Any],
+        degradation_events: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        layers = {layer: mock_layer(layer) for layer in PROVIDER_LAYERS}
+        layers["holdings"] = layer_from_provider_metadata(
+            layer="holdings",
+            provider_metadata=fund_provider_metadata,
+            note="Fund holdings fetched from Eastmoney when available; falls back to V1 mock fixtures on provider failure.",
+        )
+        return build_provider_foundation(
+            layers=layers,
+            degradation_events=degradation_events,
+        )
 
 
 def build_eastmoney_holdings_url(fund_code: str) -> str:

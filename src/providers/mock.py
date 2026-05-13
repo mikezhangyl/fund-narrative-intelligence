@@ -7,6 +7,7 @@ from typing import Any
 
 from src.config import FIXTURE_DIR
 from src.errors import FixtureNotFoundError
+from src.providers.provenance import build_mock_provider_foundation
 from src.validation import (
     validate_evidence_payload,
     validate_fund_payload,
@@ -56,6 +57,14 @@ class MockDataProvider:
         payload = self._load_json("signal_events.json")
         validate_signal_payload(payload)
         return deepcopy(payload["signal_events"])
+
+    def get_provider_foundation(
+        self,
+        fund_provider_metadata: dict[str, Any],
+        degradation_events: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        del fund_provider_metadata
+        return build_mock_provider_foundation(degradation_events=degradation_events)
 
     def _load_json(self, filename: str) -> Any:
         path = self.fixture_dir / filename

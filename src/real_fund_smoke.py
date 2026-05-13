@@ -86,11 +86,19 @@ def _build_fund_result(
         },
     }
     coverage_ratio = coverage["coverage_ratio"]
+    provider_foundation = scoring.get("provider_foundation", {})
     return {
         "fund_code": fund_code,
         "scenario": scenario,
         "status": "passed",
         "data_quality": scoring["metadata"]["data_quality"],
+        "effective_data_quality": provider_foundation.get(
+            "effective_data_quality", scoring["metadata"]["data_quality"]
+        ),
+        "data_source_notice_required": bool(
+            provider_foundation.get("disclosure_required")
+        ),
+        "data_source_notice": provider_foundation.get("disclosure_message", ""),
         "as_of_date": scoring["metadata"]["as_of_date"],
         "primary_narrative": primary["name"],
         "stage": primary["state"]["stage"],
@@ -118,6 +126,9 @@ def _build_failed_fund_result(
         "scenario": scenario,
         "status": "failed",
         "data_quality": "unavailable",
+        "effective_data_quality": "unavailable",
+        "data_source_notice_required": True,
+        "data_source_notice": "Provider run failed; no reliable data source foundation is available.",
         "as_of_date": None,
         "primary_narrative": None,
         "stage": None,
@@ -146,8 +157,8 @@ def _write_summary(summary: dict[str, Any], output_path: Path) -> None:
         f"- Provider mode: {summary['provider_mode']}",
         f"- Minimum coverage ratio: {summary['min_coverage_ratio']:.0%}",
         "",
-        "| Fund | Scenario | Status | Primary Narrative | Stage | Coverage | Methods | Error |",
-        "| --- | --- | --- | --- | --- | ---: | --- | --- |",
+        "| Fund | Scenario | Status | Data Quality | Notice | Primary Narrative | Stage | Coverage | Methods | Error |",
+        "| --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
     ]
     for result in summary["funds"]:
         methods = ", ".join(
@@ -159,6 +170,8 @@ def _write_summary(summary: dict[str, Any], output_path: Path) -> None:
             f"{result['fund_code']} | "
             f"{result['scenario']} | "
             f"{result['status']} | "
+            f"{result['effective_data_quality']} | "
+            f"{'yes' if result['data_source_notice_required'] else 'no'} | "
             f"{result['primary_narrative'] or '-'} | "
             f"{result['stage'] or '-'} | "
             f"{result['coverage_ratio']:.0%} | "

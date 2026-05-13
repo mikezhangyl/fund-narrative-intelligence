@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Eastmoney smoke depends on public network availability.",
+    "Real evidence, news, valuation, announcement, and signal providers are not implemented yet.",
+    "Future UI work must preserve the Data Source Notice disclosure requirement."
+  ]
+}

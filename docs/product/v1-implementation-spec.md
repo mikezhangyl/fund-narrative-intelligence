@@ -41,6 +41,16 @@ Provider outputs must include:
 - `data_quality`
 - `confidence_multiplier`
 
+V1 also emits a run-level `provider_foundation` object in raw and scoring JSON. It separates provenance for these layers:
+
+- `holdings`
+- `narrative_registry`
+- `stock_mappings`
+- `evidence`
+- `signals`
+
+`provider_foundation.effective_data_quality` is the quality used for scoring confidence and user-facing reports. For example, an Eastmoney holdings run with mock registry, mapping, evidence, and signals is `partial`, not `fresh`.
+
 ## Degradation Strategy
 
 The pipeline should complete whenever enough data exists to produce a bounded report. Provider failure should reduce confidence and surface data quality, not crash the full run.
@@ -54,6 +64,8 @@ The pipeline should complete whenever enough data exists to produce a bounded re
 | Evidence unavailable | Generate report with explicit evidence gap | `partial` or `unavailable` | lower narrative confidence |
 
 V1 must never silently hide degraded data. JSON outputs and reports should show data quality at the fund, narrative, and evidence level.
+
+Reports must include a visible `Data Source Notice` whenever `provider_foundation.disclosure_required` is true. This includes pure mock runs, fallback-to-mock runs, and mixed runs where only some layers are real. The notice must state which layers are mock-backed and list degradation events such as `provider_fallback`.
 
 ## Module Responsibility Matrix
 

@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260513-real-fund-scoring-calibration",
+  "latest_run": "20260513-provider-evidence-foundation",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "calibrate real-fund smoke scoring so sector narratives produce differentiated lifecycle stages"
+  "next_step": "finish provider foundation disclosure so mock, degraded, and mixed provider runs are visible in reports"
 }

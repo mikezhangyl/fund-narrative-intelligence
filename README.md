@@ -102,6 +102,8 @@ python -m src.main --fund-code 161725 --provider-mode eastmoney
 
 If the Eastmoney request fails, the provider records a `provider_fallback` event and falls back to local mock fixtures when a matching fixture exists.
 
+Reports always disclose mock or degraded data in a `Data Source Notice` section. A pure mock run is marked as `mock`; an Eastmoney holdings run with fixture-backed registry, mappings, evidence, and signals is marked as `partial` so users do not mistake it for a fully real environment.
+
 ## Real Provider Status
 
 The first real provider adapter is `eastmoney`, covering fund holdings only. It normalizes Eastmoney fields such as stock code, stock name, holding percentage, holding change, industry, and public holding date into the same V1 fund-holdings contract used by mock providers.
@@ -131,6 +133,8 @@ The smoke summary is per-fund isolated: if one live provider call fails, the sum
 Each run writes both Markdown and HTML. The HTML report is rendered from structured scoring data with headings, sections, holdings tables, narrative dimension tables, evidence lists, and a disclaimer.
 
 Reports also include mapping coverage so real-provider runs make clear how much of a fund's holdings are explained by current registry and mapping fixtures.
+
+Reports include a `Data Source Notice` whenever the run uses mock data, degraded provider fallback, or mixed real/mock layers. This notice lists each provider layer and whether it is mock-backed.
 
 Narrative sections include deterministic interpretation notes for lifecycle stage, risk pressure, and confidence. These notes are explanatory only and do not produce allocation or trading recommendations.
 

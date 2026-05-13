@@ -47,6 +47,23 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
             }
         ],
         "risk_evidence": [],
+        "provider_foundation": {
+            "effective_data_quality": "mock",
+            "disclosure_required": True,
+            "disclosure_message": "Mock 数据：本报告使用 V1 Mock fixtures，不代表完整真实环境输出。",
+            "layers": {
+                "holdings": {
+                    "layer": "holdings",
+                    "provider_name": "mock-fixture-provider",
+                    "provider_version": "mock-v1",
+                    "data_quality": "mock",
+                    "source_url": None,
+                    "is_mock": True,
+                    "note": "V1 mock fixture.",
+                }
+            },
+            "degradation_events": [],
+        },
     }
 
     html = render_html_report(scoring_payload)
@@ -57,7 +74,9 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "<th>Stock</th>" in html
     assert '<section class="primary-narrative">' in html
     assert '<section class="mapping-coverage">' in html
+    assert '<section class="data-source-notice">' in html
     assert "Mapping Coverage" in html
+    assert "Mock 数据" in html
     assert "<h3>AI Infrastructure</h3>" in html
     assert "Lifecycle stage" in html
     assert "### AI Infrastructure" not in html

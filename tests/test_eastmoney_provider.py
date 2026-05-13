@@ -79,6 +79,46 @@ def test_eastmoney_provider_falls_back_to_mock_on_fetch_error():
     assert provider.degradation_events
     assert provider.degradation_events[0]["type"] == "provider_fallback"
 
+    foundation = provider.get_provider_foundation(
+        fund_provider_metadata=payload["fund"]["provider_metadata"],
+        degradation_events=provider.degradation_events,
+    )
+
+    assert foundation["effective_data_quality"] == "mock"
+    assert foundation["disclosure_required"] is True
+    assert "Mock 数据" in foundation["disclosure_message"]
+
+
+def test_eastmoney_provider_foundation_marks_fixture_intelligence_as_partial():
+    response = {
+        "Success": True,
+        "Expansion": "2026-03-31",
+        "Datas": {
+            "fundStocks": [
+                {
+                    "GPDM": "600519",
+                    "GPJC": "贵州茅台",
+                    "JZBL": "18.33",
+                    "PCTNVCHG": "2.95",
+                    "INDEXNAME": "食品饮料",
+                }
+            ]
+        },
+    }
+    provider = EastmoneyFundHoldingProvider(fetcher=lambda _url: response)
+    payload = provider.get_fund_holdings("161725")
+
+    foundation = provider.get_provider_foundation(
+        fund_provider_metadata=payload["fund"]["provider_metadata"],
+        degradation_events=provider.degradation_events,
+    )
+
+    assert foundation["effective_data_quality"] == "partial"
+    assert foundation["layers"]["holdings"]["data_quality"] == "fresh"
+    assert foundation["layers"]["evidence"]["data_quality"] == "mock"
+    assert foundation["layers"]["signals"]["is_mock"] is True
+    assert "混合数据源" in foundation["disclosure_message"]
+
 
 def test_eastmoney_mode_keeps_pipeline_artifacts_when_fallback_is_needed(tmp_path):
     def failing_fetcher(_url: str) -> dict:

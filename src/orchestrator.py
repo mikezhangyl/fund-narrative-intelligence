@@ -46,6 +46,15 @@ def run_pipeline(
         registry=registry_by_id,
     )
     selected_mappings = mapping_result["mappings"]
+    degradation_events = [
+        *provider_selection.degradation_events,
+        *getattr(provider, "degradation_events", []),
+    ]
+    provider_foundation = provider.get_provider_foundation(
+        fund_provider_metadata=fund["provider_metadata"],
+        degradation_events=degradation_events,
+    )
+    effective_data_quality = provider_foundation["effective_data_quality"]
     exposures = aggregate_fund_narratives(
         holdings=holdings,
         mappings=selected_mappings,
@@ -57,7 +66,7 @@ def run_pipeline(
             signal_events=signal_events,
             evidence=evidence,
             as_of_date=as_of_date,
-            data_quality=fund["provider_metadata"]["data_quality"],
+            data_quality=effective_data_quality,
         )
         for exposure in exposures
     ]
@@ -67,16 +76,13 @@ def run_pipeline(
     metadata = _metadata(
         fund_code=fund_code,
         as_of_date=as_of_date,
-        data_quality=fund["provider_metadata"]["data_quality"],
+        data_quality=effective_data_quality,
     )
-    degradation_events = [
-        *provider_selection.degradation_events,
-        *getattr(provider, "degradation_events", []),
-    ]
     raw_payload = {
         "metadata": metadata,
         "fund": fund,
         "holdings": holdings,
+        "provider_foundation": provider_foundation,
         "narrative_registry_version": registry_payload["version"],
         "narrative_registry": registry_items,
         "stock_narrative_mappings": selected_mappings,
@@ -93,6 +99,7 @@ def run_pipeline(
         "primary_narrative": primary_narrative,
         "secondary_narratives": secondary_narratives,
         "all_narratives": narrative_results,
+        "provider_foundation": provider_foundation,
         "mapping_coverage": mapping_result["coverage"],
         "unmapped_holdings": mapping_result["unmapped_holdings"],
         "supporting_evidence": _top_evidence(

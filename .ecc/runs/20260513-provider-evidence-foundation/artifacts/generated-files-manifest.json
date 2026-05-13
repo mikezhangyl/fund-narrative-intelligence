@@ -1,0 +1,15 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "coverage_report",
+      "path": ".ecc/runs/20260513-provider-evidence-foundation/artifacts/reports/coverage-report.txt",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "5ed5aec7d1013d4f6e877b813398d1840a391f60bdee2657ed6c874108b72b56",
+      "mtime_epoch": 1778668514,
+      "size_bytes": 1679,
+      "summary": "Final coverage report showing 85% total coverage over src."
+    }
+  ],
+  "notes": "Generated output reports under outputs/ are ignored by git."
+}

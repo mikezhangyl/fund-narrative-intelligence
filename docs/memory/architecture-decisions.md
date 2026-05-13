@@ -128,3 +128,24 @@ Consequences:
 - Current real smoke baseline is `strengthening` for semiconductor and defense, `diverging` for baijiu and healthcare, and `weakening` for new energy and real estate.
 - Stage rules now include moderate-strength `strengthening` and weaker-support `weakening` paths.
 - Future real signal providers should be validated against this distribution before replacing fixture-backed signals.
+
+## ADR-0007: Disclose Mock And Mixed Provider Foundations In Reports
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Add run-level provider foundation metadata and render a visible `Data Source Notice` in Markdown and HTML whenever a run uses mock data, fallback/degradation, or mixed real/mock provider layers.
+
+Rationale:
+
+- V1 can fetch real Eastmoney holdings while still using fixture-backed registry, stock mappings, evidence, and signals.
+- Treating those mixed runs as fully `fresh` would mislead users about the reliability of the report.
+- The user-facing report is the place where this distinction must be visible, not only hidden in JSON.
+
+Consequences:
+
+- Raw and scoring JSON include `provider_foundation` with per-layer provenance and `effective_data_quality`.
+- Scoring confidence uses `effective_data_quality`; Eastmoney holdings plus mock intelligence layers is `partial`.
+- Markdown and HTML reports render a `Data Source Notice` that lists provider layers and degradation events.

@@ -1,0 +1,11 @@
+{"command":"python -m pytest tests/test_cli_pipeline.py tests/test_report_writer.py tests/test_real_fund_smoke.py -q","purpose":"RED check for missing user-facing provider disclosure","exit_code":1,"summary":"Failed as expected before provider_foundation and Data Source Notice rendering existed."}
+{"command":"python -m pytest tests/test_cli_pipeline.py tests/test_report_writer.py tests/test_real_fund_smoke.py -q","purpose":"Focused disclosure tests after initial implementation","exit_code":0,"summary":"9 passed."}
+{"command":"python -m pytest tests/test_eastmoney_provider.py tests/test_cli_pipeline.py tests/test_report_writer.py tests/test_real_fund_smoke.py -q","purpose":"Provider foundation and report disclosure regression tests","exit_code":0,"summary":"14 passed."}
+{"command":"python -m ruff check .","purpose":"Lint gate","exit_code":0,"summary":"All checks passed."}
+{"command":"python -m pytest -q","purpose":"Full test suite","exit_code":0,"summary":"46 passed in 0.46s."}
+{"command":"python -m compileall -q src tests scripts","purpose":"Syntax compilation check","exit_code":0,"summary":"Compilation passed."}
+{"command":"python -m src.main --fund-code 000001 --output-dir /tmp/fni-final-mock","purpose":"Mock acceptance report with Data Source Notice","exit_code":0,"summary":"Generated all four artifacts; Markdown/HTML include Mock data notice."}
+{"command":"python -m src.main --fund-code 000001 --provider-mode real --output-dir /tmp/fni-final-real-fallback","purpose":"Fallback report with provider_fallback disclosure","exit_code":0,"summary":"Generated all four artifacts; Markdown/HTML include provider_fallback notice."}
+{"command":"python -m coverage run -m pytest -q && python -m coverage report","purpose":"Final coverage gate using pyproject fail_under","exit_code":0,"summary":"46 passed; total coverage 85%."}
+{"command":"python -m src.main --run-real-smoke","purpose":"Live Eastmoney smoke after provider foundation change","exit_code":0,"summary":"Six-fund smoke passed; all Eastmoney reports are marked partial with Data Source Notice."}
+{"command":"python scripts/ecc_task_run.py validate --run-dir .ecc/runs/20260513-provider-evidence-foundation --require-task-artifacts --require-quality-artifacts","purpose":"ECC run artifact validation","exit_code":0,"summary":"Run validation passed with no findings."}
