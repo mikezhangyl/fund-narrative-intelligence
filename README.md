@@ -154,6 +154,8 @@ outputs/real_fund_smoke_summary.md
 
 The smoke summary is per-fund isolated: if one live provider call fails, the summary still records that fund as `failed`, keeps the remaining fund checks running, and exits non-zero when any fund fails or misses the coverage threshold.
 
+When real holdings are not fully mapped, the summary JSON includes `unmapped_holdings` with stock code, stock name, industry, and weight. The Markdown summary also adds a `Mapping Gaps` section so registry expansion can be driven by concrete live-holding gaps.
+
 ## Announcement Evidence Smoke
 
 The announcement smoke command validates the optional real announcement path against an A-share fund example:

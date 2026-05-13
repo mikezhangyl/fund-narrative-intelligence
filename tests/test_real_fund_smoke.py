@@ -53,7 +53,14 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
                         "total_holding_count": 10,
                         "mapping_methods": {"registry_term_rule": 9},
                     },
-                    "unmapped_holdings": [],
+                    "unmapped_holdings": [
+                        {
+                            "stock_code": "002572",
+                            "stock_name": "索菲亚",
+                            "industry": "轻工制造",
+                            "weight": 0.0403,
+                        }
+                    ],
                     "degradation_events": [],
                     "provider_foundation": {
                         "effective_data_quality": "partial",
@@ -87,6 +94,15 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
     assert summary["funds"][0]["coverage_ratio"] == 0.9
     assert summary["funds"][0]["effective_data_quality"] == "partial"
     assert summary["funds"][0]["data_source_notice_required"] is True
+    assert summary["funds"][0]["unmapped_holding_count"] == 1
+    assert summary["funds"][0]["unmapped_holdings"] == [
+        {
+            "stock_code": "002572",
+            "stock_name": "索菲亚",
+            "industry": "轻工制造",
+            "weight": 0.0403,
+        }
+    ]
     assert (tmp_path / "real_fund_smoke_summary.json").exists()
     assert (tmp_path / "real_fund_smoke_summary.md").exists()
 
@@ -94,6 +110,9 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
     assert "Data Quality" in summary_markdown
     assert "Notice" in summary_markdown
     assert "partial" in summary_markdown
+    assert "## Mapping Gaps" in summary_markdown
+    assert "002572" in summary_markdown
+    assert "索菲亚" in summary_markdown
 
 
 def test_real_fund_smoke_summary_fails_when_coverage_is_below_threshold(tmp_path):
@@ -139,6 +158,18 @@ def test_real_fund_smoke_summary_fails_when_coverage_is_below_threshold(tmp_path
 
     assert summary["status"] == "failed"
     assert summary["funds"][0]["coverage_passed"] is False
+    assert summary["funds"][0]["unmapped_holdings"] == [
+        {
+            "stock_code": "UNKNOWN",
+            "stock_name": "Unknown",
+            "industry": None,
+            "weight": None,
+        }
+    ]
+    summary_markdown = (tmp_path / "real_fund_smoke_summary.md").read_text(
+        encoding="utf-8"
+    )
+    assert "| 000000 | UNKNOWN | Unknown | - | - |" in summary_markdown
 
 
 def test_real_fund_smoke_summary_records_runner_failures(tmp_path):

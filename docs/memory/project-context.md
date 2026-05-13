@@ -76,7 +76,7 @@ Expected artifacts:
 - Mapping output includes coverage ratio, mapping method counts, and unmapped holdings.
 - Unmapped holdings can receive low-confidence `registry_term_rule` mappings from narrative registry aliases/related terms matched against stock name and industry.
 - Narrative reports include deterministic stage, risk, and confidence interpretation notes; these are explanatory and non-advisory.
-- Real-fund smoke summaries isolate failures per fund, write summary artifacts, and return non-zero when any fund fails or falls below coverage threshold.
+- Real-fund smoke summaries isolate failures per fund, write summary artifacts, include concrete unmapped holding details, and return non-zero when any fund fails or falls below coverage threshold.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 
 ## Mock Scenario Fixtures
@@ -89,6 +89,7 @@ Expected artifacts:
 
 - `161725` with `--provider-mode eastmoney`: Premium Baijiu Consumption / `diverging` in the current fixture-backed mapping layer.
 - Real smoke set covers `161725`, `320007`, `003096`, `003834`, `001475`, and `000991`; latest smoke passed with minimum coverage ratio 78% and calibrated stages `strengthening` / `diverging` / `weakening`.
+- Current real-smoke mapping gaps are `002594` 比亚迪, `600066` 宇通客车, `603308` 应流股份, `002246` 北化股份, `002572` 索菲亚, `603816` 顾家家居, and `002918` 蒙娜丽莎.
 - Latest announcement-evidence probe for `161725` with CNINFO start date `2026-01-01` returned 56 announcements and 56 converted evidence records, while still disclosing the mixed Eastmoney/CNINFO + Mock intelligence foundation as `partial`.
 
 ## Deferred Scope

@@ -13,7 +13,7 @@ Validate V1 against a small set of live Eastmoney fund-holdings scenarios across
 ## Acceptance
 
 - Smoke command generates reports for the selected real funds.
-- Smoke summary records mapping coverage, primary narrative, stage, and unmapped holdings.
+- Smoke summary records mapping coverage, primary narrative, stage, and concrete unmapped holding details.
 - Smoke summary remains writable when an individual real-fund run fails.
 - Existing mock and Eastmoney single-fund commands remain compatible.
 

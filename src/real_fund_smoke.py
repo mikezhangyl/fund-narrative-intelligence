@@ -87,6 +87,7 @@ def _build_fund_result(
     }
     coverage_ratio = coverage["coverage_ratio"]
     provider_foundation = scoring.get("provider_foundation", {})
+    unmapped_holdings = _summarize_unmapped_holdings(scoring["unmapped_holdings"])
     return {
         "fund_code": fund_code,
         "scenario": scenario,
@@ -109,7 +110,8 @@ def _build_fund_result(
         "covered_holding_count": coverage["covered_holding_count"],
         "total_holding_count": coverage["total_holding_count"],
         "mapping_methods": coverage["mapping_methods"],
-        "unmapped_holding_count": len(scoring["unmapped_holdings"]),
+        "unmapped_holding_count": len(unmapped_holdings),
+        "unmapped_holdings": unmapped_holdings,
         "degradation_event_count": len(scoring["degradation_events"]),
         "error": None,
     }
@@ -140,9 +142,24 @@ def _build_failed_fund_result(
         "total_holding_count": 0,
         "mapping_methods": {},
         "unmapped_holding_count": 0,
+        "unmapped_holdings": [],
         "degradation_event_count": 1,
         "error": message,
     }
+
+
+def _summarize_unmapped_holdings(
+    unmapped_holdings: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "stock_code": holding.get("stock_code"),
+            "stock_name": holding.get("stock_name"),
+            "industry": holding.get("industry"),
+            "weight": holding.get("weight"),
+        }
+        for holding in unmapped_holdings
+    ]
 
 
 def _write_summary(summary: dict[str, Any], output_path: Path) -> None:
@@ -179,6 +196,35 @@ def _write_summary(summary: dict[str, Any], output_path: Path) -> None:
             f"{result['error'] or '-'} |"
         )
     lines.append("")
+    mapping_gap_results = [
+        result for result in summary["funds"] if result["unmapped_holdings"]
+    ]
+    if mapping_gap_results:
+        lines.extend(
+            [
+                "## Mapping Gaps",
+                "",
+                "| Fund | Stock | Name | Industry | Weight |",
+                "| --- | --- | --- | --- | ---: |",
+            ]
+        )
+        for result in mapping_gap_results:
+            for holding in result["unmapped_holdings"]:
+                lines.append(
+                    "| "
+                    f"{result['fund_code']} | "
+                    f"{holding['stock_code'] or '-'} | "
+                    f"{holding['stock_name'] or '-'} | "
+                    f"{holding['industry'] or '-'} | "
+                    f"{_format_weight(holding['weight'])} |"
+                )
+        lines.append("")
     (output_path / "real_fund_smoke_summary.md").write_text(
         "\n".join(lines), encoding="utf-8"
     )
+
+
+def _format_weight(weight: Any) -> str:
+    if isinstance(weight, int | float):
+        return f"{weight:.2%}"
+    return "-"

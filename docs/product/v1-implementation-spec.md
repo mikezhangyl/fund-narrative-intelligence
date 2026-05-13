@@ -337,7 +337,7 @@ The generated artifacts must satisfy:
 - The `eastmoney` provider mode can normalize no-key fund holdings while keeping non-holdings intelligence layers local in V1.
 - Reports include mapping coverage, mapping method counts, and unmapped holdings when any holdings cannot be mapped.
 - Reports include deterministic stage, risk, and confidence interpretation notes without buy/sell/hold recommendations.
-- The real-fund smoke set records coverage, primary narrative, stage, unmapped holdings, and pass/fail status.
+- The real-fund smoke set records coverage, primary narrative, stage, concrete unmapped holding details, and pass/fail status.
 - The real-fund smoke set writes summary artifacts even when an individual fund fails, marking only that fund as failed and returning a non-zero exit code for the overall smoke command.
 - The announcement-evidence smoke set writes summary artifacts and returns non-zero when CNINFO metadata, evidence conversion, announcement provider disclosure, or mock/mixed data-source notice checks fail.
 - The mock-provider path is deterministic enough for repeatable tests.
