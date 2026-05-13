@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Registry-term fallback is keyword-based and low-confidence.",
+    "Coverage is exposed, but mapping quality still depends on registry maintenance."
+  ]
+}

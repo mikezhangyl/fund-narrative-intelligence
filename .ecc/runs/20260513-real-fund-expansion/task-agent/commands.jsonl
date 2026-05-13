@@ -1,0 +1,14 @@
+{"command":"python -m pytest tests/test_real_fund_smoke.py::test_real_fund_smoke_summary_records_runner_failures -q","purpose":"RED check for per-fund smoke failure isolation","exit_code":1,"summary":"Failed as expected because runner exceptions aborted the smoke command before summary generation."}
+{"command":"python -m pytest tests/test_real_fund_smoke.py -q","purpose":"Focused smoke runner tests after implementation","exit_code":0,"summary":"4 passed."}
+{"command":"python -m pytest -q","purpose":"Full regression after real-fund smoke implementation","exit_code":0,"summary":"31 passed in 0.36s."}
+{"command":"python -m compileall -q src tests","purpose":"Syntax compilation check","exit_code":0,"summary":"Compilation passed."}
+{"command":"python -m src.main --fund-code 000001","purpose":"V1 acceptance command","exit_code":0,"summary":"Generated the four standard artifacts for fund 000001."}
+{"command":"python -m src.main --run-all-fixtures","purpose":"Mock fixture batch regression","exit_code":0,"summary":"Generated standard artifacts for 000001, 000002, and 000003."}
+{"command":"jq empty .ecc/framework-state.json .ecc/runs/20260513-real-fund-expansion/run-state.json","purpose":"Initial JSON syntax check for framework state and run state","exit_code":0,"summary":"JSON parsed successfully."}
+{"command":"python -m src.main --fund-code 161725 --provider-mode eastmoney","purpose":"Single-fund Eastmoney smoke","exit_code":0,"summary":"Generated the four standard artifacts for live holdings fund 161725."}
+{"command":"python -m src.main --run-real-smoke","purpose":"Six-fund Eastmoney smoke set","exit_code":0,"summary":"Passed for all six funds; minimum coverage was 78%."}
+{"command":"jq empty outputs/real_fund_smoke_summary.json outputs/fund_000001_raw.json outputs/fund_000001_scoring.json outputs/fund_161725_raw.json outputs/fund_161725_scoring.json","purpose":"Generated JSON artifact syntax check","exit_code":0,"summary":"Generated JSON artifacts parsed successfully."}
+{"command":"python -m ruff check .","purpose":"Lint check when available","exit_code":1,"summary":"Skipped effectively: ruff is not installed in the current Python environment."}
+{"command":"python -m coverage run -m pytest -q","purpose":"Coverage check when available","exit_code":1,"summary":"Skipped effectively: coverage is not installed in the current Python environment."}
+{"command":"rg -n \"(sk-[A-Za-z0-9]{10,}|api[_-]?key\\s*=|password\\s*=|secret\\s*=|token\\s*=)\" src tests data docs README.md pyproject.toml","purpose":"Basic hardcoded secret scan","exit_code":1,"summary":"No hardcoded credential patterns found in project source, tests, fixtures, docs, README, or pyproject."}
+{"command":"python scripts/ecc_task_run.py validate --run-dir .ecc/runs/20260513-real-fund-expansion --require-task-artifacts --require-quality-artifacts","purpose":"ECC run artifact validation","exit_code":0,"summary":"Run validation passed with no findings."}

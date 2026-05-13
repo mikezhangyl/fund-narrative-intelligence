@@ -1,0 +1,7 @@
+{"command":"python -m pytest tests/test_mapping_coverage.py -q","purpose":"RED check after adding mapping coverage tests","exit_code":2,"summary":"Failed as expected because build_mapping_result did not exist."}
+{"command":"python -m pytest tests/test_mapping_coverage.py -q","purpose":"Mapping coverage tests after implementation","exit_code":0,"summary":"3 passed."}
+{"command":"python -m pytest -q","purpose":"Full regression after mapping coverage implementation","exit_code":0,"summary":"25 passed in 0.46s."}
+{"command":"python -m compileall -q src tests","purpose":"Syntax compilation check","exit_code":0,"summary":"Compilation passed."}
+{"command":"python -m src.main --run-all-fixtures","purpose":"Batch mock regression","exit_code":0,"summary":"Generated mock scenario artifacts."}
+{"command":"python -m src.main --fund-code 161725 --provider-mode eastmoney --output-dir <tmpdir>","purpose":"Eastmoney mapping coverage smoke","exit_code":0,"summary":"Coverage ratio 1.0; fixture_rule 8; registry_term_rule 2."}
+{"command":"python -m src.main --fund-code 000001","purpose":"Original acceptance regression","exit_code":0,"summary":"Generated four artifacts for 000001."}

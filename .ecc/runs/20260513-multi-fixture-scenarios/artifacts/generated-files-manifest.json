@@ -1,0 +1,20 @@
+{
+  "generated_outputs": [
+    {
+      "path": "outputs/fund_000001_raw.json",
+      "committed": false,
+      "summary": "Raw output for strengthening scenario."
+    },
+    {
+      "path": "outputs/fund_000002_raw.json",
+      "committed": false,
+      "summary": "Raw output for crowded scenario."
+    },
+    {
+      "path": "outputs/fund_000003_raw.json",
+      "committed": false,
+      "summary": "Raw output for dead scenario."
+    }
+  ],
+  "notes": "Each scenario also generated scoring JSON, Markdown report, and HTML report. Outputs are ignored by git."
+}

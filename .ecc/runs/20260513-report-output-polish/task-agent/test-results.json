@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "test_commands": [
+    {
+      "command": "python -m pytest -q",
+      "exit_code": 0,
+      "summary": "22 passed in 0.41s"
+    },
+    {
+      "command": "python -m compileall -q src tests",
+      "exit_code": 0,
+      "summary": "Compilation passed"
+    },
+    {
+      "command": "python -m src.main --run-all-fixtures",
+      "exit_code": 0,
+      "summary": "Generated structured HTML reports for mock scenarios"
+    },
+    {
+      "command": "python -m src.main --fund-code 161725 --provider-mode eastmoney --output-dir <tmpdir>",
+      "exit_code": 0,
+      "summary": "Generated structured HTML report for live Eastmoney holdings"
+    }
+  ],
+  "coverage": {
+    "status": "not_available",
+    "reason": "coverage tooling is not installed in this environment"
+  }
+}

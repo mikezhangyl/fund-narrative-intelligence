@@ -3,23 +3,105 @@
 ## Project
 
 - Name: fund-narrative-intelligence
-- Status: bootstrap
+- Status: V1 mock pipeline implemented
 - Framework: merged ECC + Superpower + memory
 
 ## Product Goal
 
-Unknown. Fill this before implementation planning.
+Build a Fund Narrative Intelligence System: users enter a fund code, the system reads or mocks the fund's top holdings, infers the market narratives the fund is exposed to, evaluates whether those narratives are still supported by evidence, and generates a report with supporting and risk evidence.
+
+The product is a narrative sustainability analysis system, not a short-term price predictor, buy/sell signal generator, or automated investment advisor.
+
+Canonical product source:
+
+- `docs/product/fund-narrative-intelligence-system.html`
+- `docs/product/v1-implementation-spec.md`
+
+## Primary User
+
+Experienced individual investors or researchers who want to understand what market narratives a fund is effectively betting on and whether those narratives remain supported.
+
+## V1 Loop
+
+`Fund -> Holdings -> Stock Mapping -> Narrative Aggregation -> Signal-backed Narrative State -> Evidence Report`
+
+## V1 Scope
+
+- Input a fund code.
+- Fetch or mock the fund's top ten holdings.
+- Preserve the Fund -> Stock mapping.
+- Map stocks to multi-level weighted narratives with confidence.
+- Aggregate primary and secondary fund narrative exposure.
+- Score narrative sustainability across five dimensions: earnings validation, capital reinforcement, valuation pressure, narrative momentum, and counter-evidence risk.
+- Generate Markdown / HTML reports with evidence and an explicit non-investment-advice disclaimer.
+- Support mock providers so V1 runs without real API credentials.
+- Emit raw JSON, scoring JSON, Markdown report, and HTML report artifacts under `outputs/`.
+
+## V1 Acceptance Command
+
+`python -m src.main --fund-code 000001`
+
+Expected artifacts:
+
+- `outputs/fund_000001_raw.json`
+- `outputs/fund_000001_scoring.json`
+- `outputs/fund_000001_report.md`
+- `outputs/fund_000001_report.html`
+
+## Technical Stack
+
+- V1 engine: Python CLI.
+- Runtime dependencies: standard library only for the first mock pipeline.
+- Test runner: pytest.
+- Development quality tools: pytest, ruff, and coverage are declared in `pyproject.toml` under the `dev` extra.
+- Standard setup command: `python -m pip install -e ".[dev]"`.
+- Standard quality commands: `python -m ruff check .`, `python -m coverage run -m pytest -q`, `python -m coverage report`, and `python -m compileall -q src tests scripts`.
+- Data: local JSON fixtures and mock providers.
+- Future UI: Node.js / Next.js can be added later as a separate workspace layer.
+- CLI fixture discovery: `python -m src.main --list-fixtures`.
+- Batch fixture command: `python -m src.main --run-all-fixtures`.
+- Live Eastmoney smoke command: `python -m src.main --run-real-smoke`.
+- Provider payloads are validated before orchestration proceeds.
+- Real holdings adapter: `python -m src.main --fund-code 161725 --provider-mode eastmoney` tries Eastmoney/Tiantian Fund fund holdings and keeps local fixtures for all other V1 intelligence layers.
+- HTML reports render semantic sections/tables directly from structured scoring data.
+- Mapping output includes coverage ratio, mapping method counts, and unmapped holdings.
+- Unmapped holdings can receive low-confidence `registry_term_rule` mappings from narrative registry aliases/related terms matched against stock name and industry.
+- Narrative reports include deterministic stage, risk, and confidence interpretation notes; these are explanatory and non-advisory.
+- Real-fund smoke summaries isolate failures per fund, write summary artifacts, and return non-zero when any fund fails or falls below coverage threshold.
+
+## Mock Scenario Fixtures
+
+- `000001`: AI infrastructure validation scenario, primary stage `strengthening`.
+- `000002`: AI power crowding scenario, primary stage `crowded`.
+- `000003`: EV pressure and counter-evidence scenario, primary stage `dead`.
+
+## Real Provider Smoke Result
+
+- `161725` with `--provider-mode eastmoney`: Premium Baijiu Consumption / `diverging` in the current fixture-backed mapping layer.
+- Real smoke set covers `161725`, `320007`, `003096`, `003834`, `001475`, and `000991`; latest smoke passed with minimum coverage ratio 78%.
+
+## Deferred Scope
+
+- Fully automatic narrative discovery.
+- Automatic signal vocabulary governance.
+- Full historical replay.
+- Complex knowledge graph infrastructure.
+- Real-time alerts.
+- Frontend workspace.
+- Buy / sell signals.
 
 ## Current Operating Assumptions
 
 - This project starts with the merged framework scaffold.
 - QA/testing workflows are optional, not the default project identity.
 - Durable knowledge belongs in project files, not chat history.
+- V1 should be monolith-first with clear module boundaries.
+- Narrative, Signal, and Evidence are first-class domain objects.
+- Slow-changing intelligence should be maintained separately from fast on-demand report generation.
+- Human review is required before AI-proposed candidates change core registries.
+- V1 outputs must include version metadata for provider set, narrative registry, signal schema, scoring model, and report template.
+- Data provider failures should degrade output quality and confidence instead of crashing the pipeline when mock fallback or partial data is available.
 
 ## Open Questions
 
-- What is the product's primary user and core workflow?
-- What is the expected technical stack?
-- What is the first deliverable?
-- Should the first task use a worktree?
-
+- Should the next iteration broaden the narrative registry and rules for more Eastmoney real-fund sectors, or improve the scoring language and report interpretation?

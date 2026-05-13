@@ -1,0 +1,7 @@
+{"command":"python -m pytest -q","purpose":"RED check after adding Eastmoney provider tests","exit_code":2,"summary":"Failed as expected because src.providers.eastmoney did not exist."}
+{"command":"python -m pytest -q","purpose":"Run tests after implementing Eastmoney provider","exit_code":0,"summary":"20 passed, later 21 passed after report hardening."}
+{"command":"python -m src.main --fund-code 161725 --provider-mode eastmoney --output-dir <tmpdir>","purpose":"Eastmoney smoke verification","exit_code":0,"summary":"Generated four artifacts; primary Premium Baijiu Consumption; stage diverging; no fallback."}
+{"command":"python -m compileall -q src tests","purpose":"Syntax compilation check","exit_code":0,"summary":"Compilation passed."}
+{"command":"python -m src.main --run-all-fixtures","purpose":"Regression check for mock fixtures","exit_code":0,"summary":"Generated outputs for 000001, 000002, and 000003."}
+{"command":"python -m src.main --fund-code 000001","purpose":"Original acceptance command regression","exit_code":0,"summary":"Generated four artifacts for 000001."}
+{"command":"jq empty .ecc/framework-state.json data/fixtures/narrative_registry.json data/fixtures/stock_narrative_mappings.json data/fixtures/evidence.json data/fixtures/signal_events.json","purpose":"JSON validation","exit_code":0,"summary":"All checked JSON files valid."}

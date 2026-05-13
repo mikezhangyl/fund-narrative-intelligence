@@ -8,9 +8,9 @@
     "ecc-task-subagent-workflow",
     "memory-governance"
   ],
-  "current_phase": "project_bootstrap",
-  "latest_run": "20260512-framework-bootstrap",
+  "current_phase": "v1_mock_pipeline",
+  "latest_run": "20260513-quality-baseline",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "define product goal, first deliverable, initial stack assumptions, and whether the first implementation task needs a worktree"
+  "next_step": "review real-fund smoke reports, then improve sector-specific scoring signals or add another real provider layer"
 }

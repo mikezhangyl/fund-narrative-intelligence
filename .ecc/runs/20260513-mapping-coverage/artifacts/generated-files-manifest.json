@@ -1,0 +1,15 @@
+{
+  "generated_outputs": [
+    {
+      "path": "outputs/fund_000001_report.html",
+      "committed": false,
+      "summary": "HTML report regenerated with mapping coverage section."
+    },
+    {
+      "path": "<tmpdir>/fund_161725_report.html",
+      "committed": false,
+      "summary": "Eastmoney smoke report generated with mapping coverage."
+    }
+  ],
+  "notes": "Generated outputs are ignored by git. Eastmoney smoke used a temporary directory."
+}

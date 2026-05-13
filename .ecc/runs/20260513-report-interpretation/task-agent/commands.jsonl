@@ -1,0 +1,6 @@
+{"command":"python -m pytest tests/test_interpretation.py tests/test_cli_pipeline.py -q","purpose":"RED check after adding interpretation tests","exit_code":2,"summary":"Failed as expected because interpretation module did not exist."}
+{"command":"python -m pytest tests/test_interpretation.py tests/test_cli_pipeline.py -q","purpose":"Focused interpretation tests after implementation","exit_code":0,"summary":"5 passed."}
+{"command":"python -m pytest -q","purpose":"Full regression after interpretation implementation","exit_code":0,"summary":"27 passed in 0.48s."}
+{"command":"python -m src.main --run-all-fixtures","purpose":"Batch report generation with interpretation notes","exit_code":0,"summary":"Generated reports for 000001, 000002, 000003."}
+{"command":"python -m src.main --fund-code 161725 --provider-mode eastmoney --output-dir <tmpdir>","purpose":"Eastmoney report generation with interpretation notes","exit_code":0,"summary":"Generated report with interpretation for Premium Baijiu Consumption."}
+{"command":"python -m compileall -q src tests","purpose":"Syntax compilation check","exit_code":0,"summary":"Compilation passed."}

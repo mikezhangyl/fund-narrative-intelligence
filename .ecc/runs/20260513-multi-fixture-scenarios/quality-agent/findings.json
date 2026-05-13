@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Scenario fixtures are mock-only.",
+    "Stage expectations are coupled to scoring-v1 heuristics."
+  ]
+}

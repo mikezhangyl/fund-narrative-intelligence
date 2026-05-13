@@ -1,0 +1,10 @@
+{"command":"python3 -m pytest -q","purpose":"RED check after writing tests before src package existed","exit_code":2,"summary":"Failed as expected with ModuleNotFoundError for src."}
+{"command":"python3 -m pytest -q","purpose":"Run tests after implementing V1 pipeline","exit_code":0,"summary":"6 passed in 0.15s."}
+{"command":"python3 -m src.main --fund-code 000001","purpose":"Initial acceptance command using python3","exit_code":0,"summary":"Generated raw JSON, scoring JSON, Markdown report, and HTML report under outputs/."}
+{"command":"python -m pytest -q","purpose":"Final test run using the documented python command","exit_code":0,"summary":"6 passed in 0.13s."}
+{"command":"python -m src.main --fund-code 000001","purpose":"Final acceptance command using the documented python command","exit_code":0,"summary":"Generated the four required V1 artifacts under outputs/."}
+{"command":"python -m src.main --fund-code ABC","purpose":"Invalid input verification","exit_code":2,"summary":"CLI rejects non-digit fund codes with argparse error."}
+{"command":"python -m src.main --fund-code 000001 --provider-mode real --output-dir <tmpdir>","purpose":"Provider degradation verification","exit_code":0,"summary":"Real mode degrades to mock provider and records provider_fallback event."}
+{"command":"python -m pytest --cov=src --cov-report=term-missing -q","purpose":"Coverage verification attempt","exit_code":4,"summary":"pytest-cov is not installed in this environment, so --cov is unavailable."}
+{"command":"python -m coverage --version","purpose":"Coverage tool availability check","exit_code":1,"summary":"coverage module is not installed in this environment."}
+{"command":"python -m compileall -q src tests","purpose":"Syntax compilation check","exit_code":0,"summary":"All src and tests files compiled successfully."}

@@ -1,0 +1,15 @@
+{
+  "generated_outputs": [
+    {
+      "path": "outputs/fund_000001_report.md",
+      "committed": false,
+      "summary": "Markdown report regenerated with interpretation notes."
+    },
+    {
+      "path": "outputs/fund_000001_report.html",
+      "committed": false,
+      "summary": "HTML report regenerated with interpretation notes."
+    }
+  ],
+  "notes": "Generated outputs are ignored by git."
+}

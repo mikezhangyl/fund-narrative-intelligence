@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "findings": [],
+  "resolved_findings": [
+    {
+      "severity": "high",
+      "summary": "Open-ended dev dependency minimums made quality tooling less reproducible.",
+      "resolution": "Pinned pytest, ruff, and coverage versions in the dev extra."
+    },
+    {
+      "severity": "high",
+      "summary": "README hardcoded --fail-under=80, duplicating the pyproject coverage threshold.",
+      "resolution": "README now uses python -m coverage report and leaves fail_under in pyproject.toml."
+    }
+  ],
+  "residual_risks": [
+    "Coverage is aggregate and does not enforce per-file thresholds.",
+    "src/main.py remains below 80% file-level coverage.",
+    "Some CLI tests assert console presentation details."
+  ]
+}

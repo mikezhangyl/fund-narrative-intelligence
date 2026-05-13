@@ -1,0 +1,11 @@
+{
+  "review_id": "20260513-multi-fixture-scenarios",
+  "status": "passed",
+  "reviewed_at": "2026-05-13",
+  "reviewed_snapshot_type": "working_tree",
+  "quality_reviewed_commit": null,
+  "working_tree_dirty": true,
+  "findings_count": 0,
+  "unresolved_findings_count": 0,
+  "fix_required_before_next_phase": false
+}

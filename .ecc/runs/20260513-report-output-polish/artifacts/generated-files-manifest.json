@@ -1,0 +1,20 @@
+{
+  "generated_outputs": [
+    {
+      "path": "outputs/fund_000001_report.html",
+      "committed": false,
+      "summary": "Structured HTML report regenerated for mock scenario 000001."
+    },
+    {
+      "path": "outputs/fund_000002_report.html",
+      "committed": false,
+      "summary": "Structured HTML report regenerated for mock scenario 000002."
+    },
+    {
+      "path": "outputs/fund_000003_report.html",
+      "committed": false,
+      "summary": "Structured HTML report regenerated for mock scenario 000003."
+    }
+  ],
+  "notes": "Generated outputs are ignored by git."
+}

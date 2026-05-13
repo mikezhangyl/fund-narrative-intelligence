@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "test_commands": [
+    {
+      "command": "python -m pytest -q",
+      "exit_code": 0,
+      "summary": "27 passed in 0.48s"
+    },
+    {
+      "command": "python -m src.main --run-all-fixtures",
+      "exit_code": 0,
+      "summary": "Generated interpretation notes for mock reports"
+    },
+    {
+      "command": "python -m src.main --fund-code 161725 --provider-mode eastmoney --output-dir <tmpdir>",
+      "exit_code": 0,
+      "summary": "Generated interpretation notes for Eastmoney report"
+    }
+  ],
+  "coverage": {
+    "status": "not_available",
+    "reason": "coverage tooling is not installed in this environment"
+  }
+}

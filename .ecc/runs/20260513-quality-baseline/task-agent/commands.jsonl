@@ -1,0 +1,18 @@
+{"command":"python -m pytest tests/test_quality_config.py -q","purpose":"RED check for missing dev tooling contract","exit_code":1,"summary":"Failed as expected before pyproject and README quality configuration existed."}
+{"command":"python -m pytest tests/test_quality_config.py -q","purpose":"Focused quality config tests after implementation","exit_code":0,"summary":"3 passed."}
+{"command":"python -m pip install -e \".[dev]\"","purpose":"Install project dev tooling from metadata","exit_code":0,"summary":"Installed pinned dev tools: coverage 7.14.0, pytest 8.3.4, ruff 0.15.12."}
+{"command":"python -m ruff check .","purpose":"Lint gate before import cleanup","exit_code":1,"summary":"Found import ordering and unused import issues; all were mechanically fixable."}
+{"command":"python -m ruff check . --fix","purpose":"Apply mechanical lint fixes","exit_code":0,"summary":"Fixed 10 lint issues."}
+{"command":"python -m ruff check .","purpose":"Lint gate after fixes","exit_code":0,"summary":"All checks passed."}
+{"command":"python -m pytest -q","purpose":"Full test suite before coverage improvements","exit_code":0,"summary":"34 passed in 0.43s."}
+{"command":"python -m coverage run -m pytest -q && python -m coverage report --fail-under=80","purpose":"Initial coverage gate","exit_code":2,"summary":"Coverage failed at 77%; subprocess CLI tests did not cover src/main.py in-process."}
+{"command":"python -m pytest tests/test_main_cli.py -q","purpose":"Focused CLI tests after adding direct main() coverage","exit_code":0,"summary":"8 passed."}
+{"command":"python -m ruff check tests/test_main_cli.py --fix","purpose":"Fix import ordering in new CLI tests","exit_code":0,"summary":"Fixed 1 lint issue."}
+{"command":"python -m ruff check .","purpose":"Final lint gate","exit_code":0,"summary":"All checks passed."}
+{"command":"python -m pytest -q","purpose":"Final full test suite","exit_code":0,"summary":"42 passed in 0.39s."}
+{"command":"python -m compileall -q src tests scripts","purpose":"Final syntax compilation check","exit_code":0,"summary":"Compilation passed."}
+{"command":"python -m coverage run -m pytest -q && python -m coverage report","purpose":"Final coverage gate using pyproject fail_under","exit_code":0,"summary":"42 passed; total coverage 85%."}
+{"command":"python -m src.main --fund-code 000001","purpose":"V1 acceptance command after quality tooling changes","exit_code":0,"summary":"Generated the four standard artifacts for fund 000001."}
+{"command":"python -m src.main --run-all-fixtures","purpose":"Mock batch command after quality tooling changes","exit_code":0,"summary":"Generated standard artifacts for 000001, 000002, and 000003."}
+{"command":"python -m src.main --run-real-smoke","purpose":"Real provider smoke after quality tooling changes","exit_code":0,"summary":"Six-fund smoke set passed; minimum coverage was 78%."}
+{"command":"python scripts/ecc_task_run.py validate --run-dir .ecc/runs/20260513-quality-baseline --require-task-artifacts --require-quality-artifacts","purpose":"ECC run artifact validation","exit_code":0,"summary":"Run validation passed with no findings."}

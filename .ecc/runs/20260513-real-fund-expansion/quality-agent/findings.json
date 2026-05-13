@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Eastmoney endpoint availability and schema stability remain external dependencies.",
+    "Real-fund narrative scoring is still fixture-backed beyond live holdings.",
+    "Registry-term fallback mapping can over-map broad sector terms and should be reviewed with real report samples."
+  ]
+}

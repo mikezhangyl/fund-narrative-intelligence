@@ -16,7 +16,7 @@ Merged strengths:
 
 ## Current Phase
 
-`project_bootstrap`
+`v1_mock_pipeline`
 
 ## Initial Acceptance Criteria
 
@@ -30,8 +30,6 @@ Merged strengths:
 
 ## Next Steps
 
-1. Define the product/project goal.
-2. Decide whether the first implementation task needs a worktree.
-3. Create the first real task run under `.ecc/runs/<task-run-id>/`.
-4. Update project memory after the first meaningful decision.
-
+1. Review the generated V1 mock report.
+2. Decide whether the next iteration should refine scoring, add more sample funds, or integrate the first real provider.
+3. Record provider-specific architecture decisions before adding real data integrations.

@@ -1,0 +1,25 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "smoke_summary_json",
+      "path": "outputs/real_fund_smoke_summary.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "89ec089becd14fd64ef6c957655790b45ef805d87953fe2b782229cd088ed3b7",
+      "mtime_epoch": 1778652263,
+      "size_bytes": 3760,
+      "summary": "Machine-readable six-fund Eastmoney smoke summary."
+    },
+    {
+      "type": "smoke_summary_markdown",
+      "path": "outputs/real_fund_smoke_summary.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "010cea271c1fe452b6b80fd711dadbc0b9250d11fabb825b54cae057c097745e",
+      "mtime_epoch": 1778652263,
+      "size_bytes": 895,
+      "summary": "Human-readable six-fund Eastmoney smoke summary."
+    }
+  ],
+  "notes": "Generated per-fund raw, scoring, Markdown, and HTML reports are under outputs/ and ignored by git."
+}

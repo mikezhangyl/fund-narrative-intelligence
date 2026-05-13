@@ -1,0 +1,6 @@
+{"command":"python -m pytest tests/test_report_writer.py -q","purpose":"RED check after adding semantic HTML test","exit_code":1,"summary":"Failed as expected because HTML was Markdown wrapped in paragraphs."}
+{"command":"python -m pytest tests/test_report_writer.py -q","purpose":"Report writer test after implementation","exit_code":0,"summary":"1 passed."}
+{"command":"python -m pytest -q","purpose":"Full test suite after report renderer change","exit_code":0,"summary":"22 passed in 0.41s."}
+{"command":"python -m src.main --run-all-fixtures","purpose":"Regenerate mock HTML reports","exit_code":0,"summary":"Generated reports for 000001, 000002, and 000003."}
+{"command":"python -m src.main --fund-code 161725 --provider-mode eastmoney --output-dir <tmpdir>","purpose":"Eastmoney HTML smoke check","exit_code":0,"summary":"Generated structured HTML report for 161725."}
+{"command":"python -m compileall -q src tests","purpose":"Syntax compilation check","exit_code":0,"summary":"Compilation passed."}

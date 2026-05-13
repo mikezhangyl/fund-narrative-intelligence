@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "HTML reports are static and chart-free.",
+    "No browser screenshot verification was run because the report is static HTML and tests inspect structure."
+  ]
+}

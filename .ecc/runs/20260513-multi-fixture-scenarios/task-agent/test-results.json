@@ -1,0 +1,44 @@
+{
+  "status": "passed",
+  "test_commands": [
+    {
+      "command": "python -m pytest -q",
+      "exit_code": 0,
+      "summary": "16 passed in 0.33s"
+    },
+    {
+      "command": "python -m src.main --run-all-fixtures",
+      "exit_code": 0,
+      "summary": "Generated four artifacts each for 000001, 000002, and 000003"
+    },
+    {
+      "command": "python -m src.main --list-fixtures",
+      "exit_code": 0,
+      "summary": "Listed 000001, 000002, and 000003"
+    }
+  ],
+  "scenario_results": [
+    {
+      "fund_code": "000001",
+      "primary_narrative": "AI Infrastructure",
+      "stage": "strengthening",
+      "sustainability_score": 69.15
+    },
+    {
+      "fund_code": "000002",
+      "primary_narrative": "AI Power Demand",
+      "stage": "crowded",
+      "sustainability_score": 55.45
+    },
+    {
+      "fund_code": "000003",
+      "primary_narrative": "EV Price War",
+      "stage": "dead",
+      "sustainability_score": 24.5
+    }
+  ],
+  "coverage": {
+    "status": "not_available",
+    "reason": "coverage tooling is not installed in this environment"
+  }
+}

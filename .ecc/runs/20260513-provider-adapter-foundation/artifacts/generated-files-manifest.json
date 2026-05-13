@@ -1,0 +1,20 @@
+{
+  "generated_outputs": [
+    {
+      "path": "<tmpdir>/fund_161725_raw.json",
+      "committed": false,
+      "summary": "Live Eastmoney holdings smoke raw output."
+    },
+    {
+      "path": "<tmpdir>/fund_161725_scoring.json",
+      "committed": false,
+      "summary": "Live Eastmoney holdings smoke scoring output."
+    },
+    {
+      "path": "outputs/fund_000001_raw.json",
+      "committed": false,
+      "summary": "Mock acceptance output regenerated after provider adapter work."
+    }
+  ],
+  "notes": "Generated outputs are ignored by git. The Eastmoney smoke used a temporary directory."
+}

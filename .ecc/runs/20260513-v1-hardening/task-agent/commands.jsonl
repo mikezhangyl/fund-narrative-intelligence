@@ -1,0 +1,8 @@
+{"command":"python -m pytest -q","purpose":"RED check after adding hardening tests","exit_code":2,"summary":"Failed as expected because src.errors and validation did not exist yet."}
+{"command":"python -m pytest -q","purpose":"Run tests after implementing validation and CLI improvements","exit_code":0,"summary":"12 passed in 0.23s."}
+{"command":"python -m compileall -q src tests","purpose":"Syntax compilation check","exit_code":0,"summary":"All src and tests files compiled successfully."}
+{"command":"python -m src.main --list-fixtures","purpose":"Fixture discovery verification","exit_code":0,"summary":"Listed 000001."}
+{"command":"python -m src.main --fund-code 000001","purpose":"Acceptance command verification","exit_code":0,"summary":"Generated four required artifacts under outputs/."}
+{"command":"python -m src.main --fund-code 999999","purpose":"Missing fixture controlled error verification","exit_code":1,"summary":"Printed No mock fixture found for fund code 999999."}
+{"command":"python -m src.main --fund-code 000001 --provider-mode real --output-dir <tmpdir>","purpose":"Provider fallback verification","exit_code":0,"summary":"Recorded provider_fallback and generated mock-quality output."}
+{"command":"jq empty .ecc/framework-state.json .ecc/runs/20260513-v1-hardening/run-state.json outputs/fund_000001_raw.json outputs/fund_000001_scoring.json","purpose":"JSON validation","exit_code":0,"summary":"All checked JSON files are valid."}

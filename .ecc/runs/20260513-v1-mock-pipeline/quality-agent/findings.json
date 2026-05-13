@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Coverage tooling is not installed, so numeric coverage was not measured.",
+    "V1 data is mock-only and scoring is heuristic."
+  ]
+}

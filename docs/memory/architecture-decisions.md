@@ -22,3 +22,88 @@ Consequences:
 - Durable project memory lives under `docs/memory/` and `.ecc/memory/project/`.
 - QA-specific flows remain available as optional skills.
 
+## ADR-0002: Use Python For V1 Intelligence Engine
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Use Python for the V1 report-first intelligence engine.
+
+Rationale:
+
+- The core work is provider ingestion, structured fixtures, financial data normalization, signal scoring, and report generation.
+- Python aligns better with likely future providers and analysis tooling such as AKShare, Tushare, pandas, and financial/statistical workflows.
+- V1 does not need a frontend workspace, so starting with Node.js or Next.js would add surface area before the intelligence loop is validated.
+
+Consequences:
+
+- V1 runs as a Python CLI.
+- The first acceptance command is `python -m src.main --fund-code 000001`.
+- Node.js / Next.js remains a future option for a workspace UI after the report-first engine is stable.
+
+## ADR-0003: Keep Mock Baseline While Adding Eastmoney Holdings Adapter
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Add an explicit `eastmoney` provider mode for no-key Eastmoney/Tiantian Fund holdings while preserving `mock` as the deterministic baseline and keeping `real` as compatibility fallback.
+
+Rationale:
+
+- V1 needs one real holdings path to validate provider boundaries.
+- The Eastmoney/Tiantian Fund mobile endpoint can return single-fund stock holdings with holding percentages and public date.
+- Real holdings alone are not enough for the full narrative report; registry, stock mapping, evidence, and signals remain local fixtures in V1.
+- Mock fixtures must remain stable for repeatable tests and development.
+
+Consequences:
+
+- `python -m src.main --fund-code 161725 --provider-mode eastmoney` can produce a real-holdings-backed report when the public endpoint is reachable.
+- If the Eastmoney fetch fails, the adapter records `provider_fallback` and falls back to a mock fixture when available.
+- Future real providers should normalize into the same V1 fund-holdings contract before orchestration.
+
+## ADR-0004: Use A Fixed Real-Fund Smoke Set For Provider Regression
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Use a fixed Eastmoney smoke set covering baijiu consumption, semiconductors, healthcare, new energy, defense, and real estate.
+
+Rationale:
+
+- A single real fund is not enough to validate provider normalization, mapping coverage, and report generation.
+- The smoke set gives a repeatable check against multiple sector vocabularies while keeping V1 scope small.
+- It exposes mapping coverage and unmapped holdings before users trust narrative interpretation.
+
+Consequences:
+
+- `python -m src.main --run-real-smoke` generates per-fund artifacts plus summary JSON/Markdown.
+- The smoke set is a regression check, not a recommendation list.
+- Registry-term coverage should be expanded only when unmapped holdings reveal a durable narrative gap.
+
+## ADR-0005: Keep Python Quality Gates In Project Metadata
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Declare pytest, ruff, and coverage as project development dependencies and configure their gates in `pyproject.toml`.
+
+Rationale:
+
+- V1 quality checks should be reproducible across machines instead of relying on globally installed Python tools.
+- The project already uses Python as the report-first intelligence engine, so Python-native tool configuration belongs beside project metadata.
+- An 80% coverage floor matches the ECC testing requirement while keeping the early V1 CLI practical.
+
+Consequences:
+
+- Developers should run `python -m pip install -e ".[dev]"` before local quality checks.
+- Standard gates are `python -m ruff check .`, `python -m coverage run -m pytest -q`, `python -m coverage report`, and `python -m compileall -q src tests scripts`.
+- Development tool versions are pinned in the `dev` extra until the project introduces a lockfile.
+- Coverage is measured over `src`; generated outputs remain ignored.

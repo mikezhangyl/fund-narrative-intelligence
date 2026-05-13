@@ -1,0 +1,41 @@
+{
+  "status": "passed",
+  "test_commands": [
+    {
+      "command": "python -m ruff check .",
+      "exit_code": 0,
+      "summary": "All checks passed"
+    },
+    {
+      "command": "python -m pytest -q",
+      "exit_code": 0,
+      "summary": "42 passed in 0.39s"
+    },
+    {
+      "command": "python -m coverage run -m pytest -q",
+      "exit_code": 0,
+      "summary": "42 passed"
+    },
+    {
+      "command": "python -m coverage report",
+      "exit_code": 0,
+      "summary": "Total coverage 85%; configured fail_under threshold passed"
+    },
+    {
+      "command": "python -m compileall -q src tests scripts",
+      "exit_code": 0,
+      "summary": "Compilation passed"
+    },
+    {
+      "command": "python -m src.main --run-real-smoke",
+      "exit_code": 0,
+      "summary": "Real smoke passed for six funds"
+    }
+  ],
+  "coverage": {
+    "status": "passed",
+    "total": "85%",
+    "threshold": "80%",
+    "source": "src"
+  }
+}

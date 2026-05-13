@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Eastmoney endpoint may change without notice.",
+    "Real provider coverage is holdings-only.",
+    "Real holdings require local mapping coverage to produce useful narratives."
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Interpretation language is generic by design.",
+    "No human analyst style guide has been applied yet."
+  ]
+}
