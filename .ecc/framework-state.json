@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260513-provider-evidence-foundation",
+  "latest_run": "20260513-evidence-provider-interfaces",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "finish provider foundation disclosure so mock, degraded, and mixed provider runs are visible in reports"
+  "next_step": "finish provider-layer interfaces for evidence, signal, market, valuation, announcement, and news sources"
 }

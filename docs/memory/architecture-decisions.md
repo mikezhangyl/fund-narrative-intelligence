@@ -149,3 +149,24 @@ Consequences:
 - Raw and scoring JSON include `provider_foundation` with per-layer provenance and `effective_data_quality`.
 - Scoring confidence uses `effective_data_quality`; Eastmoney holdings plus mock intelligence layers is `partial`.
 - Markdown and HTML reports render a `Data Source Notice` that lists provider layers and degradation events.
+
+## ADR-0008: Split Intelligence Sources Into Layer Provider Interfaces
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Split V1 intelligence data sources into explicit provider-layer interfaces for narrative registry, stock mappings, evidence, signal events, market data, valuation, announcements, and news evidence.
+
+Rationale:
+
+- Eastmoney currently provides holdings only; the intelligence layers remain fixture-backed.
+- Future AKShare, Tushare, CNINFO, exchange announcement, and news/search providers should be added behind stable contracts instead of changing orchestration each time.
+- Empty mock providers for reserved layers make missing real providers explicit without fabricating data.
+
+Consequences:
+
+- `MockDataProvider` composes `MockIntelligenceProviderSet` for registry, mappings, evidence, and signals.
+- Reserved market, valuation, announcement, and news providers return stable empty mock payloads until real providers are implemented.
+- Provider foundation can use layer-provider provenance when rendering user-facing data-source disclosure.

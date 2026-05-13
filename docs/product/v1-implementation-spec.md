@@ -51,6 +51,21 @@ V1 also emits a run-level `provider_foundation` object in raw and scoring JSON. 
 
 `provider_foundation.effective_data_quality` is the quality used for scoring confidence and user-facing reports. For example, an Eastmoney holdings run with mock registry, mapping, evidence, and signals is `partial`, not `fresh`.
 
+Current provider-layer interfaces:
+
+| Interface | V1 Mock Implementation | Current Behavior |
+| --- | --- | --- |
+| `NarrativeRegistryProvider` | `MockNarrativeRegistryProvider` | loads `narrative_registry.json`. |
+| `StockNarrativeMappingProvider` | `MockStockNarrativeMappingProvider` | loads `stock_narrative_mappings.json`. |
+| `EvidenceProvider` | `MockEvidenceProvider` | loads `evidence.json`. |
+| `SignalEventProvider` | `MockSignalEventProvider` | loads `signal_events.json`. |
+| `MarketDataProvider` | `MockMarketDataProvider` | returns an explicit empty mock quote payload. |
+| `ValuationProvider` | `MockValuationProvider` | returns an explicit empty mock valuation payload. |
+| `AnnouncementProvider` | `MockAnnouncementProvider` | returns an explicit empty mock announcement payload. |
+| `NewsEvidenceProvider` | `MockNewsEvidenceProvider` | returns an explicit empty mock news evidence payload. |
+
+The empty mock providers are deliberate placeholders. They preserve V1 contracts without pretending that real quote, valuation, announcement, or news ingestion exists.
+
 ## Degradation Strategy
 
 The pipeline should complete whenever enough data exists to produce a bounded report. Provider failure should reduce confidence and surface data quality, not crash the full run.

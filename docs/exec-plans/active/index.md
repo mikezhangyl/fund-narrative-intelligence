@@ -12,3 +12,4 @@
 - [quality-baseline.md](./quality-baseline.md)
 - [real-fund-scoring-calibration.md](./real-fund-scoring-calibration.md)
 - [provider-evidence-foundation.md](./provider-evidence-foundation.md)
+- [evidence-provider-interfaces.md](./evidence-provider-interfaces.md)

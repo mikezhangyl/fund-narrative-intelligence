@@ -64,6 +64,7 @@ python -m compileall -q src tests scripts
 
 - Python CLI.
 - Local mock providers and JSON fixtures.
+- Mock intelligence layer providers for registry, mappings, evidence, signals, and reserved market/valuation/announcement/news interfaces.
 - Narrative registry loading.
 - Stock-to-narrative mapping.
 - Fund narrative aggregation.

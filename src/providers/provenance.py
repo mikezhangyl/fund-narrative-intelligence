@@ -23,10 +23,11 @@ LAYER_DISPLAY_NAMES = {
 
 
 def build_mock_provider_foundation(
+    layers: dict[str, dict[str, Any]] | None = None,
     degradation_events: list[dict[str, str]] | None = None,
 ) -> dict[str, Any]:
     return build_provider_foundation(
-        layers={layer: mock_layer(layer) for layer in PROVIDER_LAYERS},
+        layers=layers or {layer: mock_layer(layer) for layer in PROVIDER_LAYERS},
         degradation_events=degradation_events or [],
     )
 

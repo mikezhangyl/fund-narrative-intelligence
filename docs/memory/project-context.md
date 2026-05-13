@@ -64,6 +64,7 @@ Expected artifacts:
 - Provider payloads are validated before orchestration proceeds.
 - Real holdings adapter: `python -m src.main --fund-code 161725 --provider-mode eastmoney` tries Eastmoney/Tiantian Fund fund holdings and keeps local fixtures for all other V1 intelligence layers.
 - Provider foundation metadata separates holdings, narrative registry, stock mappings, evidence, and signals so mixed real/mock runs are marked `partial` instead of `fresh`.
+- Mock intelligence layer providers now expose separate interfaces for registry, stock mappings, evidence, signals, and reserved market/valuation/announcement/news sources.
 - Markdown and HTML reports include a `Data Source Notice` whenever a run uses mock data, fallback/degradation, or mixed real/mock layers.
 - HTML reports render semantic sections/tables directly from structured scoring data.
 - Mapping output includes coverage ratio, mapping method counts, and unmapped holdings.
@@ -104,6 +105,7 @@ Expected artifacts:
 - V1 outputs must include version metadata for provider set, narrative registry, signal schema, scoring model, and report template.
 - Data provider failures should degrade output quality and confidence instead of crashing the pipeline when mock fallback or partial data is available.
 - Mock data and mock fallback must be explicitly disclosed in user-facing report output; no UI or report should present mock-backed analysis as a fully real environment.
+- New real intelligence sources should plug into the layer provider interfaces before changing orchestration.
 
 ## Open Questions
 

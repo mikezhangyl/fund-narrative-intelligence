@@ -7,14 +7,12 @@ from typing import Any
 
 from src.config import FIXTURE_DIR
 from src.errors import FixtureNotFoundError
-from src.providers.provenance import build_mock_provider_foundation
-from src.validation import (
-    validate_evidence_payload,
-    validate_fund_payload,
-    validate_mapping_payload,
-    validate_registry_payload,
-    validate_signal_payload,
+from src.providers.intelligence import MockIntelligenceProviderSet
+from src.providers.provenance import (
+    PROVIDER_LAYERS,
+    build_mock_provider_foundation,
 )
+from src.validation import validate_fund_payload
 
 
 class MockDataProvider:
@@ -25,6 +23,9 @@ class MockDataProvider:
 
     def __init__(self, fixture_dir: Path = FIXTURE_DIR):
         self.fixture_dir = fixture_dir
+        self.intelligence_providers = MockIntelligenceProviderSet(
+            fixture_dir=fixture_dir
+        )
         self.degradation_events: list[dict[str, str]] = []
 
     def list_fund_codes(self) -> list[str]:
@@ -39,24 +40,16 @@ class MockDataProvider:
         return deepcopy(payload)
 
     def get_narrative_registry(self) -> dict[str, Any]:
-        payload = self._load_json("narrative_registry.json")
-        validate_registry_payload(payload)
-        return deepcopy(payload)
+        return self.intelligence_providers.get_narrative_registry()
 
     def get_stock_narrative_mappings(self) -> list[dict[str, Any]]:
-        payload = self._load_json("stock_narrative_mappings.json")
-        validate_mapping_payload(payload)
-        return deepcopy(payload["mappings"])
+        return self.intelligence_providers.get_stock_narrative_mappings()
 
     def get_evidence(self) -> list[dict[str, Any]]:
-        payload = self._load_json("evidence.json")
-        validate_evidence_payload(payload)
-        return deepcopy(payload["evidence"])
+        return self.intelligence_providers.get_evidence()
 
     def get_signal_events(self) -> list[dict[str, Any]]:
-        payload = self._load_json("signal_events.json")
-        validate_signal_payload(payload)
-        return deepcopy(payload["signal_events"])
+        return self.intelligence_providers.get_signal_events()
 
     def get_provider_foundation(
         self,
@@ -64,7 +57,15 @@ class MockDataProvider:
         degradation_events: list[dict[str, str]],
     ) -> dict[str, Any]:
         del fund_provider_metadata
-        return build_mock_provider_foundation(degradation_events=degradation_events)
+        layers = {
+            **build_mock_provider_foundation()["layers"],
+            **self.intelligence_providers.get_provider_layers(),
+        }
+        ordered_layers = {layer: layers[layer] for layer in PROVIDER_LAYERS}
+        return build_mock_provider_foundation(
+            layers=ordered_layers,
+            degradation_events=degradation_events,
+        )
 
     def _load_json(self, filename: str) -> Any:
         path = self.fixture_dir / filename
