@@ -52,6 +52,25 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
                 "recommended_action": "manual_review",
             }
         ],
+        "mapping_rationales": [
+            {
+                "stock_code": "NVDA",
+                "stock_name": "NVIDIA",
+                "industry": "Semiconductors",
+                "narrative_id": "N_AI_INFRA",
+                "narrative_name": "AI Infrastructure",
+                "method": "fixture_rule",
+                "confidence": 0.86,
+                "mapping_weight": 0.9,
+                "matched_terms": [],
+                "needs_review": False,
+                "precision_flag": None,
+                "reason": (
+                    "Explicit fixture_rule mapping from the stock-narrative "
+                    "mapping fixture."
+                ),
+            }
+        ],
         "supporting_evidence": [
             {
                 "title": "Guidance raised",
@@ -89,9 +108,12 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert '<section class="primary-narrative">' in html
     assert '<section class="mapping-coverage">' in html
     assert '<section class="mapping-precision-flags">' in html
+    assert '<section class="mapping-rationales">' in html
     assert '<section class="data-source-notice">' in html
     assert "Mapping Coverage" in html
     assert "Mapping Precision Flags" in html
+    assert "Mapping Rationales" in html
+    assert "Explicit fixture_rule mapping" in html
     assert "needs review" in html
     assert "Mock 数据" in html
     assert "<h3>AI Infrastructure</h3>" in html

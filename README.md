@@ -162,6 +162,8 @@ The summary also reports `multi_mapped_holdings` when one holding maps to multip
 
 When a fallback registry-term match maps one holding to multiple narratives, V1 keeps all mappings but lowers their confidence from `0.52` to `0.42`, marks each mapping with `needs_review`, and writes `mapping_precision_flags` into raw/scoring JSON plus the Markdown/HTML report.
 
+Every selected stock-to-narrative mapping also emits a `mapping_rationales` row in raw/scoring JSON and reports. This row explains the mapping method, narrative name, confidence, matched registry terms when available, and whether the mapping needs manual review. For V1 this makes the answer to "why is this stock in this narrative?" explicit instead of implicit in fixtures or broad industry rules.
+
 ## Announcement Evidence Smoke
 
 The announcement smoke command validates the optional real announcement path against an A-share fund example:
@@ -184,6 +186,8 @@ The smoke checks that CNINFO announcements are returned, converted into evidence
 Each run writes both Markdown and HTML. The HTML report is rendered from structured scoring data with headings, sections, holdings tables, narrative dimension tables, evidence lists, and a disclaimer.
 
 Reports also include mapping coverage so real-provider runs make clear how much of a fund's holdings are explained by current registry and mapping fixtures.
+
+Reports include `Mapping Rationales` so users can inspect why each mapped holding was assigned to a narrative. Fixture mappings are labeled as explicit fixture rules; fallback mappings list the registry terms that matched stock code, stock name, or industry.
 
 Reports include a `Data Source Notice` whenever the run uses mock data, degraded provider fallback, or mixed real/mock layers. This notice lists each provider layer and whether it is mock-backed.
 

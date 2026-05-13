@@ -37,6 +37,11 @@ def build_mapping_result(
         "mappings": all_mappings,
         "coverage": _coverage(holdings, all_mappings, unmapped_holdings),
         "unmapped_holdings": unmapped_holdings,
+        "mapping_rationales": _mapping_rationales(
+            holdings=holdings,
+            mappings=all_mappings,
+            registry=registry,
+        ),
         "mapping_precision_flags": _mapping_precision_flags(
             holdings=holdings,
             mappings=fallback_mappings,
@@ -122,6 +127,53 @@ def _mapping_precision_flags(
             }
         )
     return flags
+
+
+def _mapping_rationales(
+    holdings: list[dict[str, Any]],
+    mappings: list[dict[str, Any]],
+    registry: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    holdings_by_code = {holding["stock_code"]: holding for holding in holdings}
+    rationales = []
+    for mapping in mappings:
+        holding = holdings_by_code.get(mapping["stock_code"], {})
+        narrative_id = mapping["narrative_id"]
+        matched_terms = [str(term) for term in mapping.get("matched_terms", [])]
+        method = str(mapping.get("method", "unknown"))
+        rationales.append(
+            {
+                "stock_code": mapping["stock_code"],
+                "stock_name": holding.get("stock_name"),
+                "industry": holding.get("industry"),
+                "narrative_id": narrative_id,
+                "narrative_name": registry.get(narrative_id, {}).get(
+                    "name", narrative_id
+                ),
+                "method": method,
+                "confidence": mapping["confidence"],
+                "mapping_weight": mapping["mapping_weight"],
+                "matched_terms": matched_terms,
+                "needs_review": bool(mapping.get("needs_review", False)),
+                "precision_flag": mapping.get("precision_flag"),
+                "reason": _mapping_reason(
+                    method=method,
+                    matched_terms=matched_terms,
+                ),
+            }
+        )
+    return rationales
+
+
+def _mapping_reason(method: str, matched_terms: list[str]) -> str:
+    if matched_terms:
+        return (
+            "Matched registry terms against stock code/name/industry: "
+            f"{', '.join(matched_terms)}."
+        )
+    if method == "fixture_rule":
+        return "Explicit fixture_rule mapping from the stock-narrative mapping fixture."
+    return f"{method} mapping without term-level rationale."
 
 
 def _registry_terms(narrative: dict[str, Any]) -> list[str]:

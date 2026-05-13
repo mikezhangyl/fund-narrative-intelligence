@@ -297,3 +297,24 @@ Consequences:
 - A multi-match fallback lowers each affected mapping to confidence `0.42`.
 - Affected mappings carry `needs_review` and `precision_flag`.
 - Raw/scoring JSON and reports include `mapping_precision_flags` for user-visible review.
+
+## ADR-0015: Emit Mapping Rationales With Stock Narrative Mappings
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Emit `mapping_rationales` for every selected stock-to-narrative mapping in raw/scoring JSON and Markdown/HTML reports.
+
+Rationale:
+
+- Users need to know why a stock belongs to a narrative, especially when V1 combines explicit fixture mappings with broad registry-term fallback rules.
+- Mapping coverage alone can hide weak explanations; a holding matched by industry term should be visibly different from one matched by an explicit curated mapping.
+- The rationale object gives future UI and manual-review workflows a stable structure without changing scoring contracts.
+
+Consequences:
+
+- Fixture mappings are reported as explicit stock-narrative fixture rules.
+- Registry-term fallback mappings list matched terms from stock code, stock name, or industry.
+- Multi-match fallback rationales preserve `needs_review` and `precision_flag` so ambiguous mappings remain visible in user-facing output.

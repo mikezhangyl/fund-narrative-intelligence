@@ -123,6 +123,7 @@ def run_pipeline(
         "narrative_registry": registry_items,
         "stock_narrative_mappings": selected_mappings,
         "mapping_coverage": mapping_result["coverage"],
+        "mapping_rationales": mapping_result["mapping_rationales"],
         "mapping_precision_flags": mapping_result["mapping_precision_flags"],
         "unmapped_holdings": mapping_result["unmapped_holdings"],
         "evidence": evidence,
@@ -142,6 +143,7 @@ def run_pipeline(
         "all_narratives": narrative_results,
         "provider_foundation": provider_foundation,
         "mapping_coverage": mapping_result["coverage"],
+        "mapping_rationales": mapping_result["mapping_rationales"],
         "mapping_precision_flags": mapping_result["mapping_precision_flags"],
         "unmapped_holdings": mapping_result["unmapped_holdings"],
         "supporting_evidence": _top_evidence(

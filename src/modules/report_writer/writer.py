@@ -54,6 +54,8 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
             "",
             *_render_mapping_precision_flag_lines(scoring_payload),
             "",
+            *_render_mapping_rationale_lines(scoring_payload),
+            "",
             "## Primary Narrative",
             "",
             _render_narrative_markdown(primary)
@@ -149,6 +151,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
   </section>
 
   {_render_mapping_precision_flags_html(scoring_payload)}
+
+  {_render_mapping_rationales_html(scoring_payload)}
 
   <section class="primary-narrative">
     <h2>Primary Narrative</h2>
@@ -367,6 +371,34 @@ def _render_mapping_precision_flag_lines(
     return lines
 
 
+def _render_mapping_rationale_lines(scoring_payload: dict[str, Any]) -> list[str]:
+    rationales = scoring_payload.get("mapping_rationales", [])
+    if not rationales:
+        return []
+
+    lines = [
+        "## Mapping Rationales",
+        "",
+        "| Stock | Name | Narrative | Method | Confidence | Terms | Review | Reason |",
+        "| --- | --- | --- | --- | ---: | --- | --- | --- |",
+    ]
+    for rationale in rationales:
+        terms = ", ".join(rationale.get("matched_terms", [])) or "-"
+        review_label = "needs review" if rationale.get("needs_review") else "-"
+        lines.append(
+            "| "
+            f"{rationale.get('stock_code') or '-'} | "
+            f"{rationale.get('stock_name') or '-'} | "
+            f"{rationale.get('narrative_name') or rationale.get('narrative_id') or '-'} | "
+            f"{rationale.get('method') or '-'} | "
+            f"{float(rationale.get('confidence', 0)):.2f} | "
+            f"{terms} | "
+            f"{review_label} | "
+            f"{rationale.get('reason') or '-'} |"
+        )
+    return lines
+
+
 def _render_narrative_html(narrative: dict[str, Any]) -> str:
     state = narrative["state"]
     interpretation = narrative.get("interpretation", {})
@@ -455,6 +487,35 @@ def _render_mapping_precision_flags_html(scoring_payload: dict[str, Any]) -> str
     <p>Fallback mappings listed here are kept, but should be treated as lower-confidence and needs review.</p>
     <table>
       <thead><tr><th>Stock</th><th>Name</th><th>Flag</th><th>Narratives</th><th>Confidence</th><th>Action</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+"""
+
+
+def _render_mapping_rationales_html(scoring_payload: dict[str, Any]) -> str:
+    rationales = scoring_payload.get("mapping_rationales", [])
+    if not rationales:
+        return ""
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(str(rationale.get('stock_code') or '-'))}</td>"
+        f"<td>{escape(str(rationale.get('stock_name') or '-'))}</td>"
+        f"<td>{escape(str(rationale.get('narrative_name') or rationale.get('narrative_id') or '-'))}</td>"
+        f"<td>{escape(str(rationale.get('method') or '-'))}</td>"
+        f"<td>{float(rationale.get('confidence', 0)):.2f}</td>"
+        f"<td>{escape(', '.join(rationale.get('matched_terms', [])) or '-')}</td>"
+        f"<td>{escape('needs review' if rationale.get('needs_review') else '-')}</td>"
+        f"<td>{escape(str(rationale.get('reason') or '-'))}</td>"
+        "</tr>"
+        for rationale in rationales
+    )
+    return f"""
+  <section class="mapping-rationales">
+    <h2>Mapping Rationales</h2>
+    <p>Each row explains the rule or term evidence used to assign a holding to a narrative.</p>
+    <table>
+      <thead><tr><th>Stock</th><th>Name</th><th>Narrative</th><th>Method</th><th>Confidence</th><th>Terms</th><th>Review</th><th>Reason</th></tr></thead>
       <tbody>{rows}</tbody>
     </table>
   </section>

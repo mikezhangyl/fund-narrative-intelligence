@@ -369,10 +369,22 @@ def test_pipeline_surfaces_multi_match_precision_flags(tmp_path, monkeypatch):
         "N_SEMI_CAPEX",
         "N_DEFENSE_AEROSPACE",
     ]
+    assert raw["mapping_rationales"] == scoring["mapping_rationales"]
+    assert len(raw["mapping_rationales"]) == 2
+    assert {
+        tuple(rationale["matched_terms"]) for rationale in raw["mapping_rationales"]
+    } == {("电子",), ("长川科技",)}
+    assert all(
+        rationale["needs_review"] is True
+        for rationale in raw["mapping_rationales"]
+    )
     assert "Mapping Precision Flags" in markdown
+    assert "Mapping Rationales" in markdown
+    assert "Matched registry terms against stock code/name/industry" in markdown
     assert "needs review" in markdown
     assert "长川科技" in html
     assert "Mapping Precision Flags" in html
+    assert "Mapping Rationales" in html
 
 
 def test_report_generation_handles_unmapped_real_holdings(tmp_path):

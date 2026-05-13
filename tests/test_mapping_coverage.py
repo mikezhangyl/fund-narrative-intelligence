@@ -39,6 +39,25 @@ def test_exact_mappings_are_preferred_and_coverage_is_reported():
     assert result["unmapped_holdings"] == [
         {"stock_code": "UNKNOWN", "stock_name": "Unknown", "weight": 0.08}
     ]
+    assert result["mapping_rationales"] == [
+        {
+            "stock_code": "NVDA",
+            "stock_name": "NVIDIA",
+            "industry": None,
+            "narrative_id": "N_AI_INFRA",
+            "narrative_name": "AI Infrastructure",
+            "method": "fixture_rule",
+            "confidence": 0.86,
+            "mapping_weight": 0.9,
+            "matched_terms": [],
+            "needs_review": False,
+            "precision_flag": None,
+            "reason": (
+                "Explicit fixture_rule mapping from the stock-narrative "
+                "mapping fixture."
+            ),
+        }
+    ]
 
 
 def test_registry_term_fallback_maps_unmapped_industry_holdings():
@@ -74,6 +93,25 @@ def test_registry_term_fallback_maps_unmapped_industry_holdings():
     assert result["coverage"]["mapping_methods"] == {"registry_term_rule": 1}
     assert result["unmapped_holdings"] == []
     assert result["mapping_precision_flags"] == []
+    assert result["mapping_rationales"] == [
+        {
+            "stock_code": "999999",
+            "stock_name": "测试白酒",
+            "industry": "食品饮料",
+            "narrative_id": "N_BAIJIU_CONSUMPTION",
+            "narrative_name": "Premium Baijiu Consumption",
+            "method": "registry_term_rule",
+            "confidence": 0.52,
+            "mapping_weight": 0.55,
+            "matched_terms": ["食品饮料", "白酒"],
+            "needs_review": False,
+            "precision_flag": None,
+            "reason": (
+                "Matched registry terms against stock code/name/industry: "
+                "食品饮料, 白酒."
+            ),
+        }
+    ]
 
 
 def test_multi_match_fallback_lowers_confidence_and_flags_review():
@@ -126,6 +164,42 @@ def test_multi_match_fallback_lowers_confidence_and_flags_review():
             "recommended_action": "manual_review",
         }
     ]
+    assert result["mapping_rationales"] == [
+        {
+            "stock_code": "300604",
+            "stock_name": "长川科技",
+            "industry": "电子",
+            "narrative_id": "N_SEMI_CAPEX",
+            "narrative_name": "Semiconductor Capex Cycle",
+            "method": "registry_term_rule",
+            "confidence": 0.42,
+            "mapping_weight": 0.55,
+            "matched_terms": ["电子", "长川科技"],
+            "needs_review": True,
+            "precision_flag": "multi_match_fallback",
+            "reason": (
+                "Matched registry terms against stock code/name/industry: "
+                "电子, 长川科技."
+            ),
+        },
+        {
+            "stock_code": "300604",
+            "stock_name": "长川科技",
+            "industry": "电子",
+            "narrative_id": "N_DEFENSE_AEROSPACE",
+            "narrative_name": "Defense Aerospace",
+            "method": "registry_term_rule",
+            "confidence": 0.42,
+            "mapping_weight": 0.55,
+            "matched_terms": ["长川科技"],
+            "needs_review": True,
+            "precision_flag": "multi_match_fallback",
+            "reason": (
+                "Matched registry terms against stock code/name/industry: "
+                "长川科技."
+            ),
+        },
+    ]
 
 
 def test_registry_term_fallback_leaves_unmatched_holdings_unmapped():
@@ -151,6 +225,7 @@ def test_registry_term_fallback_leaves_unmatched_holdings_unmapped():
     assert result["coverage"]["coverage_ratio"] == 0
     assert result["unmapped_holdings"] == holdings
     assert result["mapping_precision_flags"] == []
+    assert result["mapping_rationales"] == []
 
 
 def test_registry_terms_cover_latest_real_smoke_mapping_gaps():

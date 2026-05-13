@@ -99,6 +99,27 @@ V1 must never silently hide degraded data. JSON outputs and reports should show 
 
 Reports must include a visible `Data Source Notice` whenever `provider_foundation.disclosure_required` is true. This includes pure mock runs, fallback-to-mock runs, and mixed runs where only some layers are real. The notice must state which layers are mock-backed and list degradation events such as `provider_fallback`.
 
+## Stock Narrative Mapping Transparency
+
+V1 must not treat stock-to-narrative mapping as an opaque assertion. Every selected mapping should produce a structured `mapping_rationales` row in raw JSON, scoring JSON, Markdown reports, and HTML reports.
+
+Required `mapping_rationales` fields:
+
+- `stock_code`
+- `stock_name`
+- `industry`
+- `narrative_id`
+- `narrative_name`
+- `method`
+- `confidence`
+- `mapping_weight`
+- `matched_terms`
+- `needs_review`
+- `precision_flag`
+- `reason`
+
+For explicit fixture mappings, `reason` should state that the mapping came from the stock-narrative mapping fixture. For `registry_term_rule` fallback mappings, `matched_terms` should list the registry aliases or related terms that matched the holding's stock code, stock name, or industry. If a fallback match maps one stock to multiple narratives, the rationale must preserve `needs_review` and `precision_flag` so users can see that the mapping is lower-confidence.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
@@ -107,7 +128,7 @@ Reports must include a visible `Data Source Notice` whenever `provider_foundatio
 | Orchestrator | run configuration | ordered execution result and artifact paths | no | yes | yes |
 | Fund Holding Provider | fund code | fund profile and top holdings | no | yes | yes |
 | Narrative Registry | registry fixture or store | approved narratives, hierarchy, aliases, version | no | yes | yes |
-| Stock Narrative Mapping | holdings, registry, optional evidence | stock-to-narrative mappings with weights and confidence | optional | yes | yes |
+| Stock Narrative Mapping | holdings, registry, optional evidence | stock-to-narrative mappings, mapping rationales, weights, confidence, and review flags | optional | yes | yes |
 | Fund Narrative Aggregation | holdings, stock mappings | primary and secondary narrative exposures | no | yes | yes |
 | Evidence Service | provider events, fixtures, source metadata, optional announcement metadata | raw evidence records | optional for extraction | yes | yes-lite |
 | Signal Service | evidence records, signal fixtures | signal events and rolling signal states | no | yes | yes-lite |

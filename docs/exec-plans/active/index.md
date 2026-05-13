@@ -21,3 +21,4 @@
 - [real-smoke-gap-mapping-rules.md](./real-smoke-gap-mapping-rules.md)
 - [real-smoke-multimatch-diagnostics.md](./real-smoke-multimatch-diagnostics.md)
 - [multimatch-precision-flags.md](./multimatch-precision-flags.md)
+- [mapping-rationale-reporting.md](./mapping-rationale-reporting.md)
