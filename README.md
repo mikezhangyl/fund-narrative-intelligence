@@ -166,6 +166,8 @@ When a fallback mapping is supported only by a broad industry term, V1 keeps the
 
 Every selected stock-to-narrative mapping also emits a `mapping_rationales` row in raw/scoring JSON and reports. This row explains the mapping method, narrative name, confidence, matched registry terms when available, and whether the mapping needs manual review. For V1 this makes the answer to "why is this stock in this narrative?" explicit instead of implicit in fixtures or broad industry rules.
 
+The latest registry curation pass replaced clear broad industry-only matches with company-level terms for baijiu, healthcare, defense, new energy, real estate chain, and selected semiconductor equipment/EDA holdings. The remaining real-smoke broad flags are intentionally left for narrative reassessment rather than forced into the current registry.
+
 ## Announcement Evidence Smoke
 
 The announcement smoke command validates the optional real announcement path against an A-share fund example:

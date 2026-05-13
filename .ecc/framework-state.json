@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-broad-industry-mapping-flags",
+  "latest_run": "20260514-real-smoke-registry-curation",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "review real-smoke broad_industry_fallback rows and decide which registry terms need company-specific replacements"
+  "next_step": "decide whether remaining Semiconductor broad flags need a new technology/software narrative or explicit exclusions"
 }

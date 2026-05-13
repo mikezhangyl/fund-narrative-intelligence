@@ -362,6 +362,169 @@ def test_registry_terms_cover_latest_real_smoke_mapping_gaps():
     }
 
 
+def test_registry_specific_terms_reduce_clear_real_smoke_broad_flags():
+    holdings = [
+        {
+            "stock_code": "603737",
+            "stock_name": "三棵树",
+            "industry": "建筑材料",
+            "weight": 0.0301,
+        },
+        {
+            "stock_code": "600383",
+            "stock_name": "金地集团",
+            "industry": "房地产",
+            "weight": 0.0294,
+        },
+        {
+            "stock_code": "688563",
+            "stock_name": "航材股份",
+            "industry": "国防军工",
+            "weight": 0.0401,
+        },
+        {
+            "stock_code": "688239",
+            "stock_name": "航宇科技",
+            "industry": "国防军工",
+            "weight": 0.0388,
+        },
+        {
+            "stock_code": "600760",
+            "stock_name": "中航沈飞",
+            "industry": "国防军工",
+            "weight": 0.0342,
+        },
+        {
+            "stock_code": "002653",
+            "stock_name": "海思科",
+            "industry": "医药生物",
+            "weight": 0.041,
+        },
+        {
+            "stock_code": "688506",
+            "stock_name": "百利天恒",
+            "industry": "医药生物",
+            "weight": 0.039,
+        },
+        {
+            "stock_code": "002422",
+            "stock_name": "科伦药业",
+            "industry": "医药生物",
+            "weight": 0.038,
+        },
+        {
+            "stock_code": "002294",
+            "stock_name": "信立泰",
+            "industry": "医药生物",
+            "weight": 0.037,
+        },
+        {
+            "stock_code": "300347",
+            "stock_name": "泰格医药",
+            "industry": "医药生物",
+            "weight": 0.036,
+        },
+        {
+            "stock_code": "688578",
+            "stock_name": "艾力斯",
+            "industry": "医药生物",
+            "weight": 0.035,
+        },
+        {
+            "stock_code": "603659",
+            "stock_name": "璞泰来",
+            "industry": "电力设备",
+            "weight": 0.044,
+        },
+        {
+            "stock_code": "002202",
+            "stock_name": "金风科技",
+            "industry": "电力设备",
+            "weight": 0.043,
+        },
+        {
+            "stock_code": "603806",
+            "stock_name": "福斯特",
+            "industry": "电力设备",
+            "weight": 0.042,
+        },
+        {
+            "stock_code": "002487",
+            "stock_name": "大金重工",
+            "industry": "电力设备",
+            "weight": 0.041,
+        },
+        {
+            "stock_code": "603198",
+            "stock_name": "迎驾贡酒",
+            "industry": "食品饮料",
+            "weight": 0.035,
+        },
+        {
+            "stock_code": "600702",
+            "stock_name": "舍得酒业",
+            "industry": "食品饮料",
+            "weight": 0.034,
+        },
+        {
+            "stock_code": "300661",
+            "stock_name": "圣邦股份",
+            "industry": "电子",
+            "weight": 0.038,
+        },
+        {
+            "stock_code": "301269",
+            "stock_name": "华大九天",
+            "industry": "计算机",
+            "weight": 0.037,
+        },
+        {
+            "stock_code": "688361",
+            "stock_name": "中科飞测",
+            "industry": "电子",
+            "weight": 0.036,
+        },
+        {
+            "stock_code": "688072",
+            "stock_name": "拓荆科技",
+            "industry": "电子",
+            "weight": 0.035,
+        },
+    ]
+    registry = _fixture_registry_by_id()
+
+    result = build_mapping_result(holdings, [], registry)
+
+    assert result["coverage"]["coverage_ratio"] == 1
+    assert result["mapping_precision_flags"] == []
+    assert {
+        mapping["stock_code"]: mapping["narrative_id"]
+        for mapping in result["mappings"]
+    } == {
+        "603737": "N_REAL_ESTATE_STABILIZATION",
+        "600383": "N_REAL_ESTATE_STABILIZATION",
+        "688563": "N_DEFENSE_AEROSPACE",
+        "688239": "N_DEFENSE_AEROSPACE",
+        "600760": "N_DEFENSE_AEROSPACE",
+        "002653": "N_HEALTHCARE_INNOVATION",
+        "688506": "N_HEALTHCARE_INNOVATION",
+        "002422": "N_HEALTHCARE_INNOVATION",
+        "002294": "N_HEALTHCARE_INNOVATION",
+        "300347": "N_HEALTHCARE_INNOVATION",
+        "688578": "N_HEALTHCARE_INNOVATION",
+        "603659": "N_NEW_ENERGY_EQUIPMENT",
+        "002202": "N_NEW_ENERGY_EQUIPMENT",
+        "603806": "N_NEW_ENERGY_EQUIPMENT",
+        "002487": "N_NEW_ENERGY_EQUIPMENT",
+        "603198": "N_BAIJIU_CONSUMPTION",
+        "600702": "N_BAIJIU_CONSUMPTION",
+        "300661": "N_SEMI_CAPEX",
+        "301269": "N_SEMI_CAPEX",
+        "688361": "N_SEMI_CAPEX",
+        "688072": "N_SEMI_CAPEX",
+    }
+
+
 def _fixture_registry_by_id() -> dict:
     payload = json.loads(
         (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8")

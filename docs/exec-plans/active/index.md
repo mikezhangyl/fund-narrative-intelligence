@@ -23,3 +23,4 @@
 - [multimatch-precision-flags.md](./multimatch-precision-flags.md)
 - [mapping-rationale-reporting.md](./mapping-rationale-reporting.md)
 - [broad-industry-mapping-flags.md](./broad-industry-mapping-flags.md)
+- [real-smoke-registry-curation.md](./real-smoke-registry-curation.md)

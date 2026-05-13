@@ -112,13 +112,17 @@
         "集成电路",
         "北方华创",
         "中微公司",
-        "中芯国际"
+        "中芯国际",
+        "圣邦股份",
+        "华大九天",
+        "中科飞测",
+        "拓荆科技"
       ],
       "human_review_status": "approved",
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2022-01-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-14"
     },
     {
       "narrative_id": "N_EV_PRICE_WAR",
@@ -165,6 +169,8 @@
         "五粮液",
         "泸州老窖",
         "山西汾酒",
+        "迎驾贡酒",
+        "舍得酒业",
         "白酒",
         "食品饮料",
         "consumer upgrade",
@@ -174,7 +180,7 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-14"
     },
     {
       "narrative_id": "N_HEALTHCARE_INNOVATION",
@@ -195,13 +201,19 @@
         "恒瑞医药",
         "药明康德",
         "康龙化成",
-        "凯莱英"
+        "凯莱英",
+        "海思科",
+        "百利天恒",
+        "科伦药业",
+        "信立泰",
+        "泰格医药",
+        "艾力斯"
       ],
       "human_review_status": "approved",
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-14"
     },
     {
       "narrative_id": "N_NEW_ENERGY_EQUIPMENT",
@@ -223,13 +235,17 @@
         "宁德时代",
         "阳光电源",
         "思源电气",
-        "科达利"
+        "科达利",
+        "璞泰来",
+        "金风科技",
+        "福斯特",
+        "大金重工"
       ],
       "human_review_status": "approved",
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-14"
     },
     {
       "narrative_id": "N_DEFENSE_AEROSPACE",
@@ -253,13 +269,16 @@
         "中国动力",
         "长川科技",
         "应流股份",
-        "北化股份"
+        "北化股份",
+        "航材股份",
+        "航宇科技",
+        "中航沈飞"
       ],
       "human_review_status": "approved",
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-14"
     },
     {
       "narrative_id": "N_REAL_ESTATE_STABILIZATION",
@@ -287,13 +306,15 @@
         "陶瓷",
         "索菲亚",
         "顾家家居",
-        "蒙娜丽莎"
+        "蒙娜丽莎",
+        "三棵树",
+        "金地集团"
       ],
       "human_review_status": "approved",
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-14"
     }
   ],
   "candidate_narratives": []

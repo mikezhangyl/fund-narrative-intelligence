@@ -340,3 +340,24 @@ Consequences:
 - The mapping carries `needs_review` and `precision_flag: broad_industry_fallback`.
 - Raw/scoring JSON and reports include a `mapping_precision_flags` row with `recommended_action: curation_review`.
 - Multi-match fallback remains the higher-priority precision flag when one holding maps to multiple narratives.
+
+## ADR-0017: Curate Clear Real-Smoke Broad Fallbacks With Company Terms
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add company-level registry terms for clear real-smoke broad industry-only fallback mappings, but leave ambiguous mappings flagged instead of forcing them into the current narrative.
+
+Rationale:
+
+- `broad_industry_fallback` rows are useful curation work items, not an automatic instruction to expand every narrative.
+- Clear cases such as baijiu producers, innovative drug companies, defense aerospace companies, new energy equipment suppliers, real estate chain companies, and semiconductor equipment/EDA companies can be made more precise with company-level terms.
+- Ambiguous cases should stay visible for narrative reassessment rather than contaminating a registry with questionable stock-to-narrative claims.
+
+Consequences:
+
+- The real-smoke broad fallback count is reduced from 24 to 3 after adding company-level terms.
+- Remaining broad flags are currently `600522` 中天科技, `688036` 传音控股, and `688692` 达梦数据 under Semiconductor Capex mapping rules.
+- Future curation should decide whether these need a different narrative, an exclusion, or a separate technology/software narrative.
