@@ -38,6 +38,20 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
             "mapping_methods": {"fixture_rule": 1},
         },
         "unmapped_holdings": [],
+        "mapping_precision_flags": [
+            {
+                "type": "multi_match_fallback",
+                "severity": "review",
+                "stock_code": "NVDA",
+                "stock_name": "NVIDIA",
+                "industry": "Semiconductors",
+                "weight": 0.12,
+                "narratives": ["AI Infrastructure", "Semiconductor Capex Cycle"],
+                "confidence_before": 0.52,
+                "confidence_after": 0.42,
+                "recommended_action": "manual_review",
+            }
+        ],
         "supporting_evidence": [
             {
                 "title": "Guidance raised",
@@ -74,8 +88,11 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "<th>Stock</th>" in html
     assert '<section class="primary-narrative">' in html
     assert '<section class="mapping-coverage">' in html
+    assert '<section class="mapping-precision-flags">' in html
     assert '<section class="data-source-notice">' in html
     assert "Mapping Coverage" in html
+    assert "Mapping Precision Flags" in html
+    assert "needs review" in html
     assert "Mock 数据" in html
     assert "<h3>AI Infrastructure</h3>" in html
     assert "Lifecycle stage" in html

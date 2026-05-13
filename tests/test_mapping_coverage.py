@@ -73,6 +73,59 @@ def test_registry_term_fallback_maps_unmapped_industry_holdings():
     assert result["coverage"]["coverage_ratio"] == 1
     assert result["coverage"]["mapping_methods"] == {"registry_term_rule": 1}
     assert result["unmapped_holdings"] == []
+    assert result["mapping_precision_flags"] == []
+
+
+def test_multi_match_fallback_lowers_confidence_and_flags_review():
+    holdings = [
+        {
+            "stock_code": "300604",
+            "stock_name": "长川科技",
+            "weight": 0.0646,
+            "industry": "电子",
+        }
+    ]
+    registry = {
+        "N_SEMI_CAPEX": {
+            "name": "Semiconductor Capex Cycle",
+            "aliases": [],
+            "related_terms": ["电子", "长川科技"],
+        },
+        "N_DEFENSE_AEROSPACE": {
+            "name": "Defense Aerospace",
+            "aliases": [],
+            "related_terms": ["长川科技"],
+        },
+    }
+
+    result = build_mapping_result(holdings, [], registry)
+
+    assert [mapping["narrative_id"] for mapping in result["mappings"]] == [
+        "N_SEMI_CAPEX",
+        "N_DEFENSE_AEROSPACE",
+    ]
+    assert {mapping["confidence"] for mapping in result["mappings"]} == {0.42}
+    assert all(mapping["needs_review"] is True for mapping in result["mappings"])
+    assert all(
+        mapping["precision_flag"] == "multi_match_fallback"
+        for mapping in result["mappings"]
+    )
+    assert result["mapping_precision_flags"] == [
+        {
+            "type": "multi_match_fallback",
+            "severity": "review",
+            "stock_code": "300604",
+            "stock_name": "长川科技",
+            "industry": "电子",
+            "weight": 0.0646,
+            "mapping_method": "registry_term_rule",
+            "narrative_ids": ["N_SEMI_CAPEX", "N_DEFENSE_AEROSPACE"],
+            "narratives": ["Semiconductor Capex Cycle", "Defense Aerospace"],
+            "confidence_before": 0.52,
+            "confidence_after": 0.42,
+            "recommended_action": "manual_review",
+        }
+    ]
 
 
 def test_registry_term_fallback_leaves_unmatched_holdings_unmapped():
@@ -97,6 +150,7 @@ def test_registry_term_fallback_leaves_unmatched_holdings_unmapped():
     assert result["mappings"] == []
     assert result["coverage"]["coverage_ratio"] == 0
     assert result["unmapped_holdings"] == holdings
+    assert result["mapping_precision_flags"] == []
 
 
 def test_registry_terms_cover_latest_real_smoke_mapping_gaps():

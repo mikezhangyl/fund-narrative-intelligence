@@ -52,6 +52,8 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
             "",
             *_render_mapping_coverage_lines(scoring_payload),
             "",
+            *_render_mapping_precision_flag_lines(scoring_payload),
+            "",
             "## Primary Narrative",
             "",
             _render_narrative_markdown(primary)
@@ -145,6 +147,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
     <h2>Mapping Coverage</h2>
     {_render_mapping_coverage_html(scoring_payload)}
   </section>
+
+  {_render_mapping_precision_flags_html(scoring_payload)}
 
   <section class="primary-narrative">
     <h2>Primary Narrative</h2>
@@ -336,6 +340,33 @@ def _render_mapping_coverage_lines(scoring_payload: dict[str, Any]) -> list[str]
     return lines
 
 
+def _render_mapping_precision_flag_lines(
+    scoring_payload: dict[str, Any],
+) -> list[str]:
+    flags = scoring_payload.get("mapping_precision_flags", [])
+    if not flags:
+        return []
+
+    lines = [
+        "## Mapping Precision Flags",
+        "",
+        "| Stock | Name | Flag | Narratives | Confidence | Action |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for flag in flags:
+        lines.append(
+            "| "
+            f"{flag.get('stock_code') or '-'} | "
+            f"{flag.get('stock_name') or '-'} | "
+            f"{flag.get('type') or '-'} | "
+            f"{', '.join(flag.get('narratives', [])) or '-'} | "
+            f"{flag.get('confidence_before'):.2f} -> "
+            f"{flag.get('confidence_after'):.2f} | "
+            f"{_format_precision_action(flag.get('recommended_action'))} |"
+        )
+    return lines
+
+
 def _render_narrative_html(narrative: dict[str, Any]) -> str:
     state = narrative["state"]
     interpretation = narrative.get("interpretation", {})
@@ -401,6 +432,39 @@ def _render_mapping_coverage_html(scoring_payload: dict[str, Any]) -> str:
 <p>Mapping methods: {escape(_format_mapping_methods(coverage.get('mapping_methods', {})))}</p>
 {unmapped_html}
 """
+
+
+def _render_mapping_precision_flags_html(scoring_payload: dict[str, Any]) -> str:
+    flags = scoring_payload.get("mapping_precision_flags", [])
+    if not flags:
+        return ""
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(str(flag.get('stock_code') or '-'))}</td>"
+        f"<td>{escape(str(flag.get('stock_name') or '-'))}</td>"
+        f"<td>{escape(str(flag.get('type') or '-'))}</td>"
+        f"<td>{escape(', '.join(flag.get('narratives', [])) or '-')}</td>"
+        f"<td>{flag.get('confidence_before'):.2f} -&gt; {flag.get('confidence_after'):.2f}</td>"
+        f"<td>{escape(_format_precision_action(flag.get('recommended_action')))}</td>"
+        "</tr>"
+        for flag in flags
+    )
+    return f"""
+  <section class="mapping-precision-flags">
+    <h2>Mapping Precision Flags</h2>
+    <p>Fallback mappings listed here are kept, but should be treated as lower-confidence and needs review.</p>
+    <table>
+      <thead><tr><th>Stock</th><th>Name</th><th>Flag</th><th>Narratives</th><th>Confidence</th><th>Action</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+"""
+
+
+def _format_precision_action(action: Any) -> str:
+    if action == "manual_review":
+        return "needs review"
+    return str(action or "-")
 
 
 def _format_mapping_methods(mapping_methods: dict[str, int]) -> str:

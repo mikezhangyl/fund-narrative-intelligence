@@ -3,6 +3,9 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
+FALLBACK_MAPPING_CONFIDENCE = 0.52
+MULTI_MATCH_FALLBACK_CONFIDENCE = 0.42
+
 
 def select_mappings_for_holdings(
     holdings: list[dict[str, Any]], mappings: list[dict[str, Any]]
@@ -34,6 +37,11 @@ def build_mapping_result(
         "mappings": all_mappings,
         "coverage": _coverage(holdings, all_mappings, unmapped_holdings),
         "unmapped_holdings": unmapped_holdings,
+        "mapping_precision_flags": _mapping_precision_flags(
+            holdings=holdings,
+            mappings=fallback_mappings,
+            registry=registry,
+        ),
     }
 
 
@@ -60,12 +68,60 @@ def _fallback_mappings_for_holding(
                     "stock_code": holding["stock_code"],
                     "narrative_id": narrative_id,
                     "mapping_weight": 0.55,
-                    "confidence": 0.52,
+                    "confidence": FALLBACK_MAPPING_CONFIDENCE,
                     "method": "registry_term_rule",
                     "matched_terms": matched_terms,
                 }
             )
-    return matches
+    if len(matches) <= 1:
+        return matches
+    return [
+        {
+            **match,
+            "confidence": MULTI_MATCH_FALLBACK_CONFIDENCE,
+            "needs_review": True,
+            "precision_flag": "multi_match_fallback",
+        }
+        for match in matches
+    ]
+
+
+def _mapping_precision_flags(
+    holdings: list[dict[str, Any]],
+    mappings: list[dict[str, Any]],
+    registry: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    holdings_by_code = {holding["stock_code"]: holding for holding in holdings}
+    mappings_by_stock: dict[str, list[dict[str, Any]]] = {}
+    for mapping in mappings:
+        if mapping.get("precision_flag") != "multi_match_fallback":
+            continue
+        mappings_by_stock.setdefault(mapping["stock_code"], []).append(mapping)
+
+    flags = []
+    for stock_code, stock_mappings in sorted(mappings_by_stock.items()):
+        holding = holdings_by_code.get(stock_code, {})
+        narrative_ids = [mapping["narrative_id"] for mapping in stock_mappings]
+        flags.append(
+            {
+                "type": "multi_match_fallback",
+                "severity": "review",
+                "stock_code": stock_code,
+                "stock_name": holding.get("stock_name"),
+                "industry": holding.get("industry"),
+                "weight": holding.get("weight"),
+                "mapping_method": "registry_term_rule",
+                "narrative_ids": narrative_ids,
+                "narratives": [
+                    registry.get(narrative_id, {}).get("name", narrative_id)
+                    for narrative_id in narrative_ids
+                ],
+                "confidence_before": FALLBACK_MAPPING_CONFIDENCE,
+                "confidence_after": MULTI_MATCH_FALLBACK_CONFIDENCE,
+                "recommended_action": "manual_review",
+            }
+        )
+    return flags
 
 
 def _registry_terms(narrative: dict[str, Any]) -> list[str]:

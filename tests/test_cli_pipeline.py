@@ -323,6 +323,58 @@ def test_eastmoney_holdings_with_mock_intelligence_is_disclosed_as_partial(
     assert "混合数据源" in html
 
 
+def test_pipeline_surfaces_multi_match_precision_flags(tmp_path, monkeypatch):
+    def fake_fetcher(_url: str) -> dict:
+        return {
+            "Success": True,
+            "Expansion": "2026-03-31",
+            "Datas": {
+                "fundStocks": [
+                    {
+                        "GPDM": "300604",
+                        "GPJC": "长川科技",
+                        "JZBL": "6.46",
+                        "PCTNVCHG": "0",
+                        "INDEXNAME": "电子",
+                    }
+                ]
+            },
+        }
+
+    monkeypatch.setattr(eastmoney_module, "_fetch_json", fake_fetcher)
+
+    artifacts = run_pipeline(
+        fund_code="001475",
+        provider_mode="eastmoney",
+        output_dir=tmp_path,
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+    html = artifacts["html"].read_text()
+
+    flagged_mappings = [
+        mapping
+        for mapping in raw["stock_narrative_mappings"]
+        if mapping.get("precision_flag") == "multi_match_fallback"
+    ]
+
+    assert len(flagged_mappings) == 2
+    assert {mapping["confidence"] for mapping in flagged_mappings} == {0.42}
+    assert all(mapping["needs_review"] is True for mapping in flagged_mappings)
+    assert raw["mapping_precision_flags"] == scoring["mapping_precision_flags"]
+    assert raw["mapping_precision_flags"][0]["recommended_action"] == "manual_review"
+    assert raw["mapping_precision_flags"][0]["narrative_ids"] == [
+        "N_SEMI_CAPEX",
+        "N_DEFENSE_AEROSPACE",
+    ]
+    assert "Mapping Precision Flags" in markdown
+    assert "needs review" in markdown
+    assert "长川科技" in html
+    assert "Mapping Precision Flags" in html
+
+
 def test_report_generation_handles_unmapped_real_holdings(tmp_path):
     from src.modules.report_writer.writer import write_reports
 

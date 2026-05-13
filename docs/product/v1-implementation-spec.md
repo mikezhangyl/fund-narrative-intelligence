@@ -336,6 +336,7 @@ The generated artifacts must satisfy:
 - The mock-provider path includes multiple scenario funds so lifecycle stages are not validated only against one happy path.
 - The `eastmoney` provider mode can normalize no-key fund holdings while keeping non-holdings intelligence layers local in V1.
 - Reports include mapping coverage, mapping method counts, and unmapped holdings when any holdings cannot be mapped.
+- Multi-match fallback mappings must be retained but lowered in confidence, marked `needs_review`, and emitted as `mapping_precision_flags`.
 - Reports include deterministic stage, risk, and confidence interpretation notes without buy/sell/hold recommendations.
 - The real-fund smoke set records coverage, primary narrative, stage, concrete unmapped holding details, and pass/fail status.
 - The real-fund smoke set records multi-mapped holdings so high coverage does not hide possible registry precision risks.

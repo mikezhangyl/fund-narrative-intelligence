@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260513-real-smoke-multimatch-diagnostics",
+  "latest_run": "20260513-multimatch-precision-flags",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "decide whether multi-match holdings need confidence weighting or manual review flags before broader real-provider work"
+  "next_step": "review whether mapping_precision_flags should drive report interpretation language or remain diagnostics-only"
 }

@@ -275,3 +275,25 @@ Consequences:
 - `CNInfoAnnouncementProvider` builds selectors such as `600519,gssh0600519` and `000001,gssz0000001`.
 - `python -m src.main --run-announcement-smoke` runs the `161725` Eastmoney + CNINFO path and writes `announcement_evidence_smoke_summary.json` and `.md`.
 - The smoke fails if announcements are empty, evidence conversion is empty, the `Announcements` provider layer is missing or mock, or the data-source notice does not disclose mixed/mock output.
+
+## ADR-0014: Lower Confidence For Multi-Match Fallback Mappings
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Retain multi-match `registry_term_rule` mappings, but lower their confidence and emit review flags instead of deleting or silently accepting them as ordinary fallback matches.
+
+Rationale:
+
+- Some companies are genuinely cross-domain, so deleting one of the mappings would be too aggressive without manual review.
+- Full mapping coverage can hide precision risk if one holding contributes to multiple narratives through broad registry terms.
+- Downstream scoring should see lower confidence for ambiguous fallback mappings, and reports should make the ambiguity visible.
+
+Consequences:
+
+- A single fallback match keeps confidence `0.52`.
+- A multi-match fallback lowers each affected mapping to confidence `0.42`.
+- Affected mappings carry `needs_review` and `precision_flag`.
+- Raw/scoring JSON and reports include `mapping_precision_flags` for user-visible review.

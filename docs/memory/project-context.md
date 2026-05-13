@@ -75,6 +75,7 @@ Expected artifacts:
 - HTML reports render semantic sections/tables directly from structured scoring data.
 - Mapping output includes coverage ratio, mapping method counts, and unmapped holdings.
 - Unmapped holdings can receive low-confidence `registry_term_rule` mappings from narrative registry aliases/related terms matched against stock name and industry.
+- Multi-match `registry_term_rule` mappings are retained but lowered from confidence `0.52` to `0.42`, marked `needs_review`, and emitted as `mapping_precision_flags`.
 - Narrative reports include deterministic stage, risk, and confidence interpretation notes; these are explanatory and non-advisory.
 - Real-fund smoke summaries isolate failures per fund, write summary artifacts, include concrete unmapped holding details, and return non-zero when any fund fails or falls below coverage threshold.
 - Real-fund smoke summaries also include `multi_mapped_holdings` so 100% mapping coverage does not hide broad or cross-domain registry matches.

@@ -160,6 +160,8 @@ When real holdings are not fully mapped, the summary JSON includes `unmapped_hol
 
 The summary also reports `multi_mapped_holdings` when one holding maps to multiple narratives. This is intentional diagnostic output: full coverage should not hide possible over-broad registry terms or genuinely cross-domain companies.
 
+When a fallback registry-term match maps one holding to multiple narratives, V1 keeps all mappings but lowers their confidence from `0.52` to `0.42`, marks each mapping with `needs_review`, and writes `mapping_precision_flags` into raw/scoring JSON plus the Markdown/HTML report.
+
 ## Announcement Evidence Smoke
 
 The announcement smoke command validates the optional real announcement path against an A-share fund example:
