@@ -135,7 +135,11 @@
         "discounting",
         "inventory",
         "gross margin",
-        "demand slowdown"
+        "demand slowdown",
+        "汽车",
+        "新能源汽车",
+        "比亚迪",
+        "宇通客车"
       ],
       "human_review_status": "approved",
       "reviewed_by": null,
@@ -247,7 +251,9 @@
         "航发动力",
         "中航西飞",
         "中国动力",
-        "长川科技"
+        "长川科技",
+        "应流股份",
+        "北化股份"
       ],
       "human_review_status": "approved",
       "reviewed_by": null,
@@ -275,7 +281,13 @@
         "招商蛇口",
         "华发股份",
         "中国建筑",
-        "东方雨虹"
+        "东方雨虹",
+        "家居",
+        "家具",
+        "陶瓷",
+        "索菲亚",
+        "顾家家居",
+        "蒙娜丽莎"
       ],
       "human_review_status": "approved",
       "reviewed_by": null,

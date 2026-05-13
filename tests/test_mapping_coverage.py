@@ -1,4 +1,9 @@
+import json
+from pathlib import Path
+
 from src.modules.fund_analysis.mapping import build_mapping_result
+
+FIXTURE_DIR = Path(__file__).resolve().parents[1] / "data" / "fixtures"
 
 
 def test_exact_mappings_are_preferred_and_coverage_is_reported():
@@ -92,3 +97,76 @@ def test_registry_term_fallback_leaves_unmatched_holdings_unmapped():
     assert result["mappings"] == []
     assert result["coverage"]["coverage_ratio"] == 0
     assert result["unmapped_holdings"] == holdings
+
+
+def test_registry_terms_cover_latest_real_smoke_mapping_gaps():
+    holdings = [
+        {
+            "stock_code": "002594",
+            "stock_name": "比亚迪",
+            "industry": "汽车",
+            "weight": 0.0283,
+        },
+        {
+            "stock_code": "600066",
+            "stock_name": "宇通客车",
+            "industry": "汽车",
+            "weight": 0.0383,
+        },
+        {
+            "stock_code": "603308",
+            "stock_name": "应流股份",
+            "industry": "机械设备",
+            "weight": 0.0356,
+        },
+        {
+            "stock_code": "002246",
+            "stock_name": "北化股份",
+            "industry": "基础化工",
+            "weight": 0.0355,
+        },
+        {
+            "stock_code": "002572",
+            "stock_name": "索菲亚",
+            "industry": "轻工制造",
+            "weight": 0.0403,
+        },
+        {
+            "stock_code": "603816",
+            "stock_name": "顾家家居",
+            "industry": "轻工制造",
+            "weight": 0.0392,
+        },
+        {
+            "stock_code": "002918",
+            "stock_name": "蒙娜丽莎",
+            "industry": "轻工制造",
+            "weight": 0.0376,
+        },
+    ]
+    registry = _fixture_registry_by_id()
+
+    result = build_mapping_result(holdings, [], registry)
+
+    mappings_by_stock = {
+        mapping["stock_code"]: mapping["narrative_id"] for mapping in result["mappings"]
+    }
+
+    assert result["coverage"]["coverage_ratio"] == 1
+    assert result["unmapped_holdings"] == []
+    assert mappings_by_stock == {
+        "002594": "N_EV_PRICE_WAR",
+        "600066": "N_EV_PRICE_WAR",
+        "603308": "N_DEFENSE_AEROSPACE",
+        "002246": "N_DEFENSE_AEROSPACE",
+        "002572": "N_REAL_ESTATE_STABILIZATION",
+        "603816": "N_REAL_ESTATE_STABILIZATION",
+        "002918": "N_REAL_ESTATE_STABILIZATION",
+    }
+
+
+def _fixture_registry_by_id() -> dict:
+    payload = json.loads(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8")
+    )
+    return {item["narrative_id"]: item for item in payload["narratives"]}

@@ -145,6 +145,8 @@ The first real provider adapter is `eastmoney`, covering fund holdings only. It 
 | `001475` | Defense | Defense Aerospace | `strengthening` |
 | `000991` | Real estate chain | Real Estate Stabilization | `weakening` |
 
+The current calibrated smoke baseline reaches 100% mapping coverage for all six funds while keeping the stage distribution above.
+
 The smoke command writes:
 
 ```text

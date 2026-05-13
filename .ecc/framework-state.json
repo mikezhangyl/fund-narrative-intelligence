@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260513-real-smoke-mapping-gaps",
+  "latest_run": "20260513-real-smoke-gap-mapping-rules",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "use real-smoke mapping gaps to decide the next registry or mapping broadening pass"
+  "next_step": "review real-smoke multi-match mappings and consider precision diagnostics before adding broader real providers"
 }

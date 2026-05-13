@@ -88,8 +88,8 @@ Expected artifacts:
 ## Real Provider Smoke Result
 
 - `161725` with `--provider-mode eastmoney`: Premium Baijiu Consumption / `diverging` in the current fixture-backed mapping layer.
-- Real smoke set covers `161725`, `320007`, `003096`, `003834`, `001475`, and `000991`; latest smoke passed with minimum coverage ratio 78% and calibrated stages `strengthening` / `diverging` / `weakening`.
-- Current real-smoke mapping gaps are `002594` 比亚迪, `600066` 宇通客车, `603308` 应流股份, `002246` 北化股份, `002572` 索菲亚, `603816` 顾家家居, and `002918` 蒙娜丽莎.
+- Real smoke set covers `161725`, `320007`, `003096`, `003834`, `001475`, and `000991`; latest smoke passed with 100% mapping coverage for all six funds and calibrated stages `strengthening` / `diverging` / `weakening`.
+- Latest registry broadening resolved prior real-smoke gaps for `002594` 比亚迪, `600066` 宇通客车, `603308` 应流股份, `002246` 北化股份, `002572` 索菲亚, `603816` 顾家家居, and `002918` 蒙娜丽莎.
 - Latest announcement-evidence probe for `161725` with CNINFO start date `2026-01-01` returned 56 announcements and 56 converted evidence records, while still disclosing the mixed Eastmoney/CNINFO + Mock intelligence foundation as `partial`.
 
 ## Deferred Scope
