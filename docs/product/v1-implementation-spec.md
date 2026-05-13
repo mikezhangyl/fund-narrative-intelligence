@@ -293,6 +293,14 @@ V1 should support provider diagnostics without writing report artifacts:
 python -m src.main --fund-code 000001 --provider-diagnostics
 ```
 
+V1 can optionally include CNINFO announcement metadata as evidence:
+
+```bash
+python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01
+```
+
+This option is off by default. When enabled, raw/scoring JSON must include `announcements` and `announcement_evidence`, provider foundation must include an `announcements` layer, and reports must disclose that announcement evidence is metadata-only.
+
 And can explicitly try the Eastmoney holdings adapter:
 
 ```bash

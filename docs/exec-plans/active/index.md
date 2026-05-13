@@ -16,3 +16,4 @@
 - [provider-diagnostics-cli.md](./provider-diagnostics-cli.md)
 - [cninfo-announcement-provider.md](./cninfo-announcement-provider.md)
 - [announcement-evidence-conversion.md](./announcement-evidence-conversion.md)
+- [announcement-evidence-orchestration.md](./announcement-evidence-orchestration.md)

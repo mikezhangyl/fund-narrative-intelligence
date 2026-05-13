@@ -19,6 +19,7 @@ LAYER_DISPLAY_NAMES = {
     "stock_mappings": "Stock Mappings",
     "evidence": "Evidence",
     "signals": "Signals",
+    "announcements": "Announcements",
 }
 
 
@@ -36,8 +37,12 @@ def build_provider_foundation(
     layers: dict[str, dict[str, Any]],
     degradation_events: list[dict[str, str]] | None = None,
 ) -> dict[str, Any]:
+    layer_order = [
+        *PROVIDER_LAYERS,
+        *(layer for layer in layers if layer not in PROVIDER_LAYERS),
+    ]
     normalized_layers = {
-        layer: _normalize_layer(layer, layers[layer]) for layer in PROVIDER_LAYERS
+        layer: _normalize_layer(layer, layers[layer]) for layer in layer_order
     }
     events = degradation_events or []
     effective_data_quality = _effective_data_quality(normalized_layers)
@@ -94,7 +99,7 @@ def _normalize_layer(layer: str, payload: dict[str, Any]) -> dict[str, Any]:
     data_quality = str(payload["data_quality"])
     return {
         "layer": layer,
-        "display_name": LAYER_DISPLAY_NAMES[layer],
+        "display_name": LAYER_DISPLAY_NAMES.get(layer, layer.replace("_", " ").title()),
         "provider_name": provider_name,
         "provider_version": str(payload["provider_version"]),
         "data_quality": data_quality,
@@ -153,6 +158,8 @@ def _disclosure_message(
 def _display_provider(provider_name: str) -> str:
     if provider_name.startswith("eastmoney"):
         return "Eastmoney"
+    if provider_name.startswith("cninfo"):
+        return "CNINFO"
     if provider_name.startswith("mock"):
         return "Mock fixtures"
     return provider_name

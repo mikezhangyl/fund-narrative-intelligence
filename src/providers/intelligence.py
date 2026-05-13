@@ -56,6 +56,7 @@ class AnnouncementProvider(Protocol):
         self,
         stock_codes: list[str],
         as_of_date: str,
+        start_date: str | None = None,
     ) -> dict[str, Any]:
         raise NotImplementedError
 
@@ -199,8 +200,10 @@ class MockAnnouncementProvider:
         self,
         stock_codes: list[str],
         as_of_date: str,
+        start_date: str | None = None,
     ) -> dict[str, Any]:
         del as_of_date
+        del start_date
         return {
             "version": "announcement-mock-v1",
             "data_quality": self.data_quality,

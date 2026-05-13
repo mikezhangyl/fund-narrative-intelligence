@@ -233,3 +233,24 @@ Consequences:
 - Generated evidence confidence combines classification confidence, stock-mapping confidence, and data-quality confidence.
 - Generated summaries explicitly state that PDF content has not been parsed.
 - Unmapped or malformed announcements are tracked and skipped instead of failing the whole flow.
+
+## ADR-0012: Gate Real Announcement Evidence Behind Explicit CLI Opt-In
+
+- Status: accepted
+- Date: 2026-05-13
+
+Decision:
+
+Expose CNINFO announcement evidence through `--include-cninfo-announcements` instead of making real announcement fetching part of the default report pipeline.
+
+Rationale:
+
+- Default V1 runs must stay deterministic and mock-provider first.
+- Real announcement metadata can improve evidence density, but it must not be silently mixed into reports.
+- Users need a visible provider-foundation layer showing whether announcements were fresh, partial, unavailable, or degraded.
+
+Consequences:
+
+- Default `python -m src.main --fund-code 000001` does not call CNINFO.
+- Optional announcement runs include `announcements`, `announcement_evidence`, and an `Announcements` provider layer in output JSON.
+- Reports disclose the announcement layer and generated evidence summaries state that PDF content was not parsed.

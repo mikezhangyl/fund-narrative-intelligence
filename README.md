@@ -36,6 +36,12 @@ Inspect provider layers without generating report artifacts:
 python -m src.main --fund-code 000001 --provider-diagnostics
 ```
 
+Optionally include CNINFO announcement metadata as evidence:
+
+```bash
+python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01
+```
+
 Generated artifacts:
 
 ```text
@@ -73,6 +79,7 @@ python -m compileall -q src tests scripts
 - Mock intelligence layer providers for registry, mappings, evidence, signals, and reserved market/valuation/announcement/news interfaces.
 - Optional CNINFO announcement provider adapter with injectable fetcher; it is not part of the default report pipeline yet.
 - Optional announcement-to-evidence conversion layer; it classifies announcement metadata into V1 evidence records without parsing PDFs.
+- Optional CNINFO announcement evidence orchestration behind `--include-cninfo-announcements`; default runs do not call CNINFO.
 - Narrative registry loading.
 - Stock-to-narrative mapping.
 - Fund narrative aggregation.
@@ -112,6 +119,8 @@ python -m src.main --fund-code 161725 --provider-mode eastmoney
 If the Eastmoney request fails, the provider records a `provider_fallback` event and falls back to local mock fixtures when a matching fixture exists.
 
 Reports always disclose mock or degraded data in a `Data Source Notice` section. A pure mock run is marked as `mock`; an Eastmoney holdings run with fixture-backed registry, mappings, evidence, and signals is marked as `partial` so users do not mistake it for a fully real environment.
+
+When `--include-cninfo-announcements` is enabled, reports add an `Announcements` provider layer and generated evidence summaries state that V1 classified announcement metadata only; source PDFs are not parsed.
 
 ## Real Provider Status
 

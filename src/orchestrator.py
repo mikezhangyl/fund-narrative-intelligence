@@ -1,28 +1,39 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from src.config import DEFAULT_OUTPUT_DIR, VERSION_DEFAULTS
+from src.modules.evidence.announcements import convert_announcements_to_evidence
 from src.modules.fund_analysis.aggregation import aggregate_fund_narratives
 from src.modules.fund_analysis.mapping import build_mapping_result
 from src.modules.report_writer.interpretation import interpret_narrative
 from src.modules.report_writer.writer import write_reports
 from src.modules.signal_service.scoring import score_narrative_state
 from src.modules.snapshot_writer.writer import write_json_artifact
+from src.providers.cninfo import (
+    CNINFO_ANNOUNCEMENT_QUERY_URL,
+    CNInfoAnnouncementProvider,
+)
 from src.providers.factory import select_data_provider
 from src.providers.mock import MockDataProvider
+from src.providers.provenance import build_provider_foundation
 
 
 def run_pipeline(
     fund_code: str,
     provider_mode: str = "mock",
     output_dir: str | Path = DEFAULT_OUTPUT_DIR,
+    include_announcement_evidence: bool = False,
+    announcement_start_date: str | None = None,
+    announcement_provider: Any | None = None,
 ) -> dict[str, Any]:
     if not fund_code.isdigit():
         raise ValueError("fund_code must contain digits only")
+    if announcement_start_date is not None:
+        _require_iso_date(announcement_start_date, "announcement_start_date")
 
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -50,9 +61,34 @@ def run_pipeline(
         *provider_selection.degradation_events,
         *getattr(provider, "degradation_events", []),
     ]
-    provider_foundation = provider.get_provider_foundation(
+    announcements_payload: dict[str, Any] | None = None
+    announcement_evidence_payload: dict[str, Any] | None = None
+    announcement_layer: dict[str, Any] | None = None
+    if include_announcement_evidence:
+        announcement_result = _run_announcement_evidence(
+            stock_codes=[holding["stock_code"] for holding in holdings],
+            stock_mappings=selected_mappings,
+            as_of_date=as_of_date,
+            start_date=announcement_start_date,
+            announcement_provider=announcement_provider,
+        )
+        announcements_payload = announcement_result["announcements"]
+        announcement_evidence_payload = announcement_result["announcement_evidence"]
+        announcement_layer = announcement_result["provider_layer"]
+        degradation_events = [
+            *degradation_events,
+            *announcement_result["degradation_events"],
+        ]
+        evidence = [
+            *evidence,
+            *announcement_evidence_payload["evidence"],
+        ]
+
+    provider_foundation = _provider_foundation_with_optional_announcement_layer(
+        provider=provider,
         fund_provider_metadata=fund["provider_metadata"],
         degradation_events=degradation_events,
+        announcement_layer=announcement_layer,
     )
     effective_data_quality = provider_foundation["effective_data_quality"]
     exposures = aggregate_fund_narratives(
@@ -92,6 +128,10 @@ def run_pipeline(
         "signal_events": signal_events,
         "degradation_events": degradation_events,
     }
+    if announcements_payload is not None and announcement_evidence_payload is not None:
+        raw_payload["announcements"] = announcements_payload
+        raw_payload["announcement_evidence"] = announcement_evidence_payload
+
     scoring_payload = {
         "metadata": metadata,
         "fund": fund,
@@ -108,6 +148,8 @@ def run_pipeline(
         "risk_evidence": _top_evidence(evidence, narrative_results, sentiments={"negative"}),
         "degradation_events": degradation_events,
     }
+    if announcement_evidence_payload is not None:
+        scoring_payload["announcement_evidence"] = announcement_evidence_payload
 
     raw_path = output_path / f"fund_{fund_code}_raw.json"
     scoring_path = output_path / f"fund_{fund_code}_scoring.json"
@@ -166,6 +208,94 @@ def inspect_provider_foundation(
     }
 
 
+def _run_announcement_evidence(
+    stock_codes: list[str],
+    stock_mappings: list[dict[str, Any]],
+    as_of_date: str,
+    start_date: str | None,
+    announcement_provider: Any | None,
+) -> dict[str, Any]:
+    provider = announcement_provider or CNInfoAnnouncementProvider()
+    degradation_events: list[dict[str, str]] = []
+    try:
+        announcements_payload = provider.get_announcements(
+            stock_codes=stock_codes,
+            as_of_date=as_of_date,
+            start_date=start_date,
+        )
+    except Exception as exc:
+        provider_name = str(getattr(provider, "provider_name", "announcement-provider"))
+        degradation_events.append(
+            {
+                "type": "provider_unavailable",
+                "provider_name": provider_name,
+                "reason": f"Announcement provider failed: {exc}",
+            }
+        )
+        announcements_payload = {
+            "version": str(getattr(provider, "provider_version", "announcement-v1")),
+            "data_quality": "unavailable",
+            "announcements": [],
+            "missing_stock_codes": sorted(set(stock_codes)),
+        }
+
+    degradation_events = [
+        *degradation_events,
+        *getattr(provider, "degradation_events", []),
+    ]
+    announcement_evidence_payload = convert_announcements_to_evidence(
+        announcements_payload=announcements_payload,
+        stock_mappings=stock_mappings,
+        as_of_date=as_of_date,
+    )
+    return {
+        "announcements": announcements_payload,
+        "announcement_evidence": announcement_evidence_payload,
+        "provider_layer": _announcement_provider_layer(
+            provider=provider,
+            announcements_payload=announcements_payload,
+        ),
+        "degradation_events": degradation_events,
+    }
+
+
+def _provider_foundation_with_optional_announcement_layer(
+    provider: Any,
+    fund_provider_metadata: dict[str, Any],
+    degradation_events: list[dict[str, str]],
+    announcement_layer: dict[str, Any] | None,
+) -> dict[str, Any]:
+    foundation = provider.get_provider_foundation(
+        fund_provider_metadata=fund_provider_metadata,
+        degradation_events=degradation_events,
+    )
+    if announcement_layer is None:
+        return foundation
+    return build_provider_foundation(
+        layers={**foundation["layers"], "announcements": announcement_layer},
+        degradation_events=degradation_events,
+    )
+
+
+def _announcement_provider_layer(
+    provider: Any,
+    announcements_payload: dict[str, Any],
+) -> dict[str, Any]:
+    provider_name = str(getattr(provider, "provider_name", "announcement-provider"))
+    data_quality = str(announcements_payload.get("data_quality") or "unavailable")
+    return {
+        "layer": "announcements",
+        "provider_name": provider_name,
+        "provider_version": str(
+            getattr(provider, "provider_version", announcements_payload["version"])
+        ),
+        "data_quality": data_quality,
+        "source_url": getattr(provider, "source_url", CNINFO_ANNOUNCEMENT_QUERY_URL),
+        "is_mock": provider_name.startswith("mock") or data_quality == "mock",
+        "note": "Optional announcement metadata provider; V1 classifies metadata only and does not parse source PDFs.",
+    }
+
+
 def _with_state(
     exposure: dict[str, Any],
     signal_events: list[dict[str, Any]],
@@ -188,6 +318,13 @@ def _with_state(
     }
     result["interpretation"] = interpret_narrative(result)
     return result
+
+
+def _require_iso_date(value: str, field_name: str) -> None:
+    try:
+        date.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError(f"{field_name} must be an ISO date in YYYY-MM-DD format") from exc
 
 
 def _metadata(fund_code: str, as_of_date: str, data_quality: str) -> dict[str, Any]:

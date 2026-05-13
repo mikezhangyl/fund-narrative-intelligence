@@ -1,0 +1,15 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "coverage_report",
+      "path": ".ecc/runs/20260513-announcement-evidence-orchestration/artifacts/reports/coverage-report.txt",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "06a34212c97c52bf5a20f31d93164e0d44117c4add6b7960d0ca6941e9de8265",
+      "mtime_epoch": 1778682527,
+      "size_bytes": 2066,
+      "summary": "Final coverage report showing 85% total coverage over src."
+    }
+  ],
+  "notes": "Generated output reports under outputs/ are ignored by git."
+}

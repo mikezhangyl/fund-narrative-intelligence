@@ -17,6 +17,7 @@ CNInfoFetcher = Callable[[str, dict[str, object], dict[str, str]], dict[str, Any
 class CNInfoAnnouncementProvider:
     provider_name = "cninfo-announcement"
     provider_version = "cninfo-announcement-v1"
+    source_url = CNINFO_ANNOUNCEMENT_QUERY_URL
     data_quality = "fresh"
 
     def __init__(self, fetcher: CNInfoFetcher | None = None):

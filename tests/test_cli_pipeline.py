@@ -2,6 +2,7 @@ import json
 import subprocess
 import sys
 
+from src import main as main_module
 from src.orchestrator import run_pipeline
 from src.providers import eastmoney as eastmoney_module
 
@@ -145,6 +146,129 @@ def test_cli_provider_diagnostics_shows_real_mode_fallback(tmp_path):
     assert diagnostics["provider_foundation"]["effective_data_quality"] == "mock"
     assert events[0]["type"] == "provider_fallback"
     assert "provider_fallback" in diagnostics["provider_foundation"]["disclosure_message"]
+    assert not list(tmp_path.glob("*"))
+
+
+def test_optional_announcement_evidence_is_disclosed_and_added_to_outputs(tmp_path):
+    class FakeAnnouncementProvider:
+        provider_name = "cninfo-announcement"
+        provider_version = "cninfo-announcement-v1"
+        source_url = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_announcements(
+            self,
+            stock_codes: list[str],
+            as_of_date: str,
+            start_date: str | None = None,
+        ) -> dict:
+            assert "NVDA" in stock_codes
+            assert as_of_date == "2026-05-13"
+            assert start_date == "2026-05-01"
+            return {
+                "version": self.provider_version,
+                "data_quality": "fresh",
+                "announcements": [
+                    {
+                        "stock_code": "NVDA",
+                        "stock_name": "NVIDIA",
+                        "title": "2026年度业绩预增公告",
+                        "category": "业绩预告",
+                        "announcement_date": "2026-05-12",
+                        "source": "cninfo",
+                        "source_url": "https://static.cninfo.com.cn/finalpage/1.PDF",
+                    }
+                ],
+                "missing_stock_codes": [],
+            }
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_announcement_evidence=True,
+        announcement_start_date="2026-05-01",
+        announcement_provider=FakeAnnouncementProvider(),
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+    html = artifacts["html"].read_text()
+
+    announcement_layer = scoring["provider_foundation"]["layers"]["announcements"]
+    generated_evidence = raw["announcement_evidence"]["evidence"]
+
+    assert scoring["metadata"]["data_quality"] == "partial"
+    assert announcement_layer["provider_name"] == "cninfo-announcement"
+    assert announcement_layer["data_quality"] == "fresh"
+    assert announcement_layer["is_mock"] is False
+    assert raw["announcements"]["version"] == "cninfo-announcement-v1"
+    assert raw["announcement_evidence"]["data_quality"] == "fresh"
+    assert len(generated_evidence) == 2
+    assert {item["narrative_id"] for item in generated_evidence} == {
+        "N_AI_INFRA",
+        "N_SEMI_CAPEX",
+    }
+    assert any(item["source"] == "cninfo_announcement" for item in raw["evidence"])
+    assert "PDF content has not been parsed" in generated_evidence[0]["summary"]
+    assert "Announcements" in markdown
+    assert "cninfo-announcement" in markdown
+    assert "Announcements" in html
+    assert "cninfo-announcement" in html
+
+
+def test_cli_include_cninfo_announcements_passes_options_to_pipeline(
+    tmp_path, monkeypatch
+):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "000001",
+            "--include-cninfo-announcements",
+            "--announcement-start-date",
+            "2026-05-01",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["fund_code"] == "000001"
+    assert captured["include_announcement_evidence"] is True
+    assert captured["announcement_start_date"] == "2026-05-01"
+
+
+def test_cli_rejects_announcement_start_date_without_cninfo_opt_in(tmp_path):
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--fund-code",
+        "000001",
+        "--announcement-start-date",
+        "2026-05-01",
+        "--output-dir",
+        str(tmp_path),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 2
+    assert "--announcement-start-date requires --include-cninfo-announcements" in result.stderr
     assert not list(tmp_path.glob("*"))
 
 

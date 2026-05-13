@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "CNINFO live availability can vary.",
+    "Announcement evidence is metadata-only and not PDF-content evidence.",
+    "Signals remain fixture-backed when announcement evidence is opted in."
+  ]
+}

@@ -62,12 +62,13 @@ Expected artifacts:
 - Batch fixture command: `python -m src.main --run-all-fixtures`.
 - Live Eastmoney smoke command: `python -m src.main --run-real-smoke`.
 - Provider diagnostics command: `python -m src.main --fund-code 000001 --provider-diagnostics` prints provider foundation JSON without generating report artifacts.
+- Optional CNINFO announcement evidence command: `python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01`.
 - Provider payloads are validated before orchestration proceeds.
 - Real holdings adapter: `python -m src.main --fund-code 161725 --provider-mode eastmoney` tries Eastmoney/Tiantian Fund fund holdings and keeps local fixtures for all other V1 intelligence layers.
 - Provider foundation metadata separates holdings, narrative registry, stock mappings, evidence, and signals so mixed real/mock runs are marked `partial` instead of `fresh`.
 - Mock intelligence layer providers now expose separate interfaces for registry, stock mappings, evidence, signals, and reserved market/valuation/announcement/news sources.
 - Optional `CNInfoAnnouncementProvider` exists as the first real intelligence-source adapter foundation; it is not wired into the default report pipeline.
-- Optional announcement-to-evidence conversion exists for CNINFO-style announcement metadata; it is not wired into the default report pipeline.
+- Optional announcement-to-evidence conversion and orchestration exist for CNINFO-style announcement metadata; default reports do not call CNINFO unless `--include-cninfo-announcements` is set.
 - Markdown and HTML reports include a `Data Source Notice` whenever a run uses mock data, fallback/degradation, or mixed real/mock layers.
 - HTML reports render semantic sections/tables directly from structured scoring data.
 - Mapping output includes coverage ratio, mapping method counts, and unmapped holdings.
@@ -111,6 +112,7 @@ Expected artifacts:
 - New real intelligence sources should plug into the layer provider interfaces before changing orchestration.
 - Real source adapters should use injectable fetchers and return controlled unavailable/partial payloads on provider failure.
 - Announcement evidence generation must disclose that V1 classifies metadata only and does not parse source PDFs.
+- Optional real announcement runs must add an `Announcements` provider-foundation layer so users can see whether CNINFO data was fresh, partial, or unavailable.
 
 ## Open Questions
 

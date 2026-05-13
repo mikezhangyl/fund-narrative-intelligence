@@ -51,19 +51,36 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print provider foundation diagnostics as JSON without generating report artifacts.",
     )
+    parser.add_argument(
+        "--include-cninfo-announcements",
+        action="store_true",
+        help="Optionally fetch CNINFO announcement metadata and convert it into evidence records.",
+    )
+    parser.add_argument(
+        "--announcement-start-date",
+        help="Optional ISO start date for CNINFO announcement search when --include-cninfo-announcements is set.",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.announcement_start_date and not args.include_cninfo_announcements:
+        parser.error(
+            "--announcement-start-date requires --include-cninfo-announcements"
+        )
 
     if args.list_fixtures:
+        if args.include_cninfo_announcements:
+            parser.error("--include-cninfo-announcements requires --fund-code")
         for fund_code in MockDataProvider().list_fund_codes():
             print(fund_code)
         return 0
 
     if args.run_all_fixtures:
+        if args.include_cninfo_announcements:
+            parser.error("--include-cninfo-announcements is not supported with --run-all-fixtures")
         try:
             results = run_all_fixture_pipelines(
                 provider_mode=args.provider_mode,
@@ -84,6 +101,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.run_real_smoke:
+        if args.include_cninfo_announcements:
+            parser.error("--include-cninfo-announcements is not supported with --run-real-smoke")
         try:
             summary = run_real_fund_smoke(output_dir=args.output_dir)
         except PipelineError as exc:
@@ -104,6 +123,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if summary["status"] == "passed" else 1
 
     if args.provider_diagnostics:
+        if args.include_cninfo_announcements:
+            parser.error("--include-cninfo-announcements is not supported with --provider-diagnostics")
         if not args.fund_code:
             parser.error("--fund-code is required with --provider-diagnostics")
             return 2
@@ -136,6 +157,8 @@ def main(argv: list[str] | None = None) -> int:
             fund_code=args.fund_code,
             provider_mode=args.provider_mode,
             output_dir=args.output_dir,
+            include_announcement_evidence=args.include_cninfo_announcements,
+            announcement_start_date=args.announcement_start_date,
         )
     except PipelineError as exc:
         print(str(exc), file=sys.stderr)
