@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-persistence-result-validation",
+  "latest_run": "20260514-validate-persistence-result-cli",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "validate review-action persistence result artifacts before write"
+  "next_step": "expose persistence result artifact validation through CLI"
 }

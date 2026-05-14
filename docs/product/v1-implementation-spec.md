@@ -239,6 +239,15 @@ should be treated as one operation: if the audit write fails, the registry outpu
 must be rolled back or removed. Persistence-result artifacts must be validated
 before writing so future web/API layers can rely on the audit contract.
 
+V1 should also expose direct audit validation:
+
+```bash
+python -m src.main --validate-persistence-result path/to/persistence-result.json
+```
+
+This command validates the persistence-result contract and exits without
+requiring `--fund-code`.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |

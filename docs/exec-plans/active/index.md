@@ -37,3 +37,4 @@
 - [review-action-persistence.md](./review-action-persistence.md)
 - [review-action-audit-artifact.md](./review-action-audit-artifact.md)
 - [persistence-result-validation.md](./persistence-result-validation.md)
+- [validate-persistence-result-cli.md](./validate-persistence-result-cli.md)

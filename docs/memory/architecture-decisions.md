@@ -587,5 +587,6 @@ Consequences:
 - Direct persistence callers must supply an audit output location; registry and audit writes use rollback so audit failure does not leave an unaudited registry output.
 - Persistence result artifacts record the overwrite policy flags used for the write.
 - Persistence result artifacts are contract-validated before write.
+- Persistence result artifacts can also be validated directly through the CLI without running a fund report.
 - In-place registry overwrite requires `--allow-registry-overwrite`.
 - Normal report generation never calls review-action persistence.

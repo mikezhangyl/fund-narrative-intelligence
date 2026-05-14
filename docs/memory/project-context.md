@@ -97,6 +97,7 @@ Expected artifacts:
 - Review-action persistence writes a separate `candidate_review_action_<action_id>_persistence.json` audit artifact under `--output-dir` by default, or to `--persistence-result-output` when provided.
 - Review-action persistence requires an audit output path or directory even for direct API callers; registry and audit writes are rollback-protected so audit write failure does not leave a new registry output behind.
 - Review-action persistence result artifacts are validated before write, including overwrite policy flags and registry delta shape.
+- `python -m src.main --validate-persistence-result path/to/persistence-result.json` validates a persistence audit artifact without requiring `--fund-code`.
 - `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, `candidate_narratives=<count>`, and `review_queue=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 

@@ -17,6 +17,7 @@ from src.orchestrator import (
 )
 from src.providers.mock import MockDataProvider
 from src.real_fund_smoke import run_real_fund_smoke
+from src.validation import validate_review_action_persistence_result_payload
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -107,6 +108,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="Allow --persist-review-action to overwrite an existing persistence result artifact.",
     )
     parser.add_argument(
+        "--validate-persistence-result",
+        help="Validate a review-action persistence result artifact and exit.",
+    )
+    parser.add_argument(
         "--include-cninfo-announcements",
         action="store_true",
         help="Optionally fetch CNINFO announcement metadata and convert it into evidence records.",
@@ -139,6 +144,33 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--allow-persistence-result-overwrite requires --persist-review-action")
     if args.preview_review_action and args.persist_review_action:
         parser.error("--preview-review-action and --persist-review-action are mutually exclusive")
+    if args.validate_persistence_result and (
+        args.preview_review_action or args.persist_review_action
+    ):
+        parser.error(
+            "--validate-persistence-result cannot be combined with review action execution"
+        )
+
+    if args.validate_persistence_result:
+        try:
+            payload = _read_json_object(Path(args.validate_persistence_result))
+            validate_review_action_persistence_result_payload(payload)
+        except PipelineError as exc:
+            parser.error(str(exc))
+            return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        except Exception as exc:
+            print(
+                f"Unrecoverable persistence result validation error: {exc}",
+                file=sys.stderr,
+            )
+            return 1
+
+        print("Persistence result valid:")
+        print(Path(args.validate_persistence_result))
+        return 0
 
     if args.preview_review_action:
         if args.include_cninfo_announcements:
@@ -334,6 +366,15 @@ def main(argv: list[str] | None = None) -> int:
     for path in artifacts.values():
         print(path)
     return 0
+
+
+def _read_json_object(path: Path) -> dict:
+    if not path.exists():
+        raise ValueError(f"{path} does not exist")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    return payload
 
 
 if __name__ == "__main__":

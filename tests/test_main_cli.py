@@ -215,6 +215,65 @@ def test_main_persists_review_action_to_explicit_result_output(tmp_path, capsys)
     assert result_output_path.exists()
 
 
+def test_main_validates_persistence_result_artifact(tmp_path, capsys):
+    registry_path = tmp_path / "registry.json"
+    action_path = tmp_path / "action.json"
+    registry_output_path = tmp_path / "registry.promoted.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    action_path.write_text(
+        json.dumps(
+            {
+                "action_id": "ACT_REJECT_VALIDATE_RESULT",
+                "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
+                "action": "reject",
+                "reviewed_by": "reviewer@example.com",
+                "reviewed_at": "2026-05-14T11:00:00+00:00",
+                "review_note": "Reject in CLI validation test.",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    main_module.main(
+        [
+            "--persist-review-action",
+            str(action_path),
+            "--registry-path",
+            str(registry_path),
+            "--registry-output",
+            str(registry_output_path),
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+    result_path = (
+        tmp_path
+        / "candidate_review_action_ACT_REJECT_VALIDATE_RESULT_persistence.json"
+    )
+
+    exit_code = main_module.main(["--validate-persistence-result", str(result_path)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Persistence result valid:" in captured.out
+    assert str(result_path) in captured.out
+
+
+def test_main_validate_persistence_result_rejects_malformed_file(tmp_path, capsys):
+    result_path = tmp_path / "bad-result.json"
+    result_path.write_text("{}", encoding="utf-8")
+
+    with pytest.raises(SystemExit) as exc:
+        main_module.main(["--validate-persistence-result", str(result_path)])
+
+    captured = capsys.readouterr()
+    assert exc.value.code == 2
+    assert "review action persistence result missing required fields" in captured.err
+
+
 def test_main_persist_review_action_rejects_directory_output(tmp_path, capsys):
     registry_path = tmp_path / "registry.json"
     action_path = tmp_path / "action.json"
