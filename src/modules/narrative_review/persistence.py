@@ -10,6 +10,7 @@ from typing import Any
 from src.modules.narrative_review.preview import build_review_action_preview
 from src.validation import (
     validate_registry_payload,
+    validate_review_action_persistence_result_payload,
     validate_review_action_preview_payload,
 )
 
@@ -78,6 +79,7 @@ def persist_review_action_registry(
             **result,
             "persistence_result_path": str(resolved_result_output_path),
         }
+    validate_review_action_persistence_result_payload(result)
     _write_registry_and_result(
         registry_payload=result_registry,
         registry_output_path=output_path,

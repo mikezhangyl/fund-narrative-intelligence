@@ -3,9 +3,13 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
+from src.errors import ProviderContractError
 from src.modules.narrative_review import persistence as persistence_module
 from src.modules.narrative_review.persistence import persist_review_action_registry
-from src.validation import validate_registry_payload
+from src.validation import (
+    validate_registry_payload,
+    validate_review_action_persistence_result_payload,
+)
 
 FIXTURE_DIR = Path("data/fixtures")
 
@@ -112,6 +116,57 @@ def test_persist_review_action_writes_persistence_result_artifact(tmp_path):
     assert result_artifact["registry_delta"]["active_narrative_ids_added"] == [
         "N_CONSUMER_ELECTRONICS_GLOBALIZATION"
     ]
+    validate_review_action_persistence_result_payload(result_artifact)
+
+
+def test_validate_persistence_result_rejects_missing_required_fields(tmp_path):
+    registry_path = tmp_path / "registry.json"
+    action_path = tmp_path / "action.json"
+    registry_output_path = tmp_path / "registry.promoted.json"
+    result_output_path = tmp_path / "audit" / "result.json"
+    registry_path.write_text(_registry_text(), encoding="utf-8")
+    action_path.write_text(
+        json.dumps(_approve_action(), ensure_ascii=False),
+        encoding="utf-8",
+    )
+    result = persist_review_action_registry(
+        registry_path=registry_path,
+        action_path=action_path,
+        registry_output_path=registry_output_path,
+        result_output_path=result_output_path,
+    )
+    del result["registry_delta"]
+
+    with pytest.raises(
+        ProviderContractError,
+        match="review action persistence result missing required fields",
+    ):
+        validate_review_action_persistence_result_payload(result)
+
+
+def test_validate_persistence_result_rejects_malformed_overwrite_policy(tmp_path):
+    registry_path = tmp_path / "registry.json"
+    action_path = tmp_path / "action.json"
+    registry_output_path = tmp_path / "registry.promoted.json"
+    result_output_path = tmp_path / "audit" / "result.json"
+    registry_path.write_text(_registry_text(), encoding="utf-8")
+    action_path.write_text(
+        json.dumps(_approve_action(), ensure_ascii=False),
+        encoding="utf-8",
+    )
+    result = persist_review_action_registry(
+        registry_path=registry_path,
+        action_path=action_path,
+        registry_output_path=registry_output_path,
+        result_output_path=result_output_path,
+    )
+    result["overwrite_policy"]["allow_result_overwrite"] = "yes"
+
+    with pytest.raises(
+        ProviderContractError,
+        match="overwrite_policy.allow_result_overwrite must be boolean",
+    ):
+        validate_review_action_persistence_result_payload(result)
 
 
 def test_persist_review_action_rejects_result_artifact_source_overwrite(tmp_path):

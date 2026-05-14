@@ -236,7 +236,8 @@ registry, or registry output file. The lower-level persistence function must
 also receive a result output path or directory; callers should not be able to
 persist a registry update without an audit artifact. Registry and audit writes
 should be treated as one operation: if the audit write fails, the registry output
-must be rolled back or removed.
+must be rolled back or removed. Persistence-result artifacts must be validated
+before writing so future web/API layers can rely on the audit contract.
 
 ## Module Responsibility Matrix
 

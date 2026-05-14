@@ -245,6 +245,53 @@ def validate_review_action_preview_payload(payload: dict[str, Any]) -> None:
     validate_registry_payload(payload["result_registry"])
 
 
+def validate_review_action_persistence_result_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "review action persistence result")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "status",
+            "action_id",
+            "candidate_narrative_id",
+            "registry_path",
+            "registry_output_path",
+            "registry_overwritten",
+            "overwrite_policy",
+            "registry_delta",
+            "persistence_result_path",
+        },
+        "review action persistence result",
+    )
+    if payload["version"] != "review-action-persistence-result-v1":
+        raise ProviderContractError(
+            "review action persistence result version is unsupported"
+        )
+    if payload["status"] != "persisted":
+        raise ProviderContractError(
+            "review action persistence result status must be persisted"
+        )
+    for field in {
+        "action_id",
+        "candidate_narrative_id",
+        "registry_path",
+        "registry_output_path",
+        "persistence_result_path",
+    }:
+        if not isinstance(payload[field], str) or not payload[field]:
+            raise ProviderContractError(
+                f"review action persistence result {field} must be a non-empty string"
+            )
+    if not isinstance(payload["registry_overwritten"], bool):
+        raise ProviderContractError(
+            "review action persistence result registry_overwritten must be boolean"
+        )
+    _validate_review_action_persistence_overwrite_policy(
+        payload["overwrite_policy"]
+    )
+    _validate_review_action_registry_delta(payload["registry_delta"])
+
+
 def _require_mapping(value: Any, context: str) -> None:
     if not isinstance(value, dict):
         raise ProviderContractError(f"{context} must be an object")
@@ -336,6 +383,26 @@ def _validate_review_action_registry_delta(delta: Any) -> None:
             "review action preview registry_delta.active_narrative_count_change must be integer"
         )
     _validate_review_action_candidate_changes(delta["candidate_changes"])
+
+
+def _validate_review_action_persistence_overwrite_policy(policy: Any) -> None:
+    _require_mapping(policy, "review action persistence result overwrite_policy")
+    _require_keys(
+        policy,
+        {
+            "allow_registry_overwrite",
+            "allow_output_overwrite",
+            "allow_result_overwrite",
+        },
+        "review action persistence result overwrite_policy",
+    )
+    for field in {
+        "allow_registry_overwrite",
+        "allow_output_overwrite",
+        "allow_result_overwrite",
+    }:
+        if not isinstance(policy[field], bool):
+            raise ProviderContractError(f"overwrite_policy.{field} must be boolean")
 
 
 def _validate_review_action_candidate_changes(candidate_changes: Any) -> None:
