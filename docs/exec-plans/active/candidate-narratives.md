@@ -11,12 +11,14 @@ Preserve a review-ready candidate narrative structure for excluded fallback cand
 - Emit in-scope candidate narratives in raw/scoring JSON.
 - Render candidate narratives in Markdown/HTML reports and real-smoke summaries.
 - Print candidate narrative counts in real-smoke CLI output.
+- Preserve fields needed for a future web approval workflow, even though V1 does not implement the web UI.
 
 ## Non-Goals
 
 - Promoting candidate narratives into active scoring.
 - Adding stock-to-candidate scoring or aggregation.
 - Replacing human review with automatic narrative discovery.
+- Building web interaction or approval screens in V1.
 
 ## Acceptance
 

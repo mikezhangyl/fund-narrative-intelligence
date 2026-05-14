@@ -446,3 +446,24 @@ Consequences:
 - Raw/scoring JSON and reports include in-scope candidate narratives when related exclusions are present.
 - Candidate narratives do not enter `stock_narrative_mappings`, `all_narratives`, primary/secondary narrative selection, or lifecycle scoring.
 - Real-smoke summaries and CLI output include candidate narrative counts for taxonomy-review visibility.
+
+## ADR-0022: Preserve Future Web Approval Workflow Shape
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Do not build the web review UI in V1, but shape candidate narrative and exclusion outputs so a future web workspace can display, approve, reject, or defer them without reworking the core data contracts.
+
+Rationale:
+
+- The intended long-term workflow is visual: users review candidate narratives and approval decisions in a web interface.
+- Building the UI before the intelligence contracts stabilize would add premature surface area.
+- Stable structured objects now prevent report-only prose from becoming a migration blocker later.
+
+Consequences:
+
+- Candidate and exclusion records should keep stable IDs, status fields, rationale, source, related stock/exclusion links, reviewer metadata, and timestamps.
+- CLI and report outputs remain the current interface, but JSON must be workspace-ready.
+- Promotion from candidate to active narrative remains a human approval action, not automatic scoring behavior.

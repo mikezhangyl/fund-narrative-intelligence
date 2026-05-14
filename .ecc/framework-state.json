@@ -12,5 +12,5 @@
   "latest_run": "20260514-candidate-narratives",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "decide whether any candidate narrative should be promoted after human review"
+  "next_step": "define candidate promotion workflow with future web approval state preserved"
 }

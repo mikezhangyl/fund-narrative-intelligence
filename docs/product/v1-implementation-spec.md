@@ -135,6 +135,8 @@ V1 can also use explicit `mapping_exclusions` for known-bad fallback candidates.
 
 V1 preserves review-only `candidate_narratives` in the registry. Candidate narratives can be linked to exclusions through `related_exclusion_ids` and `triggering_stock_codes`; in-scope candidates should be emitted in raw/scoring JSON and reports, but they must not enter active stock mapping, aggregation, scoring, or lifecycle-stage output until human review promotes them into `narratives`.
 
+Future approval should happen in a web UI. V1 does not implement the UI, but all candidate/exclusion objects should be shaped for future rendering and action: stable IDs, review status, rationale, source, related stocks, related exclusions, nullable reviewer fields, and timestamps must be preserved in structured output instead of only report prose.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
@@ -292,10 +294,10 @@ V1 does not implement these capabilities, but it must preserve fields and model 
 | --- | --- | --- |
 | Historical replay | no full replay engine | save raw and scoring snapshots with version metadata and `as_of_date`. |
 | Alerting | no notifications or monitors | include nullable `previous_state`, `state_change`, and `state_change_reason`. |
-| Workspace UI | no frontend workspace | keep output JSON normalized and workspace-ready. |
+| Workspace UI | no frontend workspace | keep output JSON normalized and workspace-ready for future web review/approval screens. |
 | Auto narrative discovery | no automatic registry mutation | include `candidate_narratives` with `human_review_status`, `related_exclusion_ids`, and `triggering_stock_codes`. |
 | Signal governance | no automatic signal promotion | include `signal_schema_version` and allow unknown signals to become candidates. |
-| Human review workflow | no review UI | include `human_review_status`, `reviewed_by`, and `reviewed_at` as nullable fields where applicable. |
+| Human review workflow | no review UI yet; future review happens on the web | include stable IDs, `human_review_status`, rationale, related object links, `reviewed_by`, and `reviewed_at` as nullable fields where applicable. |
 
 ## Engineering Acceptance Criteria
 

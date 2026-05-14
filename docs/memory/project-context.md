@@ -57,7 +57,7 @@ Expected artifacts:
 - Standard setup command: `python -m pip install -e ".[dev]"`.
 - Standard quality commands: `python -m ruff check .`, `python -m coverage run -m pytest -q`, `python -m coverage report`, and `python -m compileall -q src tests scripts`.
 - Data: local JSON fixtures and mock providers.
-- Future UI: Node.js / Next.js can be added later as a separate workspace layer.
+- Future UI: Node.js / Next.js can be added later as a separate workspace layer. Candidate narrative review and approval will eventually happen in a web UI, so V1 structured outputs should remain directly renderable and action-ready for a future review workspace.
 - CLI fixture discovery: `python -m src.main --list-fixtures`.
 - Batch fixture command: `python -m src.main --run-all-fixtures`.
 - Live Eastmoney smoke command: `python -m src.main --run-real-smoke`.
@@ -84,6 +84,7 @@ Expected artifacts:
 - Real-fund smoke summaries also aggregate `mapping_precision_flags` into JSON and Markdown so registry curation work items are visible without opening each fund report.
 - Explicit mapping exclusions prevent known-bad fallback candidates from entering scoring; excluded candidates are emitted in raw/scoring JSON, reports, and real-smoke summaries.
 - Review-only candidate narratives are emitted for related exclusions but do not enter active scoring until promoted by human review.
+- Future candidate-narrative approval is expected to be a web workflow. V1 does not need web interaction yet, but candidate/exclusion objects should preserve stable IDs, review status, rationale, related stock/exclusion links, and nullable reviewer metadata for later UI actions.
 - `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, and `candidate_narratives=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 
@@ -111,7 +112,7 @@ Expected artifacts:
 - Full historical replay.
 - Complex knowledge graph infrastructure.
 - Real-time alerts.
-- Frontend workspace.
+- Frontend workspace, including web-based candidate narrative review and approval.
 - Buy / sell signals.
 
 ## Current Operating Assumptions
@@ -123,6 +124,7 @@ Expected artifacts:
 - Narrative, Signal, and Evidence are first-class domain objects.
 - Slow-changing intelligence should be maintained separately from fast on-demand report generation.
 - Human review is required before AI-proposed candidates change core registries.
+- Human review will eventually be performed in a web UI; current CLI/report outputs must preserve enough structured state for that future approval workflow.
 - V1 outputs must include version metadata for provider set, narrative registry, signal schema, scoring model, and report template.
 - Data provider failures should degrade output quality and confidence instead of crashing the pipeline when mock fallback or partial data is available.
 - Mock data and mock fallback must be explicitly disclosed in user-facing report output; no UI or report should present mock-backed analysis as a fully real environment.
