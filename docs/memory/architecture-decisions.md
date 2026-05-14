@@ -402,3 +402,25 @@ Consequences:
 
 - Existing per-fund smoke output keeps fund code, scenario, primary narrative, stage, and coverage.
 - Missing precision count fields default to `0` for compatibility.
+
+## ADR-0020: Exclude Known-Bad Fallback Mapping Candidates
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add explicit mapping exclusions for known-bad fallback candidates, and emit excluded candidates in JSON, reports, real-smoke summaries, and CLI output counts.
+
+Rationale:
+
+- Some broad industry fallback candidates are clearly not valid for the candidate narrative, but adding a replacement narrative immediately would change the taxonomy.
+- Excluding known-bad candidates prevents incorrect narrative exposure from entering aggregation and scoring while preserving a review trail.
+- Exclusions should be transparent to users and developers; an unmapped holding should show whether it was unmapped because a candidate was intentionally blocked.
+
+Consequences:
+
+- `mapping_exclusions.json` stores reviewed stock/narrative/method exclusions and reasons.
+- Exclusions apply to fallback candidates only, not explicit curated fixture mappings.
+- Excluded candidates are omitted from `stock_narrative_mappings`, then emitted as `excluded_mapping_candidates`.
+- Real-smoke summary JSON/Markdown includes excluded candidates, and CLI output includes `excluded_candidates=<count>`.

@@ -56,6 +56,8 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
             "",
             *_render_mapping_rationale_lines(scoring_payload),
             "",
+            *_render_excluded_mapping_candidate_lines(scoring_payload),
+            "",
             "## Primary Narrative",
             "",
             _render_narrative_markdown(primary)
@@ -153,6 +155,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
   {_render_mapping_precision_flags_html(scoring_payload)}
 
   {_render_mapping_rationales_html(scoring_payload)}
+
+  {_render_excluded_mapping_candidates_html(scoring_payload)}
 
   <section class="primary-narrative">
     <h2>Primary Narrative</h2>
@@ -399,6 +403,34 @@ def _render_mapping_rationale_lines(scoring_payload: dict[str, Any]) -> list[str
     return lines
 
 
+def _render_excluded_mapping_candidate_lines(
+    scoring_payload: dict[str, Any],
+) -> list[str]:
+    candidates = scoring_payload.get("excluded_mapping_candidates", [])
+    if not candidates:
+        return []
+
+    lines = [
+        "## Excluded Mapping Candidates",
+        "",
+        "| Stock | Name | Candidate Narrative | Method | Terms | Action | Reason |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for candidate in candidates:
+        terms = ", ".join(candidate.get("matched_terms", [])) or "-"
+        lines.append(
+            "| "
+            f"{candidate.get('stock_code') or '-'} | "
+            f"{candidate.get('stock_name') or '-'} | "
+            f"{candidate.get('narrative_name') or candidate.get('narrative_id') or '-'} | "
+            f"{candidate.get('method') or '-'} | "
+            f"{terms} | "
+            f"{candidate.get('recommended_action') or '-'} | "
+            f"{candidate.get('reason') or '-'} |"
+        )
+    return lines
+
+
 def _render_narrative_html(narrative: dict[str, Any]) -> str:
     state = narrative["state"]
     interpretation = narrative.get("interpretation", {})
@@ -516,6 +548,34 @@ def _render_mapping_rationales_html(scoring_payload: dict[str, Any]) -> str:
     <p>Each row explains the rule or term evidence used to assign a holding to a narrative.</p>
     <table>
       <thead><tr><th>Stock</th><th>Name</th><th>Narrative</th><th>Method</th><th>Confidence</th><th>Terms</th><th>Review</th><th>Reason</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+"""
+
+
+def _render_excluded_mapping_candidates_html(scoring_payload: dict[str, Any]) -> str:
+    candidates = scoring_payload.get("excluded_mapping_candidates", [])
+    if not candidates:
+        return ""
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(str(candidate.get('stock_code') or '-'))}</td>"
+        f"<td>{escape(str(candidate.get('stock_name') or '-'))}</td>"
+        f"<td>{escape(str(candidate.get('narrative_name') or candidate.get('narrative_id') or '-'))}</td>"
+        f"<td>{escape(str(candidate.get('method') or '-'))}</td>"
+        f"<td>{escape(', '.join(candidate.get('matched_terms', [])) or '-')}</td>"
+        f"<td>{escape(str(candidate.get('recommended_action') or '-'))}</td>"
+        f"<td>{escape(str(candidate.get('reason') or '-'))}</td>"
+        "</tr>"
+        for candidate in candidates
+    )
+    return f"""
+  <section class="excluded-mapping-candidates">
+    <h2>Excluded Mapping Candidates</h2>
+    <p>These fallback candidates were intentionally excluded from scoring and narrative aggregation.</p>
+    <table>
+      <thead><tr><th>Stock</th><th>Name</th><th>Candidate Narrative</th><th>Method</th><th>Terms</th><th>Action</th><th>Reason</th></tr></thead>
       <tbody>{rows}</tbody>
     </table>
   </section>

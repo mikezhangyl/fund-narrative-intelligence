@@ -83,6 +83,22 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
                 ),
             }
         ],
+        "excluded_mapping_candidates": [
+            {
+                "type": "excluded_mapping_candidate",
+                "exclusion_id": "EX_SEMI_688036",
+                "stock_code": "688036",
+                "stock_name": "传音控股",
+                "industry": "电子",
+                "weight": 0.06,
+                "narrative_id": "N_SEMI_CAPEX",
+                "narrative_name": "Semiconductor Capex Cycle",
+                "method": "registry_term_rule",
+                "matched_terms": ["电子"],
+                "reason": "Consumer electronics device exposure is too broad.",
+                "recommended_action": "candidate_narrative_review",
+            }
+        ],
         "supporting_evidence": [
             {
                 "title": "Guidance raised",
@@ -121,10 +137,14 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert '<section class="mapping-coverage">' in html
     assert '<section class="mapping-precision-flags">' in html
     assert '<section class="mapping-rationales">' in html
+    assert '<section class="excluded-mapping-candidates">' in html
     assert '<section class="data-source-notice">' in html
     assert "Mapping Coverage" in html
     assert "Mapping Precision Flags" in html
     assert "Mapping Rationales" in html
+    assert "Excluded Mapping Candidates" in html
+    assert "candidate_narrative_review" in html
+    assert "传音控股" in html
     assert "Explicit fixture_rule mapping" in html
     assert "needs review" in html
     assert "curation review" in html

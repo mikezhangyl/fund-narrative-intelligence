@@ -447,6 +447,66 @@ def test_pipeline_surfaces_broad_industry_precision_flags(tmp_path, monkeypatch)
     assert "curation review" in html
 
 
+def test_pipeline_excludes_known_bad_mapping_candidates(tmp_path, monkeypatch):
+    def fake_fetcher(_url: str) -> dict:
+        return {
+            "Success": True,
+            "Expansion": "2026-03-31",
+            "Datas": {
+                "fundStocks": [
+                    {
+                        "GPDM": "688036",
+                        "GPJC": "传音控股",
+                        "JZBL": "6.00",
+                        "PCTNVCHG": "0",
+                        "INDEXNAME": "电子",
+                    }
+                ]
+            },
+        }
+
+    monkeypatch.setattr(eastmoney_module, "_fetch_json", fake_fetcher)
+
+    artifacts = run_pipeline(
+        fund_code="320007",
+        provider_mode="eastmoney",
+        output_dir=tmp_path,
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+    html = artifacts["html"].read_text()
+
+    assert raw["stock_narrative_mappings"] == []
+    assert raw["mapping_coverage"]["coverage_ratio"] == 0
+    assert raw["excluded_mapping_candidates"] == scoring[
+        "excluded_mapping_candidates"
+    ]
+    assert raw["excluded_mapping_candidates"] == [
+        {
+            "type": "excluded_mapping_candidate",
+            "exclusion_id": "EX_SEMI_688036",
+            "stock_code": "688036",
+            "stock_name": "传音控股",
+            "industry": "电子",
+            "weight": 0.06,
+            "narrative_id": "N_SEMI_CAPEX",
+            "narrative_name": "Semiconductor Capex Cycle",
+            "method": "registry_term_rule",
+            "matched_terms": ["电子"],
+            "reason": (
+                "Consumer electronics device exposure is too broad for "
+                "Semiconductor Capex."
+            ),
+            "recommended_action": "candidate_narrative_review",
+        }
+    ]
+    assert "Excluded Mapping Candidates" in markdown
+    assert "传音控股" in markdown
+    assert "candidate_narrative_review" in html
+
+
 def test_report_generation_handles_unmapped_real_holdings(tmp_path):
     from src.modules.report_writer.writer import write_reports
 

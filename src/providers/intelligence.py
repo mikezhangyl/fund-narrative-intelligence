@@ -15,6 +15,7 @@ from src.providers.provenance import (
 )
 from src.validation import (
     validate_evidence_payload,
+    validate_mapping_exclusion_payload,
     validate_mapping_payload,
     validate_registry_payload,
     validate_signal_payload,
@@ -28,6 +29,11 @@ class NarrativeRegistryProvider(Protocol):
 
 class StockNarrativeMappingProvider(Protocol):
     def get_stock_narrative_mappings(self) -> list[dict[str, Any]]:
+        raise NotImplementedError
+
+
+class MappingExclusionProvider(Protocol):
+    def get_mapping_exclusions(self) -> dict[str, Any]:
         raise NotImplementedError
 
 
@@ -97,6 +103,16 @@ class MockStockNarrativeMappingProvider:
 
 
 @dataclass(frozen=True)
+class MockMappingExclusionProvider:
+    fixture_dir: Path = FIXTURE_DIR
+
+    def get_mapping_exclusions(self) -> dict[str, Any]:
+        payload = _load_fixture(self.fixture_dir, "mapping_exclusions.json")
+        validate_mapping_exclusion_payload(payload)
+        return deepcopy(payload)
+
+
+@dataclass(frozen=True)
 class MockEvidenceProvider:
     fixture_dir: Path = FIXTURE_DIR
 
@@ -139,6 +155,10 @@ class MockIntelligenceProviderSet:
         return MockEvidenceProvider(fixture_dir=self.fixture_dir)
 
     @property
+    def mapping_exclusion_provider(self) -> MockMappingExclusionProvider:
+        return MockMappingExclusionProvider(fixture_dir=self.fixture_dir)
+
+    @property
     def signal_event_provider(self) -> MockSignalEventProvider:
         return MockSignalEventProvider(fixture_dir=self.fixture_dir)
 
@@ -147,6 +167,9 @@ class MockIntelligenceProviderSet:
 
     def get_stock_narrative_mappings(self) -> list[dict[str, Any]]:
         return self.stock_mapping_provider.get_stock_narrative_mappings()
+
+    def get_mapping_exclusions(self) -> dict[str, Any]:
+        return self.mapping_exclusion_provider.get_mapping_exclusions()
 
     def get_evidence(self) -> list[dict[str, Any]]:
         return self.evidence_provider.get_evidence()

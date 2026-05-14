@@ -145,7 +145,7 @@ The first real provider adapter is `eastmoney`, covering fund holdings only. It 
 | `001475` | Defense | Defense Aerospace | `strengthening` |
 | `000991` | Real estate chain | Real Estate Stabilization | `weakening` |
 
-The current calibrated smoke baseline reaches 100% mapping coverage for all six funds while keeping the stage distribution above.
+The current calibrated smoke baseline passes the coverage threshold for all six funds while keeping the stage distribution above. Some holdings are intentionally unmapped when a known-bad fallback candidate is excluded.
 
 The smoke command writes:
 
@@ -162,7 +162,9 @@ The summary also reports `multi_mapped_holdings` when one holding maps to multip
 
 The summary also aggregates `mapping_precision_flags` into a `Mapping Precision Flags` section so curation work items from the fixed real-smoke set are visible without opening every fund report.
 
-The `--run-real-smoke` terminal output includes `precision_flags=<count>` for each fund so CI logs and quick local runs show whether coverage is clean or still has mapping precision work.
+The `--run-real-smoke` terminal output includes `precision_flags=<count>` and `excluded_candidates=<count>` for each fund so CI logs and quick local runs show whether coverage is clean or still has mapping precision or exclusion work.
+
+Known-bad fallback candidates can be listed in `mapping_exclusions.json`. These candidates are not used for scoring or aggregation; instead, raw/scoring JSON, reports, and real-smoke summaries show them as `Excluded Mapping Candidates` with the review reason.
 
 When a fallback registry-term match maps one holding to multiple narratives, V1 keeps all mappings but lowers their confidence from `0.52` to `0.42`, marks each mapping with `needs_review`, and writes `mapping_precision_flags` into raw/scoring JSON plus the Markdown/HTML report.
 
@@ -170,7 +172,7 @@ When a fallback mapping is supported only by a broad industry term, V1 keeps the
 
 Every selected stock-to-narrative mapping also emits a `mapping_rationales` row in raw/scoring JSON and reports. This row explains the mapping method, narrative name, confidence, matched registry terms when available, and whether the mapping needs manual review. For V1 this makes the answer to "why is this stock in this narrative?" explicit instead of implicit in fixtures or broad industry rules.
 
-The latest registry curation pass replaced clear broad industry-only matches with company-level terms for baijiu, healthcare, defense, new energy, real estate chain, and selected semiconductor equipment/EDA holdings. The remaining real-smoke broad flags are intentionally left for narrative reassessment rather than forced into the current registry.
+The latest registry curation pass replaced clear broad industry-only matches with company-level terms for baijiu, healthcare, defense, new energy, real estate chain, and selected semiconductor equipment/EDA holdings. The remaining ambiguous semiconductor candidates are explicitly excluded and left for narrative reassessment rather than forced into the current registry.
 
 ## Announcement Evidence Smoke
 

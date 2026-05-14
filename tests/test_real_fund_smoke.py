@@ -77,6 +77,25 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
                             "recommended_action": "curation_review",
                         }
                     ],
+                    "excluded_mapping_candidates": [
+                        {
+                            "type": "excluded_mapping_candidate",
+                            "exclusion_id": "EX_SEMI_688036",
+                            "stock_code": "688036",
+                            "stock_name": "传音控股",
+                            "industry": "电子",
+                            "weight": 0.06,
+                            "narrative_id": "N_SEMI_CAPEX",
+                            "narrative_name": "Semiconductor Capex Cycle",
+                            "method": "registry_term_rule",
+                            "matched_terms": ["电子"],
+                            "reason": (
+                                "Consumer electronics device exposure is too "
+                                "broad for Semiconductor Capex."
+                            ),
+                            "recommended_action": "candidate_narrative_review",
+                        }
+                    ],
                     "degradation_events": [],
                     "provider_foundation": {
                         "effective_data_quality": "partial",
@@ -178,6 +197,26 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
             "recommended_action": "curation_review",
         }
     ]
+    assert summary["funds"][0]["excluded_mapping_candidate_count"] == 1
+    assert summary["funds"][0]["excluded_mapping_candidates"] == [
+        {
+            "type": "excluded_mapping_candidate",
+            "exclusion_id": "EX_SEMI_688036",
+            "stock_code": "688036",
+            "stock_name": "传音控股",
+            "industry": "电子",
+            "weight": 0.06,
+            "narrative_id": "N_SEMI_CAPEX",
+            "narrative_name": "Semiconductor Capex Cycle",
+            "method": "registry_term_rule",
+            "matched_terms": ["电子"],
+            "reason": (
+                "Consumer electronics device exposure is too broad for "
+                "Semiconductor Capex."
+            ),
+            "recommended_action": "candidate_narrative_review",
+        }
+    ]
     assert (tmp_path / "real_fund_smoke_summary.json").exists()
     assert (tmp_path / "real_fund_smoke_summary.md").exists()
 
@@ -193,6 +232,8 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
     assert "## Mapping Precision Flags" in summary_markdown
     assert "broad_industry_fallback" in summary_markdown
     assert "curation_review" in summary_markdown
+    assert "## Excluded Mapping Candidates" in summary_markdown
+    assert "candidate_narrative_review" in summary_markdown
 
 
 def test_real_fund_smoke_summary_fails_when_coverage_is_below_threshold(tmp_path):
@@ -247,6 +288,7 @@ def test_real_fund_smoke_summary_fails_when_coverage_is_below_threshold(tmp_path
         }
     ]
     assert summary["funds"][0]["mapping_precision_flags"] == []
+    assert summary["funds"][0]["excluded_mapping_candidates"] == []
     summary_markdown = (tmp_path / "real_fund_smoke_summary.md").read_text(
         encoding="utf-8"
     )
@@ -270,6 +312,7 @@ def test_real_fund_smoke_summary_records_runner_failures(tmp_path):
     assert summary["funds"][0]["primary_narrative"] is None
     assert summary["funds"][0]["multi_mapped_holdings"] == []
     assert summary["funds"][0]["mapping_precision_flags"] == []
+    assert summary["funds"][0]["excluded_mapping_candidates"] == []
     assert "temporary provider failure" in summary["funds"][0]["error"]
     assert (tmp_path / "real_fund_smoke_summary.json").exists()
     assert (tmp_path / "real_fund_smoke_summary.md").exists()

@@ -92,6 +92,7 @@ def _build_fund_result(
     unmapped_holdings = _summarize_unmapped_holdings(scoring["unmapped_holdings"])
     multi_mapped_holdings = _summarize_multi_mapped_holdings(raw_path)
     mapping_precision_flags = _summarize_mapping_precision_flags(scoring)
+    excluded_mapping_candidates = _summarize_excluded_mapping_candidates(scoring)
     return {
         "fund_code": fund_code,
         "scenario": scenario,
@@ -120,6 +121,8 @@ def _build_fund_result(
         "multi_mapped_holdings": multi_mapped_holdings,
         "mapping_precision_flag_count": len(mapping_precision_flags),
         "mapping_precision_flags": mapping_precision_flags,
+        "excluded_mapping_candidate_count": len(excluded_mapping_candidates),
+        "excluded_mapping_candidates": excluded_mapping_candidates,
         "degradation_event_count": len(scoring["degradation_events"]),
         "error": None,
     }
@@ -155,6 +158,8 @@ def _build_failed_fund_result(
         "multi_mapped_holdings": [],
         "mapping_precision_flag_count": 0,
         "mapping_precision_flags": [],
+        "excluded_mapping_candidate_count": 0,
+        "excluded_mapping_candidates": [],
         "degradation_event_count": 1,
         "error": message,
     }
@@ -239,6 +244,28 @@ def _summarize_mapping_precision_flags(
             "recommended_action": flag.get("recommended_action"),
         }
         for flag in scoring.get("mapping_precision_flags", [])
+    ]
+
+
+def _summarize_excluded_mapping_candidates(
+    scoring: dict[str, Any],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "type": candidate.get("type"),
+            "exclusion_id": candidate.get("exclusion_id"),
+            "stock_code": candidate.get("stock_code"),
+            "stock_name": candidate.get("stock_name"),
+            "industry": candidate.get("industry"),
+            "weight": candidate.get("weight"),
+            "narrative_id": candidate.get("narrative_id"),
+            "narrative_name": candidate.get("narrative_name"),
+            "method": candidate.get("method"),
+            "matched_terms": candidate.get("matched_terms", []),
+            "reason": candidate.get("reason"),
+            "recommended_action": candidate.get("recommended_action"),
+        }
+        for candidate in scoring.get("excluded_mapping_candidates", [])
     ]
 
 
@@ -360,6 +387,32 @@ def _write_summary(summary: dict[str, Any], output_path: Path) -> None:
                     f"{', '.join(flag['narratives']) or '-'} | "
                     f"{_format_confidence_change(flag)} | "
                     f"{flag['recommended_action'] or '-'} |"
+                )
+        lines.append("")
+    excluded_candidate_results = [
+        result for result in summary["funds"] if result["excluded_mapping_candidates"]
+    ]
+    if excluded_candidate_results:
+        lines.extend(
+            [
+                "## Excluded Mapping Candidates",
+                "",
+                "| Fund | Stock | Name | Industry | Candidate Narrative | Terms | Action | Reason |",
+                "| --- | --- | --- | --- | --- | --- | --- | --- |",
+            ]
+        )
+        for result in excluded_candidate_results:
+            for candidate in result["excluded_mapping_candidates"]:
+                lines.append(
+                    "| "
+                    f"{result['fund_code']} | "
+                    f"{candidate['stock_code'] or '-'} | "
+                    f"{candidate['stock_name'] or '-'} | "
+                    f"{candidate['industry'] or '-'} | "
+                    f"{candidate['narrative_name'] or candidate['narrative_id'] or '-'} | "
+                    f"{', '.join(candidate['matched_terms']) or '-'} | "
+                    f"{candidate['recommended_action'] or '-'} | "
+                    f"{candidate['reason'] or '-'} |"
                 )
         lines.append("")
     (output_path / "real_fund_smoke_summary.md").write_text(

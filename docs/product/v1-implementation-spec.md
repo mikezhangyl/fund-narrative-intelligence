@@ -131,6 +131,8 @@ V1 precision tiers:
 
 If multiple precision concerns apply, `multi_match_fallback` takes precedence because a multi-narrative assignment is a stronger review signal than a single broad industry-only match.
 
+V1 can also use explicit `mapping_exclusions` for known-bad fallback candidates. Exclusions apply to fallback candidates only, not curated fixture mappings. Excluded candidates must not enter narrative aggregation or scoring. Raw JSON, scoring JSON, reports, and real-smoke summaries should include `excluded_mapping_candidates` with stock, candidate narrative, matched terms, reason, and `recommended_action`.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
@@ -373,7 +375,7 @@ The generated artifacts must satisfy:
 - The real-fund smoke set records coverage, primary narrative, stage, concrete unmapped holding details, and pass/fail status.
 - The real-fund smoke set records multi-mapped holdings so high coverage does not hide possible registry precision risks.
 - The real-fund smoke set records mapping precision flags so broad-industry and multi-match curation work is visible in the summary JSON and Markdown.
-- The real-fund smoke CLI output prints per-fund precision flag counts so terminal logs do not hide mapping precision work behind 100% coverage.
+- The real-fund smoke CLI output prints per-fund precision flag and excluded candidate counts so terminal logs do not hide mapping precision work behind coverage numbers.
 - The real-fund smoke set writes summary artifacts even when an individual fund fails, marking only that fund as failed and returning a non-zero exit code for the overall smoke command.
 - The announcement-evidence smoke set writes summary artifacts and returns non-zero when CNINFO metadata, evidence conversion, announcement provider disclosure, or mock/mixed data-source notice checks fail.
 - The mock-provider path is deterministic enough for repeatable tests.

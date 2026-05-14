@@ -101,6 +101,28 @@ def validate_mapping_payload(payload: dict[str, Any]) -> None:
         _require_probability(mapping["confidence"], f"{context}.confidence")
 
 
+def validate_mapping_exclusion_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "mapping exclusions")
+    _require_keys(payload, {"version", "exclusions"}, "mapping exclusions")
+    if not isinstance(payload["exclusions"], list):
+        raise ProviderContractError("exclusions must be a list")
+    for index, exclusion in enumerate(payload["exclusions"]):
+        context = f"exclusions[{index}]"
+        _require_mapping(exclusion, context)
+        _require_keys(
+            exclusion,
+            {
+                "exclusion_id",
+                "stock_code",
+                "narrative_id",
+                "method",
+                "reason",
+                "recommended_action",
+            },
+            context,
+        )
+
+
 def validate_evidence_payload(payload: dict[str, Any]) -> None:
     _require_mapping(payload, "evidence")
     _require_keys(payload, {"version", "evidence"}, "evidence")

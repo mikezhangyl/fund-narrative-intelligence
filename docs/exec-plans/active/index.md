@@ -26,3 +26,4 @@
 - [real-smoke-registry-curation.md](./real-smoke-registry-curation.md)
 - [real-smoke-precision-summary.md](./real-smoke-precision-summary.md)
 - [real-smoke-cli-precision-counts.md](./real-smoke-cli-precision-counts.md)
+- [mapping-exclusions.md](./mapping-exclusions.md)

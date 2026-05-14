@@ -13,11 +13,20 @@ def test_mock_intelligence_provider_set_loads_validated_fixture_layers():
 
     registry = providers.get_narrative_registry()
     mappings = providers.get_stock_narrative_mappings()
+    exclusions = providers.get_mapping_exclusions()
     evidence = providers.get_evidence()
     signals = providers.get_signal_events()
 
     assert registry["version"] == "registry-v1"
     assert mappings
+    assert exclusions["version"] == "mapping-exclusions-v1"
+    assert {
+        (item["stock_code"], item["narrative_id"]) for item in exclusions["exclusions"]
+    } >= {
+        ("688036", "N_SEMI_CAPEX"),
+        ("688692", "N_SEMI_CAPEX"),
+        ("600522", "N_SEMI_CAPEX"),
+    }
     assert evidence[0]["source"].startswith("mock_")
     assert signals[0]["signal_id"]
 

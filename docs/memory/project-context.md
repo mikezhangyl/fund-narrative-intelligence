@@ -82,7 +82,8 @@ Expected artifacts:
 - Real-fund smoke summaries isolate failures per fund, write summary artifacts, include concrete unmapped holding details, and return non-zero when any fund fails or falls below coverage threshold.
 - Real-fund smoke summaries also include `multi_mapped_holdings` so 100% mapping coverage does not hide broad or cross-domain registry matches.
 - Real-fund smoke summaries also aggregate `mapping_precision_flags` into JSON and Markdown so registry curation work items are visible without opening each fund report.
-- `python -m src.main --run-real-smoke` prints `precision_flags=<count>` per fund in stdout.
+- Explicit mapping exclusions prevent known-bad fallback candidates from entering scoring; excluded candidates are emitted in raw/scoring JSON, reports, and real-smoke summaries.
+- `python -m src.main --run-real-smoke` prints `precision_flags=<count>` and `excluded_candidates=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 
 ## Mock Scenario Fixtures
@@ -94,10 +95,11 @@ Expected artifacts:
 ## Real Provider Smoke Result
 
 - `161725` with `--provider-mode eastmoney`: Premium Baijiu Consumption / `diverging` in the current fixture-backed mapping layer.
-- Real smoke set covers `161725`, `320007`, `003096`, `003834`, `001475`, and `000991`; latest smoke passed with 100% mapping coverage for all six funds and calibrated stages `strengthening` / `diverging` / `weakening`.
+- Real smoke set covers `161725`, `320007`, `003096`, `003834`, `001475`, and `000991`; latest smoke passed the coverage threshold for all six funds and kept calibrated stages `strengthening` / `diverging` / `weakening`.
 - Latest registry broadening resolved prior real-smoke gaps for `002594` 比亚迪, `600066` 宇通客车, `603308` 应流股份, `002246` 北化股份, `002572` 索菲亚, `603816` 顾家家居, and `002918` 蒙娜丽莎.
-- Latest registry curation replaced 21 clear broad industry-only real-smoke fallback mappings with company-level terms; remaining broad flags are `600522` 中天科技, `688036` 传音控股, and `688692` 达梦数据 under the current Semiconductor Capex mapping rules.
+- Latest registry curation replaced 21 clear broad industry-only real-smoke fallback mappings with company-level terms; `600522` 中天科技, `688036` 传音控股, and `688692` 达梦数据 are now explicit excluded candidates for Semiconductor Capex.
 - Current multi-match diagnostics flag `300604` 长川科技 as Semiconductor + Defense and `600482` 中国动力 as New Energy + Defense.
+- Current excluded mapping candidates are `688036` 传音控股, `688692` 达梦数据, and `600522` 中天科技 as excluded candidates for Semiconductor Capex.
 - Latest announcement-evidence probe for `161725` with CNINFO start date `2026-01-01` returned 56 announcements and 56 converted evidence records, while still disclosing the mixed Eastmoney/CNINFO + Mock intelligence foundation as `partial`.
 
 ## Deferred Scope

@@ -19,15 +19,22 @@ def build_mapping_result(
     holdings: list[dict[str, Any]],
     mappings: list[dict[str, Any]],
     registry: dict[str, dict[str, Any]],
+    exclusions: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     exact_mappings = select_mappings_for_holdings(holdings, mappings)
     mapped_stock_codes = {mapping["stock_code"] for mapping in exact_mappings}
-    fallback_mappings = [
-        fallback
-        for holding in holdings
-        if holding["stock_code"] not in mapped_stock_codes
-        for fallback in _fallback_mappings_for_holding(holding, registry)
-    ]
+    fallback_mappings: list[dict[str, Any]] = []
+    excluded_mapping_candidates: list[dict[str, Any]] = []
+    for holding in holdings:
+        if holding["stock_code"] in mapped_stock_codes:
+            continue
+        fallback_result = _fallback_mappings_for_holding(
+            holding=holding,
+            registry=registry,
+            exclusions=exclusions or [],
+        )
+        fallback_mappings.extend(fallback_result["mappings"])
+        excluded_mapping_candidates.extend(fallback_result["excluded_candidates"])
     all_mappings = [*exact_mappings, *fallback_mappings]
     covered_stock_codes = {mapping["stock_code"] for mapping in all_mappings}
     unmapped_holdings = [
@@ -48,12 +55,15 @@ def build_mapping_result(
             mappings=fallback_mappings,
             registry=registry,
         ),
+        "excluded_mapping_candidates": excluded_mapping_candidates,
     }
 
 
 def _fallback_mappings_for_holding(
-    holding: dict[str, Any], registry: dict[str, dict[str, Any]]
-) -> list[dict[str, Any]]:
+    holding: dict[str, Any],
+    registry: dict[str, dict[str, Any]],
+    exclusions: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
     haystack = " ".join(
         str(value)
         for value in [
@@ -63,12 +73,30 @@ def _fallback_mappings_for_holding(
         ]
     ).lower()
     matches = []
+    excluded_candidates = []
     for narrative_id, narrative in registry.items():
         terms = _registry_terms(narrative)
         matched_terms = [
             term for term in terms if term.lower() and term.lower() in haystack
         ]
         if matched_terms:
+            exclusion = _matching_exclusion(
+                holding=holding,
+                narrative_id=narrative_id,
+                method="registry_term_rule",
+                exclusions=exclusions,
+            )
+            if exclusion:
+                excluded_candidates.append(
+                    _excluded_mapping_candidate(
+                        holding=holding,
+                        narrative=narrative,
+                        narrative_id=narrative_id,
+                        matched_terms=matched_terms,
+                        exclusion=exclusion,
+                    )
+                )
+                continue
             precision_fields = {}
             if _is_broad_industry_only_fallback(holding, matched_terms):
                 precision_fields = {
@@ -88,16 +116,62 @@ def _fallback_mappings_for_holding(
                 }
             )
     if len(matches) <= 1:
-        return matches
-    return [
-        {
-            **match,
-            "confidence": MULTI_MATCH_FALLBACK_CONFIDENCE,
-            "needs_review": True,
-            "precision_flag": "multi_match_fallback",
-        }
-        for match in matches
-    ]
+        return {"mappings": matches, "excluded_candidates": excluded_candidates}
+    return {
+        "mappings": [
+            {
+                **match,
+                "confidence": MULTI_MATCH_FALLBACK_CONFIDENCE,
+                "needs_review": True,
+                "precision_flag": "multi_match_fallback",
+            }
+            for match in matches
+        ],
+        "excluded_candidates": excluded_candidates,
+    }
+
+
+def _matching_exclusion(
+    holding: dict[str, Any],
+    narrative_id: str,
+    method: str,
+    exclusions: list[dict[str, Any]],
+) -> dict[str, Any] | None:
+    for exclusion in exclusions:
+        if str(exclusion.get("stock_code")) != str(holding.get("stock_code")):
+            continue
+        if str(exclusion.get("narrative_id")) != narrative_id:
+            continue
+        exclusion_method = exclusion.get("method")
+        if exclusion_method and exclusion_method != method:
+            continue
+        return exclusion
+    return None
+
+
+def _excluded_mapping_candidate(
+    holding: dict[str, Any],
+    narrative: dict[str, Any],
+    narrative_id: str,
+    matched_terms: list[str],
+    exclusion: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "type": "excluded_mapping_candidate",
+        "exclusion_id": exclusion.get("exclusion_id"),
+        "stock_code": holding["stock_code"],
+        "stock_name": holding.get("stock_name"),
+        "industry": holding.get("industry"),
+        "weight": holding.get("weight"),
+        "narrative_id": narrative_id,
+        "narrative_name": narrative.get("name", narrative_id),
+        "method": "registry_term_rule",
+        "matched_terms": [str(term) for term in matched_terms],
+        "reason": exclusion.get("reason"),
+        "recommended_action": exclusion.get(
+            "recommended_action", "candidate_narrative_review"
+        ),
+    }
 
 
 def _mapping_precision_flags(

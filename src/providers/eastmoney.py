@@ -72,6 +72,9 @@ class EastmoneyFundHoldingProvider:
     def get_stock_narrative_mappings(self) -> list[dict[str, Any]]:
         return self.fallback_provider.get_stock_narrative_mappings()
 
+    def get_mapping_exclusions(self) -> dict[str, Any]:
+        return self.fallback_provider.get_mapping_exclusions()
+
     def get_evidence(self) -> list[dict[str, Any]]:
         return self.fallback_provider.get_evidence()
 

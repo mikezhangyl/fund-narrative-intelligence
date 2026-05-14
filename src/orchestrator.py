@@ -43,6 +43,7 @@ def run_pipeline(
     fund_payload = provider.get_fund_holdings(fund_code)
     registry_payload = provider.get_narrative_registry()
     all_mappings = provider.get_stock_narrative_mappings()
+    mapping_exclusions_payload = provider.get_mapping_exclusions()
     evidence = provider.get_evidence()
     signal_events = provider.get_signal_events()
 
@@ -55,6 +56,7 @@ def run_pipeline(
         holdings=holdings,
         mappings=all_mappings,
         registry=registry_by_id,
+        exclusions=mapping_exclusions_payload["exclusions"],
     )
     selected_mappings = mapping_result["mappings"]
     degradation_events = [
@@ -122,9 +124,14 @@ def run_pipeline(
         "narrative_registry_version": registry_payload["version"],
         "narrative_registry": registry_items,
         "stock_narrative_mappings": selected_mappings,
+        "mapping_exclusions_version": mapping_exclusions_payload["version"],
+        "mapping_exclusions": mapping_exclusions_payload["exclusions"],
         "mapping_coverage": mapping_result["coverage"],
         "mapping_rationales": mapping_result["mapping_rationales"],
         "mapping_precision_flags": mapping_result["mapping_precision_flags"],
+        "excluded_mapping_candidates": mapping_result[
+            "excluded_mapping_candidates"
+        ],
         "unmapped_holdings": mapping_result["unmapped_holdings"],
         "evidence": evidence,
         "signal_events": signal_events,
@@ -145,6 +152,9 @@ def run_pipeline(
         "mapping_coverage": mapping_result["coverage"],
         "mapping_rationales": mapping_result["mapping_rationales"],
         "mapping_precision_flags": mapping_result["mapping_precision_flags"],
+        "excluded_mapping_candidates": mapping_result[
+            "excluded_mapping_candidates"
+        ],
         "unmapped_holdings": mapping_result["unmapped_holdings"],
         "supporting_evidence": _top_evidence(
             evidence, narrative_results, sentiments={"positive", "mixed"}

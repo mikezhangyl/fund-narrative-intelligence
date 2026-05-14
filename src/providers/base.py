@@ -17,6 +17,9 @@ class DataProvider(Protocol):
     def get_stock_narrative_mappings(self) -> list[dict[str, Any]]:
         raise NotImplementedError
 
+    def get_mapping_exclusions(self) -> dict[str, Any]:
+        raise NotImplementedError
+
     def get_evidence(self) -> list[dict[str, Any]]:
         raise NotImplementedError
 

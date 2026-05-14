@@ -1,0 +1,38 @@
+{
+  "version": "mapping-exclusions-v1",
+  "exclusions": [
+    {
+      "exclusion_id": "EX_SEMI_688036",
+      "stock_code": "688036",
+      "stock_name": "传音控股",
+      "narrative_id": "N_SEMI_CAPEX",
+      "method": "registry_term_rule",
+      "reason": "Consumer electronics device exposure is too broad for Semiconductor Capex.",
+      "recommended_action": "candidate_narrative_review",
+      "review_status": "approved",
+      "created_at": "2026-05-14"
+    },
+    {
+      "exclusion_id": "EX_SEMI_688692",
+      "stock_code": "688692",
+      "stock_name": "达梦数据",
+      "narrative_id": "N_SEMI_CAPEX",
+      "method": "registry_term_rule",
+      "reason": "Domestic database software exposure is too broad for Semiconductor Capex.",
+      "recommended_action": "candidate_narrative_review",
+      "review_status": "approved",
+      "created_at": "2026-05-14"
+    },
+    {
+      "exclusion_id": "EX_SEMI_600522",
+      "stock_code": "600522",
+      "stock_name": "中天科技",
+      "narrative_id": "N_SEMI_CAPEX",
+      "method": "registry_term_rule",
+      "reason": "Communication and power cable exposure is too broad for Semiconductor Capex.",
+      "recommended_action": "candidate_narrative_review",
+      "review_status": "approved",
+      "created_at": "2026-05-14"
+    }
+  ]
+}

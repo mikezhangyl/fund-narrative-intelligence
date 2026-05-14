@@ -182,6 +182,63 @@ def test_broad_industry_only_fallback_is_flagged_for_curation_review():
     ]
 
 
+def test_excluded_fallback_candidate_is_not_mapped_or_scored():
+    holdings = [
+        {
+            "stock_code": "688036",
+            "stock_name": "传音控股",
+            "weight": 0.06,
+            "industry": "电子",
+        }
+    ]
+    registry = {
+        "N_SEMI_CAPEX": {
+            "name": "Semiconductor Capex Cycle",
+            "aliases": [],
+            "related_terms": ["电子"],
+        }
+    }
+    exclusions = [
+        {
+            "exclusion_id": "EX_SEMI_688036",
+            "stock_code": "688036",
+            "narrative_id": "N_SEMI_CAPEX",
+            "method": "registry_term_rule",
+            "reason": (
+                "Consumer electronics device exposure is too broad for "
+                "Semiconductor Capex."
+            ),
+        }
+    ]
+
+    result = build_mapping_result(holdings, [], registry, exclusions=exclusions)
+
+    assert result["mappings"] == []
+    assert result["coverage"]["coverage_ratio"] == 0
+    assert result["unmapped_holdings"] == holdings
+    assert result["mapping_precision_flags"] == []
+    assert result["mapping_rationales"] == []
+    assert result["excluded_mapping_candidates"] == [
+        {
+            "type": "excluded_mapping_candidate",
+            "exclusion_id": "EX_SEMI_688036",
+            "stock_code": "688036",
+            "stock_name": "传音控股",
+            "industry": "电子",
+            "weight": 0.06,
+            "narrative_id": "N_SEMI_CAPEX",
+            "narrative_name": "Semiconductor Capex Cycle",
+            "method": "registry_term_rule",
+            "matched_terms": ["电子"],
+            "reason": (
+                "Consumer electronics device exposure is too broad for "
+                "Semiconductor Capex."
+            ),
+            "recommended_action": "candidate_narrative_review",
+        }
+    ]
+
+
 def test_multi_match_fallback_lowers_confidence_and_flags_review():
     holdings = [
         {
