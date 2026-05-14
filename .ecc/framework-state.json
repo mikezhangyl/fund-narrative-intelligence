@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-real-holdings-acceptance",
+  "latest_run": "20260514-announcement-acceptance",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "use the strict live Eastmoney holdings acceptance script before reducing additional mock layers"
+  "next_step": "use strict live acceptance scripts for Eastmoney holdings and CNINFO announcements before reducing additional mock layers"
 }

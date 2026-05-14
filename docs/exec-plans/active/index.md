@@ -47,3 +47,4 @@
 - [v1-acceptance-script.md](./v1-acceptance-script.md)
 - [ci-quality-workflow.md](./ci-quality-workflow.md)
 - [real-holdings-acceptance.md](./real-holdings-acceptance.md)
+- [announcement-acceptance.md](./announcement-acceptance.md)

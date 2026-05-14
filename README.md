@@ -49,6 +49,16 @@ Run the live Eastmoney + CNINFO announcement evidence smoke:
 python -m src.main --run-announcement-smoke
 ```
 
+Run the strict live Eastmoney + CNINFO announcement acceptance path:
+
+```bash
+python scripts/validate_announcement_acceptance.py --output-dir outputs/announcement_161725
+```
+
+This is also manual, not CI. It validates the full server-side report path with
+fresh Eastmoney holdings, non-mock CNINFO announcement metadata, generated
+announcement evidence, and explicitly disclosed Mock fixture intelligence layers.
+
 Inspect provider layers without generating report artifacts:
 
 ```bash
@@ -219,6 +229,16 @@ The announcement smoke command validates the optional real announcement path aga
 ```bash
 python -m src.main --run-announcement-smoke
 ```
+
+For strict local acceptance of the generated report artifacts, run:
+
+```bash
+python scripts/validate_announcement_acceptance.py --output-dir outputs/announcement_161725
+```
+
+The strict command rejects missing announcement metadata, missing generated
+announcement evidence, degraded provider events, and reports that do not
+disclose the mixed Eastmoney + CNINFO + Mock fixture foundation.
 
 It writes:
 

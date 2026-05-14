@@ -648,3 +648,32 @@ Consequences:
 - Markdown and HTML reports must disclose mixed Eastmoney and Mock fixture data.
 - The command remains outside CI because it depends on live network and provider
   availability.
+
+## ADR-0030: Add Strict CNINFO Announcement Acceptance
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add `scripts/validate_announcement_acceptance.py` as a manual live-provider
+acceptance command for the optional Eastmoney + CNINFO report path.
+
+Rationale:
+
+- The project is reducing mock layers incrementally and needs a strict check for
+  the first real evidence source.
+- The existing announcement smoke summary proves the high-level case, but future
+  web loading also depends on raw, scoring, review queue, manifest, Markdown,
+  and HTML artifacts preserving the same provider foundation.
+- CNINFO metadata is real provider data, but V1 only classifies metadata and does
+  not parse source PDFs, so the report must disclose this mixed foundation.
+
+Consequences:
+
+- The script runs `--include-cninfo-announcements`, validates artifact contracts,
+  and rejects missing CNINFO announcements or generated announcement evidence.
+- Eastmoney holdings and CNINFO announcements must be non-mock; registry,
+  mappings, base evidence, and signals remain mock-backed.
+- The command remains outside CI because it depends on live provider
+  availability.

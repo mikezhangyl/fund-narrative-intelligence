@@ -65,6 +65,7 @@ Expected artifacts:
 - Standard quality commands: `python -m ruff check .`, `python -m coverage run -m pytest -q`, `python -m coverage report`, and `python -m compileall -q src tests scripts`.
 - Standard V1 acceptance command: `python scripts/validate_v1_acceptance.py`.
 - Strict live Eastmoney holdings acceptance command: `python scripts/validate_real_holdings_acceptance.py --output-dir outputs/real_161725`.
+- Strict live Eastmoney + CNINFO announcement acceptance command: `python scripts/validate_announcement_acceptance.py --output-dir outputs/announcement_161725`.
 - GitHub Actions CI runs the standard quality gates on pushes to `main` and pull requests.
 - Data: local JSON fixtures and mock providers.
 - Future UI: Node.js / Next.js can be added later as a separate workspace layer. Candidate narrative review and approval will eventually happen in a web UI, so V1 structured outputs should remain directly renderable and action-ready for a future review workspace.
@@ -115,6 +116,7 @@ Expected artifacts:
 - `python -m src.main --validate-persistence-result path/to/persistence-result.json` validates a persistence audit artifact without requiring `--fund-code`.
 - `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, `candidate_narratives=<count>`, and `review_queue=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
+- Strict announcement acceptance validates the generated fund artifacts directly: Eastmoney holdings must be fresh, CNINFO announcements and converted evidence must be present, and remaining registry/mapping/base-evidence/signal layers must still disclose `mock://fixtures/...`.
 
 ## Mock Scenario Fixtures
 
