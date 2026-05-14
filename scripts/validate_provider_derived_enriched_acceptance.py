@@ -104,6 +104,7 @@ def _run_acceptance(
             "--announcement-start-date",
             announcement_start_date,
             "--include-market-quotes",
+            "--include-news-evidence",
             "--output-dir",
             str(output_dir),
         ]
@@ -114,6 +115,7 @@ def _run_acceptance(
         fund_code=fund_code,
         min_announcement_count=min_announcement_count,
         min_quote_count=min_quote_count,
+        require_news_evidence=True,
     )
 
 
@@ -122,6 +124,7 @@ def validate_acceptance_outputs(
     fund_code: str = DEFAULT_FUND_CODE,
     min_announcement_count: int = DEFAULT_MIN_ANNOUNCEMENT_COUNT,
     min_quote_count: int = DEFAULT_MIN_QUOTE_COUNT,
+    require_news_evidence: bool = False,
 ) -> None:
     validate_registry_rule_enriched_outputs(
         output_dir=output_dir,
@@ -139,6 +142,9 @@ def validate_acceptance_outputs(
     evidence_layer = layers.get("evidence", {})
     signals_layer = layers.get("signals", {})
     evidence_items = raw.get("evidence") or []
+    announcement_evidence_items = raw.get("announcement_evidence", {}).get("evidence") or []
+    news_evidence = raw.get("news_evidence", {})
+    news_evidence_items = news_evidence.get("evidence") or []
     signal_events = raw.get("signal_events") or []
     derived_signal_events = raw.get("derived_signal_events") or []
 
@@ -151,12 +157,21 @@ def validate_acceptance_outputs(
         "scoring base_intelligence_mode must be provider-derived",
     )
     _require(
-        evidence_items == raw.get("announcement_evidence", {}).get("evidence"),
-        "evidence must match announcement_evidence records",
+        evidence_items == [*announcement_evidence_items, *news_evidence_items],
+        "evidence must match provider-derived evidence records",
     )
+    if require_news_evidence:
+        _require(isinstance(news_evidence, dict) and news_evidence, "news_evidence is required")
+        _require(
+            layers.get("news_evidence", {}).get("is_mock") is False,
+            "news evidence layer must not be mock",
+        )
     _require(
-        all(item.get("source") == "cninfo_announcement" for item in evidence_items),
-        "evidence must come from cninfo_announcement",
+        all(
+            item.get("source") == "cninfo_announcement" or item.get("type") == "news"
+            for item in evidence_items
+        ),
+        "evidence must come from provider-derived announcement or news sources",
     )
     _require(
         signal_events == derived_signal_events,

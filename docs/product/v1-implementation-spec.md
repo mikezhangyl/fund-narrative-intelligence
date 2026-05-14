@@ -610,7 +610,9 @@ same shape. The payload must include `query_scope` with requested, queried, and
 omitted narrative IDs so reports can disclose top-N coverage. V1 classifies RSS
 titles/snippets only and does not parse article bodies. Provider failures must
 degrade into `unavailable` payloads and recorded degradation events rather than
-crashing the pipeline.
+crashing the pipeline. News evidence also derives `news-derived-signals` for
+momentum scoring: positive snippets become `news_frequency_up`, mixed snippets
+become `research_mentions_up`, and negative snippets become `language_decay`.
 
 - Missing local mock fixtures and invalid provider payloads produce controlled errors.
 - The mock-provider path includes multiple scenario funds so lifecycle stages are not validated only against one happy path.

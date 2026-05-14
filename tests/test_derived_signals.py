@@ -1,6 +1,7 @@
 from src.modules.signal_service.derived import (
     derive_announcement_signal_events,
     derive_market_quote_signal_events,
+    derive_news_signal_events,
 )
 from src.modules.signal_service.scoring import calculate_dimension_score
 from src.validation import validate_signal_payload
@@ -113,6 +114,109 @@ def test_ignores_generic_mixed_or_non_announcement_evidence():
     ]
 
     assert derive_announcement_signal_events(evidence) == []
+
+
+def test_derives_positive_momentum_signal_from_news_evidence():
+    evidence = [
+        {
+            "evidence_id": "EV_NEWS_N_AI_INFRA_123",
+            "narrative_id": "N_AI_INFRA",
+            "type": "news",
+            "source": "google_news_rss",
+            "source_url": "https://example.com/news/ai",
+            "title": "AI infrastructure growth accelerates",
+            "summary": "RSS title/snippet only.",
+            "sentiment": "positive",
+            "confidence": 0.52,
+            "event_date": "2026-05-14",
+            "source_provider": "google-news-rss",
+        }
+    ]
+
+    signals = derive_news_signal_events(evidence)
+
+    assert signals == [
+        {
+            "signal_id": "SIG_NEWS_EV_NEWS_N_AI_INFRA_123",
+            "narrative_id": "N_AI_INFRA",
+            "signal_type": "news_frequency_up",
+            "strength": 0.416,
+            "confidence": 0.52,
+            "confidence_multiplier": 0.55,
+            "event_date": "2026-05-14",
+            "half_life_days": 14,
+            "source": "news_evidence",
+            "source_provider": "google-news-rss",
+            "source_evidence_id": "EV_NEWS_N_AI_INFRA_123",
+            "source_url": "https://example.com/news/ai",
+            "derivation_reason": "provider news evidence",
+        }
+    ]
+    validate_signal_payload({"version": "signals-v1", "signal_events": signals})
+
+    momentum_score = calculate_dimension_score(
+        "momentum_score",
+        signals,
+        as_of_date="2026-05-14",
+        data_quality="partial",
+    )
+    assert momentum_score["supporting_signal_count"] == 1
+    assert momentum_score["score"] > 50
+
+
+def test_derives_language_decay_signal_from_negative_news_evidence():
+    evidence = [
+        {
+            "evidence_id": "EV_NEWS_N_NEW_ENERGY_123",
+            "narrative_id": "N_NEW_ENERGY",
+            "type": "news",
+            "source": "google_news_rss",
+            "source_url": "https://example.com/news/risk",
+            "title": "Battery demand risk warning",
+            "summary": "RSS title/snippet only.",
+            "sentiment": "negative",
+            "confidence": 0.5,
+            "event_date": "2026-05-14",
+            "source_provider": "google-news-rss",
+        }
+    ]
+
+    signals = derive_news_signal_events(evidence)
+
+    assert signals[0]["signal_type"] == "language_decay"
+    assert signals[0]["strength"] == 0.35
+    momentum_score = calculate_dimension_score(
+        "momentum_score",
+        signals,
+        as_of_date="2026-05-14",
+        data_quality="partial",
+    )
+    assert momentum_score["risk_signal_count"] == 1
+    assert momentum_score["score"] < 50
+
+
+def test_derives_low_weight_research_signal_from_mixed_news_evidence():
+    evidence = [
+        {
+            "evidence_id": "EV_NEWS_N_HEALTHCARE_123",
+            "narrative_id": "N_HEALTHCARE",
+            "type": "news",
+            "source": "google_news_rss",
+            "source_url": "https://example.com/news/healthcare",
+            "title": "Healthcare innovation coverage continues",
+            "summary": "RSS title/snippet only.",
+            "sentiment": "mixed",
+            "confidence": 0.46,
+            "event_date": "2026-05-14",
+            "source_provider": "google-news-rss",
+        }
+    ]
+
+    signals = derive_news_signal_events(evidence)
+
+    assert signals[0]["signal_type"] == "research_mentions_up"
+    assert signals[0]["strength"] == 0.23
+    assert signals[0]["confidence_multiplier"] == 0.45
 
 
 def test_derives_relative_strength_signal_from_positive_market_quote():

@@ -96,6 +96,7 @@ def calculate_dimension_score(
 
     confidences = [
         float(event.get("confidence", 0))
+        * float(event.get("confidence_multiplier", 1))
         for event in signal_events
         if event["signal_type"] in config["support"] or event["signal_type"] in config["negative"]
     ]

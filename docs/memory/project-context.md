@@ -140,6 +140,7 @@ Expected artifacts:
 - Optional market quote runs now derive scoring signals from quote change percentages. Positive changes become `relative_strength_up`; negative changes become `relative_strength_down`, a capital-score risk signal.
 - Optional valuation snapshot runs derive lightweight `valuation_snapshots` from market quotes and add a non-mock `Valuation` provider layer named `quote-derived-valuation`. This is explicitly quote-derived context, not full fundamental valuation.
 - Optional news evidence runs derive `news_evidence` from Google News RSS titles/snippets and add a non-mock `News Evidence` provider layer named `google-news-rss`. The shared artifact contract is provider-agnostic and includes `query_scope` with requested/queried/omitted narrative IDs. V1 does not parse article bodies and must disclose the title/snippet limitation plus query coverage in reports/source tables.
+- Optional news evidence runs also derive `news-derived-signals`: positive snippets become `news_frequency_up`, mixed snippets become `research_mentions_up`, and negative snippets become `language_decay`.
 
 ## Mock Scenario Fixtures
 

@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-news-evidence-provider",
+  "latest_run": "20260515-news-derived-signals",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "continue reducing mock usage by adding optional RSS-derived news evidence before full search/news API integration"
+  "next_step": "continue reducing mock usage by deriving scoring signals from optional news evidence"
 }

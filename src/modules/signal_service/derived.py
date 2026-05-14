@@ -4,6 +4,7 @@ from typing import Any
 
 ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER = "cninfo-derived-signals"
 MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER = "market-quote-derived-signals"
+NEWS_DERIVED_SIGNAL_PROVIDER = "news-derived-signals"
 
 _ANNOUNCEMENT_SIGNAL_MAP = {
     ("earnings", "positive"): (
@@ -54,11 +55,29 @@ _ANNOUNCEMENT_SIGNAL_MAP = {
 def derive_announcement_signal_events(
     evidence_items: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    signals = [
-        _to_signal_event(item)
-        for item in evidence_items
-        if _to_signal_event(item) is not None
-    ]
+    signals = []
+    for item in evidence_items:
+        signal = _announcement_evidence_to_signal_event(item)
+        if signal is not None:
+            signals.append(signal)
+    return sorted(
+        signals,
+        key=lambda item: (
+            item["narrative_id"],
+            item["event_date"],
+            item["signal_id"],
+        ),
+    )
+
+
+def derive_news_signal_events(
+    evidence_items: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    signals = []
+    for item in evidence_items:
+        signal = _news_evidence_to_signal_event(item)
+        if signal is not None:
+            signals.append(signal)
     return sorted(
         signals,
         key=lambda item: (
@@ -98,7 +117,7 @@ def derive_market_quote_signal_events(
     )
 
 
-def _to_signal_event(item: dict[str, Any]) -> dict[str, Any] | None:
+def _announcement_evidence_to_signal_event(item: dict[str, Any]) -> dict[str, Any] | None:
     if item.get("source") != "cninfo_announcement":
         return None
     profile = _ANNOUNCEMENT_SIGNAL_MAP.get(
@@ -129,6 +148,49 @@ def _to_signal_event(item: dict[str, Any]) -> dict[str, Any] | None:
         "source_evidence_id": evidence_id,
         "source_url": item.get("source_url"),
         "derivation_reason": reason,
+    }
+
+
+def _news_evidence_to_signal_event(item: dict[str, Any]) -> dict[str, Any] | None:
+    if item.get("type") != "news":
+        return None
+    evidence_id = str(item.get("evidence_id") or "")
+    narrative_id = str(item.get("narrative_id") or "")
+    event_date = str(item.get("event_date") or "")
+    if not evidence_id or not narrative_id or not event_date:
+        return None
+
+    sentiment = str(item.get("sentiment") or "")
+    if sentiment == "positive":
+        signal_type = "news_frequency_up"
+        strength_multiplier = 0.8
+        confidence_multiplier = 0.55
+    elif sentiment == "mixed":
+        signal_type = "research_mentions_up"
+        strength_multiplier = 0.5
+        confidence_multiplier = 0.45
+    elif sentiment == "negative":
+        signal_type = "language_decay"
+        strength_multiplier = 0.7
+        confidence_multiplier = 0.55
+    else:
+        return None
+
+    confidence = _confidence(item.get("confidence"))
+    return {
+        "signal_id": f"SIG_NEWS_{evidence_id}",
+        "narrative_id": narrative_id,
+        "signal_type": signal_type,
+        "strength": round(confidence * strength_multiplier, 3),
+        "confidence": confidence,
+        "confidence_multiplier": confidence_multiplier,
+        "event_date": event_date,
+        "half_life_days": 14,
+        "source": "news_evidence",
+        "source_provider": str(item.get("source_provider") or ""),
+        "source_evidence_id": evidence_id,
+        "source_url": item.get("source_url"),
+        "derivation_reason": "provider news evidence",
     }
 
 

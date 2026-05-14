@@ -116,6 +116,7 @@ def _run_acceptance(
             "--announcement-start-date",
             announcement_start_date,
             "--include-market-quotes",
+            "--include-news-evidence",
             "--output-dir",
             str(output_dir),
         ]
@@ -126,6 +127,7 @@ def _run_acceptance(
         fund_code=fund_code,
         min_announcement_count=min_announcement_count,
         min_quote_count=min_quote_count,
+        require_news_evidence=True,
     )
 
 
@@ -137,6 +139,7 @@ def validate_acceptance_outputs(
     stock_mapping_mode: str = DEFAULT_STOCK_MAPPING_MODE,
     stock_mapping_provider_name: str = "registry-rule-stock-mapping",
     stock_mapping_method: str = "registry_term_rule",
+    require_news_evidence: bool = False,
 ) -> None:
     artifacts = {
         "raw": output_dir / f"fund_{fund_code}_raw.json",
@@ -165,6 +168,9 @@ def validate_acceptance_outputs(
     quotes = raw.get("market_quotes", {}).get("quotes") or []
     mappings = raw.get("stock_narrative_mappings") or []
     evidence_items = raw.get("evidence") or []
+    announcement_evidence_items = raw.get("announcement_evidence", {}).get("evidence") or []
+    news_evidence = raw.get("news_evidence", {})
+    news_evidence_items = news_evidence.get("evidence") or []
     signal_events = raw.get("signal_events") or []
     derived_signal_events = raw.get("derived_signal_events") or []
 
@@ -255,9 +261,15 @@ def validate_acceptance_outputs(
         f"all selected mappings must use {stock_mapping_method}",
     )
     _require(
-        evidence_items == raw.get("announcement_evidence", {}).get("evidence"),
-        "evidence must match announcement_evidence records",
+        evidence_items == [*announcement_evidence_items, *news_evidence_items],
+        "evidence must match provider-derived evidence records",
     )
+    if require_news_evidence:
+        _require(isinstance(news_evidence, dict) and news_evidence, "news_evidence is required")
+        _require(
+            layers.get("news_evidence", {}).get("is_mock") is False,
+            "news evidence layer must not be mock",
+        )
     _require(
         signal_events == derived_signal_events,
         "signal_events must match derived_signal_events",

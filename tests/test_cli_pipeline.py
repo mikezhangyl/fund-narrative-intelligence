@@ -768,17 +768,15 @@ def test_provider_derived_intelligence_preserves_fresh_empty_signal_provenance(
     raw = json.loads(artifacts["raw"].read_text())
     scoring = json.loads(artifacts["scoring"].read_text())
     signals_layer = scoring["provider_foundation"]["layers"]["signals"]
-    derived_layer = scoring["provider_foundation"]["layers"]["derived_signals"]
 
     assert raw["announcement_evidence"]["data_quality"] == "fresh"
-    assert raw["derived_signal_events"] == []
-    assert scoring["derived_signal_events"] == []
+    assert raw.get("derived_signal_events", []) == []
+    assert scoring.get("derived_signal_events", []) == []
     assert raw["signal_events"] == []
     assert signals_layer["provider_name"] == "provider-derived-signals"
-    assert signals_layer["data_quality"] == "fresh"
-    assert "cninfo-derived-signals" in signals_layer["note"]
-    assert derived_layer["provider_name"] == "cninfo-derived-signals"
-    assert derived_layer["data_quality"] == "fresh"
+    assert signals_layer["data_quality"] == "unavailable"
+    assert "source providers: none" in signals_layer["note"]
+    assert "derived_signals" not in scoring["provider_foundation"]["layers"]
 
 
 def test_cli_rejects_announcement_start_date_without_cninfo_opt_in(tmp_path):
@@ -1017,6 +1015,12 @@ def test_optional_news_evidence_is_disclosed_and_added_to_outputs(tmp_path):
     assert raw["news_evidence"]["query_scope"]["omitted_narrative_ids"] == []
     assert raw["news_evidence"]["evidence"][0]["source"] == "google_news_rss"
     assert any(item["source"] == "google_news_rss" for item in raw["evidence"])
+    assert raw["derived_signal_events"] == scoring["derived_signal_events"]
+    assert any(item["source"] == "news_evidence" for item in raw["derived_signal_events"])
+    assert any(item["signal_type"] == "news_frequency_up" for item in raw["signal_events"])
+    assert scoring["provider_foundation"]["layers"]["derived_signals"][
+        "provider_name"
+    ] == "news-derived-signals"
     assert news_layer["provider_name"] == "google-news-rss"
     assert news_layer["is_mock"] is False
     assert "titles/snippets only" in news_layer["note"]
@@ -1024,6 +1028,107 @@ def test_optional_news_evidence_is_disclosed_and_added_to_outputs(tmp_path):
     assert {layer["layer"] for layer in source_table["layers"]} >= {"news_evidence"}
     assert "News Evidence" in markdown
     assert "titles/snippets only" in html
+
+
+def test_provider_derived_mode_uses_news_evidence_and_signals(tmp_path):
+    class FakeAnnouncementProvider:
+        provider_name = "cninfo-announcement"
+        provider_version = "cninfo-announcement-v1"
+        source_url = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_announcements(
+            self,
+            stock_codes: list[str],
+            as_of_date: str,
+            start_date: str | None = None,
+        ) -> dict:
+            del stock_codes, as_of_date, start_date
+            return {
+                "version": self.provider_version,
+                "data_quality": "fresh",
+                "announcements": [],
+                "missing_stock_codes": [],
+            }
+
+    class FakeNewsEvidenceProvider:
+        provider_name = "google-news-rss"
+        provider_version = "google-news-rss-v1"
+        source_url = "https://news.google.com/rss/search"
+
+        def get_news_evidence(self, narratives: list[dict], as_of_date: str) -> dict:
+            del as_of_date
+            return {
+                "version": "news-evidence-v1",
+                "provider_name": self.provider_name,
+                "provider_version": self.provider_version,
+                "data_quality": "fresh",
+                "source_url": self.source_url,
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+                "query_scope": {
+                    "requested_narrative_ids": [],
+                    "queried_narrative_ids": [
+                        narrative["narrative_id"] for narrative in narratives
+                    ],
+                    "omitted_narrative_ids": [],
+                    "query_limit": 4,
+                },
+                "evidence": [
+                    {
+                        "evidence_id": "EV_NEWS_N_AI_INFRA_TEST",
+                        "narrative_id": "N_AI_INFRA",
+                        "type": "news",
+                        "source": "google_news_rss",
+                        "source_url": "https://example.com/news/ai",
+                        "title": "AI infrastructure growth accelerates",
+                        "summary": (
+                            "Example News headline/snippet matched the narrative "
+                            "query. V1 classified only RSS title/snippet text; "
+                            "article body content was not parsed."
+                        ),
+                        "sentiment": "positive",
+                        "confidence": 0.52,
+                        "event_date": "2026-05-14",
+                        "source_provider": self.provider_name,
+                        "retrieved_at": "2026-05-14T00:00:00+00:00",
+                        "provider_data_quality": "fresh",
+                        "classification_reason": "keyword heuristic over RSS title/snippet",
+                    }
+                ],
+                "missing_narrative_ids": [],
+                "skipped_item_count": 0,
+                "degradation_events": [],
+            }
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_announcement_evidence=True,
+        announcement_provider=FakeAnnouncementProvider(),
+        include_news_evidence=True,
+        news_evidence_provider=FakeNewsEvidenceProvider(),
+        base_intelligence_mode="provider-derived",
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    foundation = scoring["provider_foundation"]
+
+    assert raw["base_intelligence_mode"] == "provider-derived"
+    assert raw["evidence"] == raw["news_evidence"]["evidence"]
+    assert raw["signal_events"] == raw["derived_signal_events"]
+    assert raw["signal_events"][0]["source"] == "news_evidence"
+    assert foundation["layers"]["evidence"]["provider_name"] == (
+        "provider-derived-evidence"
+    )
+    assert "news_evidence" in foundation["layers"]["evidence"]["note"]
+    assert foundation["layers"]["signals"]["provider_name"] == (
+        "provider-derived-signals"
+    )
+    assert foundation["layers"]["derived_signals"]["provider_name"] == (
+        "news-derived-signals"
+    )
 
 
 def test_eastmoney_holdings_with_mock_intelligence_is_disclosed_as_partial(

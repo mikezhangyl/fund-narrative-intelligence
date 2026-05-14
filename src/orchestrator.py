@@ -20,8 +20,10 @@ from src.modules.report_writer.writer import write_reports
 from src.modules.signal_service.derived import (
     ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER,
     MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER,
+    NEWS_DERIVED_SIGNAL_PROVIDER,
     derive_announcement_signal_events,
     derive_market_quote_signal_events,
+    derive_news_signal_events,
 )
 from src.modules.signal_service.scoring import score_narrative_state
 from src.modules.snapshot_writer.writer import write_json_artifact
@@ -252,11 +254,11 @@ def run_pipeline(
         announcement_signal_events = derive_announcement_signal_events(
             announcement_evidence_payload["evidence"]
         )
-        derived_signal_provider_names.append(ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER)
-        derived_signal_data_qualities.append(
-            str(announcement_evidence_payload.get("data_quality") or "unavailable")
-        )
         if announcement_signal_events:
+            derived_signal_provider_names.append(ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER)
+            derived_signal_data_qualities.append(
+                str(announcement_evidence_payload.get("data_quality") or "unavailable")
+            )
             derived_signal_events = [
                 *derived_signal_events,
                 *announcement_signal_events,
@@ -293,6 +295,20 @@ def run_pipeline(
             *evidence,
             *news_evidence_payload["evidence"],
         ]
+        news_signal_events = derive_news_signal_events(news_evidence_payload["evidence"])
+        if news_signal_events:
+            derived_signal_provider_names.append(NEWS_DERIVED_SIGNAL_PROVIDER)
+            derived_signal_data_qualities.append(
+                str(news_evidence_payload.get("data_quality") or "unavailable")
+            )
+            derived_signal_events = [
+                *derived_signal_events,
+                *news_signal_events,
+            ]
+            signal_events = [
+                *signal_events,
+                *news_signal_events,
+            ]
 
     if derived_signal_provider_names:
         derived_signals_layer = _derived_signals_provider_layer(
@@ -302,6 +318,7 @@ def run_pipeline(
     if base_intelligence_mode == BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED:
         evidence_layer = _provider_derived_evidence_layer(
             announcement_evidence_payload=announcement_evidence_payload,
+            news_evidence_payload=news_evidence_payload,
         )
         signals_layer = _provider_derived_signals_layer(
             provider_names=derived_signal_provider_names,
@@ -901,13 +918,27 @@ def _stock_mapping_provider_layer(
 
 def _provider_derived_evidence_layer(
     announcement_evidence_payload: dict[str, Any] | None,
+    news_evidence_payload: dict[str, Any] | None,
 ) -> dict[str, Any]:
-    data_quality = (
-        str(announcement_evidence_payload.get("data_quality") or "unavailable")
-        if announcement_evidence_payload is not None
-        else "unavailable"
+    data_qualities = [
+        str(payload.get("data_quality") or "unavailable")
+        for payload in (announcement_evidence_payload, news_evidence_payload)
+        if payload is not None and payload.get("evidence")
+    ]
+    data_quality = _derived_signal_data_quality(data_qualities)
+    evidence_count = sum(
+        len(payload.get("evidence") or [])
+        for payload in (announcement_evidence_payload, news_evidence_payload)
+        if payload is not None
     )
-    evidence_count = len(announcement_evidence_payload.get("evidence") or []) if announcement_evidence_payload else 0
+    source_names = []
+    if announcement_evidence_payload is not None and announcement_evidence_payload.get(
+        "evidence"
+    ):
+        source_names.append("announcement_evidence")
+    if news_evidence_payload is not None and news_evidence_payload.get("evidence"):
+        source_names.append("news_evidence")
+    source_summary = ", ".join(source_names) if source_names else "none"
     return {
         "layer": "evidence",
         "provider_name": "provider-derived-evidence",
@@ -917,7 +948,8 @@ def _provider_derived_evidence_layer(
         "is_mock": False,
         "note": (
             "Evidence input excludes base fixtures and uses provider-derived "
-            f"evidence records only; evidence count {evidence_count}."
+            f"evidence records only; sources: {source_summary}; "
+            f"evidence count {evidence_count}."
         ),
     }
 
@@ -954,7 +986,10 @@ def _derived_signals_provider_layer(
         "data_quality": _derived_signal_data_quality(data_qualities),
         "source_url": f"derived://{provider_name}",
         "is_mock": False,
-        "note": "Derived from real provider evidence or quote snapshots; V1 keeps base fixture signals separately.",
+        "note": (
+            "Derived from real provider evidence, news evidence, or quote "
+            "snapshots; V1 keeps base fixture signals separately."
+        ),
     }
 
 

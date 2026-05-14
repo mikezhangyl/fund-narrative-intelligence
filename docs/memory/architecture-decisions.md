@@ -1174,3 +1174,30 @@ Consequences:
 - Provider failures degrade to `unavailable` payloads with degradation events.
 - Reports/source tables must state that V1 classifies RSS titles/snippets only
   and does not parse article bodies, plus the queried narrative coverage.
+
+## ADR-0047: Derive Momentum Signals From News Evidence
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Convert optional `news_evidence` into deterministic `news-derived-signals` that
+feed the existing scoring dimensions.
+
+Rationale:
+
+- News ingestion should affect narrative state, not only report evidence
+  density.
+- The scoring model already has momentum signal types for news frequency,
+  research mentions, and language decay.
+- Keeping derivation deterministic avoids LLM-based sentiment drift while still
+  reducing fixture-signal dependency.
+
+Consequences:
+
+- Positive news snippets become `news_frequency_up`.
+- Mixed news snippets become `research_mentions_up`.
+- Negative news snippets become `language_decay`.
+- `Derived Signals` provider foundation can now report `news-derived-signals`
+  or `mixed-derived-signals` when combined with CNINFO/market quote signals.

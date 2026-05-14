@@ -55,6 +55,30 @@ def test_missing_dimension_data_returns_neutral_score_with_zero_confidence():
     }
 
 
+def test_dimension_confidence_uses_signal_confidence_multiplier():
+    events = [
+        {
+            "signal_id": "SIG_NEWS",
+            "narrative_id": "N_AI_INFRA",
+            "signal_type": "news_frequency_up",
+            "strength": 0.8,
+            "confidence": 0.8,
+            "confidence_multiplier": 0.5,
+            "event_date": "2026-05-13",
+            "half_life_days": 14,
+        }
+    ]
+
+    result = calculate_dimension_score(
+        dimension="momentum_score",
+        signal_events=events,
+        as_of_date="2026-05-13",
+        data_quality="fresh",
+    )
+
+    assert result["confidence"] == 0.4
+
+
 def test_narrative_state_scores_dimensions_and_stage():
     signal_events = [
         {
