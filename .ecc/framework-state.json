@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-market-quotes-provider",
+  "latest_run": "20260514-market-quotes-acceptance",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "continue reducing mock layers after optional market quote snapshots are wired into generated artifacts"
+  "next_step": "continue reducing mock layers after strict live acceptance covers holdings, announcements, and market quote snapshots"
 }

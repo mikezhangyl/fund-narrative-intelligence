@@ -77,6 +77,12 @@ Optionally include real market quote snapshots for current holdings:
 python -m src.main --fund-code 161725 --provider-mode eastmoney --include-market-quotes
 ```
 
+Run the strict live market quote acceptance path:
+
+```bash
+python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_quotes_161725
+```
+
 Generated artifacts:
 
 ```text
@@ -176,6 +182,15 @@ Reports always disclose mock or degraded data in a `Data Source Notice` section.
 When `--include-cninfo-announcements` is enabled, reports add an `Announcements` provider layer and generated evidence summaries state that V1 classified announcement metadata only; source PDFs are not parsed.
 
 When `--include-market-quotes` is enabled, raw and scoring artifacts add a `market_quotes` payload and reports add a `Market Quotes` provider layer. V1 records quote snapshots for future analysis and web display, but does not use them in scoring yet.
+
+For strict local acceptance of quote artifacts, run:
+
+```bash
+python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_quotes_161725
+```
+
+The strict command rejects missing quote rows, mock quote layers, and reports
+that do not disclose the mixed real holdings/quotes plus Mock fixture foundation.
 
 For CNINFO announcement search, V1 sends Shanghai and Shenzhen stock selectors in `code,orgId` form, such as `600519,gssh0600519` and `000001,gssz0000001`. This is covered by unit tests and by the live announcement smoke command.
 

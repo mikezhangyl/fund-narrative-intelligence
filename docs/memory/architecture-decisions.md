@@ -709,3 +709,32 @@ Consequences:
   quality instead of crashing the run.
 - V1 scoring remains driven by existing signal events until a later scoring
   calibration explicitly consumes quote data.
+
+## ADR-0032: Add Strict Market Quote Acceptance
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add `scripts/validate_market_quotes_acceptance.py` as a manual live-provider
+acceptance command for the optional quote snapshot path.
+
+Rationale:
+
+- Quote snapshots are useful for future web display only if they are generated
+  as structured, non-mock artifacts.
+- The normal quote path can degrade or fallback by provider, but acceptance
+  should prove that at least one real quote row is present.
+- The same raw, scoring, review queue, manifest, Markdown, and HTML bundle must
+  remain web-loadable after quote data is added.
+
+Consequences:
+
+- The script runs `--include-market-quotes`, validates artifact contracts, and
+  rejects missing or mock quote rows.
+- Eastmoney holdings remain strict and fresh.
+- Registry, mappings, base evidence, and signals intentionally remain
+  mock-backed in this check.
+- The command remains outside CI because it depends on live provider
+  availability.
