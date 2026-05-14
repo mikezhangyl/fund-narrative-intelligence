@@ -559,9 +559,31 @@ python -m src.main --validate-artifact-contracts outputs/
 
 When given a directory, this command validates all known contract artifacts in
 that directory: fund manifests, source-table artifacts, review queue artifacts,
-review-action previews, and review-action persistence results. When given a
-manifest file, it validates the manifest and every file referenced by it,
-including source-table identity and provider-foundation consistency.
+workspace snapshots, review-action previews, and review-action persistence
+results. When given a manifest file, it validates the manifest and every file
+referenced by it, including source-table identity and provider-foundation
+consistency.
+
+V1 should also be able to assemble a future-web workspace snapshot from an
+existing manifest or output directory:
+
+```bash
+python -m src.main --build-workspace-snapshot outputs/
+python -m src.main --validate-workspace-snapshot outputs/fund_000001_workspace_snapshot.json
+```
+
+The workspace snapshot is a server-side loader contract, not a UI. It must
+include:
+
+- `version = workspace-snapshot-v1`
+- fund identity, provider mode, data quality, and `web_ready`
+- the original artifact manifest and provider foundation
+- the full source-table artifact
+- the full review-queue artifact
+- primary/secondary narrative summaries and mapping context
+- report artifact references
+- `approval_workflow.status = ready_for_future_web`
+
 - Missing local mock fixtures and invalid provider payloads produce controlled errors.
 - The mock-provider path includes multiple scenario funds so lifecycle stages are not validated only against one happy path.
 - The `eastmoney` provider mode can normalize no-key fund holdings while keeping non-holdings intelligence layers local in V1.

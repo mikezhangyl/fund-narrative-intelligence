@@ -1,0 +1,32 @@
+{
+  "task_run_id": "20260515-workspace-snapshot-loader",
+  "task_state": "passed",
+  "review_cycle": 1,
+  "branch": "codex/workspace-snapshot-loader",
+  "worktree": "main",
+  "base_commit": "b7dc82a",
+  "head_commit": "pending-commit",
+  "merge_base": "b7dc82a",
+  "quality_reviewed_commit": "pending-commit",
+  "reviewed_snapshot_type": "quality-agent-review",
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": true,
+  "final_decision": "commit_and_merge",
+  "review_outcome": "Added workspace snapshot build/validate contract for future web loading; reviewer found report-link, output-location, review-queue identity, and narrative schema gaps, all fixed with regression coverage; quality gates passed",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "ready_for_quality",
+  "decisions": [
+    {
+      "id": "WS-001",
+      "date": "2026-05-15",
+      "decision": "Prepare a server-side workspace snapshot contract before building any web UI.",
+      "rationale": "Future web approval screens should load a stable backend artifact instead of duplicating bundle assembly logic in the browser."
+    }
+  ]
+}

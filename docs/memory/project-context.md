@@ -118,7 +118,9 @@ Expected artifacts:
 - Pipeline outputs include `fund_<code>_source_table.json`, a dedicated future-workspace artifact containing provider-foundation source rows, mock flags, data quality, degradation events, and reviewed-store metadata when present.
 - Pipeline outputs include `fund_<code>_manifest.json`, a web-ready discovery artifact with relative artifact paths, provider foundation, data quality, and degradation events.
 - `python -m src.main --validate-artifact-manifest path/to/fund_000001_manifest.json` validates a manifest artifact without requiring `--fund-code`.
-- `python -m src.main --validate-artifact-contracts path/to/outputs_or_manifest` validates known generated artifact contracts in one command before future web workspace loading, including manifest-referenced source-table artifacts.
+- `python -m src.main --validate-artifact-contracts path/to/outputs_or_manifest` validates known generated artifact contracts in one command before future web workspace loading, including manifest-referenced source-table artifacts and generated workspace snapshots.
+- `python -m src.main --build-workspace-snapshot path/to/outputs_or_manifest` writes `fund_<code>_workspace_snapshot.json`, a future-web loader artifact that bundles the manifest, provider foundation, source table, review queue, narrative summaries, report paths, and approval workflow readiness metadata.
+- `python -m src.main --validate-workspace-snapshot path/to/fund_000001_workspace_snapshot.json` validates that loader artifact without building UI.
 - `python -m src.main --validate-review-queue path/to/fund_000001_review_queue.json` validates a review queue artifact without requiring `--fund-code`.
 - `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.

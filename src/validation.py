@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from src.errors import ProviderContractError
@@ -446,6 +447,195 @@ def validate_source_table_artifact_payload(payload: dict[str, Any]) -> None:
         raise ProviderContractError(
             "source table degradation_events must match provider_foundation"
         )
+
+
+def validate_workspace_snapshot_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "workspace snapshot")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "fund_code",
+            "as_of_date",
+            "provider_mode",
+            "data_quality",
+            "web_ready",
+            "artifact_manifest",
+            "provider_foundation",
+            "source_table",
+            "review_queue",
+            "narratives",
+            "reports",
+            "approval_workflow",
+        },
+        "workspace snapshot",
+    )
+    if payload["version"] != "workspace-snapshot-v1":
+        raise ProviderContractError("workspace snapshot version is unsupported")
+    for field in {"fund_code", "as_of_date", "provider_mode", "data_quality"}:
+        if not isinstance(payload[field], str) or not payload[field]:
+            raise ProviderContractError(
+                f"workspace snapshot {field} must be a non-empty string"
+            )
+    if payload["web_ready"] is not True:
+        raise ProviderContractError("workspace snapshot web_ready must be true")
+    validate_pipeline_artifact_manifest_payload(payload["artifact_manifest"])
+    validate_source_table_artifact_payload(payload["source_table"])
+    validate_review_queue_artifact_payload(payload["review_queue"])
+    _require_mapping(payload["provider_foundation"], "workspace snapshot provider_foundation")
+    _validate_workspace_snapshot_identity(payload)
+    _validate_workspace_snapshot_narratives(payload["narratives"])
+    _validate_workspace_snapshot_reports(payload["reports"])
+    _validate_workspace_snapshot_approval_workflow(payload["approval_workflow"])
+
+
+def _validate_workspace_snapshot_identity(payload: dict[str, Any]) -> None:
+    manifest = payload["artifact_manifest"]
+    if payload["fund_code"] != manifest["fund_code"]:
+        raise ProviderContractError("workspace snapshot fund_code mismatch")
+    if payload["as_of_date"] != manifest["as_of_date"]:
+        raise ProviderContractError("workspace snapshot as_of_date mismatch")
+    if payload["provider_mode"] != manifest["provider_mode"]:
+        raise ProviderContractError("workspace snapshot provider_mode mismatch")
+    if payload["data_quality"] != manifest["data_quality"]:
+        raise ProviderContractError("workspace snapshot data_quality mismatch")
+    if payload["provider_foundation"] != manifest["provider_foundation"]:
+        raise ProviderContractError("workspace snapshot provider_foundation mismatch")
+    if payload["source_table"]["fund_code"] != payload["fund_code"]:
+        raise ProviderContractError("workspace snapshot source table fund_code mismatch")
+    if payload["source_table"]["as_of_date"] != payload["as_of_date"]:
+        raise ProviderContractError(
+            "workspace snapshot source table as_of_date mismatch"
+        )
+    if payload["source_table"]["provider_foundation"] != payload["provider_foundation"]:
+        raise ProviderContractError(
+            "workspace snapshot source table provider_foundation mismatch"
+        )
+    if payload["review_queue"]["provider_foundation"] != payload["provider_foundation"]:
+        raise ProviderContractError(
+            "workspace snapshot review queue provider_foundation mismatch"
+        )
+    queue_metadata = payload["review_queue"].get("metadata", {})
+    if queue_metadata.get("fund_code") != payload["fund_code"]:
+        raise ProviderContractError("workspace snapshot review queue fund_code mismatch")
+    if queue_metadata.get("as_of_date") != payload["as_of_date"]:
+        raise ProviderContractError("workspace snapshot review queue as_of_date mismatch")
+    if queue_metadata.get("data_quality") != payload["data_quality"]:
+        raise ProviderContractError("workspace snapshot review queue data_quality mismatch")
+    if payload["review_queue"].get("fund", {}).get("fund_code") != payload["fund_code"]:
+        raise ProviderContractError("workspace snapshot review queue fund_code mismatch")
+
+
+def _validate_workspace_snapshot_narratives(narratives: Any) -> None:
+    _require_mapping(narratives, "workspace snapshot narratives")
+    _require_keys(
+        narratives,
+        {
+            "primary",
+            "secondary",
+            "mapping_coverage",
+            "candidate_narratives",
+            "excluded_mapping_candidates",
+            "unmapped_holdings",
+        },
+        "workspace snapshot narratives",
+    )
+    _require_mapping(narratives["primary"], "workspace snapshot narratives.primary")
+    _require_keys(
+        narratives["primary"],
+        {
+            "narrative_id",
+            "name",
+            "normalized_exposure",
+            "raw_exposure",
+            "confidence",
+            "state",
+        },
+        "workspace snapshot narratives.primary",
+    )
+    _require_mapping(
+        narratives["primary"]["state"],
+        "workspace snapshot narratives.primary.state",
+    )
+    _require_keys(
+        narratives["primary"]["state"],
+        {"stage", "sustainability_score", "confidence", "dimensions"},
+        "workspace snapshot narratives.primary.state",
+    )
+    for field in {
+        "secondary",
+        "candidate_narratives",
+        "excluded_mapping_candidates",
+        "unmapped_holdings",
+    }:
+        if not isinstance(narratives[field], list):
+            raise ProviderContractError(
+                f"workspace snapshot narratives.{field} must be a list"
+            )
+    _require_mapping(
+        narratives["mapping_coverage"],
+        "workspace snapshot narratives.mapping_coverage",
+    )
+    _require_keys(
+        narratives["mapping_coverage"],
+        {
+            "coverage_ratio",
+            "covered_holding_count",
+            "total_holding_count",
+            "mapping_methods",
+        },
+        "workspace snapshot narratives.mapping_coverage",
+    )
+
+
+def _validate_workspace_snapshot_reports(reports: Any) -> None:
+    _require_mapping(reports, "workspace snapshot reports")
+    _require_keys(reports, {"markdown", "html"}, "workspace snapshot reports")
+    for key in {"markdown", "html"}:
+        _require_mapping(reports[key], f"workspace snapshot reports.{key}")
+        _require_keys(
+            reports[key],
+            {"path", "format"},
+            f"workspace snapshot reports.{key}",
+        )
+        if not isinstance(reports[key]["path"], str) or not reports[key]["path"]:
+            raise ProviderContractError(
+                f"workspace snapshot reports.{key}.path must be a non-empty string"
+            )
+        if Path(reports[key]["path"]).is_absolute() or ".." in Path(
+            reports[key]["path"]
+        ).parts:
+            raise ProviderContractError(
+                f"workspace snapshot reports.{key}.path must be relative"
+            )
+        if reports[key]["format"] != key:
+            raise ProviderContractError(
+                f"workspace snapshot reports.{key}.format mismatch"
+            )
+
+
+def _validate_workspace_snapshot_approval_workflow(approval_workflow: Any) -> None:
+    _require_mapping(approval_workflow, "workspace snapshot approval_workflow")
+    _require_keys(
+        approval_workflow,
+        {
+            "status",
+            "read_only",
+            "requires_user_approval",
+            "preview_command",
+            "persist_command",
+        },
+        "workspace snapshot approval_workflow",
+    )
+    if approval_workflow["status"] != "ready_for_future_web":
+        raise ProviderContractError(
+            "workspace snapshot approval_workflow.status is unsupported"
+        )
+    for field in {"read_only", "requires_user_approval"}:
+        if not isinstance(approval_workflow[field], bool):
+            raise ProviderContractError(
+                f"workspace snapshot approval_workflow.{field} must be boolean"
+            )
 
 
 def _require_mapping(value: Any, context: str) -> None:

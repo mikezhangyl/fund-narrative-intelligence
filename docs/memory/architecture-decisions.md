@@ -1088,3 +1088,31 @@ Consequences:
   duplicate layer names, layer/foundation drift, and degradation-event drift.
 - V1 still performs approvals through CLI/file artifacts only; web interaction
   remains a later slice.
+
+## ADR-0044: Add Workspace Snapshot Loader Contract
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add a build/validate CLI for `fund_<code>_workspace_snapshot.json`.
+
+Rationale:
+
+- Future web screens should not have to rediscover generated artifacts or
+  duplicate backend bundle-joining logic.
+- The current artifact family already contains the data needed for a read-only
+  approval/source workspace: manifest, source table, review queue, scoring
+  narratives, and report links.
+- A server-side snapshot contract lets us validate web-readiness before adding
+  Next.js or browser interaction.
+
+Consequences:
+
+- `--build-workspace-snapshot` accepts a manifest file or single-manifest output
+  directory and writes the snapshot beside the bundle by default.
+- `--validate-workspace-snapshot` validates identity, provider foundation,
+  source-table, review-queue, report, narrative, and approval-workflow fields.
+- The snapshot marks `approval_workflow.status = ready_for_future_web`, but
+  remains read-only; existing preview/persist CLI commands still own mutations.

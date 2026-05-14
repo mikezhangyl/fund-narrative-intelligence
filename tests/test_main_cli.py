@@ -233,6 +233,7 @@ def test_main_validates_artifact_contract_directory(tmp_path, capsys):
     assert "manifests=1" in captured.out
     assert "source_tables=1" in captured.out
     assert "review_queues=1" in captured.out
+    assert "workspace_snapshots=0" in captured.out
     assert "review_previews=1" in captured.out
     assert "persistence_results=1" in captured.out
 
@@ -252,6 +253,33 @@ def test_main_validate_artifact_contracts_discovers_standalone_source_table(
     assert "manifests=0" in captured.out
     assert "source_tables=1" in captured.out
     assert "review_queues=0" in captured.out
+    assert "workspace_snapshots=0" in captured.out
+
+
+def test_main_builds_and_validates_workspace_snapshot(tmp_path, capsys):
+    main_module.main(["--fund-code", "000001", "--output-dir", str(tmp_path)])
+
+    exit_code = main_module.main(["--build-workspace-snapshot", str(tmp_path)])
+
+    captured = capsys.readouterr()
+    snapshot_path = tmp_path / "fund_000001_workspace_snapshot.json"
+    assert exit_code == 0
+    assert "Workspace snapshot built:" in captured.out
+    assert str(snapshot_path) in captured.out
+    assert snapshot_path.exists()
+
+    exit_code = main_module.main(["--validate-workspace-snapshot", str(snapshot_path)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Workspace snapshot valid:" in captured.out
+    assert str(snapshot_path) in captured.out
+
+    exit_code = main_module.main(["--validate-artifact-contracts", str(tmp_path)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "workspace_snapshots=1" in captured.out
 
 
 def test_main_validate_artifact_contracts_rejects_missing_manifest_file(

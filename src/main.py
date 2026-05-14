@@ -10,6 +10,7 @@ from src.config import DEFAULT_OUTPUT_DIR, FIXTURE_DIR
 from src.errors import PipelineError
 from src.modules.narrative_review.persistence import persist_review_action_registry
 from src.modules.narrative_review.preview import write_review_action_preview
+from src.modules.workspace_snapshot.builder import build_workspace_snapshot
 from src.orchestrator import (
     BASE_INTELLIGENCE_MODE_FIXTURE,
     BASE_INTELLIGENCE_MODES,
@@ -30,6 +31,7 @@ from src.validation import (
     validate_review_action_preview_payload,
     validate_review_queue_artifact_payload,
     validate_source_table_artifact_payload,
+    validate_workspace_snapshot_payload,
 )
 
 
@@ -189,6 +191,21 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--build-workspace-snapshot",
+        help=(
+            "Build a future-web workspace snapshot from a manifest file or output "
+            "directory and exit."
+        ),
+    )
+    parser.add_argument(
+        "--workspace-snapshot-output",
+        help="Optional explicit output path for --build-workspace-snapshot.",
+    )
+    parser.add_argument(
+        "--validate-workspace-snapshot",
+        help="Validate a workspace snapshot artifact and exit.",
+    )
+    parser.add_argument(
         "--include-cninfo-announcements",
         action="store_true",
         help="Optionally fetch CNINFO announcement metadata and convert it into evidence records.",
@@ -231,10 +248,16 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--allow-registry-output-overwrite requires --persist-review-action")
     if args.persistence_result_output and not args.persist_review_action:
         parser.error("--persistence-result-output requires --persist-review-action")
+    if args.workspace_snapshot_output and not args.build_workspace_snapshot:
+        parser.error("--workspace-snapshot-output requires --build-workspace-snapshot")
     if args.allow_persistence_result_overwrite and not args.persist_review_action:
         parser.error("--allow-persistence-result-overwrite requires --persist-review-action")
     if args.preview_review_action and args.persist_review_action:
         parser.error("--preview-review-action and --persist-review-action are mutually exclusive")
+    if args.build_workspace_snapshot and args.validate_workspace_snapshot:
+        parser.error(
+            "--build-workspace-snapshot and --validate-workspace-snapshot are mutually exclusive"
+        )
     if args.validate_persistence_result and (
         args.preview_review_action or args.persist_review_action
     ):
@@ -264,6 +287,18 @@ def main(argv: list[str] | None = None) -> int:
     ):
         parser.error(
             "--validate-artifact-contracts cannot be combined with review action execution"
+        )
+    if args.build_workspace_snapshot and (
+        args.preview_review_action or args.persist_review_action
+    ):
+        parser.error(
+            "--build-workspace-snapshot cannot be combined with review action execution"
+        )
+    if args.validate_workspace_snapshot and (
+        args.preview_review_action or args.persist_review_action
+    ):
+        parser.error(
+            "--validate-workspace-snapshot cannot be combined with review action execution"
         )
     if (
         args.narrative_registry_mode != NARRATIVE_REGISTRY_MODE_FIXTURE
@@ -384,11 +419,58 @@ def main(argv: list[str] | None = None) -> int:
                     f"manifests={summary['manifests']}",
                     f"source_tables={summary['source_tables']}",
                     f"review_queues={summary['review_queues']}",
+                    f"workspace_snapshots={summary['workspace_snapshots']}",
                     f"review_previews={summary['review_previews']}",
                     f"persistence_results={summary['persistence_results']}",
                 ]
             )
         )
+        return 0
+
+    if args.build_workspace_snapshot:
+        try:
+            snapshot_path = build_workspace_snapshot(
+                Path(args.build_workspace_snapshot),
+                output_path=Path(args.workspace_snapshot_output)
+                if args.workspace_snapshot_output
+                else None,
+            )
+        except PipelineError as exc:
+            parser.error(str(exc))
+            return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        except Exception as exc:
+            print(
+                f"Unrecoverable workspace snapshot build error: {exc}",
+                file=sys.stderr,
+            )
+            return 1
+
+        print("Workspace snapshot built:")
+        print(snapshot_path)
+        return 0
+
+    if args.validate_workspace_snapshot:
+        try:
+            payload = _read_json_object(Path(args.validate_workspace_snapshot))
+            validate_workspace_snapshot_payload(payload)
+        except PipelineError as exc:
+            parser.error(str(exc))
+            return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        except Exception as exc:
+            print(
+                f"Unrecoverable workspace snapshot validation error: {exc}",
+                file=sys.stderr,
+            )
+            return 1
+
+        print("Workspace snapshot valid:")
+        print(Path(args.validate_workspace_snapshot))
         return 0
 
     if args.validate_persistence_result:
@@ -653,6 +735,8 @@ def _uses_non_pipeline_action(args: argparse.Namespace) -> bool:
             args.validate_review_queue,
             args.validate_artifact_manifest,
             args.validate_artifact_contracts,
+            args.build_workspace_snapshot,
+            args.validate_workspace_snapshot,
         )
     )
 
@@ -680,6 +764,9 @@ def _validate_artifact_contract_directory(path: Path) -> dict[str, int]:
     for source_table_path in sorted(path.glob("fund_*_source_table.json")):
         validate_source_table_artifact_payload(_read_json_object(source_table_path))
         summary["source_tables"] += 1
+    for snapshot_path in sorted(path.glob("fund_*_workspace_snapshot.json")):
+        validate_workspace_snapshot_payload(_read_json_object(snapshot_path))
+        summary["workspace_snapshots"] += 1
     for preview_path in sorted(path.glob("candidate_review_action_*_preview.json")):
         validate_review_action_preview_payload(_read_json_object(preview_path))
         summary["review_previews"] += 1
@@ -769,6 +856,7 @@ def _empty_contract_summary() -> dict[str, int]:
         "manifests": 0,
         "source_tables": 0,
         "review_queues": 0,
+        "workspace_snapshots": 0,
         "review_previews": 0,
         "persistence_results": 0,
     }
