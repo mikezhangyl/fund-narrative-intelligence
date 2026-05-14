@@ -53,3 +53,4 @@
 - [announcement-derived-signals.md](./announcement-derived-signals.md)
 - [market-quote-derived-signals.md](./market-quote-derived-signals.md)
 - [real-enriched-acceptance.md](./real-enriched-acceptance.md)
+- [registry-rule-mapping-mode.md](./registry-rule-mapping-mode.md)

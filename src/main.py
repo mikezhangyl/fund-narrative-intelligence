@@ -11,6 +11,8 @@ from src.errors import PipelineError
 from src.modules.narrative_review.persistence import persist_review_action_registry
 from src.modules.narrative_review.preview import write_review_action_preview
 from src.orchestrator import (
+    STOCK_MAPPING_MODE_FIXTURE,
+    STOCK_MAPPING_MODES,
     inspect_provider_foundation,
     run_all_fixture_pipelines,
     run_pipeline,
@@ -35,6 +37,16 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["mock", "real", "eastmoney"],
         default="mock",
         help="Provider mode. V1 real mode falls back to mock fixtures; eastmoney tries no-key fund holdings.",
+    )
+    parser.add_argument(
+        "--stock-mapping-mode",
+        choices=sorted(STOCK_MAPPING_MODES),
+        default=STOCK_MAPPING_MODE_FIXTURE,
+        help=(
+            "Stock-to-narrative mapping mode. Default uses explicit fixture "
+            "mappings plus registry-rule fallback; registry-rule derives "
+            "mappings from current holdings and Narrative Registry terms only."
+        ),
     )
     parser.add_argument(
         "--output-dir",
@@ -204,6 +216,13 @@ def main(argv: list[str] | None = None) -> int:
     ):
         parser.error(
             "--validate-artifact-contracts cannot be combined with review action execution"
+        )
+    if (
+        args.stock_mapping_mode != STOCK_MAPPING_MODE_FIXTURE
+        and _uses_non_pipeline_action(args)
+    ):
+        parser.error(
+            "--stock-mapping-mode is only supported with single --fund-code report generation"
         )
 
     if args.validate_review_preview:
@@ -516,6 +535,7 @@ def main(argv: list[str] | None = None) -> int:
             include_announcement_evidence=args.include_cninfo_announcements,
             announcement_start_date=args.announcement_start_date,
             include_market_quotes=args.include_market_quotes,
+            stock_mapping_mode=args.stock_mapping_mode,
         )
     except PipelineError as exc:
         print(str(exc), file=sys.stderr)
@@ -540,6 +560,26 @@ def _read_json_object(path: Path) -> dict:
     if not isinstance(payload, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return payload
+
+
+def _uses_non_pipeline_action(args: argparse.Namespace) -> bool:
+    return any(
+        bool(value)
+        for value in (
+            args.list_fixtures,
+            args.run_all_fixtures,
+            args.run_real_smoke,
+            args.run_announcement_smoke,
+            args.provider_diagnostics,
+            args.preview_review_action,
+            args.persist_review_action,
+            args.validate_persistence_result,
+            args.validate_review_preview,
+            args.validate_review_queue,
+            args.validate_artifact_manifest,
+            args.validate_artifact_contracts,
+        )
+    )
 
 
 def _validate_artifact_contracts(path: Path) -> dict[str, int]:

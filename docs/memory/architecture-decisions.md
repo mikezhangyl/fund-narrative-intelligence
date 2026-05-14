@@ -832,3 +832,37 @@ Consequences:
   mock-backed in this acceptance until later provider work replaces them.
 - The command remains outside CI because it depends on live provider
   availability.
+
+## ADR-0036: Add Optional Registry-Rule Stock Mapping Mode
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add `--stock-mapping-mode registry-rule` for single report runs.
+
+Rationale:
+
+- Users need to see why a holding maps to a narrative without treating static
+  fixture mappings as the only source of truth.
+- The existing registry-term fallback can be promoted into an explicit optional
+  mapping mode without changing default behavior.
+- Future web approval flows need a clean distinction between mapping generated
+  by runtime rules and mapping asserted by a static fixture.
+
+Consequences:
+
+- Default runs still use explicit fixture mappings plus registry-rule fallback.
+- Registry-rule mode skips `stock_narrative_mappings.json` and derives selected
+  mappings from holdings and Narrative Registry aliases/terms only.
+- Raw and scoring artifacts include `stock_mapping_mode`.
+- Provider foundation marks `Stock Mappings` as
+  `registry-rule-stock-mapping` in registry-rule mode.
+- Fully mock-backed registry-rule runs remain `mock`; runtime mapping does not
+  upgrade mock inputs into mixed real data.
+- The CLI accepts registry-rule mode only for single `--fund-code` report runs;
+  diagnostics, batch/smoke, validation, and review-action commands reject it
+  instead of silently ignoring it.
+- The Narrative Registry layer remains Mock-backed and must still be disclosed
+  until a real registry store replaces the fixture.

@@ -29,6 +29,13 @@ from src.providers.factory import select_data_provider
 from src.providers.mock import MockDataProvider
 from src.providers.provenance import build_provider_foundation
 
+STOCK_MAPPING_MODE_FIXTURE = "fixture"
+STOCK_MAPPING_MODE_REGISTRY_RULE = "registry-rule"
+STOCK_MAPPING_MODES = {
+    STOCK_MAPPING_MODE_FIXTURE,
+    STOCK_MAPPING_MODE_REGISTRY_RULE,
+}
+
 
 def run_pipeline(
     fund_code: str,
@@ -39,11 +46,17 @@ def run_pipeline(
     announcement_provider: Any | None = None,
     include_market_quotes: bool = False,
     market_data_provider: Any | None = None,
+    stock_mapping_mode: str = STOCK_MAPPING_MODE_FIXTURE,
 ) -> dict[str, Any]:
     if not fund_code.isdigit():
         raise ValueError("fund_code must contain digits only")
     if announcement_start_date is not None:
         _require_iso_date(announcement_start_date, "announcement_start_date")
+    if stock_mapping_mode not in STOCK_MAPPING_MODES:
+        raise ValueError(
+            "stock_mapping_mode must be one of: "
+            f"{', '.join(sorted(STOCK_MAPPING_MODES))}"
+        )
 
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -52,7 +65,10 @@ def run_pipeline(
     provider = provider_selection.provider
     fund_payload = provider.get_fund_holdings(fund_code)
     registry_payload = provider.get_narrative_registry()
-    all_mappings = provider.get_stock_narrative_mappings()
+    all_mappings = _stock_mapping_inputs(
+        provider=provider,
+        stock_mapping_mode=stock_mapping_mode,
+    )
     mapping_exclusions_payload = provider.get_mapping_exclusions()
     evidence = provider.get_evidence()
     signal_events = provider.get_signal_events()
@@ -68,6 +84,11 @@ def run_pipeline(
         mappings=all_mappings,
         registry=registry_by_id,
         exclusions=mapping_exclusions_payload["exclusions"],
+    )
+    stock_mapping_layer = _stock_mapping_provider_layer(
+        stock_mapping_mode=stock_mapping_mode,
+        mapping_result=mapping_result,
+        fund_provider_metadata=fund["provider_metadata"],
     )
     selected_mappings = mapping_result["mappings"]
     in_scope_candidate_narratives = _candidate_narratives_for_excluded_candidates(
@@ -172,6 +193,7 @@ def run_pipeline(
         announcement_layer=announcement_layer,
         derived_signals_layer=derived_signals_layer,
         market_quotes_layer=market_quotes_layer,
+        stock_mapping_layer=stock_mapping_layer,
     )
     effective_data_quality = provider_foundation["effective_data_quality"]
     exposures = aggregate_fund_narratives(
@@ -207,6 +229,7 @@ def run_pipeline(
         "candidate_narrative_registry_version": registry_payload["version"],
         "candidate_narratives": in_scope_candidate_narratives,
         "candidate_review_queue": candidate_review_queue,
+        "stock_mapping_mode": stock_mapping_mode,
         "stock_narrative_mappings": selected_mappings,
         "mapping_exclusions_version": mapping_exclusions_payload["version"],
         "mapping_exclusions": mapping_exclusions_payload["exclusions"],
@@ -238,6 +261,7 @@ def run_pipeline(
         "all_narratives": narrative_results,
         "provider_foundation": provider_foundation,
         "mapping_coverage": mapping_result["coverage"],
+        "stock_mapping_mode": stock_mapping_mode,
         "mapping_rationales": mapping_result["mapping_rationales"],
         "mapping_precision_flags": mapping_result["mapping_precision_flags"],
         "excluded_mapping_candidates": mapping_result[
@@ -483,6 +507,7 @@ def _provider_foundation_with_optional_announcement_layer(
     announcement_layer: dict[str, Any] | None,
     derived_signals_layer: dict[str, Any] | None,
     market_quotes_layer: dict[str, Any] | None,
+    stock_mapping_layer: dict[str, Any] | None,
 ) -> dict[str, Any]:
     foundation = provider.get_provider_foundation(
         fund_provider_metadata=fund_provider_metadata,
@@ -492,9 +517,12 @@ def _provider_foundation_with_optional_announcement_layer(
         announcement_layer is None
         and derived_signals_layer is None
         and market_quotes_layer is None
+        and stock_mapping_layer is None
     ):
         return foundation
     layers = foundation["layers"]
+    if stock_mapping_layer is not None:
+        layers = {**layers, "stock_mappings": stock_mapping_layer}
     if market_quotes_layer is not None:
         layers = {**layers, "market_quotes": market_quotes_layer}
     if announcement_layer is not None:
@@ -505,6 +533,51 @@ def _provider_foundation_with_optional_announcement_layer(
         layers=layers,
         degradation_events=degradation_events,
     )
+
+
+def _stock_mapping_inputs(provider: Any, stock_mapping_mode: str) -> list[dict[str, Any]]:
+    if stock_mapping_mode == STOCK_MAPPING_MODE_FIXTURE:
+        return provider.get_stock_narrative_mappings()
+    if stock_mapping_mode == STOCK_MAPPING_MODE_REGISTRY_RULE:
+        return []
+    raise ValueError(
+        "stock_mapping_mode must be one of: "
+        f"{', '.join(sorted(STOCK_MAPPING_MODES))}"
+    )
+
+
+def _stock_mapping_provider_layer(
+    stock_mapping_mode: str,
+    mapping_result: dict[str, Any],
+    fund_provider_metadata: dict[str, Any],
+) -> dict[str, Any] | None:
+    if stock_mapping_mode == STOCK_MAPPING_MODE_FIXTURE:
+        return None
+    coverage = mapping_result["coverage"]
+    covered = coverage["covered_holding_count"]
+    total = coverage["total_holding_count"]
+    review_count = len(mapping_result["mapping_precision_flags"])
+    input_data_quality = str(fund_provider_metadata.get("data_quality") or "unavailable")
+    data_quality = "mock" if input_data_quality == "mock" else "partial"
+    is_mock = data_quality == "mock"
+    return {
+        "layer": "stock_mappings",
+        "provider_name": "registry-rule-stock-mapping",
+        "provider_version": "stock-mapping-v1",
+        "data_quality": data_quality,
+        "source_url": (
+            "mock://derived/registry-term-rule-stock-mapping"
+            if is_mock
+            else "derived://registry-term-rule-stock-mapping"
+        ),
+        "is_mock": is_mock,
+        "note": (
+            "Runtime stock-to-narrative mappings derived from current holdings "
+            f"and Narrative Registry terms; coverage {covered}/{total}, "
+            f"review flags {review_count}. Registry provenance is disclosed "
+            "separately."
+        ),
+    }
 
 
 def _derived_signals_provider_layer(

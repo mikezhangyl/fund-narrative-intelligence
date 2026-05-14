@@ -78,6 +78,18 @@ Optionally include real market quote snapshots for current holdings:
 python -m src.main --fund-code 161725 --provider-mode eastmoney --include-market-quotes
 ```
 
+Optionally derive stock-to-narrative mappings from the Narrative Registry at
+runtime instead of the static stock mapping fixture:
+
+```bash
+python -m src.main --fund-code 161725 --provider-mode eastmoney --stock-mapping-mode registry-rule
+```
+
+This keeps the registry provenance visible: `Stock Mappings` becomes a
+runtime-derived provider layer, while `Narrative Registry` remains disclosed as
+Mock-backed until a real registry store replaces the fixture. The option is
+supported only for single `--fund-code` report generation.
+
 Run the strict live market quote acceptance path:
 
 ```bash
@@ -271,6 +283,14 @@ When a fallback registry-term match maps one holding to multiple narratives, V1 
 When a fallback mapping is supported only by a broad industry term, V1 keeps the mapping but lowers confidence from `0.52` to `0.48`, marks it with `broad_industry_fallback`, and recommends `curation_review`. This catches cases such as a generic `电子` industry match before it is treated like a more specific stock-name or product-term match.
 
 Every selected stock-to-narrative mapping also emits a `mapping_rationales` row in raw/scoring JSON and reports. This row explains the mapping method, narrative name, confidence, matched registry terms when available, and whether the mapping needs manual review. For V1 this makes the answer to "why is this stock in this narrative?" explicit instead of implicit in fixtures or broad industry rules.
+
+For single pipeline runs, `--stock-mapping-mode registry-rule` skips the static
+stock mapping fixture and derives mappings from current holdings and Narrative
+Registry aliases/terms only. This mode is useful for testing the path toward a
+non-fixture mapping service; the registry layer is still Mock-backed and remains
+disclosed in provider foundation metadata and reports. A fully mock-backed run
+still remains `mock`; runtime mapping does not upgrade mock inputs into a mixed
+real environment.
 
 The latest registry curation pass replaced clear broad industry-only matches with company-level terms for baijiu, healthcare, defense, new energy, real estate chain, and selected semiconductor equipment/EDA holdings. The remaining ambiguous semiconductor candidates are explicitly excluded and left for narrative reassessment rather than forced into the current registry.
 

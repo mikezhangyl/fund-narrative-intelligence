@@ -326,6 +326,40 @@ def test_cli_include_market_quotes_passes_options_to_pipeline(tmp_path, monkeypa
     assert captured["include_market_quotes"] is True
 
 
+def test_cli_stock_mapping_mode_passes_option_to_pipeline(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--provider-mode",
+            "eastmoney",
+            "--stock-mapping-mode",
+            "registry-rule",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["fund_code"] == "161725"
+    assert captured["stock_mapping_mode"] == "registry-rule"
+
+
 def test_cli_rejects_announcement_start_date_without_cninfo_opt_in(tmp_path):
     command = [
         sys.executable,
@@ -471,6 +505,222 @@ def test_eastmoney_holdings_with_mock_intelligence_is_disclosed_as_partial(
     assert "Eastmoney" in markdown
     assert "Mock fixtures" in markdown
     assert "混合数据源" in html
+
+
+def test_registry_rule_stock_mapping_mode_uses_runtime_mapping_layer(
+    tmp_path, monkeypatch
+):
+    def fake_fetcher(_url: str) -> dict:
+        return {
+            "Success": True,
+            "Expansion": "2026-03-31",
+            "Datas": {
+                "fundStocks": [
+                    {
+                        "GPDM": "600519",
+                        "GPJC": "贵州茅台",
+                        "JZBL": "18.33",
+                        "PCTNVCHG": "2.95",
+                        "INDEXNAME": "食品饮料",
+                    },
+                    {
+                        "GPDM": "000858",
+                        "GPJC": "五粮液",
+                        "JZBL": "16.14",
+                        "PCTNVCHG": "1.49",
+                        "INDEXNAME": "食品饮料",
+                    },
+                ]
+            },
+        }
+
+    monkeypatch.setattr(eastmoney_module, "_fetch_json", fake_fetcher)
+
+    artifacts = run_pipeline(
+        fund_code="161725",
+        provider_mode="eastmoney",
+        output_dir=tmp_path,
+        stock_mapping_mode="registry-rule",
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+
+    mapping_layer = scoring["provider_foundation"]["layers"]["stock_mappings"]
+
+    assert raw["stock_mapping_mode"] == "registry-rule"
+    assert scoring["stock_mapping_mode"] == "registry-rule"
+    assert raw["mapping_coverage"]["mapping_methods"] == {"registry_term_rule": 2}
+    assert all(
+        mapping["method"] == "registry_term_rule"
+        for mapping in raw["stock_narrative_mappings"]
+    )
+    assert {mapping["stock_code"] for mapping in raw["stock_narrative_mappings"]} == {
+        "600519",
+        "000858",
+    }
+    assert mapping_layer["provider_name"] == "registry-rule-stock-mapping"
+    assert mapping_layer["data_quality"] == "partial"
+    assert mapping_layer["source_url"] == "derived://registry-term-rule-stock-mapping"
+    assert mapping_layer["is_mock"] is False
+    assert scoring["provider_foundation"]["layers"]["narrative_registry"][
+        "is_mock"
+    ] is True
+    assert "Stock Mappings 来自 registry-rule-stock-mapping" in markdown
+    assert "Narrative Registry" in markdown
+    assert "Mock fixtures" in markdown
+
+
+def test_registry_rule_mapping_keeps_fully_mock_run_mock(tmp_path):
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        stock_mapping_mode="registry-rule",
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+
+    mapping_layer = scoring["provider_foundation"]["layers"]["stock_mappings"]
+
+    assert raw["metadata"]["data_quality"] == "mock"
+    assert scoring["metadata"]["data_quality"] == "mock"
+    assert scoring["provider_foundation"]["effective_data_quality"] == "mock"
+    assert mapping_layer["provider_name"] == "registry-rule-stock-mapping"
+    assert mapping_layer["data_quality"] == "mock"
+    assert mapping_layer["is_mock"] is True
+    assert "Mock 数据" in markdown
+    assert "混合数据源" not in markdown
+
+
+def test_cli_rejects_stock_mapping_mode_with_provider_diagnostics(tmp_path):
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--fund-code",
+        "000001",
+        "--provider-diagnostics",
+        "--stock-mapping-mode",
+        "registry-rule",
+        "--output-dir",
+        str(tmp_path),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 2
+    assert "--stock-mapping-mode is only supported" in result.stderr
+    assert not list(tmp_path.glob("*"))
+
+
+def test_cli_rejects_stock_mapping_mode_with_batch_actions(tmp_path):
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--run-real-smoke",
+        "--stock-mapping-mode",
+        "registry-rule",
+        "--output-dir",
+        str(tmp_path),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 2
+    assert "--stock-mapping-mode is only supported" in result.stderr
+    assert not list(tmp_path.glob("*"))
+
+
+def test_cli_rejects_stock_mapping_mode_with_validation_actions(tmp_path):
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--validate-artifact-contracts",
+        str(tmp_path),
+        "--stock-mapping-mode",
+        "registry-rule",
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 2
+    assert "--stock-mapping-mode is only supported" in result.stderr
+
+
+def test_cli_rejects_stock_mapping_mode_with_review_actions(tmp_path):
+    action_path = tmp_path / "action.json"
+    action_path.write_text("{}", encoding="utf-8")
+
+    exit_code = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "src.main",
+            "--preview-review-action",
+            str(action_path),
+            "--stock-mapping-mode",
+            "registry-rule",
+            "--output-dir",
+            str(tmp_path / "out"),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert exit_code.returncode == 2
+    assert "--stock-mapping-mode is only supported" in exit_code.stderr
+
+
+def test_cli_stock_mapping_mode_still_allows_single_run(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "000001",
+            "--stock-mapping-mode",
+            "registry-rule",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["stock_mapping_mode"] == "registry-rule"
+
+
+def test_pipeline_rejects_unknown_stock_mapping_mode(tmp_path):
+    try:
+        run_pipeline(
+            fund_code="000001",
+            provider_mode="mock",
+            output_dir=tmp_path,
+            stock_mapping_mode="unknown",
+        )
+    except ValueError as exc:
+        assert "stock_mapping_mode" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for unknown stock mapping mode")
 
 
 def test_pipeline_surfaces_multi_match_precision_flags(tmp_path, monkeypatch):

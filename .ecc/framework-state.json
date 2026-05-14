@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-real-enriched-acceptance",
+  "latest_run": "20260514-registry-rule-mapping-mode",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "continue reducing mock registry, mapping, base-evidence, and base-signal layers after strict combined real enriched acceptance"
+  "next_step": "validate registry-rule mapping mode against real-fund smoke cases, then continue replacing base evidence and signal fixtures"
 }

@@ -93,6 +93,7 @@ Expected artifacts:
 - Multi-match `registry_term_rule` mappings are retained but lowered from confidence `0.52` to `0.42`, marked `needs_review`, and emitted as `mapping_precision_flags`.
 - Single fallback mappings supported only by broad holding industry terms are lowered from confidence `0.52` to `0.48`, marked `broad_industry_fallback`, and emitted with `curation_review`.
 - Selected stock-to-narrative mappings also emit `mapping_rationales` in raw/scoring JSON and reports, including method, confidence, matched registry terms, and review flags so users can see why a holding was mapped to a narrative.
+- `--stock-mapping-mode registry-rule` skips the static stock mapping fixture for a single `--fund-code` report run and derives all selected mappings from current holdings plus Narrative Registry terms. In that mode the `Stock Mappings` provider layer becomes `registry-rule-stock-mapping`, while the Narrative Registry layer remains Mock-backed and visibly disclosed. Fully mock-backed runs remain `mock`; runtime mapping does not upgrade mock inputs to `partial`.
 - Narrative reports include deterministic stage, risk, and confidence interpretation notes; these are explanatory and non-advisory.
 - Real-fund smoke summaries isolate failures per fund, write summary artifacts, include concrete unmapped holding details, and return non-zero when any fund fails or falls below coverage threshold.
 - Real-fund smoke summaries also include `multi_mapped_holdings` so 100% mapping coverage does not hide broad or cross-domain registry matches.
