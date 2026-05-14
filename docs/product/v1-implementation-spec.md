@@ -99,6 +99,10 @@ V1 must never silently hide degraded data. JSON outputs and reports should show 
 
 Reports must include a visible `Data Source Notice` whenever `provider_foundation.disclosure_required` is true. This includes pure mock runs, fallback-to-mock runs, and mixed runs where only some layers are real. The notice must state which layers are mock-backed and list degradation events such as `provider_fallback`.
 
+Mock-backed source fields should use stable `mock://fixtures/...` identifiers
+instead of blank URLs so raw/scoring JSON, report source tables, and future web
+UI surfaces visibly mark non-real fixture data at the source field itself.
+
 ## Stock Narrative Mapping Transparency
 
 V1 must not treat stock-to-narrative mapping as an opaque assertion. Every selected mapping should produce a structured `mapping_rationales` row in raw JSON, scoring JSON, Markdown reports, and HTML reports.

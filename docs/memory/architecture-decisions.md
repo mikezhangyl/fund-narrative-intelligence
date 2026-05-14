@@ -149,6 +149,7 @@ Consequences:
 - Raw and scoring JSON include `provider_foundation` with per-layer provenance and `effective_data_quality`.
 - Scoring confidence uses `effective_data_quality`; Eastmoney holdings plus mock intelligence layers is `partial`.
 - Markdown and HTML reports render a `Data Source Notice` that lists provider layers and degradation events.
+- Mock-backed source fields use `mock://fixtures/...` identifiers so source/URL displays do not collapse mock data into a blank source.
 
 ## ADR-0008: Split Intelligence Sources Into Layer Provider Interfaces
 

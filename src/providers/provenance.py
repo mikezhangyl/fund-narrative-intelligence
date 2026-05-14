@@ -82,13 +82,17 @@ def layer_from_provider_metadata(
     }
 
 
-def mock_layer(layer: str, note: str | None = None) -> dict[str, Any]:
+def mock_layer(
+    layer: str,
+    note: str | None = None,
+    source_url: str | None = None,
+) -> dict[str, Any]:
     return {
         "layer": layer,
         "provider_name": MOCK_PROVIDER_NAME,
         "provider_version": MOCK_PROVIDER_VERSION,
         "data_quality": "mock",
-        "source_url": None,
+        "source_url": source_url or f"mock://fixtures/{layer}",
         "is_mock": True,
         "note": note or "V1 Mock fixture layer.",
     }

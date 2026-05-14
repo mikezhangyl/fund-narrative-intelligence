@@ -262,4 +262,8 @@ def _load_fixture(fixture_dir: Path, filename: str) -> Any:
 
 
 def _mock_fixture_layer(layer: str, filename: str) -> dict[str, Any]:
-    return mock_layer(layer, note=f"Loaded from V1 fixture {filename}.")
+    return mock_layer(
+        layer,
+        note=f"Loaded from V1 fixture {filename}.",
+        source_url=f"mock://fixtures/{filename}",
+    )

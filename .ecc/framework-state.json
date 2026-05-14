@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-validate-review-queue-cli",
+  "latest_run": "20260514-mock-data-source-url-disclosure",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "expose review queue artifact validation through CLI"
+  "next_step": "make mock data sources visible in source_url fields and report source tables"
 }

@@ -38,9 +38,18 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
     assert raw["metadata"]["fund_code"] == "000001"
     assert raw["metadata"]["provider_set_version"] == "mock-v1"
     assert raw["fund"]["provider_metadata"]["data_quality"] == "mock"
+    assert raw["fund"]["provider_metadata"]["source_url"] == (
+        "mock://fixtures/fund_000001.json"
+    )
     assert len(raw["holdings"]) == 10
 
     assert scoring["metadata"]["scoring_model_version"] == "scoring-v1"
+    assert scoring["provider_foundation"]["layers"]["holdings"]["source_url"] == (
+        "mock://fixtures/fund_000001.json"
+    )
+    assert scoring["provider_foundation"]["layers"]["narrative_registry"][
+        "source_url"
+    ] == "mock://fixtures/narrative_registry.json"
     assert scoring["primary_narrative"]["narrative_id"]
     assert "interpretation" in scoring["primary_narrative"]
     assert len(scoring["secondary_narratives"]) >= 2
@@ -55,6 +64,8 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
     assert "Data Source Notice" in html
     assert "Mock 数据" in markdown
     assert "Mock 数据" in html
+    assert "mock://fixtures/fund_000001.json" in markdown
+    assert "mock://fixtures/fund_000001.json" in html
     assert "Interpretation" in markdown
     assert "Interpretation" in html
     assert "AI Infrastructure" in markdown
@@ -116,6 +127,9 @@ def test_cli_provider_diagnostics_prints_foundation_without_artifacts(tmp_path):
     assert diagnostics["fund_code"] == "000001"
     assert diagnostics["provider_mode"] == "mock"
     assert diagnostics["provider_foundation"]["effective_data_quality"] == "mock"
+    assert diagnostics["provider_foundation"]["layers"]["holdings"]["source_url"] == (
+        "mock://fixtures/fund_000001.json"
+    )
     assert diagnostics["provider_foundation"]["disclosure_required"] is True
     assert "Mock 数据" in diagnostics["provider_foundation"]["disclosure_message"]
     assert not list(tmp_path.glob("*"))

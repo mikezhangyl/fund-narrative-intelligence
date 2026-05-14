@@ -11,6 +11,7 @@ from src.providers.intelligence import MockIntelligenceProviderSet
 from src.providers.provenance import (
     PROVIDER_LAYERS,
     build_mock_provider_foundation,
+    layer_from_provider_metadata,
 )
 from src.validation import validate_fund_payload
 
@@ -35,7 +36,9 @@ class MockDataProvider:
         )
 
     def get_fund_holdings(self, fund_code: str) -> dict[str, Any]:
-        payload = self._load_json(f"fund_{fund_code}.json")
+        filename = f"fund_{fund_code}.json"
+        payload = self._load_json(filename)
+        payload = _with_mock_source_url(payload, source_url=_mock_fixture_url(filename))
         validate_fund_payload(payload, fund_code=fund_code)
         return deepcopy(payload)
 
@@ -59,11 +62,15 @@ class MockDataProvider:
         fund_provider_metadata: dict[str, Any],
         degradation_events: list[dict[str, str]],
     ) -> dict[str, Any]:
-        del fund_provider_metadata
         layers = {
             **build_mock_provider_foundation()["layers"],
             **self.intelligence_providers.get_provider_layers(),
         }
+        layers["holdings"] = layer_from_provider_metadata(
+            layer="holdings",
+            provider_metadata=fund_provider_metadata,
+            note="Loaded from V1 mock fund fixture.",
+        )
         ordered_layers = {layer: layers[layer] for layer in PROVIDER_LAYERS}
         return build_mock_provider_foundation(
             layers=ordered_layers,
@@ -80,3 +87,22 @@ class MockDataProvider:
                 )
             raise FixtureNotFoundError(f"Missing fixture: {path}")
         return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _mock_fixture_url(filename: str) -> str:
+    return f"mock://fixtures/{filename}"
+
+
+def _with_mock_source_url(payload: dict[str, Any], source_url: str) -> dict[str, Any]:
+    fund = payload["fund"]
+    provider_metadata = {
+        **fund["provider_metadata"],
+        "source_url": source_url,
+    }
+    return {
+        **payload,
+        "fund": {
+            **fund,
+            "provider_metadata": provider_metadata,
+        },
+    }
