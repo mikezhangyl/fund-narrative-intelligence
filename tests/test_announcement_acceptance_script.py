@@ -81,6 +81,16 @@ def _write_announcement_outputs(
             "stock_mappings": _mock_layer("stock_mappings"),
             "evidence": _mock_layer("evidence"),
             "signals": _mock_layer("signals"),
+            "derived_signals": {
+                "layer": "derived_signals",
+                "display_name": "Derived Signals",
+                "provider_name": "cninfo-derived-signals",
+                "provider_version": "announcement-derived-signals-v1",
+                "data_quality": "fresh",
+                "source_url": "derived://cninfo-announcement-evidence",
+                "is_mock": False,
+                "note": "Derived from CNINFO announcement evidence metadata.",
+            },
             "announcements": {
                 "layer": "announcements",
                 "display_name": "Announcements",
@@ -112,6 +122,23 @@ def _write_announcement_outputs(
             "source_url": "https://static.cninfo.com.cn/fake.pdf",
             "summary": "CNINFO announcement metadata.",
             "sentiment": "mixed",
+        }
+        for index in range(evidence_count)
+    ]
+    derived_signal_events = [
+        {
+            "signal_id": f"SIG_ANN_cninfo-600519-{index}",
+            "narrative_id": "premium_baijiu_consumption",
+            "signal_type": "management_mentions_up",
+            "strength": 0.18,
+            "confidence": 0.3,
+            "confidence_multiplier": 0.55,
+            "event_date": "2026-03-15",
+            "half_life_days": 30,
+            "source": "cninfo_announcement",
+            "source_evidence_id": f"cninfo-600519-{index}",
+            "source_url": "https://static.cninfo.com.cn/fake.pdf",
+            "derivation_reason": "mixed financial disclosure announcement evidence",
         }
         for index in range(evidence_count)
     ]
@@ -147,6 +174,8 @@ def _write_announcement_outputs(
             "skipped_announcement_count": 0,
         },
         "evidence": evidence,
+        "signal_events": derived_signal_events,
+        "derived_signal_events": derived_signal_events,
         "degradation_events": [],
     }
     scoring = {
@@ -154,6 +183,7 @@ def _write_announcement_outputs(
         "fund": raw["fund"],
         "provider_foundation": provider_foundation,
         "announcement_evidence": raw["announcement_evidence"],
+        "derived_signal_events": derived_signal_events,
         "candidate_review_queue": {
             "version": "candidate-review-queue-v1",
             "summary": {"total_count": 0, "pending_count": 0, "action_required": False},

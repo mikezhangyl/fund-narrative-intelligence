@@ -50,3 +50,4 @@
 - [announcement-acceptance.md](./announcement-acceptance.md)
 - [market-quotes-provider.md](./market-quotes-provider.md)
 - [market-quotes-acceptance.md](./market-quotes-acceptance.md)
+- [announcement-derived-signals.md](./announcement-derived-signals.md)

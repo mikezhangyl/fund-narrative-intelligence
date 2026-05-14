@@ -1,0 +1,111 @@
+from src.modules.signal_service.derived import derive_announcement_signal_events
+from src.validation import validate_signal_payload
+
+
+def test_derives_earnings_announcement_signal_from_positive_evidence():
+    evidence = [
+        {
+            "evidence_id": "EV_ANN_000001_N_BANK_123",
+            "narrative_id": "N_BANK",
+            "type": "earnings",
+            "source": "cninfo_announcement",
+            "source_url": "https://static.cninfo.com.cn/finalpage/1.PDF",
+            "title": "2026年度业绩预增公告",
+            "summary": "positive earnings metadata",
+            "sentiment": "positive",
+            "confidence": 0.552,
+            "event_date": "2026-05-12",
+            "stock_code": "000001",
+            "stock_name": "平安银行",
+        }
+    ]
+
+    signals = derive_announcement_signal_events(evidence)
+
+    assert signals == [
+        {
+            "signal_id": "SIG_ANN_EV_ANN_000001_N_BANK_123",
+            "narrative_id": "N_BANK",
+            "signal_type": "revenue_growth_up",
+            "strength": 0.552,
+            "confidence": 0.552,
+            "confidence_multiplier": 0.85,
+            "event_date": "2026-05-12",
+            "half_life_days": 45,
+            "source": "cninfo_announcement",
+            "source_evidence_id": "EV_ANN_000001_N_BANK_123",
+            "source_url": "https://static.cninfo.com.cn/finalpage/1.PDF",
+            "derivation_reason": "positive earnings announcement evidence",
+        }
+    ]
+    validate_signal_payload({"version": "signals-v1", "signal_events": signals})
+
+
+def test_derives_counter_evidence_signal_from_negative_risk_evidence():
+    evidence = [
+        {
+            "evidence_id": "EV_ANN_300750_N_NEW_ENERGY_123",
+            "narrative_id": "N_NEW_ENERGY",
+            "type": "risk",
+            "source": "cninfo_announcement",
+            "source_url": "https://static.cninfo.com.cn/finalpage/2.PDF",
+            "title": "重大诉讼及风险提示公告",
+            "summary": "negative risk metadata",
+            "sentiment": "negative",
+            "confidence": 0.405,
+            "event_date": "2026-05-09",
+        }
+    ]
+
+    signals = derive_announcement_signal_events(evidence)
+
+    assert signals[0]["signal_type"] == "regulatory_risk"
+    assert signals[0]["strength"] == 0.405
+    assert signals[0]["confidence_multiplier"] == 0.85
+
+
+def test_derives_low_weight_momentum_signal_from_mixed_financial_disclosure():
+    evidence = [
+        {
+            "evidence_id": "EV_MIXED",
+            "narrative_id": "N_BANK",
+            "type": "financial_report",
+            "source": "cninfo_announcement",
+            "source_url": "https://static.cninfo.com.cn/finalpage/3.PDF",
+            "sentiment": "mixed",
+            "confidence": 0.3,
+            "event_date": "2026-05-12",
+        }
+    ]
+
+    signals = derive_announcement_signal_events(evidence)
+
+    assert signals[0]["signal_type"] == "management_mentions_up"
+    assert signals[0]["strength"] == 0.18
+    assert signals[0]["confidence"] == 0.3
+    assert signals[0]["confidence_multiplier"] == 0.55
+
+
+def test_ignores_generic_mixed_or_non_announcement_evidence():
+    evidence = [
+        {
+            "evidence_id": "EV_GENERIC",
+            "narrative_id": "N_BANK",
+            "type": "announcement",
+            "source": "cninfo_announcement",
+            "sentiment": "mixed",
+            "confidence": 0.3,
+            "event_date": "2026-05-12",
+        },
+        {
+            "evidence_id": "EV_NEWS",
+            "narrative_id": "N_BANK",
+            "type": "earnings",
+            "source": "news",
+            "sentiment": "positive",
+            "confidence": 0.7,
+            "event_date": "2026-05-12",
+        },
+    ]
+
+    assert derive_announcement_signal_events(evidence) == []

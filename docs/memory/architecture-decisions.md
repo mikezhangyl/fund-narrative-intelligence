@@ -738,3 +738,33 @@ Consequences:
   mock-backed in this check.
 - The command remains outside CI because it depends on live provider
   availability.
+
+## ADR-0033: Derive Scoring Signals From CNINFO Announcement Evidence
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+When `--include-cninfo-announcements` is enabled, convert generated CNINFO
+announcement evidence into traceable `derived_signal_events` and include those
+events in narrative scoring.
+
+Rationale:
+
+- Real announcement evidence should not remain report-only once the evidence
+  path is stable.
+- The first scoring integration should be conservative and inspectable, not a
+  broad model recalibration.
+- Future web source tables need to distinguish fixture base signals from
+  provider-derived signals.
+
+Consequences:
+
+- Positive earnings, order, and capital-flow announcements become V1 support
+  signal types.
+- Negative risk announcements become counter-evidence risk signals.
+- Mixed financial and governance disclosures become low-weight momentum signals.
+- Raw and scoring artifacts include `derived_signal_events`.
+- Provider foundation adds a non-mock `Derived Signals` layer while the base
+  `Signals` layer remains mock-backed.

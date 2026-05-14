@@ -234,6 +234,19 @@ def test_optional_announcement_evidence_is_disclosed_and_added_to_outputs(tmp_pa
     assert raw["announcements"]["version"] == "cninfo-announcement-v1"
     assert raw["announcement_evidence"]["data_quality"] == "fresh"
     assert len(generated_evidence) == 2
+    assert len(raw["derived_signal_events"]) == 2
+    assert raw["derived_signal_events"] == scoring["derived_signal_events"]
+    assert all(
+        item["source"] == "cninfo_announcement"
+        for item in raw["derived_signal_events"]
+    )
+    assert any(
+        item["signal_id"].startswith("SIG_ANN_")
+        for item in raw["signal_events"]
+    )
+    assert scoring["provider_foundation"]["layers"]["derived_signals"][
+        "provider_name"
+    ] == "cninfo-derived-signals"
     assert {item["narrative_id"] for item in generated_evidence} == {
         "N_AI_INFRA",
         "N_SEMI_CAPEX",

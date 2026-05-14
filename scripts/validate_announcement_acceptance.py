@@ -155,12 +155,15 @@ def validate_acceptance_outputs(
     layers = foundation.get("layers", {})
     holdings_layer = layers.get("holdings", {})
     announcements_layer = layers.get("announcements", {})
+    derived_signals_layer = layers.get("derived_signals", {})
     raw_provider = raw.get("fund", {}).get("provider_metadata", {})
     announcements = raw.get("announcements", {})
     announcement_items = announcements.get("announcements") or []
     raw_announcement_evidence = raw.get("announcement_evidence", {})
     scoring_announcement_evidence = scoring.get("announcement_evidence", {})
     raw_evidence = raw_announcement_evidence.get("evidence") or []
+    raw_derived_signals = raw.get("derived_signal_events") or []
+    scoring_derived_signals = scoring.get("derived_signal_events") or []
 
     _require(raw.get("metadata", {}).get("fund_code") == fund_code, "raw fund_code mismatch")
     _require(
@@ -238,6 +241,40 @@ def validate_acceptance_outputs(
     _require(
         all(_cninfo_static_url(item.get("source_url")) for item in raw_evidence),
         "announcement evidence source_url values must point to CNINFO static URLs",
+    )
+    _require(
+        isinstance(raw_derived_signals, list)
+        and len(raw_derived_signals) >= min_announcement_count,
+        f"derived announcement signal count must be at least {min_announcement_count}",
+    )
+    _require(
+        raw_derived_signals == scoring_derived_signals,
+        "scoring derived signals must match raw derived signals",
+    )
+    _require(
+        all(item.get("source") == "cninfo_announcement" for item in raw_derived_signals),
+        "derived signals must come from cninfo_announcement",
+    )
+    signal_ids = {
+        str(item.get("signal_id"))
+        for item in raw.get("signal_events", [])
+        if item.get("signal_id")
+    }
+    _require(
+        all(item.get("signal_id") in signal_ids for item in raw_derived_signals),
+        "raw signal_events must include derived announcement signals",
+    )
+    _require(
+        derived_signals_layer.get("provider_name") == "cninfo-derived-signals",
+        "derived signals layer must use cninfo-derived-signals",
+    )
+    _require(
+        derived_signals_layer.get("data_quality") in {"fresh", "partial"},
+        "derived signals layer data_quality must be fresh or partial",
+    )
+    _require(
+        derived_signals_layer.get("is_mock") is False,
+        "derived signals layer must not be mock",
     )
 
     for layer_name in ("narrative_registry", "stock_mappings", "evidence", "signals"):
@@ -339,6 +376,7 @@ def _print_success(
     print(f"min_announcement_count={min_announcement_count}")
     print("holdings=fresh")
     print("announcements=fresh_or_partial")
+    print("derived_signals=fresh_or_partial")
     print("intelligence_layers=mock")
     print("effective_data_quality=partial")
 

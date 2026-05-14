@@ -57,7 +57,8 @@ python scripts/validate_announcement_acceptance.py --output-dir outputs/announce
 
 This is also manual, not CI. It validates the full server-side report path with
 fresh Eastmoney holdings, non-mock CNINFO announcement metadata, generated
-announcement evidence, and explicitly disclosed Mock fixture intelligence layers.
+announcement evidence, derived announcement signals, and explicitly disclosed
+Mock fixture intelligence layers.
 
 Inspect provider layers without generating report artifacts:
 
@@ -179,7 +180,7 @@ source notice.
 
 Reports always disclose mock or degraded data in a `Data Source Notice` section. A pure mock run is marked as `mock`; an Eastmoney holdings run with fixture-backed registry, mappings, evidence, and signals is marked as `partial` so users do not mistake it for a fully real environment.
 
-When `--include-cninfo-announcements` is enabled, reports add an `Announcements` provider layer and generated evidence summaries state that V1 classified announcement metadata only; source PDFs are not parsed.
+When `--include-cninfo-announcements` is enabled, reports add `Announcements` and `Derived Signals` provider layers. Generated evidence summaries state that V1 classified announcement metadata only; source PDFs are not parsed. Derived signals are included in scoring with conservative confidence multipliers.
 
 When `--include-market-quotes` is enabled, raw and scoring artifacts add a `market_quotes` payload and reports add a `Market Quotes` provider layer. V1 records quote snapshots for future analysis and web display, but does not use them in scoring yet.
 
@@ -263,8 +264,9 @@ python scripts/validate_announcement_acceptance.py --output-dir outputs/announce
 ```
 
 The strict command rejects missing announcement metadata, missing generated
-announcement evidence, degraded provider events, and reports that do not
-disclose the mixed Eastmoney + CNINFO + Mock fixture foundation.
+announcement evidence, missing derived signals, degraded provider events, and
+reports that do not disclose the mixed Eastmoney + CNINFO + Mock fixture
+foundation.
 
 It writes:
 

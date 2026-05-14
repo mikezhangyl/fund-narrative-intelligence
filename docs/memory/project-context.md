@@ -119,6 +119,7 @@ Expected artifacts:
 - `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, `candidate_narratives=<count>`, and `review_queue=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 - Strict announcement acceptance validates the generated fund artifacts directly: Eastmoney holdings must be fresh, CNINFO announcements and converted evidence must be present, and remaining registry/mapping/base-evidence/signal layers must still disclose `mock://fixtures/...`.
+- Optional CNINFO announcement runs now derive scoring signals from generated announcement evidence. Positive earnings/orders/capital announcements affect the matching score dimensions, negative risk announcements affect counter-evidence risk, and mixed financial/governance disclosures become low-weight momentum signals.
 
 ## Mock Scenario Fixtures
 
@@ -168,6 +169,7 @@ Expected artifacts:
 - Optional real announcement runs must add an `Announcements` provider-foundation layer so users can see whether CNINFO data was fresh, partial, or unavailable.
 - Optional market quote runs must add a `Market Quotes` provider-foundation layer and preserve provider fallback/degradation events; quote snapshots are artifact/display data only until scoring explicitly consumes them.
 - Strict market quote acceptance validates generated artifacts directly: holdings must be fresh Eastmoney data, market quotes must contain real non-mock rows, and remaining registry/mapping/base-evidence/signal layers must disclose `mock://fixtures/...`.
+- Derived announcement signals are exposed as `derived_signal_events` in raw/scoring JSON and as a non-mock `Derived Signals` provider layer. Base fixture signals remain present and explicitly mock-backed until a later provider replaces them.
 
 ## Open Questions
 

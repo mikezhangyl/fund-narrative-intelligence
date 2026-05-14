@@ -12,6 +12,10 @@ from src.modules.fund_analysis.mapping import build_mapping_result
 from src.modules.narrative_review.queue import build_candidate_review_queue
 from src.modules.report_writer.interpretation import interpret_narrative
 from src.modules.report_writer.writer import write_reports
+from src.modules.signal_service.derived import (
+    ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER,
+    derive_announcement_signal_events,
+)
 from src.modules.signal_service.scoring import score_narrative_state
 from src.modules.snapshot_writer.writer import write_json_artifact
 from src.providers.cninfo import (
@@ -79,6 +83,8 @@ def run_pipeline(
     announcements_payload: dict[str, Any] | None = None
     announcement_evidence_payload: dict[str, Any] | None = None
     announcement_layer: dict[str, Any] | None = None
+    derived_signal_events: list[dict[str, Any]] = []
+    derived_signals_layer: dict[str, Any] | None = None
     market_quotes_payload: dict[str, Any] | None = None
     market_quotes_layer: dict[str, Any] | None = None
     if include_market_quotes:
@@ -111,12 +117,24 @@ def run_pipeline(
             *evidence,
             *announcement_evidence_payload["evidence"],
         ]
+        derived_signal_events = derive_announcement_signal_events(
+            announcement_evidence_payload["evidence"]
+        )
+        signal_events = [
+            *signal_events,
+            *derived_signal_events,
+        ]
+        derived_signals_layer = _derived_signals_provider_layer(
+            announcement_evidence_payload=announcement_evidence_payload,
+            derived_signal_events=derived_signal_events,
+        )
 
     provider_foundation = _provider_foundation_with_optional_announcement_layer(
         provider=provider,
         fund_provider_metadata=fund["provider_metadata"],
         degradation_events=degradation_events,
         announcement_layer=announcement_layer,
+        derived_signals_layer=derived_signals_layer,
         market_quotes_layer=market_quotes_layer,
     )
     effective_data_quality = provider_foundation["effective_data_quality"]
@@ -170,6 +188,7 @@ def run_pipeline(
     if announcements_payload is not None and announcement_evidence_payload is not None:
         raw_payload["announcements"] = announcements_payload
         raw_payload["announcement_evidence"] = announcement_evidence_payload
+        raw_payload["derived_signal_events"] = derived_signal_events
     if market_quotes_payload is not None:
         raw_payload["market_quotes"] = market_quotes_payload
 
@@ -198,6 +217,7 @@ def run_pipeline(
     }
     if announcement_evidence_payload is not None:
         scoring_payload["announcement_evidence"] = announcement_evidence_payload
+        scoring_payload["derived_signal_events"] = derived_signal_events
     if market_quotes_payload is not None:
         scoring_payload["market_quotes"] = market_quotes_payload
 
@@ -423,23 +443,50 @@ def _provider_foundation_with_optional_announcement_layer(
     fund_provider_metadata: dict[str, Any],
     degradation_events: list[dict[str, str]],
     announcement_layer: dict[str, Any] | None,
+    derived_signals_layer: dict[str, Any] | None,
     market_quotes_layer: dict[str, Any] | None,
 ) -> dict[str, Any]:
     foundation = provider.get_provider_foundation(
         fund_provider_metadata=fund_provider_metadata,
         degradation_events=degradation_events,
     )
-    if announcement_layer is None and market_quotes_layer is None:
+    if (
+        announcement_layer is None
+        and derived_signals_layer is None
+        and market_quotes_layer is None
+    ):
         return foundation
     layers = foundation["layers"]
     if market_quotes_layer is not None:
         layers = {**layers, "market_quotes": market_quotes_layer}
     if announcement_layer is not None:
         layers = {**layers, "announcements": announcement_layer}
+    if derived_signals_layer is not None:
+        layers = {**layers, "derived_signals": derived_signals_layer}
     return build_provider_foundation(
         layers=layers,
         degradation_events=degradation_events,
     )
+
+
+def _derived_signals_provider_layer(
+    announcement_evidence_payload: dict[str, Any],
+    derived_signal_events: list[dict[str, Any]],
+) -> dict[str, Any]:
+    data_quality = (
+        str(announcement_evidence_payload.get("data_quality") or "unavailable")
+        if derived_signal_events
+        else "unavailable"
+    )
+    return {
+        "layer": "derived_signals",
+        "provider_name": ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER,
+        "provider_version": "announcement-derived-signals-v1",
+        "data_quality": data_quality,
+        "source_url": "derived://cninfo-announcement-evidence",
+        "is_mock": False,
+        "note": "Derived from CNINFO announcement evidence metadata; V1 does not parse source PDFs.",
+    }
 
 
 def _market_quotes_provider_layer(
