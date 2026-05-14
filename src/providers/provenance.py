@@ -21,6 +21,7 @@ LAYER_DISPLAY_NAMES = {
     "signals": "Signals",
     "valuation": "Valuation",
     "announcements": "Announcements",
+    "news_evidence": "News Evidence",
     "market_quotes": "Market Quotes",
     "derived_signals": "Derived Signals",
 }

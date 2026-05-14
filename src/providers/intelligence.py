@@ -77,7 +77,7 @@ class AnnouncementProvider(Protocol):
 class NewsEvidenceProvider(Protocol):
     def get_news_evidence(
         self,
-        narrative_ids: list[str],
+        narratives: list[dict[str, Any]],
         as_of_date: str,
     ) -> dict[str, Any]:
         raise NotImplementedError
@@ -309,18 +309,37 @@ class MockNewsEvidenceProvider:
     provider_name = MOCK_PROVIDER_NAME
     provider_version = MOCK_PROVIDER_VERSION
     data_quality = "mock"
+    source_url = "mock://fixtures/news_evidence"
 
     def get_news_evidence(
         self,
-        narrative_ids: list[str],
+        narratives: list[dict[str, Any]],
         as_of_date: str,
     ) -> dict[str, Any]:
-        del as_of_date
+        narrative_ids = [str(item.get("narrative_id") or "") for item in narratives]
         return {
-            "version": "news-evidence-mock-v1",
+            "version": "news-evidence-v1",
+            "provider_name": self.provider_name,
+            "provider_version": self.provider_version,
             "data_quality": self.data_quality,
+            "source_url": self.source_url,
+            "retrieved_at": f"{as_of_date}T00:00:00+00:00",
+            "query_scope": {
+                "requested_narrative_ids": sorted(
+                    narrative_id for narrative_id in set(narrative_ids) if narrative_id
+                ),
+                "queried_narrative_ids": [],
+                "omitted_narrative_ids": sorted(
+                    narrative_id for narrative_id in set(narrative_ids) if narrative_id
+                ),
+                "query_limit": 0,
+            },
             "evidence": [],
-            "missing_narrative_ids": sorted(set(narrative_ids)),
+            "missing_narrative_ids": sorted(
+                narrative_id for narrative_id in set(narrative_ids) if narrative_id
+            ),
+            "skipped_item_count": 0,
+            "degradation_events": [],
         }
 
 

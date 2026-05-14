@@ -80,6 +80,7 @@ Expected artifacts:
 - Optional CNINFO announcement evidence command: `python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01`.
 - Optional market quote snapshot command: `python -m src.main --fund-code 161725 --provider-mode eastmoney --include-market-quotes`.
 - Optional quote-derived valuation context command: `python -m src.main --fund-code 161725 --provider-mode eastmoney --include-market-quotes --include-valuation-snapshots`.
+- Optional RSS-derived news evidence command: `python -m src.main --fund-code 000001 --include-news-evidence`.
 - Strict live market quote acceptance command: `python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_quotes_161725`.
 - Provider payloads are validated before orchestration proceeds.
 - Real holdings adapter: `python -m src.main --fund-code 161725 --provider-mode eastmoney` tries Eastmoney/Tiantian Fund fund holdings and keeps local fixtures for all other V1 intelligence layers.
@@ -138,6 +139,7 @@ Expected artifacts:
 - Optional CNINFO announcement runs now derive scoring signals from generated announcement evidence. Positive earnings/orders/capital announcements affect the matching score dimensions, negative risk announcements affect counter-evidence risk, and mixed financial/governance disclosures become low-weight momentum signals.
 - Optional market quote runs now derive scoring signals from quote change percentages. Positive changes become `relative_strength_up`; negative changes become `relative_strength_down`, a capital-score risk signal.
 - Optional valuation snapshot runs derive lightweight `valuation_snapshots` from market quotes and add a non-mock `Valuation` provider layer named `quote-derived-valuation`. This is explicitly quote-derived context, not full fundamental valuation.
+- Optional news evidence runs derive `news_evidence` from Google News RSS titles/snippets and add a non-mock `News Evidence` provider layer named `google-news-rss`. The shared artifact contract is provider-agnostic and includes `query_scope` with requested/queried/omitted narrative IDs. V1 does not parse article bodies and must disclose the title/snippet limitation plus query coverage in reports/source tables.
 
 ## Mock Scenario Fixtures
 

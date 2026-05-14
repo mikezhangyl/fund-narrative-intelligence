@@ -256,7 +256,7 @@ def test_reserved_mock_source_providers_return_stable_empty_payloads():
         as_of_date="2026-05-13",
     )
     news = MockNewsEvidenceProvider().get_news_evidence(
-        narrative_ids=["N_AI_INFRA"],
+        narratives=[{"narrative_id": "N_AI_INFRA"}],
         as_of_date="2026-05-13",
     )
 
@@ -279,10 +279,22 @@ def test_reserved_mock_source_providers_return_stable_empty_payloads():
         "missing_stock_codes": ["NVDA"],
     }
     assert news == {
-        "version": "news-evidence-mock-v1",
+        "version": "news-evidence-v1",
+        "provider_name": "mock-fixture-provider",
+        "provider_version": "mock-v1",
         "data_quality": "mock",
+        "source_url": "mock://fixtures/news_evidence",
+        "retrieved_at": "2026-05-13T00:00:00+00:00",
+        "query_scope": {
+            "requested_narrative_ids": ["N_AI_INFRA"],
+            "queried_narrative_ids": [],
+            "omitted_narrative_ids": ["N_AI_INFRA"],
+            "query_limit": 0,
+        },
         "evidence": [],
         "missing_narrative_ids": ["N_AI_INFRA"],
+        "skipped_item_count": 0,
+        "degradation_events": [],
     }
 
 

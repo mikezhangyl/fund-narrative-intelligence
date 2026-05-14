@@ -89,6 +89,93 @@ def test_workspace_snapshot_preserves_valuation_layer_for_future_web(tmp_path):
     }
 
 
+def test_workspace_snapshot_preserves_news_layer_for_future_web(tmp_path):
+    class FakeNewsEvidenceProvider:
+        provider_name = "google-news-rss"
+        provider_version = "google-news-rss-v1"
+        source_url = "https://news.google.com/rss/search"
+
+        def get_news_evidence(self, narratives: list[dict], as_of_date: str) -> dict:
+            del as_of_date
+            return {
+                "version": "news-evidence-v1",
+                "provider_name": self.provider_name,
+                "provider_version": self.provider_version,
+                "data_quality": "fresh",
+                "source_url": self.source_url,
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+                "query_scope": {
+                    "requested_narrative_ids": [],
+                    "queried_narrative_ids": [
+                        narrative["narrative_id"] for narrative in narratives
+                    ],
+                    "omitted_narrative_ids": [],
+                    "query_limit": 4,
+                },
+                "evidence": [
+                    {
+                        "evidence_id": "EV_NEWS_N_AI_INFRA_TEST",
+                        "narrative_id": narratives[0]["narrative_id"],
+                        "type": "news",
+                        "source": "google_news_rss",
+                        "source_url": "https://example.com/news/ai",
+                        "title": "AI infrastructure growth accelerates",
+                        "summary": (
+                            "Example News headline/snippet matched the narrative "
+                            "query. V1 classified only RSS title/snippet text; "
+                            "article body content was not parsed."
+                        ),
+                        "sentiment": "positive",
+                        "confidence": 0.52,
+                        "event_date": "2026-05-14",
+                        "source_provider": self.provider_name,
+                        "retrieved_at": "2026-05-14T00:00:00+00:00",
+                        "provider_data_quality": "fresh",
+                        "classification_reason": "keyword heuristic over RSS title/snippet",
+                    }
+                ],
+                "missing_narrative_ids": [],
+                "skipped_item_count": 0,
+                "degradation_events": [],
+            }
+
+    run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_news_evidence=True,
+        news_evidence_provider=FakeNewsEvidenceProvider(),
+    )
+
+    snapshot_path = build_workspace_snapshot(tmp_path)
+    snapshot = json.loads(snapshot_path.read_text())
+
+    validate_workspace_snapshot_payload(snapshot)
+    news_layer = snapshot["provider_foundation"]["layers"]["news_evidence"]
+    assert news_layer["provider_name"] == "google-news-rss"
+    assert "titles/snippets only" in news_layer["note"]
+    assert {layer["layer"] for layer in snapshot["source_table"]["layers"]} >= {
+        "news_evidence"
+    }
+
+
+def test_build_workspace_snapshot_rejects_invalid_news_payload(tmp_path):
+    run_pipeline(fund_code="000001", provider_mode="mock", output_dir=tmp_path)
+    raw_path = tmp_path / "fund_000001_raw.json"
+    scoring_path = tmp_path / "fund_000001_scoring.json"
+    raw = json.loads(raw_path.read_text())
+    scoring = json.loads(scoring_path.read_text())
+    raw["news_evidence"] = {"version": "news-evidence-v1"}
+    scoring["news_evidence"] = raw["news_evidence"]
+    raw_path.write_text(json.dumps(raw), encoding="utf-8")
+    scoring_path.write_text(json.dumps(scoring), encoding="utf-8")
+
+    with pytest.raises(ProviderContractError) as exc:
+        build_workspace_snapshot(tmp_path)
+
+    assert "news evidence missing required fields" in str(exc.value)
+
+
 def test_workspace_snapshot_validation_rejects_identity_drift(tmp_path):
     run_pipeline(fund_code="000001", provider_mode="mock", output_dir=tmp_path)
     snapshot_path = build_workspace_snapshot(tmp_path)

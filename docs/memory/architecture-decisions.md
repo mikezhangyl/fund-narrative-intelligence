@@ -1145,3 +1145,32 @@ Consequences:
 - The payload carries `valuation_basis = quote_derived_context` to prevent
   overclaiming.
 - Scoring weights are unchanged in this slice.
+
+## ADR-0046: Add RSS-Derived News Evidence As Optional Layer
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add optional `google-news-rss` evidence ingestion for mapped narratives before
+introducing paid search/news APIs.
+
+Rationale:
+
+- News and market language is a documented data-source layer, but V1 should not
+  require API credentials or silently scrape article bodies.
+- RSS title/snippet evidence provides an end-to-end provider surface that can
+  reduce mock usage while staying honest about source depth.
+- The future web workspace needs source-table-ready provider metadata for this
+  layer even before a UI exists.
+
+Consequences:
+
+- `--include-news-evidence` adds `news_evidence` to raw/scoring artifacts and a
+  `News Evidence` provider-foundation/source-table layer.
+- The artifact contract is provider-agnostic and includes `query_scope` with
+  requested, queried, and omitted narrative IDs.
+- Provider failures degrade to `unavailable` payloads with degradation events.
+- Reports/source tables must state that V1 classifies RSS titles/snippets only
+  and does not parse article bodies, plus the queried narrative coverage.

@@ -6,6 +6,7 @@ from typing import Any
 
 from src.modules.snapshot_writer.writer import write_json_artifact
 from src.validation import (
+    validate_news_evidence_payload,
     validate_pipeline_artifact_manifest_payload,
     validate_review_queue_artifact_payload,
     validate_source_table_artifact_payload,
@@ -190,3 +191,16 @@ def _require_bundle_identity(
         raise ValueError("workspace snapshot source table provider_foundation mismatch")
     if scoring.get("provider_foundation") != manifest["provider_foundation"]:
         raise ValueError("workspace snapshot scoring provider_foundation mismatch")
+    if raw.get("provider_foundation") != manifest["provider_foundation"]:
+        raise ValueError("workspace snapshot raw provider_foundation mismatch")
+    _validate_optional_bundle_payloads(raw, scoring)
+
+
+def _validate_optional_bundle_payloads(raw: dict[str, Any], scoring: dict[str, Any]) -> None:
+    raw_news = raw.get("news_evidence")
+    scoring_news = scoring.get("news_evidence")
+    if raw_news is None and scoring_news is None:
+        return
+    if raw_news != scoring_news:
+        raise ValueError("workspace snapshot news_evidence mismatch")
+    validate_news_evidence_payload(raw_news)

@@ -63,3 +63,4 @@
 - [source-table-artifact.md](./source-table-artifact.md)
 - [workspace-snapshot-loader.md](./workspace-snapshot-loader.md)
 - [valuation-snapshot-provider.md](./valuation-snapshot-provider.md)
+- [news-evidence-provider.md](./news-evidence-provider.md)

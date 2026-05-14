@@ -445,6 +445,42 @@ def test_cli_include_valuation_snapshots_passes_option_to_pipeline(
     assert captured["include_valuation_snapshots"] is True
 
 
+def test_cli_include_news_evidence_passes_option_to_pipeline(
+    tmp_path,
+    monkeypatch,
+):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "source_table": tmp_path / "source_table.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--provider-mode",
+            "eastmoney",
+            "--include-news-evidence",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["include_news_evidence"] is True
+
+
 def test_cli_base_intelligence_mode_passes_option_to_pipeline(tmp_path, monkeypatch):
     captured = {}
 
@@ -905,6 +941,89 @@ def test_optional_valuation_snapshots_are_quote_derived_and_disclosed(tmp_path):
     assert {layer["layer"] for layer in source_table["layers"]} >= {"valuation"}
     assert "Quote-derived valuation context" in artifacts["markdown"].read_text()
     assert "not a full fundamental valuation feed" in artifacts["html"].read_text()
+
+
+def test_optional_news_evidence_is_disclosed_and_added_to_outputs(tmp_path):
+    class FakeNewsEvidenceProvider:
+        provider_name = "google-news-rss"
+        provider_version = "google-news-rss-v1"
+        source_url = "https://news.google.com/rss/search"
+
+        def get_news_evidence(self, narratives: list[dict], as_of_date: str) -> dict:
+            assert as_of_date == "2026-05-13"
+            assert narratives[0]["narrative_id"] == "N_AI_INFRA"
+            return {
+                "version": "news-evidence-v1",
+                "provider_name": self.provider_name,
+                "provider_version": self.provider_version,
+                "data_quality": "fresh",
+                "source_url": self.source_url,
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+                "query_scope": {
+                    "requested_narrative_ids": [],
+                    "queried_narrative_ids": [
+                        narrative["narrative_id"] for narrative in narratives
+                    ],
+                    "omitted_narrative_ids": [],
+                    "query_limit": 4,
+                },
+                "evidence": [
+                    {
+                        "evidence_id": "EV_NEWS_N_AI_INFRA_TEST",
+                        "narrative_id": "N_AI_INFRA",
+                        "type": "news",
+                        "source": "google_news_rss",
+                        "source_url": "https://example.com/news/ai",
+                        "title": "AI infrastructure growth accelerates",
+                        "summary": (
+                            "Example News headline/snippet matched the narrative "
+                            "query. V1 classified only RSS title/snippet text; "
+                            "article body content was not parsed."
+                        ),
+                        "sentiment": "positive",
+                        "confidence": 0.52,
+                        "event_date": "2026-05-14",
+                        "source_provider": self.provider_name,
+                        "retrieved_at": "2026-05-14T00:00:00+00:00",
+                        "provider_data_quality": "fresh",
+                        "classification_reason": "keyword heuristic over RSS title/snippet",
+                    }
+                ],
+                "missing_narrative_ids": [],
+                "skipped_item_count": 0,
+                "degradation_events": [],
+            }
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_news_evidence=True,
+        news_evidence_provider=FakeNewsEvidenceProvider(),
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    source_table = json.loads(artifacts["source_table"].read_text())
+    markdown = artifacts["markdown"].read_text()
+    html = artifacts["html"].read_text()
+    news_layer = scoring["provider_foundation"]["layers"]["news_evidence"]
+
+    assert raw["news_evidence"] == scoring["news_evidence"]
+    assert raw["news_evidence"]["provider_name"] == "google-news-rss"
+    assert raw["news_evidence"]["query_scope"]["requested_narrative_ids"] == sorted(
+        item["narrative_id"] for item in scoring["all_narratives"]
+    )
+    assert raw["news_evidence"]["query_scope"]["omitted_narrative_ids"] == []
+    assert raw["news_evidence"]["evidence"][0]["source"] == "google_news_rss"
+    assert any(item["source"] == "google_news_rss" for item in raw["evidence"])
+    assert news_layer["provider_name"] == "google-news-rss"
+    assert news_layer["is_mock"] is False
+    assert "titles/snippets only" in news_layer["note"]
+    assert "queried 4/4 mapped narratives" in news_layer["note"]
+    assert {layer["layer"] for layer in source_table["layers"]} >= {"news_evidence"}
+    assert "News Evidence" in markdown
+    assert "titles/snippets only" in html
 
 
 def test_eastmoney_holdings_with_mock_intelligence_is_disclosed_as_partial(

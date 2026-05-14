@@ -40,6 +40,12 @@ from src.providers.intelligence import (
     ReviewedStockNarrativeMappingProvider,
 )
 from src.providers.mock import MockDataProvider
+from src.providers.news import (
+    GOOGLE_NEWS_RSS_PROVIDER,
+    GOOGLE_NEWS_RSS_SOURCE_URL,
+    GOOGLE_NEWS_RSS_VERSION,
+    GoogleNewsRssEvidenceProvider,
+)
 from src.providers.provenance import build_provider_foundation
 
 NARRATIVE_REGISTRY_MODE_FIXTURE = "fixture"
@@ -74,6 +80,8 @@ def run_pipeline(
     include_market_quotes: bool = False,
     market_data_provider: Any | None = None,
     include_valuation_snapshots: bool = False,
+    include_news_evidence: bool = False,
+    news_evidence_provider: Any | None = None,
     narrative_registry_mode: str = NARRATIVE_REGISTRY_MODE_FIXTURE,
     narrative_registry_path: str | Path | None = None,
     stock_mapping_mode: str = STOCK_MAPPING_MODE_FIXTURE,
@@ -180,6 +188,8 @@ def run_pipeline(
     derived_signals_layer: dict[str, Any] | None = None
     evidence_layer: dict[str, Any] | None = None
     signals_layer: dict[str, Any] | None = None
+    news_evidence_payload: dict[str, Any] | None = None
+    news_evidence_layer: dict[str, Any] | None = None
     market_quotes_payload: dict[str, Any] | None = None
     market_quotes_layer: dict[str, Any] | None = None
     valuation_snapshots_payload: dict[str, Any] | None = None
@@ -256,6 +266,34 @@ def run_pipeline(
                 *announcement_signal_events,
             ]
 
+    exposures = aggregate_fund_narratives(
+        holdings=holdings,
+        mappings=selected_mappings,
+        registry=registry_by_id,
+    )
+    if include_news_evidence:
+        news_narratives = [
+            registry_by_id[exposure["narrative_id"]]
+            for exposure in exposures[:4]
+            if exposure["narrative_id"] in registry_by_id
+        ]
+        news_result = _run_news_evidence(
+            narratives=news_narratives,
+            all_narrative_ids=[exposure["narrative_id"] for exposure in exposures],
+            as_of_date=as_of_date,
+            news_evidence_provider=news_evidence_provider,
+        )
+        news_evidence_payload = news_result["news_evidence"]
+        news_evidence_layer = news_result["provider_layer"]
+        degradation_events = [
+            *degradation_events,
+            *news_result["degradation_events"],
+        ]
+        evidence = [
+            *evidence,
+            *news_evidence_payload["evidence"],
+        ]
+
     if derived_signal_provider_names:
         derived_signals_layer = _derived_signals_provider_layer(
             provider_names=derived_signal_provider_names,
@@ -278,17 +316,13 @@ def run_pipeline(
         derived_signals_layer=derived_signals_layer,
         market_quotes_layer=market_quotes_layer,
         valuation_layer=valuation_layer,
+        news_evidence_layer=news_evidence_layer,
         narrative_registry_layer=narrative_registry_layer,
         stock_mapping_layer=stock_mapping_layer,
         evidence_layer=evidence_layer,
         signals_layer=signals_layer,
     )
     effective_data_quality = provider_foundation["effective_data_quality"]
-    exposures = aggregate_fund_narratives(
-        holdings=holdings,
-        mappings=selected_mappings,
-        registry=registry_by_id,
-    )
     narrative_results = [
         _with_state(
             exposure=exposure,
@@ -337,6 +371,8 @@ def run_pipeline(
     if announcements_payload is not None and announcement_evidence_payload is not None:
         raw_payload["announcements"] = announcements_payload
         raw_payload["announcement_evidence"] = announcement_evidence_payload
+    if news_evidence_payload is not None:
+        raw_payload["news_evidence"] = news_evidence_payload
     if market_quotes_payload is not None:
         raw_payload["market_quotes"] = market_quotes_payload
     if valuation_snapshots_payload is not None:
@@ -372,6 +408,8 @@ def run_pipeline(
     }
     if announcement_evidence_payload is not None:
         scoring_payload["announcement_evidence"] = announcement_evidence_payload
+    if news_evidence_payload is not None:
+        scoring_payload["news_evidence"] = news_evidence_payload
     if market_quotes_payload is not None:
         scoring_payload["market_quotes"] = market_quotes_payload
     if valuation_snapshots_payload is not None:
@@ -623,6 +661,79 @@ def _run_market_quotes(
     }
 
 
+def _run_news_evidence(
+    narratives: list[dict[str, Any]],
+    all_narrative_ids: list[str],
+    as_of_date: str,
+    news_evidence_provider: Any | None,
+) -> dict[str, Any]:
+    provider = news_evidence_provider or GoogleNewsRssEvidenceProvider()
+    degradation_events: list[dict[str, str]] = []
+    try:
+        news_evidence_payload = provider.get_news_evidence(
+            narratives=narratives,
+            as_of_date=as_of_date,
+        )
+        news_evidence_payload = _with_news_query_scope(
+            payload=news_evidence_payload,
+            queried_narrative_ids=[
+                str(narrative.get("narrative_id") or "") for narrative in narratives
+            ],
+            all_narrative_ids=all_narrative_ids,
+        )
+    except Exception as exc:
+        provider_name = str(getattr(provider, "provider_name", GOOGLE_NEWS_RSS_PROVIDER))
+        provider_version = str(
+            getattr(provider, "provider_version", GOOGLE_NEWS_RSS_VERSION)
+        )
+        source_url = str(getattr(provider, "source_url", GOOGLE_NEWS_RSS_SOURCE_URL))
+        degradation_events.append(
+            {
+                "type": "provider_unavailable",
+                "provider_name": provider_name,
+                "reason": f"News evidence provider failed: {exc}",
+            }
+        )
+        news_evidence_payload = {
+            "version": "news-evidence-v1",
+            "provider_name": provider_name,
+            "provider_version": provider_version,
+            "data_quality": "unavailable",
+            "source_url": source_url,
+            "retrieved_at": datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .isoformat(),
+            "query_scope": _news_query_scope(
+                queried_narrative_ids=[
+                    str(narrative.get("narrative_id") or "") for narrative in narratives
+                ],
+                all_narrative_ids=all_narrative_ids,
+            ),
+            "evidence": [],
+            "missing_narrative_ids": sorted(
+                str(narrative.get("narrative_id"))
+                for narrative in narratives
+                if narrative.get("narrative_id")
+            ),
+            "skipped_item_count": 0,
+            "degradation_events": degradation_events,
+        }
+    else:
+        degradation_events = [
+            *degradation_events,
+            *news_evidence_payload.get("degradation_events", []),
+        ]
+    degradation_events = [*degradation_events, *getattr(provider, "degradation_events", [])]
+    return {
+        "news_evidence": news_evidence_payload,
+        "provider_layer": _news_evidence_provider_layer(
+            provider=provider,
+            news_evidence_payload=news_evidence_payload,
+        ),
+        "degradation_events": degradation_events,
+    }
+
+
 def _provider_foundation_with_optional_announcement_layer(
     provider: Any,
     fund_provider_metadata: dict[str, Any],
@@ -631,6 +742,7 @@ def _provider_foundation_with_optional_announcement_layer(
     derived_signals_layer: dict[str, Any] | None,
     market_quotes_layer: dict[str, Any] | None,
     valuation_layer: dict[str, Any] | None,
+    news_evidence_layer: dict[str, Any] | None,
     narrative_registry_layer: dict[str, Any] | None,
     stock_mapping_layer: dict[str, Any] | None,
     evidence_layer: dict[str, Any] | None,
@@ -645,6 +757,7 @@ def _provider_foundation_with_optional_announcement_layer(
         and derived_signals_layer is None
         and market_quotes_layer is None
         and valuation_layer is None
+        and news_evidence_layer is None
         and narrative_registry_layer is None
         and stock_mapping_layer is None
         and evidence_layer is None
@@ -664,6 +777,8 @@ def _provider_foundation_with_optional_announcement_layer(
         layers = {**layers, "market_quotes": market_quotes_layer}
     if valuation_layer is not None:
         layers = {**layers, "valuation": valuation_layer}
+    if news_evidence_layer is not None:
+        layers = {**layers, "news_evidence": news_evidence_layer}
     if announcement_layer is not None:
         layers = {**layers, "announcements": announcement_layer}
     if derived_signals_layer is not None:
@@ -899,6 +1014,76 @@ def _announcement_provider_layer(
         "source_url": getattr(provider, "source_url", CNINFO_ANNOUNCEMENT_QUERY_URL),
         "is_mock": provider_name.startswith("mock") or data_quality == "mock",
         "note": "Optional announcement metadata provider; V1 classifies metadata only and does not parse source PDFs.",
+    }
+
+
+def _news_evidence_provider_layer(
+    provider: Any,
+    news_evidence_payload: dict[str, Any],
+) -> dict[str, Any]:
+    provider_name = str(
+        news_evidence_payload.get("provider_name")
+        or getattr(provider, "provider_name", "news-evidence-provider")
+    )
+    data_quality = str(news_evidence_payload.get("data_quality") or "unavailable")
+    evidence_count = len(news_evidence_payload.get("evidence") or [])
+    query_scope = news_evidence_payload.get("query_scope")
+    if not isinstance(query_scope, dict):
+        query_scope = {
+            "requested_narrative_ids": [],
+            "queried_narrative_ids": [],
+        }
+    return {
+        "layer": "news_evidence",
+        "provider_name": provider_name,
+        "provider_version": str(
+            news_evidence_payload.get("provider_version")
+            or getattr(provider, "provider_version", news_evidence_payload["version"])
+        ),
+        "data_quality": data_quality,
+        "source_url": news_evidence_payload.get("source_url")
+        or getattr(provider, "source_url", GOOGLE_NEWS_RSS_SOURCE_URL),
+        "is_mock": provider_name.startswith("mock") or data_quality == "mock",
+        "note": (
+            "Optional news evidence provider; V1 classifies RSS titles/snippets "
+            "only, does not parse article bodies, "
+            f"queried {len(query_scope.get('queried_narrative_ids', []))}/"
+            f"{len(query_scope.get('requested_narrative_ids', []))} mapped narratives, "
+            f"evidence count {evidence_count}."
+        ),
+    }
+
+
+def _with_news_query_scope(
+    payload: dict[str, Any],
+    queried_narrative_ids: list[str],
+    all_narrative_ids: list[str],
+) -> dict[str, Any]:
+    existing_scope = payload.get("query_scope")
+    if isinstance(existing_scope, dict):
+        queried = existing_scope.get("queried_narrative_ids")
+        if isinstance(queried, list):
+            queried_narrative_ids = [str(item) for item in queried]
+    return {
+        **payload,
+        "query_scope": _news_query_scope(
+            queried_narrative_ids=queried_narrative_ids,
+            all_narrative_ids=all_narrative_ids,
+        ),
+    }
+
+
+def _news_query_scope(
+    queried_narrative_ids: list[str],
+    all_narrative_ids: list[str],
+) -> dict[str, Any]:
+    requested = sorted(narrative_id for narrative_id in set(all_narrative_ids) if narrative_id)
+    queried = sorted(narrative_id for narrative_id in set(queried_narrative_ids) if narrative_id)
+    return {
+        "requested_narrative_ids": requested,
+        "queried_narrative_ids": queried,
+        "omitted_narrative_ids": sorted(set(requested) - set(queried)),
+        "query_limit": 4,
     }
 
 

@@ -325,6 +325,80 @@ def _validate_valuation_snapshot_item(item: Any, context: str) -> None:
             raise ProviderContractError(f"{context}.{field} must be a non-empty string")
 
 
+def validate_news_evidence_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "news evidence")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "provider_name",
+            "provider_version",
+            "data_quality",
+            "source_url",
+            "retrieved_at",
+            "query_scope",
+            "evidence",
+            "missing_narrative_ids",
+            "skipped_item_count",
+            "degradation_events",
+        },
+        "news evidence",
+    )
+    if payload["version"] != "news-evidence-v1":
+        raise ProviderContractError("news evidence version is unsupported")
+    if payload["data_quality"] not in {"fresh", "partial", "mock", "unavailable"}:
+        raise ProviderContractError(
+            "news evidence data_quality must be fresh, partial, mock, or unavailable"
+        )
+    for field in {"provider_name", "provider_version", "source_url", "retrieved_at"}:
+        if not isinstance(payload[field], str) or not payload[field]:
+            raise ProviderContractError(f"news evidence {field} must be a non-empty string")
+    if not isinstance(payload["evidence"], list):
+        raise ProviderContractError("news evidence evidence must be a list")
+    _validate_news_query_scope(payload["query_scope"])
+    if not isinstance(payload["missing_narrative_ids"], list):
+        raise ProviderContractError(
+            "news evidence missing_narrative_ids must be a list"
+        )
+    if not isinstance(payload["skipped_item_count"], int):
+        raise ProviderContractError("news evidence skipped_item_count must be an integer")
+    if not isinstance(payload["degradation_events"], list):
+        raise ProviderContractError("news evidence degradation_events must be a list")
+    validate_evidence_payload(
+        {"version": payload["version"], "evidence": payload["evidence"]}
+    )
+    for index, item in enumerate(payload["evidence"]):
+        context = f"news evidence evidence[{index}]"
+        for field in {"source_provider", "retrieved_at", "provider_data_quality"}:
+            if not isinstance(item.get(field), str) or not item[field]:
+                raise ProviderContractError(f"{context}.{field} must be non-empty")
+
+
+def _validate_news_query_scope(query_scope: Any) -> None:
+    _require_mapping(query_scope, "news evidence query_scope")
+    _require_keys(
+        query_scope,
+        {
+            "requested_narrative_ids",
+            "queried_narrative_ids",
+            "omitted_narrative_ids",
+            "query_limit",
+        },
+        "news evidence query_scope",
+    )
+    for field in {
+        "requested_narrative_ids",
+        "queried_narrative_ids",
+        "omitted_narrative_ids",
+    }:
+        if not isinstance(query_scope[field], list):
+            raise ProviderContractError(f"news evidence query_scope.{field} must be a list")
+    if not isinstance(query_scope["query_limit"], int) or query_scope["query_limit"] < 0:
+        raise ProviderContractError(
+            "news evidence query_scope.query_limit must be a non-negative integer"
+        )
+
+
 def validate_review_action_preview_payload(payload: dict[str, Any]) -> None:
     _require_mapping(payload, "review action preview")
     _require_keys(

@@ -20,7 +20,7 @@ Provider interfaces are part of V1. Real providers are optional in V1, but mock 
 | Stock quotes and liquidity | AKShare, Eastmoney, yfinance | mock first | yes-lite | Used for capital reinforcement and valuation context; V1 can use fixture data. |
 | Financials and valuation | Tushare, AKShare, financial reports | mock first, quote-derived context first | yes-lite | Used for earnings validation and valuation pressure. V1 can derive lightweight valuation context from market quotes, but must label it as quote-derived until fundamental valuation feeds exist. Missing data must not crash scoring. |
 | Announcements | CNINFO, exchange announcements | mock first | yes-lite | Used as evidence events. Real ingestion can be deferred. |
-| News and market language | finance news sources, search APIs, crawlers | mock first | yes-lite | Used for narrative momentum and counter evidence. |
+| News and market language | finance news sources, search APIs, crawlers | mock first, RSS-derived optional path | yes-lite | Used for narrative momentum and counter evidence. V1 can derive title/snippet evidence from RSS/search-style feeds, but must disclose that article bodies are not parsed. |
 | Narrative registry | human-approved local registry | local fixture file | yes | V1 should load a stable registry from local structured data. |
 | Signal events and states | derived from evidence/events | local fixture file plus aggregation | yes-lite | V1 needs enough signal state data to score sample funds. |
 | LLM calls | OpenAI-compatible provider or local stub | disabled by default; stub allowed | optional | V1 mapping can be fixture/rule based. Any LLM use must be replaceable by deterministic fixtures. |
@@ -596,6 +596,21 @@ and the payload must include `valuation_basis = quote_derived_context`; it is
 not a substitute for full PE/PB/DCF or financial-report valuation data. Reports
 and source tables must surface this limitation in the provider note so users do
 not mistake quote-derived context for fundamental valuation.
+
+V1 can also fetch RSS-derived news evidence for mapped narratives:
+
+```bash
+python -m src.main --fund-code 000001 --include-news-evidence
+```
+
+This produces `news_evidence` in raw/scoring JSON and a `News Evidence`
+provider-foundation layer. The first provider is `google-news-rss`, but the
+artifact contract is provider-agnostic so future search/news APIs can reuse the
+same shape. The payload must include `query_scope` with requested, queried, and
+omitted narrative IDs so reports can disclose top-N coverage. V1 classifies RSS
+titles/snippets only and does not parse article bodies. Provider failures must
+degrade into `unavailable` payloads and recorded degradation events rather than
+crashing the pipeline.
 
 - Missing local mock fixtures and invalid provider payloads produce controlled errors.
 - The mock-provider path includes multiple scenario funds so lifecycle stages are not validated only against one happy path.
