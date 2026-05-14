@@ -18,7 +18,7 @@ Provider interfaces are part of V1. Real providers are optional in V1, but mock 
 | --- | --- | --- | --- | --- |
 | Fund holdings | AKShare, Tushare, Eastmoney, Tiantian Fund | `MockFundHoldingProvider` first; real provider adapter later | yes | Must return top holdings with fund-to-stock mapping, weights, as-of date, and source metadata. |
 | Stock quotes and liquidity | AKShare, Eastmoney, yfinance | mock first | yes-lite | Used for capital reinforcement and valuation context; V1 can use fixture data. |
-| Financials and valuation | Tushare, AKShare, financial reports | mock first | yes-lite | Used for earnings validation and valuation pressure. Missing data must not crash scoring. |
+| Financials and valuation | Tushare, AKShare, financial reports | mock first, quote-derived context first | yes-lite | Used for earnings validation and valuation pressure. V1 can derive lightweight valuation context from market quotes, but must label it as quote-derived until fundamental valuation feeds exist. Missing data must not crash scoring. |
 | Announcements | CNINFO, exchange announcements | mock first | yes-lite | Used as evidence events. Real ingestion can be deferred. |
 | News and market language | finance news sources, search APIs, crawlers | mock first | yes-lite | Used for narrative momentum and counter evidence. |
 | Narrative registry | human-approved local registry | local fixture file | yes | V1 should load a stable registry from local structured data. |
@@ -583,6 +583,19 @@ include:
 - primary/secondary narrative summaries and mapping context
 - report artifact references
 - `approval_workflow.status = ready_for_future_web`
+
+V1 can also derive lightweight valuation context from market quotes:
+
+```bash
+python -m src.main --fund-code 000001 --include-market-quotes --include-valuation-snapshots
+```
+
+This produces `valuation_snapshots` in raw/scoring JSON and a `Valuation`
+provider-foundation layer. The provider name must be `quote-derived-valuation`
+and the payload must include `valuation_basis = quote_derived_context`; it is
+not a substitute for full PE/PB/DCF or financial-report valuation data. Reports
+and source tables must surface this limitation in the provider note so users do
+not mistake quote-derived context for fundamental valuation.
 
 - Missing local mock fixtures and invalid provider payloads produce controlled errors.
 - The mock-provider path includes multiple scenario funds so lifecycle stages are not validated only against one happy path.

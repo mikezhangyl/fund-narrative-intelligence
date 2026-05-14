@@ -1116,3 +1116,32 @@ Consequences:
   source-table, review-queue, report, narrative, and approval-workflow fields.
 - The snapshot marks `approval_workflow.status = ready_for_future_web`, but
   remains read-only; existing preview/persist CLI commands still own mutations.
+
+## ADR-0045: Add Quote-Derived Valuation Context
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add `--include-valuation-snapshots` as an optional layer that derives
+`valuation_snapshots` from market quote payloads.
+
+Rationale:
+
+- Valuation is a planned V1 dimension, but full financial valuation feeds require
+  Tushare, AKShare, or report parsing that is not wired yet.
+- A quote-derived context layer lets the service exercise valuation artifact and
+  source-table plumbing without pretending it has full fundamental valuation.
+- The feature requires `--include-market-quotes`, so it only runs when there is
+  a concrete quote source to cite.
+
+Consequences:
+
+- Raw and scoring artifacts include `valuation_snapshots` only when explicitly
+  requested.
+- Provider foundation includes a `Valuation` layer with provider
+  `quote-derived-valuation`.
+- The payload carries `valuation_basis = quote_derived_context` to prevent
+  overclaiming.
+- Scoring weights are unchanged in this slice.

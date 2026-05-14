@@ -248,6 +248,83 @@ def validate_market_quote_payload(payload: dict[str, Any]) -> None:
             raise ProviderContractError(f"{context}.stock_code must be non-empty")
 
 
+def validate_valuation_snapshot_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "valuation snapshots")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "provider_name",
+            "provider_version",
+            "data_quality",
+            "source_url",
+            "retrieved_at",
+            "valuation_basis",
+            "valuations",
+            "missing_stock_codes",
+        },
+        "valuation snapshots",
+    )
+    if payload["version"] != "valuation-snapshot-v1":
+        raise ProviderContractError("valuation snapshots version is unsupported")
+    if payload["provider_name"] != "quote-derived-valuation":
+        raise ProviderContractError(
+            "valuation snapshots provider_name must be quote-derived-valuation"
+        )
+    if payload["provider_version"] != "quote-derived-valuation-v1":
+        raise ProviderContractError(
+            "valuation snapshots provider_version must be quote-derived-valuation-v1"
+        )
+    if payload["valuation_basis"] != "quote_derived_context":
+        raise ProviderContractError("valuation snapshots valuation_basis is unsupported")
+    if payload["data_quality"] not in {"fresh", "partial", "mock", "unavailable"}:
+        raise ProviderContractError(
+            "valuation snapshots data_quality must be fresh, partial, mock, or unavailable"
+        )
+    for field in {"provider_name", "provider_version", "source_url", "retrieved_at"}:
+        if not isinstance(payload[field], str) or not payload[field]:
+            raise ProviderContractError(
+                f"valuation snapshots {field} must be a non-empty string"
+            )
+    if not isinstance(payload["valuations"], list):
+        raise ProviderContractError("valuation snapshots valuations must be a list")
+    if not isinstance(payload["missing_stock_codes"], list):
+        raise ProviderContractError(
+            "valuation snapshots missing_stock_codes must be a list"
+        )
+    for index, valuation in enumerate(payload["valuations"]):
+        _validate_valuation_snapshot_item(valuation, f"valuations[{index}]")
+
+
+def _validate_valuation_snapshot_item(item: Any, context: str) -> None:
+    _require_mapping(item, context)
+    _require_keys(
+        item,
+        {
+            "stock_code",
+            "stock_name",
+            "latest_price",
+            "previous_close",
+            "price_change_percent",
+            "valuation_pressure",
+            "source",
+            "source_provider",
+            "source_url",
+            "retrieved_at",
+        },
+        context,
+    )
+    if not item["stock_code"]:
+        raise ProviderContractError(f"{context}.stock_code must be non-empty")
+    if item["valuation_pressure"] not in {"elevated", "neutral", "discounted", "unknown"}:
+        raise ProviderContractError(f"{context}.valuation_pressure is unsupported")
+    if item["source"] != "market_quote":
+        raise ProviderContractError(f"{context}.source must be market_quote")
+    for field in {"source_provider", "source_url", "retrieved_at"}:
+        if not isinstance(item[field], str) or not item[field]:
+            raise ProviderContractError(f"{context}.{field} must be a non-empty string")
+
+
 def validate_review_action_preview_payload(payload: dict[str, Any]) -> None:
     _require_mapping(payload, "review action preview")
     _require_keys(

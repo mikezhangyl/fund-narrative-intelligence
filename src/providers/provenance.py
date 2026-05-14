@@ -19,6 +19,7 @@ LAYER_DISPLAY_NAMES = {
     "stock_mappings": "Stock Mappings",
     "evidence": "Evidence",
     "signals": "Signals",
+    "valuation": "Valuation",
     "announcements": "Announcements",
     "market_quotes": "Market Quotes",
     "derived_signals": "Derived Signals",

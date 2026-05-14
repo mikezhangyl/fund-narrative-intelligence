@@ -5,7 +5,11 @@ from pathlib import Path
 import pytest
 from src.errors import FixtureNotFoundError, ProviderContractError
 from src.providers.mock import MockDataProvider
-from src.validation import validate_fund_payload, validate_source_table_artifact_payload
+from src.validation import (
+    validate_fund_payload,
+    validate_source_table_artifact_payload,
+    validate_valuation_snapshot_payload,
+)
 
 
 def test_mock_provider_lists_available_fund_codes():
@@ -149,6 +153,25 @@ def test_source_table_validation_rejects_layer_missing_render_fields():
     assert "missing required fields" in str(exc.value)
 
 
+def test_valuation_snapshot_validation_rejects_wrong_provider_name():
+    payload = _valuation_snapshot_payload(provider_name="not-quote-derived-valuation")
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_valuation_snapshot_payload(payload)
+
+    assert "provider_name must be quote-derived-valuation" in str(exc.value)
+
+
+def test_valuation_snapshot_validation_rejects_missing_row_provenance():
+    payload = _valuation_snapshot_payload()
+    payload["valuations"][0]["source_url"] = None
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_valuation_snapshot_payload(payload)
+
+    assert "valuations[0].source_url must be a non-empty string" in str(exc.value)
+
+
 def _source_table_layer(
     layer: str = "holdings",
     **overrides: object,
@@ -164,6 +187,34 @@ def _source_table_layer(
         "note": "test layer",
         **overrides,
     }
+
+
+def _valuation_snapshot_payload(**overrides: object) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "version": "valuation-snapshot-v1",
+        "provider_name": "quote-derived-valuation",
+        "provider_version": "quote-derived-valuation-v1",
+        "data_quality": "fresh",
+        "source_url": "derived://market-quotes/valuation-context",
+        "retrieved_at": "2026-05-14T00:00:00+00:00",
+        "valuation_basis": "quote_derived_context",
+        "valuations": [
+            {
+                "stock_code": "NVDA",
+                "stock_name": "NVIDIA",
+                "latest_price": 106.0,
+                "previous_close": 100.0,
+                "price_change_percent": 6.0,
+                "valuation_pressure": "elevated",
+                "source": "market_quote",
+                "source_provider": "eastmoney",
+                "source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+            }
+        ],
+        "missing_stock_codes": [],
+    }
+    return {**payload, **overrides}
 
 
 def test_cli_lists_available_fixtures():

@@ -202,15 +202,16 @@ def _render_data_source_notice_lines(scoring_payload: dict[str, Any]) -> list[st
         "",
         f"> {foundation['disclosure_message']}",
         "",
-        "| Layer | Provider | Quality | Mock | Source |",
-        "| --- | --- | --- | --- | --- |",
+        "| Layer | Provider | Quality | Mock | Source | Note |",
+        "| --- | --- | --- | --- | --- | --- |",
     ]
     for layer in foundation["layers"].values():
         source = layer.get("source_url") or "-"
         mock_label = "yes" if layer["is_mock"] else "no"
+        note = layer.get("note") or "-"
         lines.append(
             f"| {_layer_display_name(layer)} | {layer['provider_name']} | "
-            f"{layer['data_quality']} | {mock_label} | {source} |"
+            f"{layer['data_quality']} | {mock_label} | {source} | {note} |"
         )
 
     degradation_events = foundation.get("degradation_events", [])
@@ -237,6 +238,7 @@ def _render_data_source_notice_html(scoring_payload: dict[str, Any]) -> str:
         f"<td>{escape(layer['data_quality'])}</td>"
         f"<td>{'yes' if layer['is_mock'] else 'no'}</td>"
         f"<td>{escape(str(layer.get('source_url') or '-'))}</td>"
+        f"<td>{escape(str(layer.get('note') or '-'))}</td>"
         "</tr>"
         for layer in foundation["layers"].values()
     )
@@ -258,7 +260,7 @@ def _render_data_source_notice_html(scoring_payload: dict[str, Any]) -> str:
     <h2>Data Source Notice</h2>
     <p>{escape(foundation['disclosure_message'])}</p>
     <table>
-      <thead><tr><th>Layer</th><th>Provider</th><th>Quality</th><th>Mock</th><th>Source</th></tr></thead>
+      <thead><tr><th>Layer</th><th>Provider</th><th>Quality</th><th>Mock</th><th>Source</th><th>Note</th></tr></thead>
       <tbody>{layer_rows}</tbody>
     </table>
     {degradation_html}

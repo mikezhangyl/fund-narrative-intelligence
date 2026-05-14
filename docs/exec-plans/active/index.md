@@ -62,3 +62,4 @@
 - [provider-foundation-review-metadata.md](./provider-foundation-review-metadata.md)
 - [source-table-artifact.md](./source-table-artifact.md)
 - [workspace-snapshot-loader.md](./workspace-snapshot-loader.md)
+- [valuation-snapshot-provider.md](./valuation-snapshot-provider.md)

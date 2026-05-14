@@ -25,6 +25,10 @@ from src.modules.signal_service.derived import (
 )
 from src.modules.signal_service.scoring import score_narrative_state
 from src.modules.snapshot_writer.writer import write_json_artifact
+from src.modules.valuation.snapshots import (
+    build_quote_derived_valuation_snapshots,
+    valuation_provider_layer,
+)
 from src.providers.cninfo import (
     CNINFO_ANNOUNCEMENT_QUERY_URL,
     CNInfoAnnouncementProvider,
@@ -69,6 +73,7 @@ def run_pipeline(
     announcement_provider: Any | None = None,
     include_market_quotes: bool = False,
     market_data_provider: Any | None = None,
+    include_valuation_snapshots: bool = False,
     narrative_registry_mode: str = NARRATIVE_REGISTRY_MODE_FIXTURE,
     narrative_registry_path: str | Path | None = None,
     stock_mapping_mode: str = STOCK_MAPPING_MODE_FIXTURE,
@@ -177,6 +182,8 @@ def run_pipeline(
     signals_layer: dict[str, Any] | None = None
     market_quotes_payload: dict[str, Any] | None = None
     market_quotes_layer: dict[str, Any] | None = None
+    valuation_snapshots_payload: dict[str, Any] | None = None
+    valuation_layer: dict[str, Any] | None = None
     if include_market_quotes:
         market_result = _run_market_quotes(
             stock_codes=[holding["stock_code"] for holding in holdings],
@@ -206,6 +213,13 @@ def run_pipeline(
             *degradation_events,
             *market_result["degradation_events"],
         ]
+        if include_valuation_snapshots:
+            valuation_snapshots_payload = build_quote_derived_valuation_snapshots(
+                market_quotes_payload
+            )
+            valuation_layer = valuation_provider_layer(valuation_snapshots_payload)
+    elif include_valuation_snapshots:
+        raise ValueError("include_valuation_snapshots requires include_market_quotes")
     if include_announcement_evidence:
         announcement_result = _run_announcement_evidence(
             stock_codes=[holding["stock_code"] for holding in holdings],
@@ -263,6 +277,7 @@ def run_pipeline(
         announcement_layer=announcement_layer,
         derived_signals_layer=derived_signals_layer,
         market_quotes_layer=market_quotes_layer,
+        valuation_layer=valuation_layer,
         narrative_registry_layer=narrative_registry_layer,
         stock_mapping_layer=stock_mapping_layer,
         evidence_layer=evidence_layer,
@@ -324,6 +339,8 @@ def run_pipeline(
         raw_payload["announcement_evidence"] = announcement_evidence_payload
     if market_quotes_payload is not None:
         raw_payload["market_quotes"] = market_quotes_payload
+    if valuation_snapshots_payload is not None:
+        raw_payload["valuation_snapshots"] = valuation_snapshots_payload
     if derived_signal_provider_names:
         raw_payload["derived_signal_events"] = derived_signal_events
 
@@ -357,6 +374,8 @@ def run_pipeline(
         scoring_payload["announcement_evidence"] = announcement_evidence_payload
     if market_quotes_payload is not None:
         scoring_payload["market_quotes"] = market_quotes_payload
+    if valuation_snapshots_payload is not None:
+        scoring_payload["valuation_snapshots"] = valuation_snapshots_payload
     if derived_signal_provider_names:
         scoring_payload["derived_signal_events"] = derived_signal_events
 
@@ -611,6 +630,7 @@ def _provider_foundation_with_optional_announcement_layer(
     announcement_layer: dict[str, Any] | None,
     derived_signals_layer: dict[str, Any] | None,
     market_quotes_layer: dict[str, Any] | None,
+    valuation_layer: dict[str, Any] | None,
     narrative_registry_layer: dict[str, Any] | None,
     stock_mapping_layer: dict[str, Any] | None,
     evidence_layer: dict[str, Any] | None,
@@ -624,6 +644,7 @@ def _provider_foundation_with_optional_announcement_layer(
         announcement_layer is None
         and derived_signals_layer is None
         and market_quotes_layer is None
+        and valuation_layer is None
         and narrative_registry_layer is None
         and stock_mapping_layer is None
         and evidence_layer is None
@@ -641,6 +662,8 @@ def _provider_foundation_with_optional_announcement_layer(
         layers = {**layers, "stock_mappings": stock_mapping_layer}
     if market_quotes_layer is not None:
         layers = {**layers, "market_quotes": market_quotes_layer}
+    if valuation_layer is not None:
+        layers = {**layers, "valuation": valuation_layer}
     if announcement_layer is not None:
         layers = {**layers, "announcements": announcement_layer}
     if derived_signals_layer is not None:

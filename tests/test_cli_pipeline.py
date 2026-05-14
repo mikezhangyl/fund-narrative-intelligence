@@ -2,6 +2,7 @@ import json
 import subprocess
 import sys
 
+import pytest
 from src import main as main_module
 from src.config import FIXTURE_DIR
 from src.orchestrator import run_pipeline
@@ -395,6 +396,53 @@ def test_cli_include_market_quotes_passes_options_to_pipeline(tmp_path, monkeypa
     assert exit_code == 0
     assert captured["fund_code"] == "161725"
     assert captured["include_market_quotes"] is True
+
+
+def test_cli_include_valuation_snapshots_requires_market_quotes(capsys):
+    with pytest.raises(SystemExit) as exc:
+        main_module.main(["--fund-code", "161725", "--include-valuation-snapshots"])
+
+    captured = capsys.readouterr()
+    assert exc.value.code == 2
+    assert "--include-valuation-snapshots requires --include-market-quotes" in captured.err
+
+
+def test_cli_include_valuation_snapshots_passes_option_to_pipeline(
+    tmp_path,
+    monkeypatch,
+):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "source_table": tmp_path / "source_table.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--provider-mode",
+            "eastmoney",
+            "--include-market-quotes",
+            "--include-valuation-snapshots",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["include_market_quotes"] is True
+    assert captured["include_valuation_snapshots"] is True
 
 
 def test_cli_base_intelligence_mode_passes_option_to_pipeline(tmp_path, monkeypatch):
@@ -791,6 +839,72 @@ def test_optional_eastmoney_quotes_are_disclosed_and_added_to_outputs(tmp_path):
     assert "eastmoney-market-quote" in markdown
     assert "Market Quotes" in html
     assert "eastmoney-market-quote" in html
+
+
+def test_optional_valuation_snapshots_are_quote_derived_and_disclosed(tmp_path):
+    class FakeMarketDataProvider:
+        provider_name = "eastmoney-market-quote"
+        provider_version = "eastmoney-market-quote-v1"
+        source_url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_stock_quotes(self, stock_codes: list[str]) -> dict:
+            assert "NVDA" in stock_codes
+            return {
+                "version": self.provider_version,
+                "provider_name": self.provider_name,
+                "provider_version": self.provider_version,
+                "data_quality": "fresh",
+                "source_url": self.source_url,
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+                "quotes": [
+                    {
+                        "stock_code": "NVDA",
+                        "stock_name": "NVIDIA",
+                        "source_provider": "eastmoney",
+                        "source_url": self.source_url,
+                        "latest_price": 106.0,
+                        "change_percent": 6.0,
+                        "change_amount": 6.0,
+                        "volume": 100,
+                        "amount": 10600.0,
+                        "high": 107.0,
+                        "low": 99.0,
+                        "open": 100.0,
+                        "previous_close": 100.0,
+                        "retrieved_at": "2026-05-14T00:00:00+00:00",
+                    }
+                ],
+                "missing_stock_codes": [],
+            }
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_market_quotes=True,
+        include_valuation_snapshots=True,
+        market_data_provider=FakeMarketDataProvider(),
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    source_table = json.loads(artifacts["source_table"].read_text())
+    valuation = raw["valuation_snapshots"]
+    valuation_layer = scoring["provider_foundation"]["layers"]["valuation"]
+
+    assert valuation == scoring["valuation_snapshots"]
+    assert valuation["provider_name"] == "quote-derived-valuation"
+    assert valuation["valuation_basis"] == "quote_derived_context"
+    assert valuation["valuations"][0]["valuation_pressure"] == "elevated"
+    assert valuation["valuations"][0]["source"] == "market_quote"
+    assert valuation["valuations"][0]["source_provider"] == "eastmoney"
+    assert valuation["valuations"][0]["source_url"] == FakeMarketDataProvider.source_url
+    assert valuation_layer["provider_name"] == "quote-derived-valuation"
+    assert valuation_layer["is_mock"] is False
+    assert {layer["layer"] for layer in source_table["layers"]} >= {"valuation"}
+    assert "Quote-derived valuation context" in artifacts["markdown"].read_text()
+    assert "not a full fundamental valuation feed" in artifacts["html"].read_text()
 
 
 def test_eastmoney_holdings_with_mock_intelligence_is_disclosed_as_partial(

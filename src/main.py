@@ -218,6 +218,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optionally fetch real market quote snapshots for current holdings.",
     )
     parser.add_argument(
+        "--include-valuation-snapshots",
+        action="store_true",
+        help="Optionally derive lightweight valuation context from market quote snapshots.",
+    )
+    parser.add_argument(
         "--announcement-start-date",
         help="Optional ISO start date for CNINFO announcement search when --include-cninfo-announcements is set.",
     )
@@ -231,6 +236,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(
             "--announcement-start-date requires --include-cninfo-announcements"
         )
+    if args.include_valuation_snapshots and not args.include_market_quotes:
+        parser.error("--include-valuation-snapshots requires --include-market-quotes")
     if (
         args.narrative_registry_path
         and args.narrative_registry_mode != NARRATIVE_REGISTRY_MODE_REVIEWED
@@ -499,6 +506,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-cninfo-announcements is not supported with --preview-review-action")
         if args.include_market_quotes:
             parser.error("--include-market-quotes is not supported with --preview-review-action")
+        if args.include_valuation_snapshots:
+            parser.error("--include-valuation-snapshots is not supported with --preview-review-action")
         try:
             output_path = write_review_action_preview(
                 registry_path=Path(args.registry_path),
@@ -527,6 +536,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-cninfo-announcements is not supported with --persist-review-action")
         if args.include_market_quotes:
             parser.error("--include-market-quotes is not supported with --persist-review-action")
+        if args.include_valuation_snapshots:
+            parser.error("--include-valuation-snapshots is not supported with --persist-review-action")
         if not args.registry_output:
             parser.error("--registry-output is required with --persist-review-action")
         try:
@@ -566,6 +577,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-cninfo-announcements requires --fund-code")
         if args.include_market_quotes:
             parser.error("--include-market-quotes requires --fund-code")
+        if args.include_valuation_snapshots:
+            parser.error("--include-valuation-snapshots requires --fund-code")
         for fund_code in MockDataProvider().list_fund_codes():
             print(fund_code)
         return 0
@@ -575,6 +588,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-cninfo-announcements is not supported with --run-all-fixtures")
         if args.include_market_quotes:
             parser.error("--include-market-quotes is not supported with --run-all-fixtures")
+        if args.include_valuation_snapshots:
+            parser.error("--include-valuation-snapshots is not supported with --run-all-fixtures")
         try:
             results = run_all_fixture_pipelines(
                 provider_mode=args.provider_mode,
@@ -599,6 +614,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-cninfo-announcements is not supported with --run-real-smoke")
         if args.include_market_quotes:
             parser.error("--include-market-quotes is not supported with --run-real-smoke")
+        if args.include_valuation_snapshots:
+            parser.error("--include-valuation-snapshots is not supported with --run-real-smoke")
         try:
             summary = run_real_fund_smoke(output_dir=args.output_dir)
         except PipelineError as exc:
@@ -627,6 +644,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-cninfo-announcements is not supported with --run-announcement-smoke")
         if args.include_market_quotes:
             parser.error("--include-market-quotes is not supported with --run-announcement-smoke")
+        if args.include_valuation_snapshots:
+            parser.error("--include-valuation-snapshots is not supported with --run-announcement-smoke")
         try:
             summary = run_announcement_evidence_smoke(output_dir=args.output_dir)
         except PipelineError as exc:
@@ -653,6 +672,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-cninfo-announcements is not supported with --provider-diagnostics")
         if args.include_market_quotes:
             parser.error("--include-market-quotes is not supported with --provider-diagnostics")
+        if args.include_valuation_snapshots:
+            parser.error("--include-valuation-snapshots is not supported with --provider-diagnostics")
         if not args.fund_code:
             parser.error("--fund-code is required with --provider-diagnostics")
             return 2
@@ -688,6 +709,7 @@ def main(argv: list[str] | None = None) -> int:
             include_announcement_evidence=args.include_cninfo_announcements,
             announcement_start_date=args.announcement_start_date,
             include_market_quotes=args.include_market_quotes,
+            include_valuation_snapshots=args.include_valuation_snapshots,
             narrative_registry_mode=args.narrative_registry_mode,
             narrative_registry_path=args.narrative_registry_path,
             stock_mapping_mode=args.stock_mapping_mode,

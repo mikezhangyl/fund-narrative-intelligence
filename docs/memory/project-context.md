@@ -79,6 +79,7 @@ Expected artifacts:
 - Provider diagnostics command: `python -m src.main --fund-code 000001 --provider-diagnostics` prints provider foundation JSON without generating report artifacts.
 - Optional CNINFO announcement evidence command: `python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01`.
 - Optional market quote snapshot command: `python -m src.main --fund-code 161725 --provider-mode eastmoney --include-market-quotes`.
+- Optional quote-derived valuation context command: `python -m src.main --fund-code 161725 --provider-mode eastmoney --include-market-quotes --include-valuation-snapshots`.
 - Strict live market quote acceptance command: `python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_quotes_161725`.
 - Provider payloads are validated before orchestration proceeds.
 - Real holdings adapter: `python -m src.main --fund-code 161725 --provider-mode eastmoney` tries Eastmoney/Tiantian Fund fund holdings and keeps local fixtures for all other V1 intelligence layers.
@@ -136,6 +137,7 @@ Expected artifacts:
 - Strict announcement acceptance validates the generated fund artifacts directly: Eastmoney holdings must be fresh, CNINFO announcements and converted evidence must be present, and remaining registry/mapping/base-evidence/signal layers must still disclose `mock://fixtures/...`.
 - Optional CNINFO announcement runs now derive scoring signals from generated announcement evidence. Positive earnings/orders/capital announcements affect the matching score dimensions, negative risk announcements affect counter-evidence risk, and mixed financial/governance disclosures become low-weight momentum signals.
 - Optional market quote runs now derive scoring signals from quote change percentages. Positive changes become `relative_strength_up`; negative changes become `relative_strength_down`, a capital-score risk signal.
+- Optional valuation snapshot runs derive lightweight `valuation_snapshots` from market quotes and add a non-mock `Valuation` provider layer named `quote-derived-valuation`. This is explicitly quote-derived context, not full fundamental valuation.
 
 ## Mock Scenario Fixtures
 
