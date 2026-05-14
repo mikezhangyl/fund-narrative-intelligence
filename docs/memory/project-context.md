@@ -93,6 +93,7 @@ Expected artifacts:
 - `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.
 - Review-action preview artifacts are validated before write; the reusable validator checks preview metadata, summary, registry delta, and result registry shape.
+- `python -m src.main --persist-review-action path/to/action.json --registry-output path/to/registry.next.json` writes an explicitly reviewed registry result without requiring `--fund-code`; in-place overwrite requires `--allow-registry-overwrite`, and overwriting an existing non-source output requires `--allow-registry-output-overwrite`.
 - `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, `candidate_narratives=<count>`, and `review_queue=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 
@@ -134,7 +135,7 @@ Expected artifacts:
 - Human review is required before AI-proposed candidates change core registries.
 - Human review will eventually be performed in a web UI; current CLI/report outputs must preserve enough structured state for that future approval workflow.
 - Candidate review workflow code should stay pure and immutable so future web endpoints can call it without hidden side effects.
-- Review action preview artifacts should use the same action payload contract expected from the future web UI, but remain non-persistent until a human explicitly approves a registry write workflow.
+- Review action preview and persistence should use the same action payload contract expected from the future web UI. Preview remains non-persistent; persistence must be explicit and guarded.
 - V1 outputs must include version metadata for provider set, narrative registry, signal schema, scoring model, and report template.
 - Data provider failures should degrade output quality and confidence instead of crashing the pipeline when mock fallback or partial data is available.
 - Mock data and mock fallback must be explicitly disclosed in user-facing report output; no UI or report should present mock-backed analysis as a fully real environment.

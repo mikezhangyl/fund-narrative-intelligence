@@ -34,3 +34,4 @@
 - [review-action-preview.md](./review-action-preview.md)
 - [review-action-delta.md](./review-action-delta.md)
 - [review-preview-validation.md](./review-preview-validation.md)
+- [review-action-persistence.md](./review-action-persistence.md)

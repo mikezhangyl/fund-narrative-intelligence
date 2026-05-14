@@ -8,6 +8,7 @@ from pathlib import Path
 from src.announcement_smoke import run_announcement_evidence_smoke
 from src.config import DEFAULT_OUTPUT_DIR, FIXTURE_DIR
 from src.errors import PipelineError
+from src.modules.narrative_review.persistence import persist_review_action_registry
 from src.modules.narrative_review.preview import write_review_action_preview
 from src.orchestrator import (
     inspect_provider_foundation,
@@ -67,6 +68,13 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--persist-review-action",
+        help=(
+            "Persist one candidate narrative review action JSON to an explicit "
+            "registry output path."
+        ),
+    )
+    parser.add_argument(
         "--registry-path",
         default=str(FIXTURE_DIR / "narrative_registry.json"),
         help="Narrative registry JSON used by --preview-review-action.",
@@ -74,6 +82,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--review-action-output",
         help="Optional explicit output path for --preview-review-action.",
+    )
+    parser.add_argument(
+        "--registry-output",
+        help="Required output registry JSON path for --persist-review-action.",
+    )
+    parser.add_argument(
+        "--allow-registry-overwrite",
+        action="store_true",
+        help="Allow --persist-review-action to overwrite --registry-path in place.",
+    )
+    parser.add_argument(
+        "--allow-registry-output-overwrite",
+        action="store_true",
+        help="Allow --persist-review-action to overwrite an existing non-source registry output file.",
     )
     parser.add_argument(
         "--include-cninfo-announcements",
@@ -96,6 +118,14 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.review_action_output and not args.preview_review_action:
         parser.error("--review-action-output requires --preview-review-action")
+    if args.registry_output and not args.persist_review_action:
+        parser.error("--registry-output requires --persist-review-action")
+    if args.allow_registry_overwrite and not args.persist_review_action:
+        parser.error("--allow-registry-overwrite requires --persist-review-action")
+    if args.allow_registry_output_overwrite and not args.persist_review_action:
+        parser.error("--allow-registry-output-overwrite requires --persist-review-action")
+    if args.preview_review_action and args.persist_review_action:
+        parser.error("--preview-review-action and --persist-review-action are mutually exclusive")
 
     if args.preview_review_action:
         if args.include_cninfo_announcements:
@@ -121,6 +151,36 @@ def main(argv: list[str] | None = None) -> int:
 
         print("Review action preview:")
         print(output_path)
+        return 0
+
+    if args.persist_review_action:
+        if args.include_cninfo_announcements:
+            parser.error("--include-cninfo-announcements is not supported with --persist-review-action")
+        if not args.registry_output:
+            parser.error("--registry-output is required with --persist-review-action")
+        try:
+            result = persist_review_action_registry(
+                registry_path=Path(args.registry_path),
+                action_path=Path(args.persist_review_action),
+                registry_output_path=Path(args.registry_output),
+                allow_registry_overwrite=args.allow_registry_overwrite,
+                allow_output_overwrite=args.allow_registry_output_overwrite,
+            )
+        except PipelineError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        except Exception as exc:
+            print(
+                f"Unrecoverable review action persistence error: {exc}",
+                file=sys.stderr,
+            )
+            return 1
+
+        print("Review action persisted:")
+        print(result["registry_output_path"])
         return 0
 
     if args.list_fixtures:

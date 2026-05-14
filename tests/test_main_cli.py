@@ -122,6 +122,99 @@ def test_main_preview_review_action_rejects_missing_file(capsys):
     assert "does not exist" in captured.err
 
 
+def test_main_persists_review_action_to_explicit_registry_output(tmp_path, capsys):
+    registry_path = tmp_path / "registry.json"
+    action_path = tmp_path / "action.json"
+    registry_output_path = tmp_path / "registry.promoted.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    action_path.write_text(
+        json.dumps(
+            {
+                "action_id": "ACT_REJECT_PERSIST_TEST",
+                "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
+                "action": "reject",
+                "reviewed_by": "reviewer@example.com",
+                "reviewed_at": "2026-05-14T11:00:00+00:00",
+                "review_note": "Reject in CLI persistence test.",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = main_module.main(
+        [
+            "--persist-review-action",
+            str(action_path),
+            "--registry-path",
+            str(registry_path),
+            "--registry-output",
+            str(registry_output_path),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    persisted_registry = json.loads(registry_output_path.read_text(encoding="utf-8"))
+    assert exit_code == 0
+    assert "Review action persisted:" in captured.out
+    assert str(registry_output_path) in captured.out
+    assert persisted_registry["candidate_narratives"][1]["status"] == "rejected"
+
+
+def test_main_persist_review_action_rejects_directory_output(tmp_path, capsys):
+    registry_path = tmp_path / "registry.json"
+    action_path = tmp_path / "action.json"
+    registry_output_path = tmp_path / "registry-output-dir"
+    registry_output_path.mkdir()
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    action_path.write_text(
+        json.dumps(
+            {
+                "action_id": "ACT_REJECT_DIRECTORY_TEST",
+                "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
+                "action": "reject",
+                "reviewed_by": "reviewer@example.com",
+                "reviewed_at": "2026-05-14T11:00:00+00:00",
+                "review_note": "Reject in CLI directory test.",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(SystemExit) as exc:
+        main_module.main(
+            [
+                "--persist-review-action",
+                str(action_path),
+                "--registry-path",
+                str(registry_path),
+                "--registry-output",
+                str(registry_output_path),
+            ]
+        )
+
+    captured = capsys.readouterr()
+    assert exc.value.code == 2
+    assert "must not be a directory" in captured.err
+
+
+def test_main_persist_review_action_requires_registry_output(tmp_path):
+    action_path = tmp_path / "action.json"
+    action_path.write_text("{}", encoding="utf-8")
+
+    with pytest.raises(SystemExit) as exc:
+        main_module.main(["--persist-review-action", str(action_path)])
+
+    assert exc.value.code == 2
+
+
 def test_main_returns_controlled_error_for_missing_fixture(tmp_path, capsys):
     exit_code = main_module.main(
         ["--fund-code", "999999", "--output-dir", str(tmp_path)]

@@ -556,3 +556,32 @@ Consequences:
 - The source registry fixture is never written by this command; explicit output paths must stay inside `--output-dir` and must not overwrite registry/action inputs.
 - Preview artifacts are contract-validated before they are written.
 - Future persistence/API work must be explicit.
+
+## ADR-0027: Require Explicit Registry Persistence For Review Actions
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add a separate review-action persistence command that writes the reviewed
+registry result to an explicit registry output path. In-place registry overwrite
+is rejected unless explicitly allowed.
+
+Rationale:
+
+- Preview and persistence have different risk profiles and should not share one
+  ambiguous command.
+- Future web approval screens need a backend persistence boundary that reuses
+  the same action payload and validation contract.
+- Registry updates change taxonomy state, so accidental fixture mutation must be
+  guarded.
+
+Consequences:
+
+- `python -m src.main --persist-review-action <action.json> --registry-output <registry.next.json>` does not require `--fund-code`.
+- The persistence path validates the preview and final registry before writing.
+- The action input file cannot be overwritten.
+- Existing non-source output files cannot be overwritten unless `--allow-registry-output-overwrite` is present.
+- In-place registry overwrite requires `--allow-registry-overwrite`.
+- Normal report generation never calls review-action persistence.

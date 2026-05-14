@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-review-preview-validation",
+  "latest_run": "20260514-review-action-persistence",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "add an explicit persisted registry update workflow only after human confirmation of review semantics"
+  "next_step": "add guarded explicit registry persistence for approved review actions"
 }

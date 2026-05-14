@@ -206,6 +206,20 @@ Preview artifacts should be validated with the same contract before writing and
 before any future API persistence step. The validator must check top-level
 version/status, summary fields, `registry_delta`, and `result_registry`.
 
+After human confirmation, V1 should expose a separate persistence wrapper:
+
+```bash
+python -m src.main --persist-review-action path/to/action.json --registry-output path/to/registry.next.json
+```
+
+The persistence wrapper uses the same action payload as preview, validates the
+generated preview, and writes only the resulting registry payload to the explicit
+`--registry-output` path. It must not require `--fund-code`. It must reject
+overwriting the action input. It must reject existing non-source output files
+unless `--allow-registry-output-overwrite` is passed. It must also reject
+in-place registry overwrite unless `--allow-registry-overwrite` is passed. Normal
+fund report generation must never call this persistence path.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
@@ -222,6 +236,7 @@ version/status, summary fields, `registry_delta`, and `result_registry`.
 | Report Writer | fund, holdings, narratives, scores, evidence | Markdown and HTML reports | optional for wording | yes | yes |
 | Snapshot Writer | all structured run data | raw JSON and scoring JSON artifacts | no | yes | yes |
 | Candidate Review Workflow | candidate review action, registry payload | preview artifact or immutable result registry | no | yes | yes |
+| Candidate Review Persistence | candidate review action, registry payload, explicit registry output path | validated registry JSON and persistence summary | no | yes | yes |
 
 ## V1 Scoring Rules
 
@@ -428,6 +443,19 @@ The preview command must write a preview artifact only. It must not mutate the
 source registry fixture, must reject output paths that overwrite source inputs or
 escape `--output-dir`, and must not silently promote a candidate during normal
 report generation.
+
+V1 should support explicit persistence of a reviewed action without requiring a
+fund code:
+
+```bash
+python -m src.main --persist-review-action path/to/action.json --registry-output path/to/registry.next.json
+```
+
+The persistence command must write the updated registry only to
+`--registry-output` by default. In-place overwrite of `--registry-path` is allowed
+only when `--allow-registry-overwrite` is present. Overwriting any other existing
+registry output file is allowed only when `--allow-registry-output-overwrite` is
+present.
 
 And can explicitly try the Eastmoney holdings adapter:
 
