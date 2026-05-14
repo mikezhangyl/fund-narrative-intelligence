@@ -107,6 +107,15 @@ holdings, CNINFO announcement evidence, market quote snapshots, derived signals,
 and explicit Mock fixture disclosure for the intelligence layers not yet backed
 by real providers.
 
+Run the same enriched path without static stock mapping fixtures:
+
+```bash
+python scripts/validate_registry_rule_enriched_acceptance.py --output-dir outputs/registry_rule_enriched_161725
+```
+
+This requires all selected mappings to come from `registry_term_rule` and keeps
+the remaining Mock-backed registry, evidence, and base signal layers visible.
+
 Generated artifacts:
 
 ```text
@@ -229,6 +238,16 @@ provider layers, missing announcement or quote-derived signals, and reports that
 hide the remaining Mock fixture foundation. Market quote fallback from
 Eastmoney to Yahoo is allowed only when it is recorded as a provider fallback
 and disclosed in the provider foundation.
+
+For the strict registry-rule enriched path, run:
+
+```bash
+python scripts/validate_registry_rule_enriched_acceptance.py --output-dir outputs/registry_rule_enriched_161725
+```
+
+This command adds `--stock-mapping-mode registry-rule` to the enriched live
+path. It rejects static `fixture_rule` mappings and checks that reports disclose
+runtime stock mappings plus the remaining Mock fixture foundation.
 
 For CNINFO announcement search, V1 sends Shanghai and Shenzhen stock selectors in `code,orgId` form, such as `600519,gssh0600519` and `000001,gssz0000001`. This is covered by unit tests and by the live announcement smoke command.
 

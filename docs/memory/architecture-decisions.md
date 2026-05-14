@@ -866,3 +866,32 @@ Consequences:
   instead of silently ignoring it.
 - The Narrative Registry layer remains Mock-backed and must still be disclosed
   until a real registry store replaces the fixture.
+
+## ADR-0037: Add Strict Registry-Rule Enriched Acceptance
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add `scripts/validate_registry_rule_enriched_acceptance.py` as a manual
+live-provider acceptance gate for the enriched path with
+`--stock-mapping-mode registry-rule`.
+
+Rationale:
+
+- The project needs a concrete end-to-end proof that a real fund can run
+  without static stock mapping fixtures.
+- Registry-rule mapping is still registry-dependent, so the acceptance must
+  preserve Mock disclosure for the registry while proving the stock mapping
+  layer itself is runtime-derived.
+- This is a bridge toward replacing fixture mapping with a service-backed
+  mapping provider and future web approval flows.
+
+Consequences:
+
+- The command reuses the strict real-enriched acceptance contract.
+- It rejects static `fixture_rule` selected mappings.
+- It requires `stock_mapping_mode=registry-rule`, `registry_term_rule` mapping
+  methods, and a `registry-rule-stock-mapping` provider layer.
+- It remains outside CI because it depends on live provider availability.

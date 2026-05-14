@@ -54,3 +54,4 @@
 - [market-quote-derived-signals.md](./market-quote-derived-signals.md)
 - [real-enriched-acceptance.md](./real-enriched-acceptance.md)
 - [registry-rule-mapping-mode.md](./registry-rule-mapping-mode.md)
+- [registry-rule-enriched-acceptance.md](./registry-rule-enriched-acceptance.md)

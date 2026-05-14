@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-registry-rule-mapping-mode",
+  "latest_run": "20260514-registry-rule-enriched-acceptance",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "validate registry-rule mapping mode against real-fund smoke cases, then continue replacing base evidence and signal fixtures"
+  "next_step": "continue replacing base evidence and signal fixtures after strict registry-rule enriched acceptance"
 }

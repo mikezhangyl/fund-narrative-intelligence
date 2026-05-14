@@ -153,6 +153,7 @@ def validate_acceptance_outputs(
     fund_code: str = DEFAULT_FUND_CODE,
     min_announcement_count: int = DEFAULT_MIN_ANNOUNCEMENT_COUNT,
     min_quote_count: int = DEFAULT_MIN_QUOTE_COUNT,
+    stock_mapping_mode: str = "fixture",
 ) -> None:
     artifacts = {
         "raw": output_dir / f"fund_{fund_code}_raw.json",
@@ -218,7 +219,12 @@ def validate_acceptance_outputs(
     _require_real_layer(layers.get("market_quotes", {}), "market_quotes")
     _require_layer(layers, "derived_signals", "mixed-derived-signals")
 
-    for layer_name in ("narrative_registry", "stock_mappings", "evidence", "signals"):
+    mock_layer_names = (
+        ("narrative_registry", "evidence", "signals")
+        if stock_mapping_mode == "registry-rule"
+        else ("narrative_registry", "stock_mappings", "evidence", "signals")
+    )
+    for layer_name in mock_layer_names:
         layer = layers.get(layer_name, {})
         _require(
             layer.get("data_quality") == "mock",
