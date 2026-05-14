@@ -51,3 +51,4 @@
 - [market-quotes-provider.md](./market-quotes-provider.md)
 - [market-quotes-acceptance.md](./market-quotes-acceptance.md)
 - [announcement-derived-signals.md](./announcement-derived-signals.md)
+- [market-quote-derived-signals.md](./market-quote-derived-signals.md)

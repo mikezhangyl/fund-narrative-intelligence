@@ -120,6 +120,7 @@ Expected artifacts:
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 - Strict announcement acceptance validates the generated fund artifacts directly: Eastmoney holdings must be fresh, CNINFO announcements and converted evidence must be present, and remaining registry/mapping/base-evidence/signal layers must still disclose `mock://fixtures/...`.
 - Optional CNINFO announcement runs now derive scoring signals from generated announcement evidence. Positive earnings/orders/capital announcements affect the matching score dimensions, negative risk announcements affect counter-evidence risk, and mixed financial/governance disclosures become low-weight momentum signals.
+- Optional market quote runs now derive scoring signals from quote change percentages. Positive changes become `relative_strength_up`; negative changes become `relative_strength_down`, a capital-score risk signal.
 
 ## Mock Scenario Fixtures
 
@@ -170,6 +171,7 @@ Expected artifacts:
 - Optional market quote runs must add a `Market Quotes` provider-foundation layer and preserve provider fallback/degradation events; quote snapshots are artifact/display data only until scoring explicitly consumes them.
 - Strict market quote acceptance validates generated artifacts directly: holdings must be fresh Eastmoney data, market quotes must contain real non-mock rows, and remaining registry/mapping/base-evidence/signal layers must disclose `mock://fixtures/...`.
 - Derived announcement signals are exposed as `derived_signal_events` in raw/scoring JSON and as a non-mock `Derived Signals` provider layer. Base fixture signals remain present and explicitly mock-backed until a later provider replaces them.
+- Market quote derived signals share the same `derived_signal_events` contract and are included in raw `signal_events` plus scoring input. The `Market Quotes` and `Derived Signals` layers stay separate in provider foundation metadata.
 
 ## Open Questions
 

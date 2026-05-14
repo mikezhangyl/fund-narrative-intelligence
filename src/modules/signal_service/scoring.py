@@ -19,7 +19,12 @@ DIMENSION_SIGNALS = {
             "volume_breakout",
             "relative_strength_up",
         },
-        "negative": {"institutional_outflow", "etf_outflow", "liquidity_drop"},
+        "negative": {
+            "institutional_outflow",
+            "etf_outflow",
+            "liquidity_drop",
+            "relative_strength_down",
+        },
         "risk_dimension": False,
     },
     "valuation_risk_score": {

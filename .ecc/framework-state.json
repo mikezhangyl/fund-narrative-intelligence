@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-announcement-derived-signals",
+  "latest_run": "20260514-market-quote-derived-signals",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "continue reducing mock layers after CNINFO announcement evidence now derives scoring signals"
+  "next_step": "continue reducing mock layers after announcement and market quote data now derive scoring signals"
 }

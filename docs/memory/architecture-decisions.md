@@ -768,3 +768,33 @@ Consequences:
 - Raw and scoring artifacts include `derived_signal_events`.
 - Provider foundation adds a non-mock `Derived Signals` layer while the base
   `Signals` layer remains mock-backed.
+
+## ADR-0034: Derive Scoring Signals From Market Quote Snapshots
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+When `--include-market-quotes` is enabled, convert market quote change
+percentages into conservative relative-strength signal events and include those
+events in narrative scoring.
+
+Rationale:
+
+- Quote snapshots should become more than display-only once their artifact path
+  and acceptance gate are stable.
+- Relative strength is a narrow, inspectable first signal from price data.
+- Negative quote movement needs a scoring vocabulary entry, so
+  `relative_strength_down` is added to capital-score negatives.
+
+Consequences:
+
+- Positive quote changes become `relative_strength_up`.
+- Negative quote changes become `relative_strength_down`.
+- Raw and scoring artifacts include quote-derived events in
+  `derived_signal_events`.
+- Raw `signal_events` and scoring input include both fixture signals and
+  derived quote signals.
+- Provider foundation keeps `Market Quotes` and `Derived Signals` as separate
+  non-mock layers while base `Signals` remains mock-backed.

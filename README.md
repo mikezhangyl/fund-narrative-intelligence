@@ -182,7 +182,7 @@ Reports always disclose mock or degraded data in a `Data Source Notice` section.
 
 When `--include-cninfo-announcements` is enabled, reports add `Announcements` and `Derived Signals` provider layers. Generated evidence summaries state that V1 classified announcement metadata only; source PDFs are not parsed. Derived signals are included in scoring with conservative confidence multipliers.
 
-When `--include-market-quotes` is enabled, raw and scoring artifacts add a `market_quotes` payload and reports add a `Market Quotes` provider layer. V1 records quote snapshots for future analysis and web display, but does not use them in scoring yet.
+When `--include-market-quotes` is enabled, raw and scoring artifacts add a `market_quotes` payload and reports add a `Market Quotes` provider layer. Quote change percentages also derive conservative relative-strength signals that enter scoring through the `Derived Signals` layer.
 
 For strict local acceptance of quote artifacts, run:
 
@@ -190,8 +190,9 @@ For strict local acceptance of quote artifacts, run:
 python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_quotes_161725
 ```
 
-The strict command rejects missing quote rows, mock quote layers, and reports
-that do not disclose the mixed real holdings/quotes plus Mock fixture foundation.
+The strict command rejects missing quote rows, missing derived quote signals,
+mock quote layers, and reports that do not disclose the mixed real
+holdings/quotes plus Mock fixture foundation.
 
 For CNINFO announcement search, V1 sends Shanghai and Shenzhen stock selectors in `code,orgId` form, such as `600519,gssh0600519` and `000001,gssz0000001`. This is covered by unit tests and by the live announcement smoke command.
 

@@ -61,7 +61,7 @@ def _write_market_quote_outputs(
             "source_provider": "yahoo-chart",
             "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS",
             "latest_price": 1342.17,
-            "change_percent": -0.14,
+            "change_percent": 2.0,
             "change_amount": -1.92,
             "volume": 55244,
             "amount": None,
@@ -108,6 +108,16 @@ def _write_market_quote_outputs(
             "stock_mappings": _mock_layer("stock_mappings"),
             "evidence": _mock_layer("evidence"),
             "signals": _mock_layer("signals"),
+            "derived_signals": {
+                "layer": "derived_signals",
+                "display_name": "Derived Signals",
+                "provider_name": "market-quote-derived-signals",
+                "provider_version": "derived-signals-v1",
+                "data_quality": market_quality,
+                "source_url": "derived://market-quote-derived-signals",
+                "is_mock": False,
+                "note": "Derived from real market quote snapshots.",
+            },
             "market_quotes": {
                 "layer": "market_quotes",
                 "display_name": "Market Quotes",
@@ -121,6 +131,24 @@ def _write_market_quote_outputs(
         },
         "degradation_events": [],
     }
+    derived_signal_events = [
+        {
+            "signal_id": f"SIG_QUOTE_600519_premium_baijiu_consumption_{index}",
+            "narrative_id": "premium_baijiu_consumption",
+            "signal_type": "relative_strength_up",
+            "strength": 0.4,
+            "confidence": 0.44,
+            "confidence_multiplier": 0.65,
+            "event_date": "2026-05-14",
+            "half_life_days": 10,
+            "source": "market_quote",
+            "source_provider": "yahoo-chart",
+            "source_stock_code": "600519",
+            "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS",
+            "derivation_reason": "positive market quote change percent",
+        }
+        for index in range(quote_count)
+    ]
     raw = {
         "metadata": {
             "fund_code": "161725",
@@ -141,6 +169,8 @@ def _write_market_quote_outputs(
         },
         "provider_foundation": provider_foundation,
         "market_quotes": market_quotes,
+        "signal_events": derived_signal_events,
+        "derived_signal_events": derived_signal_events,
         "degradation_events": [],
     }
     scoring = {
@@ -148,6 +178,7 @@ def _write_market_quote_outputs(
         "fund": raw["fund"],
         "provider_foundation": provider_foundation,
         "market_quotes": market_quotes,
+        "derived_signal_events": derived_signal_events,
         "candidate_review_queue": {
             "version": "candidate-review-queue-v1",
             "summary": {"total_count": 0, "pending_count": 0, "action_required": False},

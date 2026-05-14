@@ -399,6 +399,19 @@ def test_optional_eastmoney_quotes_are_disclosed_and_added_to_outputs(tmp_path):
     assert raw["market_quotes"] == scoring["market_quotes"]
     assert raw["market_quotes"]["data_quality"] == "fresh"
     assert raw["market_quotes"]["quotes"][0]["stock_code"] == "NVDA"
+    assert len(raw["derived_signal_events"]) >= 1
+    assert raw["derived_signal_events"] == scoring["derived_signal_events"]
+    assert all(item["source"] == "market_quote" for item in raw["derived_signal_events"])
+    assert all(
+        item["signal_type"] == "relative_strength_up"
+        for item in raw["derived_signal_events"]
+    )
+    assert set(item["signal_id"] for item in raw["derived_signal_events"]).issubset({
+        item["signal_id"] for item in raw["signal_events"]
+    })
+    assert scoring["provider_foundation"]["layers"]["derived_signals"][
+        "provider_name"
+    ] == "market-quote-derived-signals"
     assert scoring["metadata"]["data_quality"] == "partial"
     assert quote_layer["provider_name"] == "eastmoney-market-quote"
     assert quote_layer["data_quality"] == "fresh"

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER = "cninfo-derived-signals"
+MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER = "market-quote-derived-signals"
 
 _ANNOUNCEMENT_SIGNAL_MAP = {
     ("earnings", "positive"): (
@@ -68,6 +69,35 @@ def derive_announcement_signal_events(
     )
 
 
+def derive_market_quote_signal_events(
+    market_quotes_payload: dict[str, Any],
+    stock_mappings: list[dict[str, Any]],
+    as_of_date: str,
+) -> list[dict[str, Any]]:
+    quotes = market_quotes_payload.get("quotes")
+    if not isinstance(quotes, list):
+        return []
+    mappings_by_stock = _mappings_by_stock(stock_mappings)
+    signals = [
+        signal
+        for quote in quotes
+        for signal in _quote_signals(
+            quote=quote,
+            stock_mappings=mappings_by_stock.get(str(quote.get("stock_code") or ""), []),
+            data_quality=str(market_quotes_payload.get("data_quality") or "unavailable"),
+            as_of_date=as_of_date,
+        )
+    ]
+    return sorted(
+        signals,
+        key=lambda item: (
+            item["narrative_id"],
+            item["event_date"],
+            item["signal_id"],
+        ),
+    )
+
+
 def _to_signal_event(item: dict[str, Any]) -> dict[str, Any] | None:
     if item.get("source") != "cninfo_announcement":
         return None
@@ -102,9 +132,85 @@ def _to_signal_event(item: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
+def _quote_signals(
+    quote: dict[str, Any],
+    stock_mappings: list[dict[str, Any]],
+    data_quality: str,
+    as_of_date: str,
+) -> list[dict[str, Any]]:
+    change_percent = _optional_float(quote.get("change_percent"))
+    if change_percent is None or abs(change_percent) < 1.5:
+        return []
+    signal_type = (
+        "relative_strength_up" if change_percent > 0 else "relative_strength_down"
+    )
+    direction = "positive" if change_percent > 0 else "negative"
+    stock_code = str(quote.get("stock_code") or "")
+    source_provider = str(quote.get("source_provider") or "")
+    source_url = quote.get("source_url")
+    event_date = _quote_event_date(quote=quote, as_of_date=as_of_date)
+    strength = round(min(abs(change_percent) / 5, 1), 3)
+    data_quality_confidence = 0.8 if data_quality == "fresh" else 0.65
+    suffix = "REL_STRENGTH_UP" if change_percent > 0 else "REL_STRENGTH_DOWN"
+    return [
+        {
+            "signal_id": f"SIG_QUOTE_{stock_code}_{mapping['narrative_id']}_{suffix}",
+            "narrative_id": str(mapping["narrative_id"]),
+            "signal_type": signal_type,
+            "strength": strength,
+            "confidence": round(
+                float(mapping.get("confidence", 0)) * data_quality_confidence * 0.6875,
+                4,
+            ),
+            "confidence_multiplier": 0.65,
+            "event_date": event_date,
+            "half_life_days": 10,
+            "source": "market_quote",
+            "source_provider": source_provider,
+            "source_stock_code": stock_code,
+            "source_url": source_url,
+            "derivation_reason": f"{direction} market quote change percent",
+        }
+        for mapping in stock_mappings
+        if mapping.get("narrative_id")
+    ]
+
+
 def _confidence(value: Any) -> float:
     try:
         numeric = float(value)
     except (TypeError, ValueError):
         return 0
     return round(max(0, min(1, numeric)), 3)
+
+
+def _optional_float(value: Any) -> float | None:
+    if value in (None, "", "-", "--"):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _quote_event_date(quote: dict[str, Any], as_of_date: str) -> str:
+    retrieved_at = str(quote.get("retrieved_at") or "")
+    if len(retrieved_at) >= 10:
+        return retrieved_at[:10]
+    return as_of_date
+
+
+def _mappings_by_stock(
+    stock_mappings: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    mappings_by_stock: dict[str, list[dict[str, Any]]] = {}
+    for mapping in stock_mappings:
+        stock_code = str(mapping.get("stock_code") or "")
+        narrative_id = mapping.get("narrative_id")
+        if not stock_code or not narrative_id:
+            continue
+        mappings_by_stock.setdefault(stock_code, []).append(mapping)
+    return {
+        stock_code: sorted(items, key=lambda item: str(item["narrative_id"]))
+        for stock_code, items in mappings_by_stock.items()
+    }

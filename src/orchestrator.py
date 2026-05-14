@@ -14,7 +14,9 @@ from src.modules.report_writer.interpretation import interpret_narrative
 from src.modules.report_writer.writer import write_reports
 from src.modules.signal_service.derived import (
     ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER,
+    MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER,
     derive_announcement_signal_events,
+    derive_market_quote_signal_events,
 )
 from src.modules.signal_service.scoring import score_narrative_state
 from src.modules.snapshot_writer.writer import write_json_artifact
@@ -84,6 +86,8 @@ def run_pipeline(
     announcement_evidence_payload: dict[str, Any] | None = None
     announcement_layer: dict[str, Any] | None = None
     derived_signal_events: list[dict[str, Any]] = []
+    derived_signal_provider_names: list[str] = []
+    derived_signal_data_qualities: list[str] = []
     derived_signals_layer: dict[str, Any] | None = None
     market_quotes_payload: dict[str, Any] | None = None
     market_quotes_layer: dict[str, Any] | None = None
@@ -94,6 +98,24 @@ def run_pipeline(
         )
         market_quotes_payload = market_result["market_quotes"]
         market_quotes_layer = market_result["provider_layer"]
+        market_quote_signal_events = derive_market_quote_signal_events(
+            market_quotes_payload=market_quotes_payload,
+            stock_mappings=selected_mappings,
+            as_of_date=as_of_date,
+        )
+        if market_quote_signal_events:
+            derived_signal_events = [
+                *derived_signal_events,
+                *market_quote_signal_events,
+            ]
+            signal_events = [
+                *signal_events,
+                *market_quote_signal_events,
+            ]
+            derived_signal_provider_names.append(MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER)
+            derived_signal_data_qualities.append(
+                str(market_quotes_payload.get("data_quality") or "unavailable")
+            )
         degradation_events = [
             *degradation_events,
             *market_result["degradation_events"],
@@ -117,16 +139,30 @@ def run_pipeline(
             *evidence,
             *announcement_evidence_payload["evidence"],
         ]
-        derived_signal_events = derive_announcement_signal_events(
+        announcement_signal_events = derive_announcement_signal_events(
             announcement_evidence_payload["evidence"]
         )
-        signal_events = [
-            *signal_events,
-            *derived_signal_events,
-        ]
+        if announcement_signal_events:
+            derived_signal_events = [
+                *derived_signal_events,
+                *announcement_signal_events,
+            ]
+            signal_events = [
+                *signal_events,
+                *announcement_signal_events,
+            ]
+            derived_signal_provider_names.append(ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER)
+            derived_signal_data_qualities.append(
+                str(
+                    announcement_evidence_payload.get("data_quality")
+                    or "unavailable"
+                )
+            )
+
+    if derived_signal_provider_names:
         derived_signals_layer = _derived_signals_provider_layer(
-            announcement_evidence_payload=announcement_evidence_payload,
-            derived_signal_events=derived_signal_events,
+            provider_names=derived_signal_provider_names,
+            data_qualities=derived_signal_data_qualities,
         )
 
     provider_foundation = _provider_foundation_with_optional_announcement_layer(
@@ -188,9 +224,10 @@ def run_pipeline(
     if announcements_payload is not None and announcement_evidence_payload is not None:
         raw_payload["announcements"] = announcements_payload
         raw_payload["announcement_evidence"] = announcement_evidence_payload
-        raw_payload["derived_signal_events"] = derived_signal_events
     if market_quotes_payload is not None:
         raw_payload["market_quotes"] = market_quotes_payload
+    if derived_signal_provider_names:
+        raw_payload["derived_signal_events"] = derived_signal_events
 
     scoring_payload = {
         "metadata": metadata,
@@ -217,9 +254,10 @@ def run_pipeline(
     }
     if announcement_evidence_payload is not None:
         scoring_payload["announcement_evidence"] = announcement_evidence_payload
-        scoring_payload["derived_signal_events"] = derived_signal_events
     if market_quotes_payload is not None:
         scoring_payload["market_quotes"] = market_quotes_payload
+    if derived_signal_provider_names:
+        scoring_payload["derived_signal_events"] = derived_signal_events
 
     review_queue_payload = {
         "metadata": metadata,
@@ -470,23 +508,35 @@ def _provider_foundation_with_optional_announcement_layer(
 
 
 def _derived_signals_provider_layer(
-    announcement_evidence_payload: dict[str, Any],
-    derived_signal_events: list[dict[str, Any]],
+    provider_names: list[str],
+    data_qualities: list[str],
 ) -> dict[str, Any]:
-    data_quality = (
-        str(announcement_evidence_payload.get("data_quality") or "unavailable")
-        if derived_signal_events
-        else "unavailable"
-    )
+    provider_name = _derived_signal_provider_name(provider_names)
     return {
         "layer": "derived_signals",
-        "provider_name": ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER,
-        "provider_version": "announcement-derived-signals-v1",
-        "data_quality": data_quality,
-        "source_url": "derived://cninfo-announcement-evidence",
+        "provider_name": provider_name,
+        "provider_version": "derived-signals-v1",
+        "data_quality": _derived_signal_data_quality(data_qualities),
+        "source_url": f"derived://{provider_name}",
         "is_mock": False,
-        "note": "Derived from CNINFO announcement evidence metadata; V1 does not parse source PDFs.",
+        "note": "Derived from real provider evidence or quote snapshots; V1 keeps base fixture signals separately.",
     }
+
+
+def _derived_signal_provider_name(provider_names: list[str]) -> str:
+    providers = sorted(set(provider_names))
+    if len(providers) == 1:
+        return providers[0]
+    return "mixed-derived-signals"
+
+
+def _derived_signal_data_quality(data_qualities: list[str]) -> str:
+    qualities = [quality for quality in data_qualities if quality != "unavailable"]
+    if not qualities:
+        return "unavailable"
+    if all(quality == "fresh" for quality in qualities):
+        return "fresh"
+    return "partial"
 
 
 def _market_quotes_provider_layer(

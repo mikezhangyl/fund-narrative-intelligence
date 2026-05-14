@@ -1,4 +1,8 @@
-from src.modules.signal_service.derived import derive_announcement_signal_events
+from src.modules.signal_service.derived import (
+    derive_announcement_signal_events,
+    derive_market_quote_signal_events,
+)
+from src.modules.signal_service.scoring import calculate_dimension_score
 from src.validation import validate_signal_payload
 
 
@@ -109,3 +113,95 @@ def test_ignores_generic_mixed_or_non_announcement_evidence():
     ]
 
     assert derive_announcement_signal_events(evidence) == []
+
+
+def test_derives_relative_strength_signal_from_positive_market_quote():
+    market_quotes = {
+        "version": "eastmoney-market-quote-v1",
+        "data_quality": "fresh",
+        "quotes": [
+            {
+                "stock_code": "600519",
+                "stock_name": "贵州茅台",
+                "change_percent": 3.2,
+                "source_provider": "eastmoney",
+                "source_url": "https://push2his.eastmoney.com/quote",
+                "retrieved_at": "2026-05-14T12:00:00+00:00",
+            }
+        ],
+    }
+    stock_mappings = [
+        {
+            "stock_code": "600519",
+            "narrative_id": "N_BAIJIU",
+            "confidence": 0.8,
+        }
+    ]
+
+    signals = derive_market_quote_signal_events(
+        market_quotes_payload=market_quotes,
+        stock_mappings=stock_mappings,
+        as_of_date="2026-05-14",
+    )
+
+    assert signals == [
+        {
+            "signal_id": "SIG_QUOTE_600519_N_BAIJIU_REL_STRENGTH_UP",
+            "narrative_id": "N_BAIJIU",
+            "signal_type": "relative_strength_up",
+            "strength": 0.64,
+            "confidence": 0.44,
+            "confidence_multiplier": 0.65,
+            "event_date": "2026-05-14",
+            "half_life_days": 10,
+            "source": "market_quote",
+            "source_provider": "eastmoney",
+            "source_stock_code": "600519",
+            "source_url": "https://push2his.eastmoney.com/quote",
+            "derivation_reason": "positive market quote change percent",
+        }
+    ]
+    validate_signal_payload({"version": "signals-v1", "signal_events": signals})
+
+
+def test_derives_relative_weakness_signal_from_negative_market_quote():
+    market_quotes = {
+        "version": "eastmoney-market-quote-v1",
+        "data_quality": "fresh",
+        "quotes": [
+            {
+                "stock_code": "300750",
+                "stock_name": "宁德时代",
+                "change_percent": -2.5,
+                "source_provider": "yahoo-chart",
+                "source_url": "https://query1.finance.yahoo.com/chart/300750.SZ",
+                "retrieved_at": "2026-05-14T12:00:00+00:00",
+            }
+        ],
+    }
+    stock_mappings = [
+        {
+            "stock_code": "300750",
+            "narrative_id": "N_NEW_ENERGY",
+            "confidence": 0.75,
+        }
+    ]
+
+    signals = derive_market_quote_signal_events(
+        market_quotes_payload=market_quotes,
+        stock_mappings=stock_mappings,
+        as_of_date="2026-05-14",
+    )
+
+    assert signals[0]["signal_type"] == "relative_strength_down"
+    assert signals[0]["strength"] == 0.5
+    assert signals[0]["confidence"] == 0.4125
+
+    capital_score = calculate_dimension_score(
+        "capital_score",
+        signals,
+        as_of_date="2026-05-14",
+        data_quality="partial",
+    )
+    assert capital_score["risk_signal_count"] == 1
+    assert capital_score["score"] < 50
