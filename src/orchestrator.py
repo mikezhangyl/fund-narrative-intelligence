@@ -9,6 +9,7 @@ from src.config import DEFAULT_OUTPUT_DIR, VERSION_DEFAULTS
 from src.modules.evidence.announcements import convert_announcements_to_evidence
 from src.modules.fund_analysis.aggregation import aggregate_fund_narratives
 from src.modules.fund_analysis.mapping import build_mapping_result
+from src.modules.narrative_review.queue import build_candidate_review_queue
 from src.modules.report_writer.interpretation import interpret_narrative
 from src.modules.report_writer.writer import write_reports
 from src.modules.signal_service.scoring import score_narrative_state
@@ -62,6 +63,10 @@ def run_pipeline(
     selected_mappings = mapping_result["mappings"]
     in_scope_candidate_narratives = _candidate_narratives_for_excluded_candidates(
         candidate_narratives=candidate_narratives,
+        excluded_mapping_candidates=mapping_result["excluded_mapping_candidates"],
+    )
+    candidate_review_queue = build_candidate_review_queue(
+        candidate_narratives=in_scope_candidate_narratives,
         excluded_mapping_candidates=mapping_result["excluded_mapping_candidates"],
     )
     degradation_events = [
@@ -130,6 +135,7 @@ def run_pipeline(
         "narrative_registry": registry_items,
         "candidate_narrative_registry_version": registry_payload["version"],
         "candidate_narratives": in_scope_candidate_narratives,
+        "candidate_review_queue": candidate_review_queue,
         "stock_narrative_mappings": selected_mappings,
         "mapping_exclusions_version": mapping_exclusions_payload["version"],
         "mapping_exclusions": mapping_exclusions_payload["exclusions"],
@@ -163,6 +169,7 @@ def run_pipeline(
             "excluded_mapping_candidates"
         ],
         "candidate_narratives": in_scope_candidate_narratives,
+        "candidate_review_queue": candidate_review_queue,
         "unmapped_holdings": mapping_result["unmapped_holdings"],
         "supporting_evidence": _top_evidence(
             evidence, narrative_results, sentiments={"positive", "mixed"}

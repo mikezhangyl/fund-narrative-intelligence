@@ -117,6 +117,40 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
                             "last_updated_at": "2026-05-14",
                         }
                     ],
+                    "candidate_review_queue": {
+                        "version": "candidate-review-queue-v1",
+                        "summary": {
+                            "total_count": 1,
+                            "pending_count": 1,
+                            "action_required": True,
+                        },
+                        "items": [
+                            {
+                                "review_item_id": (
+                                    "RQ_C_CONSUMER_ELECTRONICS_GLOBALIZATION"
+                                ),
+                                "item_type": "candidate_narrative",
+                                "candidate_narrative_id": (
+                                    "C_CONSUMER_ELECTRONICS_GLOBALIZATION"
+                                ),
+                                "name": "Consumer Electronics Globalization",
+                                "canonical_taxonomy": "Technology Hardware",
+                                "status": "candidate",
+                                "human_review_status": "candidate",
+                                "source": "mapping_exclusion_review",
+                                "rationale": (
+                                    "Device exposure candidate, not semiconductor capex."
+                                ),
+                                "triggering_stock_codes": ["688036"],
+                                "related_exclusion_ids": ["EX_SEMI_688036"],
+                                "related_exclusions": [],
+                                "available_actions": ["approve", "reject", "defer"],
+                                "default_action": "defer",
+                                "requires_promotion_metadata": True,
+                                "promotion_action_template": {},
+                            }
+                        ],
+                    },
                     "degradation_events": [],
                     "provider_foundation": {
                         "effective_data_quality": "partial",
@@ -250,6 +284,18 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
             "related_exclusion_ids": ["EX_SEMI_688036"],
             "human_review_status": "candidate",
             "rationale": "Device exposure candidate, not semiconductor capex.",
+        }
+    ]
+    assert summary["funds"][0]["candidate_review_queue_item_count"] == 1
+    assert summary["funds"][0]["candidate_review_queue_items"] == [
+        {
+            "review_item_id": "RQ_C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+            "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+            "name": "Consumer Electronics Globalization",
+            "status": "candidate",
+            "human_review_status": "candidate",
+            "available_actions": ["approve", "reject", "defer"],
+            "related_exclusion_ids": ["EX_SEMI_688036"],
         }
     ]
     assert (tmp_path / "real_fund_smoke_summary.json").exists()

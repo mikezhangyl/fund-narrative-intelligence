@@ -489,3 +489,24 @@ Consequences:
 - `reject` and `defer` update candidate review state only and do not change active narratives.
 - Default report generation does not call the review-action workflow.
 - Future persistence/API work can wrap the pure function rather than reimplementing promotion semantics.
+
+## ADR-0024: Emit Candidate Review Queue For Future Web Workspace
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Emit a `candidate_review_queue` object in raw/scoring outputs for in-scope candidate narratives.
+
+Rationale:
+
+- Future web approval screens need a single queue-shaped object rather than reconstructing work items from reports.
+- The queue should connect candidates, exclusions, available actions, and an approval action template.
+- Emitting a queue now validates the data contract without building UI or persistence early.
+
+Consequences:
+
+- Queue items are read-ready and deterministic.
+- Queue emission does not persist actions, call promotion, or change scoring.
+- Real-smoke summaries include queue item counts so taxonomy-review workload remains visible in CLI and CI output.

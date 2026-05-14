@@ -147,6 +147,33 @@ Candidate narrative review actions are explicit state transitions:
 
 The review action function must be immutable: it returns a new registry payload and does not mutate the input registry. V1 report generation must not call this function automatically.
 
+V1 should emit a `candidate_review_queue` object whenever in-scope candidate narratives are present:
+
+```json
+{
+  "version": "candidate-review-queue-v1",
+  "summary": {
+    "total_count": 1,
+    "pending_count": 1,
+    "action_required": true
+  },
+  "items": [
+    {
+      "review_item_id": "RQ_C_EXAMPLE",
+      "item_type": "candidate_narrative",
+      "candidate_narrative_id": "C_EXAMPLE",
+      "available_actions": ["approve", "reject", "defer"],
+      "default_action": "defer",
+      "requires_promotion_metadata": true,
+      "related_exclusions": [],
+      "promotion_action_template": {}
+    }
+  ]
+}
+```
+
+This queue is read-ready for a future web workspace. It should not persist review actions or mutate the registry by itself.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
@@ -389,7 +416,7 @@ The generated artifacts must satisfy:
 - The real-fund smoke set records coverage, primary narrative, stage, concrete unmapped holding details, and pass/fail status.
 - The real-fund smoke set records multi-mapped holdings so high coverage does not hide possible registry precision risks.
 - The real-fund smoke set records mapping precision flags so broad-industry and multi-match curation work is visible in the summary JSON and Markdown.
-- The real-fund smoke CLI output prints per-fund precision flag, excluded candidate, and candidate narrative counts so terminal logs do not hide mapping precision or taxonomy review work behind coverage numbers.
+- The real-fund smoke CLI output prints per-fund precision flag, excluded candidate, candidate narrative, and review queue counts so terminal logs do not hide mapping precision or taxonomy review work behind coverage numbers.
 - The real-fund smoke set writes summary artifacts even when an individual fund fails, marking only that fund as failed and returning a non-zero exit code for the overall smoke command.
 - The announcement-evidence smoke set writes summary artifacts and returns non-zero when CNINFO metadata, evidence conversion, announcement provider disclosure, or mock/mixed data-source notice checks fail.
 - The mock-provider path is deterministic enough for repeatable tests.

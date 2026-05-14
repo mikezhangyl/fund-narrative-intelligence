@@ -94,6 +94,7 @@ def _build_fund_result(
     mapping_precision_flags = _summarize_mapping_precision_flags(scoring)
     excluded_mapping_candidates = _summarize_excluded_mapping_candidates(scoring)
     candidate_narratives = _summarize_candidate_narratives(scoring)
+    candidate_review_queue_items = _summarize_candidate_review_queue(scoring)
     return {
         "fund_code": fund_code,
         "scenario": scenario,
@@ -126,6 +127,8 @@ def _build_fund_result(
         "excluded_mapping_candidates": excluded_mapping_candidates,
         "candidate_narrative_count": len(candidate_narratives),
         "candidate_narratives": candidate_narratives,
+        "candidate_review_queue_item_count": len(candidate_review_queue_items),
+        "candidate_review_queue_items": candidate_review_queue_items,
         "degradation_event_count": len(scoring["degradation_events"]),
         "error": None,
     }
@@ -165,6 +168,8 @@ def _build_failed_fund_result(
         "excluded_mapping_candidates": [],
         "candidate_narrative_count": 0,
         "candidate_narratives": [],
+        "candidate_review_queue_item_count": 0,
+        "candidate_review_queue_items": [],
         "degradation_event_count": 1,
         "error": message,
     }
@@ -290,6 +295,23 @@ def _summarize_candidate_narratives(
             "rationale": candidate.get("rationale"),
         }
         for candidate in scoring.get("candidate_narratives", [])
+    ]
+
+
+def _summarize_candidate_review_queue(
+    scoring: dict[str, Any],
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "review_item_id": item.get("review_item_id"),
+            "candidate_narrative_id": item.get("candidate_narrative_id"),
+            "name": item.get("name"),
+            "status": item.get("status"),
+            "human_review_status": item.get("human_review_status"),
+            "available_actions": item.get("available_actions", []),
+            "related_exclusion_ids": item.get("related_exclusion_ids", []),
+        }
+        for item in scoring.get("candidate_review_queue", {}).get("items", [])
     ]
 
 

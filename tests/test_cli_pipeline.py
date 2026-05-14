@@ -504,6 +504,26 @@ def test_pipeline_excludes_known_bad_mapping_candidates(tmp_path, monkeypatch):
             "last_updated_at": "2026-05-14",
         }
     ]
+    assert raw["candidate_review_queue"] == scoring["candidate_review_queue"]
+    assert raw["candidate_review_queue"]["summary"] == {
+        "total_count": 1,
+        "pending_count": 1,
+        "action_required": True,
+    }
+    assert raw["candidate_review_queue"]["items"][0]["review_item_id"] == (
+        "RQ_C_CONSUMER_ELECTRONICS_GLOBALIZATION"
+    )
+    assert raw["candidate_review_queue"]["items"][0]["available_actions"] == [
+        "approve",
+        "reject",
+        "defer",
+    ]
+    assert raw["candidate_review_queue"]["items"][0]["related_exclusions"][0][
+        "stock_code"
+    ] == "688036"
+    assert raw["candidate_review_queue"]["items"][0]["promotion_action_template"][
+        "candidate_narrative_id"
+    ] == "C_CONSUMER_ELECTRONICS_GLOBALIZATION"
     assert raw["excluded_mapping_candidates"] == scoring[
         "excluded_mapping_candidates"
     ]

@@ -29,3 +29,4 @@
 - [mapping-exclusions.md](./mapping-exclusions.md)
 - [candidate-narratives.md](./candidate-narratives.md)
 - [candidate-promotion-workflow.md](./candidate-promotion-workflow.md)
+- [candidate-review-queue.md](./candidate-review-queue.md)
