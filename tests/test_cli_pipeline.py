@@ -3,6 +3,7 @@ import subprocess
 import sys
 
 from src import main as main_module
+from src.config import FIXTURE_DIR
 from src.orchestrator import run_pipeline
 from src.providers import eastmoney as eastmoney_module
 
@@ -394,6 +395,47 @@ def test_cli_stock_mapping_mode_passes_option_to_pipeline(tmp_path, monkeypatch)
     assert captured["stock_mapping_mode"] == "registry-rule"
 
 
+def test_cli_narrative_registry_mode_passes_options_to_pipeline(tmp_path, monkeypatch):
+    captured = {}
+    registry_path = tmp_path / "narrative_registry.reviewed.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--provider-mode",
+            "eastmoney",
+            "--narrative-registry-mode",
+            "reviewed",
+            "--narrative-registry-path",
+            str(registry_path),
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["narrative_registry_mode"] == "reviewed"
+    assert captured["narrative_registry_path"] == registry_path
+
+
 def test_provider_derived_intelligence_excludes_fixture_evidence_and_signals(
     tmp_path,
 ):
@@ -752,6 +794,40 @@ def test_registry_rule_stock_mapping_mode_uses_runtime_mapping_layer(
     assert "Mock fixtures" in markdown
 
 
+def test_reviewed_narrative_registry_mode_uses_store_layer(tmp_path):
+    registry_path = tmp_path / "narrative_registry.reviewed.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        narrative_registry_mode="reviewed",
+        narrative_registry_path=registry_path,
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+    html = artifacts["html"].read_text()
+    registry_layer = scoring["provider_foundation"]["layers"]["narrative_registry"]
+
+    assert raw["narrative_registry_mode"] == "reviewed"
+    assert scoring["narrative_registry_mode"] == "reviewed"
+    assert registry_layer["provider_name"] == "reviewed-registry-store"
+    assert registry_layer["data_quality"] == "fresh"
+    assert registry_layer["source_url"].startswith("reviewed-registry://external/")
+    assert "/narrative_registry.reviewed.json#sha256=" in registry_layer["source_url"]
+    assert registry_layer["is_mock"] is False
+    assert scoring["provider_foundation"]["effective_data_quality"] == "partial"
+    assert "Narrative Registry 来自 reviewed-registry-store" in markdown
+    assert "reviewed-registry://external/" in markdown
+    assert "Narrative Registry 来自 reviewed-registry-store" in html
+
+
 def test_registry_rule_mapping_keeps_fully_mock_run_mock(tmp_path):
     artifacts = run_pipeline(
         fund_code="000001",
@@ -858,6 +934,54 @@ def test_cli_rejects_stock_mapping_mode_with_review_actions(tmp_path):
     assert "--stock-mapping-mode is only supported" in exit_code.stderr
 
 
+def test_cli_rejects_narrative_registry_mode_with_provider_diagnostics(tmp_path):
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--fund-code",
+        "000001",
+        "--provider-diagnostics",
+        "--narrative-registry-mode",
+        "reviewed",
+        "--output-dir",
+        str(tmp_path),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 2
+    assert "--narrative-registry-mode is only supported" in result.stderr
+    assert not list(tmp_path.glob("*"))
+
+
+def test_cli_rejects_narrative_registry_path_without_reviewed_mode(tmp_path):
+    registry_path = tmp_path / "narrative_registry.reviewed.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--fund-code",
+        "000001",
+        "--narrative-registry-path",
+        str(registry_path),
+        "--output-dir",
+        str(tmp_path / "out"),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 2
+    assert "--narrative-registry-path requires --narrative-registry-mode reviewed" in (
+        result.stderr
+    )
+    assert not (tmp_path / "out").exists()
+
+
 def test_cli_stock_mapping_mode_still_allows_single_run(tmp_path, monkeypatch):
     captured = {}
 
@@ -901,6 +1025,20 @@ def test_pipeline_rejects_unknown_stock_mapping_mode(tmp_path):
         assert "stock_mapping_mode" in str(exc)
     else:
         raise AssertionError("expected ValueError for unknown stock mapping mode")
+
+
+def test_pipeline_rejects_unknown_narrative_registry_mode(tmp_path):
+    try:
+        run_pipeline(
+            fund_code="000001",
+            provider_mode="mock",
+            output_dir=tmp_path,
+            narrative_registry_mode="unknown",
+        )
+    except ValueError as exc:
+        assert "narrative_registry_mode" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for unknown registry mode")
 
 
 def test_pipeline_surfaces_multi_match_precision_flags(tmp_path, monkeypatch):

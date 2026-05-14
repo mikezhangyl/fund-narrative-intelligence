@@ -1,0 +1,406 @@
+{
+  "version": "registry-v1",
+  "narratives": [
+    {
+      "narrative_id": "N_AI",
+      "canonical_taxonomy": "AI",
+      "name": "AI",
+      "parent_id": null,
+      "level": 1,
+      "status": "active",
+      "aliases": [
+        "artificial intelligence"
+      ],
+      "related_terms": [
+        "accelerated computing",
+        "machine learning"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2023-01-01",
+      "last_updated_at": "2026-05-13"
+    },
+    {
+      "narrative_id": "N_AI_INFRA",
+      "canonical_taxonomy": "AI",
+      "name": "AI Infrastructure",
+      "parent_id": "N_AI",
+      "level": 2,
+      "status": "active",
+      "aliases": [
+        "AI compute infrastructure",
+        "AI datacenter infrastructure"
+      ],
+      "related_terms": [
+        "GPU",
+        "datacenter",
+        "networking",
+        "servers"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2023-03-01",
+      "last_updated_at": "2026-05-13"
+    },
+    {
+      "narrative_id": "N_AI_POWER",
+      "canonical_taxonomy": "AI",
+      "name": "AI Power Demand",
+      "parent_id": "N_AI_INFRA",
+      "level": 3,
+      "status": "active",
+      "aliases": [
+        "AI electricity demand",
+        "datacenter power demand"
+      ],
+      "related_terms": [
+        "power grid",
+        "nuclear",
+        "cooling",
+        "data center electricity"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2024-09-01",
+      "last_updated_at": "2026-05-13"
+    },
+    {
+      "narrative_id": "N_AI_APPS",
+      "canonical_taxonomy": "AI",
+      "name": "AI Applications",
+      "parent_id": "N_AI",
+      "level": 2,
+      "status": "active",
+      "aliases": [
+        "AI software",
+        "enterprise AI applications"
+      ],
+      "related_terms": [
+        "copilot",
+        "agents",
+        "AI productivity"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2023-06-01",
+      "last_updated_at": "2026-05-13"
+    },
+    {
+      "narrative_id": "N_SEMI_CAPEX",
+      "canonical_taxonomy": "Semiconductors",
+      "name": "Semiconductor Capex Cycle",
+      "parent_id": null,
+      "level": 2,
+      "status": "active",
+      "aliases": [
+        "semi equipment cycle",
+        "chip capex cycle"
+      ],
+      "related_terms": [
+        "lithography",
+        "foundry",
+        "advanced packaging",
+        "电子",
+        "计算机",
+        "通信",
+        "半导体",
+        "芯片",
+        "集成电路",
+        "北方华创",
+        "中微公司",
+        "中芯国际",
+        "圣邦股份",
+        "华大九天",
+        "中科飞测",
+        "拓荆科技"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2022-01-01",
+      "last_updated_at": "2026-05-14"
+    },
+    {
+      "narrative_id": "N_EV_PRICE_WAR",
+      "canonical_taxonomy": "EV",
+      "name": "EV Price War",
+      "parent_id": null,
+      "level": 2,
+      "status": "active",
+      "aliases": [
+        "electric vehicle price war",
+        "EV margin compression"
+      ],
+      "related_terms": [
+        "discounting",
+        "inventory",
+        "gross margin",
+        "demand slowdown",
+        "汽车",
+        "新能源汽车",
+        "比亚迪",
+        "宇通客车"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2023-01-01",
+      "last_updated_at": "2026-05-13"
+    },
+    {
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "canonical_taxonomy": "Consumption",
+      "name": "Premium Baijiu Consumption",
+      "parent_id": null,
+      "level": 2,
+      "status": "active",
+      "aliases": [
+        "baijiu consumption",
+        "premium liquor demand"
+      ],
+      "related_terms": [
+        "Kweichow Moutai",
+        "Wuliangye",
+        "贵州茅台",
+        "五粮液",
+        "泸州老窖",
+        "山西汾酒",
+        "迎驾贡酒",
+        "舍得酒业",
+        "白酒",
+        "食品饮料",
+        "consumer upgrade",
+        "food and beverage"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2021-01-01",
+      "last_updated_at": "2026-05-14"
+    },
+    {
+      "narrative_id": "N_HEALTHCARE_INNOVATION",
+      "canonical_taxonomy": "Healthcare",
+      "name": "Healthcare Innovation",
+      "parent_id": null,
+      "level": 2,
+      "status": "active",
+      "aliases": [
+        "innovative drugs",
+        "CRO healthcare"
+      ],
+      "related_terms": [
+        "医药生物",
+        "创新药",
+        "医疗服务",
+        "CRO",
+        "恒瑞医药",
+        "药明康德",
+        "康龙化成",
+        "凯莱英",
+        "海思科",
+        "百利天恒",
+        "科伦药业",
+        "信立泰",
+        "泰格医药",
+        "艾力斯"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2021-01-01",
+      "last_updated_at": "2026-05-14"
+    },
+    {
+      "narrative_id": "N_NEW_ENERGY_EQUIPMENT",
+      "canonical_taxonomy": "New Energy",
+      "name": "New Energy Equipment",
+      "parent_id": null,
+      "level": 2,
+      "status": "active",
+      "aliases": [
+        "新能源设备",
+        "battery and solar equipment"
+      ],
+      "related_terms": [
+        "电力设备",
+        "新能源",
+        "电池",
+        "光伏",
+        "储能",
+        "宁德时代",
+        "阳光电源",
+        "思源电气",
+        "科达利",
+        "璞泰来",
+        "金风科技",
+        "福斯特",
+        "大金重工"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2021-01-01",
+      "last_updated_at": "2026-05-14"
+    },
+    {
+      "narrative_id": "N_DEFENSE_AEROSPACE",
+      "canonical_taxonomy": "Defense",
+      "name": "Defense Aerospace",
+      "parent_id": null,
+      "level": 2,
+      "status": "active",
+      "aliases": [
+        "军工",
+        "defense aerospace"
+      ],
+      "related_terms": [
+        "国防军工",
+        "军工",
+        "航空",
+        "航发",
+        "睿创微纳",
+        "航发动力",
+        "中航西飞",
+        "中国动力",
+        "长川科技",
+        "应流股份",
+        "北化股份",
+        "航材股份",
+        "航宇科技",
+        "中航沈飞"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2021-01-01",
+      "last_updated_at": "2026-05-14"
+    },
+    {
+      "narrative_id": "N_REAL_ESTATE_STABILIZATION",
+      "canonical_taxonomy": "Real Estate",
+      "name": "Real Estate Stabilization",
+      "parent_id": null,
+      "level": 2,
+      "status": "active",
+      "aliases": [
+        "地产链修复",
+        "property stabilization"
+      ],
+      "related_terms": [
+        "房地产",
+        "建筑材料",
+        "建筑装饰",
+        "地产",
+        "保利发展",
+        "招商蛇口",
+        "华发股份",
+        "中国建筑",
+        "东方雨虹",
+        "家居",
+        "家具",
+        "陶瓷",
+        "索菲亚",
+        "顾家家居",
+        "蒙娜丽莎",
+        "三棵树",
+        "金地集团"
+      ],
+      "human_review_status": "approved",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2021-01-01",
+      "last_updated_at": "2026-05-14"
+    }
+  ],
+  "candidate_narratives": [
+    {
+      "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+      "name": "Consumer Electronics Globalization",
+      "canonical_taxonomy": "Technology Hardware",
+      "status": "candidate",
+      "source": "mapping_exclusion_review",
+      "triggering_stock_codes": [
+        "688036"
+      ],
+      "related_exclusion_ids": [
+        "EX_SEMI_688036"
+      ],
+      "aliases": [
+        "consumer electronics exports",
+        "device globalization"
+      ],
+      "related_terms": [
+        "消费电子",
+        "终端设备",
+        "海外手机"
+      ],
+      "rationale": "Transsion is a device and overseas-market exposure candidate, not a semiconductor capex exposure.",
+      "human_review_status": "candidate",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2026-05-14",
+      "last_updated_at": "2026-05-14"
+    },
+    {
+      "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
+      "name": "Domestic Database Infrastructure",
+      "canonical_taxonomy": "Enterprise Software",
+      "status": "candidate",
+      "source": "mapping_exclusion_review",
+      "triggering_stock_codes": [
+        "688692"
+      ],
+      "related_exclusion_ids": [
+        "EX_SEMI_688692"
+      ],
+      "aliases": [
+        "domestic database software",
+        "xinchuang database"
+      ],
+      "related_terms": [
+        "数据库",
+        "基础软件",
+        "信创"
+      ],
+      "rationale": "Dameng Data is a domestic database and infrastructure-software exposure candidate, not a semiconductor capex exposure.",
+      "human_review_status": "candidate",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2026-05-14",
+      "last_updated_at": "2026-05-14"
+    },
+    {
+      "candidate_narrative_id": "C_COMMUNICATION_POWER_INFRASTRUCTURE",
+      "name": "Communication And Power Infrastructure",
+      "canonical_taxonomy": "Infrastructure Equipment",
+      "status": "candidate",
+      "source": "mapping_exclusion_review",
+      "triggering_stock_codes": [
+        "600522"
+      ],
+      "related_exclusion_ids": [
+        "EX_SEMI_600522"
+      ],
+      "aliases": [
+        "communication infrastructure",
+        "power cable infrastructure"
+      ],
+      "related_terms": [
+        "通信",
+        "电力电缆",
+        "海缆"
+      ],
+      "rationale": "Zhongtian Technology is a communication and power-cable infrastructure exposure candidate, not a semiconductor capex exposure.",
+      "human_review_status": "candidate",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2026-05-14",
+      "last_updated_at": "2026-05-14"
+    }
+  ]
+}

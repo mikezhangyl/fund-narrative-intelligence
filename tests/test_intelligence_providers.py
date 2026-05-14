@@ -1,9 +1,14 @@
+import json
+
+from src.config import FIXTURE_DIR
+from src.errors import FixtureNotFoundError
 from src.providers.intelligence import (
     MockAnnouncementProvider,
     MockIntelligenceProviderSet,
     MockMarketDataProvider,
     MockNewsEvidenceProvider,
     MockValuationProvider,
+    ReviewedNarrativeRegistryProvider,
 )
 from src.providers.mock import MockDataProvider
 
@@ -67,6 +72,56 @@ def test_mock_intelligence_provider_set_exposes_layer_provenance():
     assert all(layer["is_mock"] is True for layer in layers.values())
     assert layers["evidence"]["provider_name"] == "mock-fixture-provider"
     assert "evidence.json" in layers["evidence"]["note"]
+
+
+def test_reviewed_narrative_registry_provider_loads_validated_store(tmp_path):
+    registry_path = tmp_path / "narrative_registry.reviewed.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    provider = ReviewedNarrativeRegistryProvider(registry_path=registry_path)
+
+    registry = provider.get_narrative_registry()
+    registry["narratives"][0]["name"] = "mutated"
+    fresh_registry = provider.get_narrative_registry()
+    layer = provider.get_provider_layer()
+
+    assert fresh_registry["version"] == "registry-v1"
+    assert fresh_registry["narratives"][0]["name"] != "mutated"
+    assert layer["layer"] == "narrative_registry"
+    assert layer["provider_name"] == "reviewed-registry-store"
+    assert layer["provider_version"] == "reviewed-registry-v1"
+    assert layer["data_quality"] == "fresh"
+    assert layer["source_url"].startswith("reviewed-registry://external/")
+    assert "/narrative_registry.reviewed.json#sha256=" in layer["source_url"]
+    assert layer["is_mock"] is False
+
+
+def test_reviewed_narrative_registry_provider_rejects_non_object_store(tmp_path):
+    registry_path = tmp_path / "narrative_registry.reviewed.json"
+    registry_path.write_text(json.dumps([]), encoding="utf-8")
+    provider = ReviewedNarrativeRegistryProvider(registry_path=registry_path)
+
+    try:
+        provider.get_narrative_registry()
+    except ValueError as exc:
+        assert "must contain a JSON object" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for non-object reviewed registry")
+
+
+def test_reviewed_narrative_registry_provider_rejects_missing_store(tmp_path):
+    provider = ReviewedNarrativeRegistryProvider(
+        registry_path=tmp_path / "missing.reviewed.json"
+    )
+
+    try:
+        provider.get_narrative_registry()
+    except FixtureNotFoundError as exc:
+        assert "Missing reviewed registry" in str(exc)
+    else:
+        raise AssertionError("expected FixtureNotFoundError for missing store")
 
 
 def test_mock_data_provider_uses_intelligence_layer_provenance():

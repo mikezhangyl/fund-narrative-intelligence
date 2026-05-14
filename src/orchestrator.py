@@ -5,7 +5,11 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from src.config import DEFAULT_OUTPUT_DIR, VERSION_DEFAULTS
+from src.config import (
+    DEFAULT_OUTPUT_DIR,
+    DEFAULT_REVIEWED_REGISTRY_PATH,
+    VERSION_DEFAULTS,
+)
 from src.modules.evidence.announcements import convert_announcements_to_evidence
 from src.modules.fund_analysis.aggregation import aggregate_fund_narratives
 from src.modules.fund_analysis.mapping import build_mapping_result
@@ -26,9 +30,16 @@ from src.providers.cninfo import (
 )
 from src.providers.eastmoney_market import EastmoneyMarketDataProvider
 from src.providers.factory import select_data_provider
+from src.providers.intelligence import ReviewedNarrativeRegistryProvider
 from src.providers.mock import MockDataProvider
 from src.providers.provenance import build_provider_foundation
 
+NARRATIVE_REGISTRY_MODE_FIXTURE = "fixture"
+NARRATIVE_REGISTRY_MODE_REVIEWED = "reviewed"
+NARRATIVE_REGISTRY_MODES = {
+    NARRATIVE_REGISTRY_MODE_FIXTURE,
+    NARRATIVE_REGISTRY_MODE_REVIEWED,
+}
 STOCK_MAPPING_MODE_FIXTURE = "fixture"
 STOCK_MAPPING_MODE_REGISTRY_RULE = "registry-rule"
 STOCK_MAPPING_MODES = {
@@ -52,6 +63,8 @@ def run_pipeline(
     announcement_provider: Any | None = None,
     include_market_quotes: bool = False,
     market_data_provider: Any | None = None,
+    narrative_registry_mode: str = NARRATIVE_REGISTRY_MODE_FIXTURE,
+    narrative_registry_path: str | Path | None = None,
     stock_mapping_mode: str = STOCK_MAPPING_MODE_FIXTURE,
     base_intelligence_mode: str = BASE_INTELLIGENCE_MODE_FIXTURE,
 ) -> dict[str, Any]:
@@ -59,6 +72,11 @@ def run_pipeline(
         raise ValueError("fund_code must contain digits only")
     if announcement_start_date is not None:
         _require_iso_date(announcement_start_date, "announcement_start_date")
+    if narrative_registry_mode not in NARRATIVE_REGISTRY_MODES:
+        raise ValueError(
+            "narrative_registry_mode must be one of: "
+            f"{', '.join(sorted(NARRATIVE_REGISTRY_MODES))}"
+        )
     if stock_mapping_mode not in STOCK_MAPPING_MODES:
         raise ValueError(
             "stock_mapping_mode must be one of: "
@@ -84,7 +102,13 @@ def run_pipeline(
     provider_selection = select_data_provider(provider_mode)
     provider = provider_selection.provider
     fund_payload = provider.get_fund_holdings(fund_code)
-    registry_payload = provider.get_narrative_registry()
+    registry_result = _narrative_registry_inputs(
+        provider=provider,
+        narrative_registry_mode=narrative_registry_mode,
+        narrative_registry_path=narrative_registry_path,
+    )
+    registry_payload = registry_result["payload"]
+    narrative_registry_layer = registry_result["provider_layer"]
     all_mappings = _stock_mapping_inputs(
         provider=provider,
         stock_mapping_mode=stock_mapping_mode,
@@ -226,6 +250,7 @@ def run_pipeline(
         announcement_layer=announcement_layer,
         derived_signals_layer=derived_signals_layer,
         market_quotes_layer=market_quotes_layer,
+        narrative_registry_layer=narrative_registry_layer,
         stock_mapping_layer=stock_mapping_layer,
         evidence_layer=evidence_layer,
         signals_layer=signals_layer,
@@ -265,6 +290,7 @@ def run_pipeline(
         "candidate_narratives": in_scope_candidate_narratives,
         "candidate_review_queue": candidate_review_queue,
         "base_intelligence_mode": base_intelligence_mode,
+        "narrative_registry_mode": narrative_registry_mode,
         "stock_mapping_mode": stock_mapping_mode,
         "stock_narrative_mappings": selected_mappings,
         "mapping_exclusions_version": mapping_exclusions_payload["version"],
@@ -298,6 +324,7 @@ def run_pipeline(
         "provider_foundation": provider_foundation,
         "mapping_coverage": mapping_result["coverage"],
         "base_intelligence_mode": base_intelligence_mode,
+        "narrative_registry_mode": narrative_registry_mode,
         "stock_mapping_mode": stock_mapping_mode,
         "mapping_rationales": mapping_result["mapping_rationales"],
         "mapping_precision_flags": mapping_result["mapping_precision_flags"],
@@ -544,6 +571,7 @@ def _provider_foundation_with_optional_announcement_layer(
     announcement_layer: dict[str, Any] | None,
     derived_signals_layer: dict[str, Any] | None,
     market_quotes_layer: dict[str, Any] | None,
+    narrative_registry_layer: dict[str, Any] | None,
     stock_mapping_layer: dict[str, Any] | None,
     evidence_layer: dict[str, Any] | None,
     signals_layer: dict[str, Any] | None,
@@ -556,6 +584,7 @@ def _provider_foundation_with_optional_announcement_layer(
         announcement_layer is None
         and derived_signals_layer is None
         and market_quotes_layer is None
+        and narrative_registry_layer is None
         and stock_mapping_layer is None
         and evidence_layer is None
         and signals_layer is None
@@ -566,6 +595,8 @@ def _provider_foundation_with_optional_announcement_layer(
         layers = {**layers, "evidence": evidence_layer}
     if signals_layer is not None:
         layers = {**layers, "signals": signals_layer}
+    if narrative_registry_layer is not None:
+        layers = {**layers, "narrative_registry": narrative_registry_layer}
     if stock_mapping_layer is not None:
         layers = {**layers, "stock_mappings": stock_mapping_layer}
     if market_quotes_layer is not None:
@@ -577,6 +608,32 @@ def _provider_foundation_with_optional_announcement_layer(
     return build_provider_foundation(
         layers=layers,
         degradation_events=degradation_events,
+    )
+
+
+def _narrative_registry_inputs(
+    provider: Any,
+    narrative_registry_mode: str,
+    narrative_registry_path: str | Path | None,
+) -> dict[str, Any]:
+    if narrative_registry_mode == NARRATIVE_REGISTRY_MODE_FIXTURE:
+        return {
+            "payload": provider.get_narrative_registry(),
+            "provider_layer": None,
+        }
+    if narrative_registry_mode == NARRATIVE_REGISTRY_MODE_REVIEWED:
+        registry_provider = ReviewedNarrativeRegistryProvider(
+            registry_path=Path(narrative_registry_path)
+            if narrative_registry_path
+            else DEFAULT_REVIEWED_REGISTRY_PATH
+        )
+        return {
+            "payload": registry_provider.get_narrative_registry(),
+            "provider_layer": registry_provider.get_provider_layer(),
+        }
+    raise ValueError(
+        "narrative_registry_mode must be one of: "
+        f"{', '.join(sorted(NARRATIVE_REGISTRY_MODES))}"
     )
 
 

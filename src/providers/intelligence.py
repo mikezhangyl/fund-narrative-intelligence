@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import quote
 
-from src.config import FIXTURE_DIR
+from src.config import DEFAULT_REVIEWED_REGISTRY_PATH, FIXTURE_DIR, PROJECT_ROOT
 from src.errors import FixtureNotFoundError
 from src.providers.provenance import (
     MOCK_PROVIDER_NAME,
@@ -87,6 +89,31 @@ class MockNarrativeRegistryProvider:
 
     def get_provider_layer(self) -> dict[str, Any]:
         return _mock_fixture_layer("narrative_registry", "narrative_registry.json")
+
+
+@dataclass(frozen=True)
+class ReviewedNarrativeRegistryProvider:
+    registry_path: Path = DEFAULT_REVIEWED_REGISTRY_PATH
+
+    provider_name = "reviewed-registry-store"
+    provider_version = "reviewed-registry-v1"
+    data_quality = "fresh"
+
+    def get_narrative_registry(self) -> dict[str, Any]:
+        payload = _load_json_object(self.registry_path)
+        validate_registry_payload(payload)
+        return deepcopy(payload)
+
+    def get_provider_layer(self) -> dict[str, Any]:
+        return {
+            "layer": "narrative_registry",
+            "provider_name": self.provider_name,
+            "provider_version": self.provider_version,
+            "data_quality": self.data_quality,
+            "source_url": _reviewed_registry_source_url(self.registry_path),
+            "is_mock": False,
+            "note": "Loaded from file-backed Narrative Registry store for reviewed workflows.",
+        }
 
 
 @dataclass(frozen=True)
@@ -259,6 +286,30 @@ def _load_fixture(fixture_dir: Path, filename: str) -> Any:
     if not path.exists():
         raise FixtureNotFoundError(f"Missing fixture: {path}")
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _load_json_object(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        raise FixtureNotFoundError(f"Missing reviewed registry: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    return payload
+
+
+def _reviewed_registry_source_url(path: Path) -> str:
+    resolved = path.expanduser().resolve()
+    try:
+        location = resolved.relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except ValueError:
+        path_hash = hashlib.sha256(str(resolved).encode("utf-8")).hexdigest()[:12]
+        location = f"external/{path_hash}/{resolved.name}"
+    content_hash = _file_sha256(resolved)[:12] if resolved.exists() else "missing"
+    return f"reviewed-registry://{quote(location, safe='/._-')}#sha256={content_hash}"
+
+
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _mock_fixture_layer(layer: str, filename: str) -> dict[str, Any]:

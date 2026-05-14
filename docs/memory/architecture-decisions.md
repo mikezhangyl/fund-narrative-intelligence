@@ -927,3 +927,39 @@ Consequences:
   `Signals` as `provider-derived-signals`.
 - The Narrative Registry remains Mock-backed and visibly disclosed until a real
   registry store replaces it.
+
+## ADR-0039: Add File-Backed Reviewed Narrative Registry Store
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add `--narrative-registry-mode reviewed` for single report runs, backed by
+`data/registry/narrative_registry.reviewed.json`, and add
+`scripts/validate_reviewed_registry_enriched_acceptance.py` as the strict manual
+live acceptance gate for the enriched reviewed-registry path.
+
+Rationale:
+
+- The Narrative Registry changes slowly and should be separated from fixture
+  data before a web approval workflow exists.
+- A file-backed reviewed-registry store gives the future web UI a durable read/write
+  target while keeping the current CLI/report pipeline simple.
+- Reviewed registry provenance must appear as a non-mock provider layer so users
+  are not told that approved registry data came from Mock fixtures.
+
+Consequences:
+
+- Default runs still use the fixture-backed registry.
+- Reviewed mode validates the registry payload before orchestration and returns
+  deep copies to avoid hidden mutation.
+- Raw and scoring artifacts include `narrative_registry_mode`.
+- Provider foundation marks `Narrative Registry` as
+  `reviewed-registry-store` with `reviewed-registry://...#sha256=...` source
+  URLs so same-basename registry snapshots remain distinguishable.
+- `--narrative-registry-path` requires reviewed mode and is rejected for
+  diagnostics, batch/smoke, validation, and review-action commands.
+- The reviewed-registry enriched acceptance path now runs without mock
+  provider-foundation layers; effective data quality remains `partial` until
+  stock mappings become a fully reviewed provider/service.

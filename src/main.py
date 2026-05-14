@@ -13,6 +13,9 @@ from src.modules.narrative_review.preview import write_review_action_preview
 from src.orchestrator import (
     BASE_INTELLIGENCE_MODE_FIXTURE,
     BASE_INTELLIGENCE_MODES,
+    NARRATIVE_REGISTRY_MODE_FIXTURE,
+    NARRATIVE_REGISTRY_MODE_REVIEWED,
+    NARRATIVE_REGISTRY_MODES,
     STOCK_MAPPING_MODE_FIXTURE,
     STOCK_MAPPING_MODES,
     inspect_provider_foundation,
@@ -39,6 +42,23 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["mock", "real", "eastmoney"],
         default="mock",
         help="Provider mode. V1 real mode falls back to mock fixtures; eastmoney tries no-key fund holdings.",
+    )
+    parser.add_argument(
+        "--narrative-registry-mode",
+        choices=sorted(NARRATIVE_REGISTRY_MODES),
+        default=NARRATIVE_REGISTRY_MODE_FIXTURE,
+        help=(
+            "Narrative Registry mode. Default uses the fixture-backed registry; "
+            "reviewed loads a file-backed registry store for reviewed workflows."
+        ),
+    )
+    parser.add_argument(
+        "--narrative-registry-path",
+        type=Path,
+        help=(
+            "Optional reviewed Narrative Registry JSON path. Requires "
+            "--narrative-registry-mode reviewed."
+        ),
     )
     parser.add_argument(
         "--stock-mapping-mode",
@@ -185,6 +205,11 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(
             "--announcement-start-date requires --include-cninfo-announcements"
         )
+    if (
+        args.narrative_registry_path
+        and args.narrative_registry_mode != NARRATIVE_REGISTRY_MODE_REVIEWED
+    ):
+        parser.error("--narrative-registry-path requires --narrative-registry-mode reviewed")
     if args.review_action_output and not args.preview_review_action:
         parser.error("--review-action-output requires --preview-review-action")
     if args.registry_output and not args.persist_review_action:
@@ -228,6 +253,17 @@ def main(argv: list[str] | None = None) -> int:
     ):
         parser.error(
             "--validate-artifact-contracts cannot be combined with review action execution"
+        )
+    if (
+        args.narrative_registry_mode != NARRATIVE_REGISTRY_MODE_FIXTURE
+        and _uses_non_pipeline_action(args)
+    ):
+        parser.error(
+            "--narrative-registry-mode is only supported with single --fund-code report generation"
+        )
+    if args.narrative_registry_path and _uses_non_pipeline_action(args):
+        parser.error(
+            "--narrative-registry-path is only supported with single --fund-code report generation"
         )
     if (
         args.stock_mapping_mode != STOCK_MAPPING_MODE_FIXTURE
@@ -554,6 +590,8 @@ def main(argv: list[str] | None = None) -> int:
             include_announcement_evidence=args.include_cninfo_announcements,
             announcement_start_date=args.announcement_start_date,
             include_market_quotes=args.include_market_quotes,
+            narrative_registry_mode=args.narrative_registry_mode,
+            narrative_registry_path=args.narrative_registry_path,
             stock_mapping_mode=args.stock_mapping_mode,
             base_intelligence_mode=args.base_intelligence_mode,
         )

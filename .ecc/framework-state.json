@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-provider-derived-intelligence-mode",
+  "latest_run": "20260515-reviewed-registry-store",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "continue replacing the mock Narrative Registry layer with a reviewed registry store after provider-derived enriched acceptance"
+  "next_step": "continue replacing derived registry-rule stock mappings with a reviewed mapping provider or service-backed mapping store"
 }

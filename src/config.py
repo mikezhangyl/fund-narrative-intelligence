@@ -4,6 +4,8 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_DIR = PROJECT_ROOT / "data" / "fixtures"
+REGISTRY_DIR = PROJECT_ROOT / "data" / "registry"
+DEFAULT_REVIEWED_REGISTRY_PATH = REGISTRY_DIR / "narrative_registry.reviewed.json"
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs"
 
 VERSION_DEFAULTS = {

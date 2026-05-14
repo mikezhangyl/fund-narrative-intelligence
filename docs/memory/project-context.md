@@ -96,6 +96,8 @@ Expected artifacts:
 - `--stock-mapping-mode registry-rule` skips the static stock mapping fixture for a single `--fund-code` report run and derives all selected mappings from current holdings plus Narrative Registry terms. In that mode the `Stock Mappings` provider layer becomes `registry-rule-stock-mapping`, while the Narrative Registry layer remains Mock-backed and visibly disclosed. Fully mock-backed runs remain `mock`; runtime mapping does not upgrade mock inputs to `partial`.
 - `python scripts/validate_registry_rule_enriched_acceptance.py --output-dir outputs/registry_rule_enriched_161725` is the strict live-provider acceptance command for the enriched path without static stock mapping fixtures. It requires `registry_term_rule` mappings, a runtime `Stock Mappings` layer, and visible disclosure of remaining Mock-backed layers.
 - `--base-intelligence-mode provider-derived` skips base evidence and signal fixtures for a single enriched report run, requires CNINFO announcements, and uses generated announcement evidence plus derived provider signals as the only evidence/signal inputs. `python scripts/validate_provider_derived_enriched_acceptance.py --output-dir outputs/provider_derived_enriched_161725` is the strict live-provider acceptance command for this path.
+- `--narrative-registry-mode reviewed` loads a file-backed Narrative Registry store for reviewed workflows, defaulting to `data/registry/narrative_registry.reviewed.json`, and replaces the `Narrative Registry` provider layer with non-mock `reviewed-registry-store`. `--narrative-registry-path` is allowed only with reviewed mode and only for single `--fund-code` report runs.
+- `python scripts/validate_reviewed_registry_enriched_acceptance.py --output-dir outputs/reviewed_registry_enriched_161725` is the strict live-provider acceptance command for the first no-mock-core-intelligence enriched path: Eastmoney holdings, reviewed registry, registry-rule mappings, provider-derived evidence/signals, CNINFO announcements, and market quotes.
 - Narrative reports include deterministic stage, risk, and confidence interpretation notes; these are explanatory and non-advisory.
 - Real-fund smoke summaries isolate failures per fund, write summary artifacts, include concrete unmapped holding details, and return non-zero when any fund fails or falls below coverage threshold.
 - Real-fund smoke summaries also include `multi_mapped_holdings` so 100% mapping coverage does not hide broad or cross-domain registry matches.
@@ -141,6 +143,7 @@ Expected artifacts:
 - Current excluded mapping candidates are `688036` 传音控股, `688692` 达梦数据, and `600522` 中天科技 as excluded candidates for Semiconductor Capex.
 - Current candidate narratives are Consumer Electronics Globalization for `688036`, Domestic Database Infrastructure for `688692`, and Communication And Power Infrastructure for `600522`.
 - Latest announcement-evidence probe for `161725` with CNINFO start date `2026-01-01` returned 56 announcements and 56 converted evidence records, while still disclosing the mixed Eastmoney/CNINFO + Mock intelligence foundation as `partial`.
+- Latest reviewed-registry enriched acceptance for `161725` passed with no mock provider-foundation layers; effective data quality remains `partial` because registry-rule stock mappings are derived rather than a fully reviewed mapping provider.
 
 ## Deferred Scope
 
@@ -176,6 +179,7 @@ Expected artifacts:
 - Derived announcement signals are exposed as `derived_signal_events` in raw/scoring JSON and as a non-mock `Derived Signals` provider layer. Base fixture signals remain present and explicitly mock-backed until a later provider replaces them.
 - Market quote derived signals share the same `derived_signal_events` contract and are included in raw `signal_events` plus scoring input. The `Market Quotes` and `Derived Signals` layers stay separate in provider foundation metadata.
 - `python scripts/validate_real_enriched_acceptance.py --output-dir outputs/real_enriched_161725` is the strict combined live-provider acceptance command for Eastmoney holdings, CNINFO announcements/evidence, market quotes, and both derived-signal sources. It still requires registry, mapping, base-evidence, and base-signal layers to disclose Mock fixtures. Eastmoney-to-Yahoo quote fallback is allowed only as a recorded and disclosed provider fallback.
+- Reviewed-registry workflow data is intentionally separate from `data/fixtures/`. The current store is file-backed so future web approval flows can write reviewed registry snapshots without changing the pipeline contract.
 
 ## Open Questions
 
