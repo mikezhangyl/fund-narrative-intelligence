@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-candidate-narratives",
+  "latest_run": "20260514-candidate-promotion-workflow",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "define candidate promotion workflow with future web approval state preserved"
+  "next_step": "wrap candidate review actions in future persistence/API layer when web workspace begins"
 }

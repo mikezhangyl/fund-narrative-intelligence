@@ -168,6 +168,8 @@ Known-bad fallback candidates can be listed in `mapping_exclusions.json`. These 
 
 Review-only candidate narratives live in the registry's `candidate_narratives` list. They are shown in raw/scoring JSON, reports, and real-smoke summaries when related exclusions appear, but they are not part of active stock mapping, aggregation, or scoring until human review promotes them into the active registry.
 
+Candidate promotion is an explicit review action. The backend supports approve/reject/defer state transitions for a future web review workspace, but the report pipeline never promotes candidates automatically.
+
 When a fallback registry-term match maps one holding to multiple narratives, V1 keeps all mappings but lowers their confidence from `0.52` to `0.42`, marks each mapping with `needs_review`, and writes `mapping_precision_flags` into raw/scoring JSON plus the Markdown/HTML report.
 
 When a fallback mapping is supported only by a broad industry term, V1 keeps the mapping but lowers confidence from `0.52` to `0.48`, marks it with `broad_industry_fallback`, and recommends `curation_review`. This catches cases such as a generic `电子` industry match before it is treated like a more specific stock-name or product-term match.

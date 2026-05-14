@@ -137,6 +137,16 @@ V1 preserves review-only `candidate_narratives` in the registry. Candidate narra
 
 Future approval should happen in a web UI. V1 does not implement the UI, but all candidate/exclusion objects should be shaped for future rendering and action: stable IDs, review status, rationale, source, related stocks, related exclusions, nullable reviewer fields, and timestamps must be preserved in structured output instead of only report prose.
 
+Candidate narrative review actions are explicit state transitions:
+
+| Action | Candidate Status | Active Registry Change | Required Fields |
+| --- | --- | --- | --- |
+| `approve` | `promoted` / `approved` | append one active narrative from supplied promotion metadata | `action_id`, `candidate_narrative_id`, `reviewed_by`, `reviewed_at`, `review_note`, `promotion.narrative_id`, `promotion.parent_id`, `promotion.level`, `promotion.aliases`, `promotion.related_terms` |
+| `reject` | `rejected` / `rejected` | none | `action_id`, `candidate_narrative_id`, `reviewed_by`, `reviewed_at`, `review_note` |
+| `defer` | `deferred` / `deferred` | none | `action_id`, `candidate_narrative_id`, `reviewed_by`, `reviewed_at`, `review_note` |
+
+The review action function must be immutable: it returns a new registry payload and does not mutate the input registry. V1 report generation must not call this function automatically.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |

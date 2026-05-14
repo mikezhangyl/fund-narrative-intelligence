@@ -467,3 +467,25 @@ Consequences:
 - Candidate and exclusion records should keep stable IDs, status fields, rationale, source, related stock/exclusion links, reviewer metadata, and timestamps.
 - CLI and report outputs remain the current interface, but JSON must be workspace-ready.
 - Promotion from candidate to active narrative remains a human approval action, not automatic scoring behavior.
+
+## ADR-0023: Use Explicit Immutable Candidate Review Actions
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Represent candidate narrative approval as explicit immutable review actions supporting `approve`, `reject`, and `defer`.
+
+Rationale:
+
+- Future web approval screens need a deterministic backend contract that can be tested before the UI exists.
+- Approval has higher risk than report rendering because it can change the active taxonomy.
+- A pure function makes review actions auditable and avoids hidden mutation of the registry fixture or future persistence layer.
+
+Consequences:
+
+- `approve` requires promotion metadata and appends a new active narrative while marking the candidate as promoted/approved.
+- `reject` and `defer` update candidate review state only and do not change active narratives.
+- Default report generation does not call the review-action workflow.
+- Future persistence/API work can wrap the pure function rather than reimplementing promotion semantics.

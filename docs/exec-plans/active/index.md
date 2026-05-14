@@ -28,3 +28,4 @@
 - [real-smoke-cli-precision-counts.md](./real-smoke-cli-precision-counts.md)
 - [mapping-exclusions.md](./mapping-exclusions.md)
 - [candidate-narratives.md](./candidate-narratives.md)
+- [candidate-promotion-workflow.md](./candidate-promotion-workflow.md)
