@@ -1,0 +1,257 @@
+{
+  "version": "mapping-v1",
+  "mappings": [
+    {
+      "stock_code": "NVDA",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.9,
+      "confidence": 0.86,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "NVDA",
+      "narrative_id": "N_SEMI_CAPEX",
+      "mapping_weight": 0.7,
+      "confidence": 0.74,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "MSFT",
+      "narrative_id": "N_AI_APPS",
+      "mapping_weight": 0.75,
+      "confidence": 0.78,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "MSFT",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.3,
+      "confidence": 0.66,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "VST",
+      "narrative_id": "N_AI_POWER",
+      "mapping_weight": 0.9,
+      "confidence": 0.84,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "VST",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.6,
+      "confidence": 0.78,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "TSM",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.8,
+      "confidence": 0.82,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "TSM",
+      "narrative_id": "N_SEMI_CAPEX",
+      "mapping_weight": 0.8,
+      "confidence": 0.81,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "AVGO",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.85,
+      "confidence": 0.8,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "SMCI",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.75,
+      "confidence": 0.69,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "GOOGL",
+      "narrative_id": "N_AI_APPS",
+      "mapping_weight": 0.7,
+      "confidence": 0.73,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "NEE",
+      "narrative_id": "N_AI_POWER",
+      "mapping_weight": 0.65,
+      "confidence": 0.7,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "AMZN",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.5,
+      "confidence": 0.68,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "AMZN",
+      "narrative_id": "N_AI_APPS",
+      "mapping_weight": 0.5,
+      "confidence": 0.69,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "ASML",
+      "narrative_id": "N_SEMI_CAPEX",
+      "mapping_weight": 0.85,
+      "confidence": 0.8,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "CEG",
+      "narrative_id": "N_AI_POWER",
+      "mapping_weight": 0.9,
+      "confidence": 0.82,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "ETN",
+      "narrative_id": "N_AI_POWER",
+      "mapping_weight": 0.8,
+      "confidence": 0.78,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "PWR",
+      "narrative_id": "N_AI_POWER",
+      "mapping_weight": 0.75,
+      "confidence": 0.76,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "TSLA",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.85,
+      "confidence": 0.78,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "BYD",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.9,
+      "confidence": 0.82,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "NIO",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.9,
+      "confidence": 0.8,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "LI",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.8,
+      "confidence": 0.76,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "XPEV",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.85,
+      "confidence": 0.78,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "ALB",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.55,
+      "confidence": 0.64,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "600519",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.95,
+      "confidence": 0.86,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "000858",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.92,
+      "confidence": 0.84,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "000568",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.88,
+      "confidence": 0.82,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "600809",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.9,
+      "confidence": 0.82,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "002304",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.86,
+      "confidence": 0.78,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "000596",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.82,
+      "confidence": 0.76,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "000799",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.8,
+      "confidence": 0.74,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "603198",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.78,
+      "confidence": 0.74,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "600702",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.78,
+      "confidence": 0.74,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "603369",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.78,
+      "confidence": 0.72,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "600779",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.76,
+      "confidence": 0.7,
+      "method": "reviewed_mapping"
+    },
+    {
+      "stock_code": "603589",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.74,
+      "confidence": 0.68,
+      "method": "reviewed_mapping"
+    }
+  ]
+}

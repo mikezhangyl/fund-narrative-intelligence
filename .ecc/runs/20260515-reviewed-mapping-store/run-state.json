@@ -1,0 +1,44 @@
+{
+  "task_run_id": "20260515-reviewed-mapping-store",
+  "task_state": "passed",
+  "review_cycle": 1,
+  "branch": "codex/reviewed-mapping-store",
+  "worktree": "main",
+  "base_commit": "a26ea43",
+  "head_commit": "pending-commit",
+  "merge_base": "a26ea43",
+  "quality_reviewed_commit": "pending-commit",
+  "reviewed_snapshot_type": "quality-agent-review",
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": true,
+  "final_decision": "commit_and_merge",
+  "review_outcome": "Implemented optional reviewed stock mapping store and strict enriched acceptance; quality review blocking findings were fixed by disabling registry-rule fallback in reviewed mode, enforcing reviewed_mapping methods, and restoring scoring-mode checks; full quality gates and live reviewed-mapping enriched acceptance passed",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "ready_for_quality",
+  "decisions": [
+    {
+      "id": "RM-001",
+      "date": "2026-05-15",
+      "decision": "Add reviewed stock mappings as an opt-in file-backed store rather than changing default fixture mappings.",
+      "rationale": "This preserves V1 defaults while giving future web approval flows a durable mapping snapshot target."
+    },
+    {
+      "id": "RM-002",
+      "date": "2026-05-15",
+      "decision": "Use method reviewed_mapping for reviewed-store entries.",
+      "rationale": "Reports and acceptance scripts need to distinguish approved mapping records from fixture_rule and runtime registry_term_rule mappings."
+    },
+    {
+      "id": "RM-003",
+      "date": "2026-05-15",
+      "decision": "Reviewed mapping mode does not fall back to registry-term mapping for uncovered holdings.",
+      "rationale": "If a holding is not in the reviewed mapping store, it must remain unmapped so provider provenance does not imply unreviewed runtime mappings were reviewed."
+    }
+  ]
+}

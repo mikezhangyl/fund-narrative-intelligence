@@ -57,3 +57,4 @@
 - [registry-rule-enriched-acceptance.md](./registry-rule-enriched-acceptance.md)
 - [provider-derived-intelligence-mode.md](./provider-derived-intelligence-mode.md)
 - [reviewed-registry-store.md](./reviewed-registry-store.md)
+- [reviewed-mapping-store.md](./reviewed-mapping-store.md)

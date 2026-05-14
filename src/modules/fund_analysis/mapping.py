@@ -20,6 +20,7 @@ def build_mapping_result(
     mappings: list[dict[str, Any]],
     registry: dict[str, dict[str, Any]],
     exclusions: list[dict[str, Any]] | None = None,
+    allow_registry_term_fallback: bool = True,
 ) -> dict[str, Any]:
     exact_mappings = select_mappings_for_holdings(holdings, mappings)
     mapped_stock_codes = {mapping["stock_code"] for mapping in exact_mappings}
@@ -27,6 +28,8 @@ def build_mapping_result(
     excluded_mapping_candidates: list[dict[str, Any]] = []
     for holding in holdings:
         if holding["stock_code"] in mapped_stock_codes:
+            continue
+        if not allow_registry_term_fallback:
             continue
         fallback_result = _fallback_mappings_for_holding(
             holding=holding,
@@ -286,6 +289,8 @@ def _mapping_reason(
             "Matched registry terms against stock code/name/industry: "
             f"{', '.join(matched_terms)}."
         )
+    if method == "reviewed_mapping":
+        return "Explicit reviewed_mapping from the reviewed stock-narrative mapping store."
     if method == "fixture_rule":
         return "Explicit fixture_rule mapping from the stock-narrative mapping fixture."
     return f"{method} mapping without term-level rationale."

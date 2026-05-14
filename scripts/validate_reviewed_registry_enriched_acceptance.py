@@ -134,6 +134,9 @@ def validate_acceptance_outputs(
     fund_code: str = DEFAULT_FUND_CODE,
     min_announcement_count: int = DEFAULT_MIN_ANNOUNCEMENT_COUNT,
     min_quote_count: int = DEFAULT_MIN_QUOTE_COUNT,
+    stock_mapping_mode: str = DEFAULT_STOCK_MAPPING_MODE,
+    stock_mapping_provider_name: str = "registry-rule-stock-mapping",
+    stock_mapping_method: str = "registry_term_rule",
 ) -> None:
     artifacts = {
         "raw": output_dir / f"fund_{fund_code}_raw.json",
@@ -175,8 +178,12 @@ def validate_acceptance_outputs(
         "scoring narrative_registry_mode must be reviewed",
     )
     _require(
-        raw.get("stock_mapping_mode") == DEFAULT_STOCK_MAPPING_MODE,
-        "raw stock_mapping_mode must be registry-rule",
+        raw.get("stock_mapping_mode") == stock_mapping_mode,
+        f"raw stock_mapping_mode must be {stock_mapping_mode}",
+    )
+    _require(
+        scoring.get("stock_mapping_mode") == stock_mapping_mode,
+        f"scoring stock_mapping_mode must be {stock_mapping_mode}",
     )
     _require(
         raw.get("base_intelligence_mode") == DEFAULT_BASE_INTELLIGENCE_MODE,
@@ -197,8 +204,8 @@ def validate_acceptance_outputs(
         "registry layer source_url must include a content hash",
     )
     _require(
-        mapping_layer.get("provider_name") == "registry-rule-stock-mapping",
-        "stock mappings layer must use registry-rule-stock-mapping",
+        mapping_layer.get("provider_name") == stock_mapping_provider_name,
+        f"stock mappings layer must use {stock_mapping_provider_name}",
     )
     _require(mapping_layer.get("is_mock") is False, "stock mappings layer must not be mock")
     _require(
@@ -234,11 +241,11 @@ def validate_acceptance_outputs(
     )
     _require(
         isinstance(mappings, list) and mappings,
-        "registry-rule acceptance requires selected mappings",
+        f"{stock_mapping_mode} acceptance requires selected mappings",
     )
     _require(
-        all(item.get("method") == "registry_term_rule" for item in mappings),
-        "all selected mappings must use registry_term_rule",
+        all(item.get("method") == stock_mapping_method for item in mappings),
+        f"all selected mappings must use {stock_mapping_method}",
     )
     _require(
         evidence_items == raw.get("announcement_evidence", {}).get("evidence"),
@@ -258,7 +265,7 @@ def validate_acceptance_outputs(
     )
     expected = (
         "reviewed-registry-store",
-        "registry-rule-stock-mapping",
+        stock_mapping_provider_name,
         "provider-derived-evidence",
         "provider-derived-signals",
     )

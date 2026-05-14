@@ -8,6 +8,7 @@ from typing import Any
 from src.config import (
     DEFAULT_OUTPUT_DIR,
     DEFAULT_REVIEWED_REGISTRY_PATH,
+    DEFAULT_REVIEWED_STOCK_MAPPINGS_PATH,
     VERSION_DEFAULTS,
 )
 from src.modules.evidence.announcements import convert_announcements_to_evidence
@@ -30,7 +31,10 @@ from src.providers.cninfo import (
 )
 from src.providers.eastmoney_market import EastmoneyMarketDataProvider
 from src.providers.factory import select_data_provider
-from src.providers.intelligence import ReviewedNarrativeRegistryProvider
+from src.providers.intelligence import (
+    ReviewedNarrativeRegistryProvider,
+    ReviewedStockNarrativeMappingProvider,
+)
 from src.providers.mock import MockDataProvider
 from src.providers.provenance import build_provider_foundation
 
@@ -42,9 +46,11 @@ NARRATIVE_REGISTRY_MODES = {
 }
 STOCK_MAPPING_MODE_FIXTURE = "fixture"
 STOCK_MAPPING_MODE_REGISTRY_RULE = "registry-rule"
+STOCK_MAPPING_MODE_REVIEWED = "reviewed"
 STOCK_MAPPING_MODES = {
     STOCK_MAPPING_MODE_FIXTURE,
     STOCK_MAPPING_MODE_REGISTRY_RULE,
+    STOCK_MAPPING_MODE_REVIEWED,
 }
 BASE_INTELLIGENCE_MODE_FIXTURE = "fixture"
 BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED = "provider-derived"
@@ -66,6 +72,7 @@ def run_pipeline(
     narrative_registry_mode: str = NARRATIVE_REGISTRY_MODE_FIXTURE,
     narrative_registry_path: str | Path | None = None,
     stock_mapping_mode: str = STOCK_MAPPING_MODE_FIXTURE,
+    stock_mappings_path: str | Path | None = None,
     base_intelligence_mode: str = BASE_INTELLIGENCE_MODE_FIXTURE,
 ) -> dict[str, Any]:
     if not fund_code.isdigit():
@@ -109,10 +116,13 @@ def run_pipeline(
     )
     registry_payload = registry_result["payload"]
     narrative_registry_layer = registry_result["provider_layer"]
-    all_mappings = _stock_mapping_inputs(
+    stock_mapping_result = _stock_mapping_inputs(
         provider=provider,
         stock_mapping_mode=stock_mapping_mode,
+        stock_mappings_path=stock_mappings_path,
     )
+    all_mappings = stock_mapping_result["mappings"]
+    stock_mapping_store_layer = stock_mapping_result["provider_layer"]
     mapping_exclusions_payload = provider.get_mapping_exclusions()
     evidence = _base_evidence_inputs(
         provider=provider,
@@ -134,8 +144,11 @@ def run_pipeline(
         mappings=all_mappings,
         registry=registry_by_id,
         exclusions=mapping_exclusions_payload["exclusions"],
+        allow_registry_term_fallback=(
+            stock_mapping_mode != STOCK_MAPPING_MODE_REVIEWED
+        ),
     )
-    stock_mapping_layer = _stock_mapping_provider_layer(
+    stock_mapping_layer = stock_mapping_store_layer or _stock_mapping_provider_layer(
         stock_mapping_mode=stock_mapping_mode,
         mapping_result=mapping_result,
         fund_provider_metadata=fund["provider_metadata"],
@@ -659,11 +672,28 @@ def _base_signal_inputs(provider: Any, base_intelligence_mode: str) -> list[dict
     )
 
 
-def _stock_mapping_inputs(provider: Any, stock_mapping_mode: str) -> list[dict[str, Any]]:
+def _stock_mapping_inputs(
+    provider: Any,
+    stock_mapping_mode: str,
+    stock_mappings_path: str | Path | None,
+) -> dict[str, Any]:
     if stock_mapping_mode == STOCK_MAPPING_MODE_FIXTURE:
-        return provider.get_stock_narrative_mappings()
+        return {
+            "mappings": provider.get_stock_narrative_mappings(),
+            "provider_layer": None,
+        }
     if stock_mapping_mode == STOCK_MAPPING_MODE_REGISTRY_RULE:
-        return []
+        return {"mappings": [], "provider_layer": None}
+    if stock_mapping_mode == STOCK_MAPPING_MODE_REVIEWED:
+        mapping_provider = ReviewedStockNarrativeMappingProvider(
+            mappings_path=Path(stock_mappings_path)
+            if stock_mappings_path
+            else DEFAULT_REVIEWED_STOCK_MAPPINGS_PATH
+        )
+        return {
+            "mappings": mapping_provider.get_stock_narrative_mappings(),
+            "provider_layer": mapping_provider.get_provider_layer(),
+        }
     raise ValueError(
         "stock_mapping_mode must be one of: "
         f"{', '.join(sorted(STOCK_MAPPING_MODES))}"

@@ -8,7 +8,12 @@ from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import quote
 
-from src.config import DEFAULT_REVIEWED_REGISTRY_PATH, FIXTURE_DIR, PROJECT_ROOT
+from src.config import (
+    DEFAULT_REVIEWED_REGISTRY_PATH,
+    DEFAULT_REVIEWED_STOCK_MAPPINGS_PATH,
+    FIXTURE_DIR,
+    PROJECT_ROOT,
+)
 from src.errors import FixtureNotFoundError
 from src.providers.provenance import (
     MOCK_PROVIDER_NAME,
@@ -113,6 +118,35 @@ class ReviewedNarrativeRegistryProvider:
             "source_url": _reviewed_registry_source_url(self.registry_path),
             "is_mock": False,
             "note": "Loaded from file-backed Narrative Registry store for reviewed workflows.",
+        }
+
+
+@dataclass(frozen=True)
+class ReviewedStockNarrativeMappingProvider:
+    mappings_path: Path = DEFAULT_REVIEWED_STOCK_MAPPINGS_PATH
+
+    provider_name = "reviewed-mapping-store"
+    provider_version = "reviewed-mapping-v1"
+    data_quality = "partial"
+
+    def get_stock_narrative_mappings(self) -> list[dict[str, Any]]:
+        payload = _load_json_object(self.mappings_path, label="reviewed mappings")
+        validate_mapping_payload(payload)
+        _require_reviewed_mapping_methods(payload["mappings"])
+        return deepcopy(payload["mappings"])
+
+    def get_provider_layer(self) -> dict[str, Any]:
+        return {
+            "layer": "stock_mappings",
+            "provider_name": self.provider_name,
+            "provider_version": self.provider_version,
+            "data_quality": self.data_quality,
+            "source_url": _reviewed_source_url(
+                scheme="reviewed-mapping",
+                path=self.mappings_path,
+            ),
+            "is_mock": False,
+            "note": "Loaded from file-backed stock-to-narrative mapping store for reviewed workflows.",
         }
 
 
@@ -288,9 +322,9 @@ def _load_fixture(fixture_dir: Path, filename: str) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _load_json_object(path: Path) -> dict[str, Any]:
+def _load_json_object(path: Path, label: str = "reviewed registry") -> dict[str, Any]:
     if not path.exists():
-        raise FixtureNotFoundError(f"Missing reviewed registry: {path}")
+        raise FixtureNotFoundError(f"Missing {label}: {path}")
     payload = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise ValueError(f"{path} must contain a JSON object")
@@ -298,6 +332,25 @@ def _load_json_object(path: Path) -> dict[str, Any]:
 
 
 def _reviewed_registry_source_url(path: Path) -> str:
+    return _reviewed_source_url(scheme="reviewed-registry", path=path)
+
+
+def _require_reviewed_mapping_methods(mappings: list[dict[str, Any]]) -> None:
+    invalid_methods = sorted(
+        {
+            str(mapping.get("method"))
+            for mapping in mappings
+            if mapping.get("method") != "reviewed_mapping"
+        }
+    )
+    if invalid_methods:
+        raise ValueError(
+            "reviewed mapping store entries must use method reviewed_mapping; "
+            f"found: {', '.join(invalid_methods)}"
+        )
+
+
+def _reviewed_source_url(scheme: str, path: Path) -> str:
     resolved = path.expanduser().resolve()
     try:
         location = resolved.relative_to(PROJECT_ROOT.resolve()).as_posix()
@@ -305,7 +358,7 @@ def _reviewed_registry_source_url(path: Path) -> str:
         path_hash = hashlib.sha256(str(resolved).encode("utf-8")).hexdigest()[:12]
         location = f"external/{path_hash}/{resolved.name}"
     content_hash = _file_sha256(resolved)[:12] if resolved.exists() else "missing"
-    return f"reviewed-registry://{quote(location, safe='/._-')}#sha256={content_hash}"
+    return f"{scheme}://{quote(location, safe='/._-')}#sha256={content_hash}"
 
 
 def _file_sha256(path: Path) -> str:

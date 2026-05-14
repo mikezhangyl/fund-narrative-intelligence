@@ -71,6 +71,14 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--stock-mappings-path",
+        type=Path,
+        help=(
+            "Optional reviewed stock-to-narrative mappings JSON path. Requires "
+            "--stock-mapping-mode reviewed."
+        ),
+    )
+    parser.add_argument(
         "--base-intelligence-mode",
         choices=sorted(BASE_INTELLIGENCE_MODES),
         default=BASE_INTELLIGENCE_MODE_FIXTURE,
@@ -210,6 +218,8 @@ def main(argv: list[str] | None = None) -> int:
         and args.narrative_registry_mode != NARRATIVE_REGISTRY_MODE_REVIEWED
     ):
         parser.error("--narrative-registry-path requires --narrative-registry-mode reviewed")
+    if args.stock_mappings_path and args.stock_mapping_mode != "reviewed":
+        parser.error("--stock-mappings-path requires --stock-mapping-mode reviewed")
     if args.review_action_output and not args.preview_review_action:
         parser.error("--review-action-output requires --preview-review-action")
     if args.registry_output and not args.persist_review_action:
@@ -264,6 +274,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.narrative_registry_path and _uses_non_pipeline_action(args):
         parser.error(
             "--narrative-registry-path is only supported with single --fund-code report generation"
+        )
+    if args.stock_mappings_path and _uses_non_pipeline_action(args):
+        parser.error(
+            "--stock-mappings-path is only supported with single --fund-code report generation"
         )
     if (
         args.stock_mapping_mode != STOCK_MAPPING_MODE_FIXTURE
@@ -593,6 +607,7 @@ def main(argv: list[str] | None = None) -> int:
             narrative_registry_mode=args.narrative_registry_mode,
             narrative_registry_path=args.narrative_registry_path,
             stock_mapping_mode=args.stock_mapping_mode,
+            stock_mappings_path=args.stock_mappings_path,
             base_intelligence_mode=args.base_intelligence_mode,
         )
     except PipelineError as exc:

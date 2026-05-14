@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-reviewed-registry-store",
+  "latest_run": "20260515-reviewed-mapping-store",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "continue replacing derived registry-rule stock mappings with a reviewed mapping provider or service-backed mapping store"
+  "next_step": "continue reducing remaining partial assumptions by adding reviewed/audited provenance metadata to registry and mapping store entries or by adding the next real intelligence provider"
 }

@@ -9,6 +9,7 @@ from src.providers.intelligence import (
     MockNewsEvidenceProvider,
     MockValuationProvider,
     ReviewedNarrativeRegistryProvider,
+    ReviewedStockNarrativeMappingProvider,
 )
 from src.providers.mock import MockDataProvider
 
@@ -122,6 +123,49 @@ def test_reviewed_narrative_registry_provider_rejects_missing_store(tmp_path):
         assert "Missing reviewed registry" in str(exc)
     else:
         raise AssertionError("expected FixtureNotFoundError for missing store")
+
+
+def test_reviewed_stock_mapping_provider_loads_validated_store(tmp_path):
+    mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
+    mappings_path.write_text(
+        (FIXTURE_DIR / "stock_narrative_mappings.json")
+        .read_text(encoding="utf-8")
+        .replace('"method": "fixture_rule"', '"method": "reviewed_mapping"'),
+        encoding="utf-8",
+    )
+    provider = ReviewedStockNarrativeMappingProvider(mappings_path=mappings_path)
+
+    mappings = provider.get_stock_narrative_mappings()
+    mappings[0]["confidence"] = 0.0
+    fresh_mappings = provider.get_stock_narrative_mappings()
+    layer = provider.get_provider_layer()
+
+    assert fresh_mappings[0]["confidence"] != 0.0
+    assert {mapping["method"] for mapping in fresh_mappings} == {"reviewed_mapping"}
+    assert layer["layer"] == "stock_mappings"
+    assert layer["provider_name"] == "reviewed-mapping-store"
+    assert layer["provider_version"] == "reviewed-mapping-v1"
+    assert layer["data_quality"] == "partial"
+    assert layer["source_url"].startswith("reviewed-mapping://external/")
+    assert "/stock_narrative_mappings.reviewed.json#sha256=" in layer["source_url"]
+    assert layer["is_mock"] is False
+
+
+def test_reviewed_stock_mapping_provider_rejects_non_reviewed_methods(tmp_path):
+    mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
+    mappings_path.write_text(
+        (FIXTURE_DIR / "stock_narrative_mappings.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    provider = ReviewedStockNarrativeMappingProvider(mappings_path=mappings_path)
+
+    try:
+        provider.get_stock_narrative_mappings()
+    except ValueError as exc:
+        assert "method reviewed_mapping" in str(exc)
+        assert "fixture_rule" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for non-reviewed mapping method")
 
 
 def test_mock_data_provider_uses_intelligence_layer_provenance():

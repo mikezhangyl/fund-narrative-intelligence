@@ -963,3 +963,40 @@ Consequences:
 - The reviewed-registry enriched acceptance path now runs without mock
   provider-foundation layers; effective data quality remains `partial` until
   stock mappings become a fully reviewed provider/service.
+
+## ADR-0040: Add File-Backed Reviewed Stock Mapping Store
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add `--stock-mapping-mode reviewed` for single report runs, backed by
+`data/registry/stock_narrative_mappings.reviewed.json`, and add
+`scripts/validate_reviewed_mapping_enriched_acceptance.py` as the strict manual
+live acceptance gate for the enriched reviewed-mapping path.
+
+Rationale:
+
+- Runtime registry-rule mappings explain why a holding matched a narrative, but
+  they are still generated at report time and need review flags for ambiguous
+  cases.
+- Future web approval workflows need an explicit persisted mapping store where
+  approved stock-to-narrative relationships can live independently from static
+  fixtures.
+- Reports and artifacts need to distinguish reviewed mappings from
+  `fixture_rule` and `registry_term_rule` mappings.
+
+Consequences:
+
+- Default runs still use fixture mappings.
+- Registry-rule mode remains available for discovery and gap-filling.
+- Reviewed mode validates the mapping payload before orchestration and returns
+  deep copies to avoid hidden mutation.
+- Raw and scoring artifacts continue to include `stock_mapping_mode`.
+- Provider foundation marks `Stock Mappings` as `reviewed-mapping-store` with
+  `reviewed-mapping://...#sha256=...` source URLs.
+- `--stock-mappings-path` requires reviewed mode and is rejected for
+  diagnostics, batch/smoke, validation, and review-action commands.
+- The reviewed-mapping enriched acceptance path rejects selected mappings with
+  `fixture_rule` or `registry_term_rule`.

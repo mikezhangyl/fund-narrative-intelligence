@@ -395,6 +395,51 @@ def test_cli_stock_mapping_mode_passes_option_to_pipeline(tmp_path, monkeypatch)
     assert captured["stock_mapping_mode"] == "registry-rule"
 
 
+def test_cli_reviewed_stock_mapping_mode_passes_options_to_pipeline(
+    tmp_path, monkeypatch
+):
+    captured = {}
+    mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
+    mappings_path.write_text(
+        (FIXTURE_DIR / "stock_narrative_mappings.json")
+        .read_text(encoding="utf-8")
+        .replace('"method": "fixture_rule"', '"method": "reviewed_mapping"'),
+        encoding="utf-8",
+    )
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--provider-mode",
+            "eastmoney",
+            "--stock-mapping-mode",
+            "reviewed",
+            "--stock-mappings-path",
+            str(mappings_path),
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["stock_mapping_mode"] == "reviewed"
+    assert captured["stock_mappings_path"] == mappings_path
+
+
 def test_cli_narrative_registry_mode_passes_options_to_pipeline(tmp_path, monkeypatch):
     captured = {}
     registry_path = tmp_path / "narrative_registry.reviewed.json"
@@ -828,6 +873,85 @@ def test_reviewed_narrative_registry_mode_uses_store_layer(tmp_path):
     assert "Narrative Registry 来自 reviewed-registry-store" in html
 
 
+def test_reviewed_stock_mapping_mode_uses_store_layer(tmp_path):
+    mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
+    mappings_path.write_text(
+        (FIXTURE_DIR / "stock_narrative_mappings.json")
+        .read_text(encoding="utf-8")
+        .replace('"method": "fixture_rule"', '"method": "reviewed_mapping"'),
+        encoding="utf-8",
+    )
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        stock_mapping_mode="reviewed",
+        stock_mappings_path=mappings_path,
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+    mapping_layer = scoring["provider_foundation"]["layers"]["stock_mappings"]
+
+    assert raw["stock_mapping_mode"] == "reviewed"
+    assert scoring["stock_mapping_mode"] == "reviewed"
+    assert all(
+        mapping["method"] == "reviewed_mapping"
+        for mapping in raw["stock_narrative_mappings"]
+    )
+    assert mapping_layer["provider_name"] == "reviewed-mapping-store"
+    assert mapping_layer["data_quality"] == "partial"
+    assert mapping_layer["is_mock"] is False
+    assert mapping_layer["source_url"].startswith("reviewed-mapping://external/")
+    assert "Stock Mappings 来自 reviewed-mapping-store" in markdown
+
+
+def test_reviewed_stock_mapping_mode_does_not_fallback_to_registry_rule(tmp_path):
+    mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
+    mappings_path.write_text(
+        json.dumps(
+            {
+                "version": "mapping-v1",
+                "mappings": [
+                    {
+                        "stock_code": "NVDA",
+                        "narrative_id": "N_AI_INFRA",
+                        "mapping_weight": 0.9,
+                        "confidence": 0.86,
+                        "method": "reviewed_mapping",
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        stock_mapping_mode="reviewed",
+        stock_mappings_path=mappings_path,
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+
+    assert raw["mapping_coverage"]["mapping_methods"] == {"reviewed_mapping": 1}
+    assert all(
+        mapping["method"] == "reviewed_mapping"
+        for mapping in raw["stock_narrative_mappings"]
+    )
+    assert raw["mapping_coverage"]["covered_holding_count"] == 1
+    assert raw["unmapped_holdings"]
+    assert scoring["provider_foundation"]["layers"]["stock_mappings"][
+        "provider_name"
+    ] == "reviewed-mapping-store"
+
+
 def test_registry_rule_mapping_keeps_fully_mock_run_mock(tmp_path):
     artifacts = run_pipeline(
         fund_code="000001",
@@ -977,6 +1101,33 @@ def test_cli_rejects_narrative_registry_path_without_reviewed_mode(tmp_path):
 
     assert result.returncode == 2
     assert "--narrative-registry-path requires --narrative-registry-mode reviewed" in (
+        result.stderr
+    )
+    assert not (tmp_path / "out").exists()
+
+
+def test_cli_rejects_stock_mappings_path_without_reviewed_mode(tmp_path):
+    mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
+    mappings_path.write_text(
+        (FIXTURE_DIR / "stock_narrative_mappings.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--fund-code",
+        "000001",
+        "--stock-mappings-path",
+        str(mappings_path),
+        "--output-dir",
+        str(tmp_path / "out"),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 2
+    assert "--stock-mappings-path requires --stock-mapping-mode reviewed" in (
         result.stderr
     )
     assert not (tmp_path / "out").exists()
