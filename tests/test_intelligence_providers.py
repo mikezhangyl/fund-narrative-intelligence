@@ -78,7 +78,7 @@ def test_mock_intelligence_provider_set_exposes_layer_provenance():
 def test_reviewed_narrative_registry_provider_loads_validated_store(tmp_path):
     registry_path = tmp_path / "narrative_registry.reviewed.json"
     registry_path.write_text(
-        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        _reviewed_registry_text(),
         encoding="utf-8",
     )
     provider = ReviewedNarrativeRegistryProvider(registry_path=registry_path)
@@ -97,6 +97,41 @@ def test_reviewed_narrative_registry_provider_loads_validated_store(tmp_path):
     assert layer["source_url"].startswith("reviewed-registry://external/")
     assert "/narrative_registry.reviewed.json#sha256=" in layer["source_url"]
     assert layer["is_mock"] is False
+
+
+def test_reviewed_narrative_registry_provider_rejects_missing_audit_metadata(
+    tmp_path,
+):
+    registry_path = tmp_path / "narrative_registry.reviewed.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    provider = ReviewedNarrativeRegistryProvider(registry_path=registry_path)
+
+    try:
+        provider.get_narrative_registry()
+    except ValueError as exc:
+        assert "review_metadata" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for missing registry audit metadata")
+
+
+def test_reviewed_narrative_registry_provider_rejects_unreviewed_approved_entry(
+    tmp_path,
+):
+    registry_path = tmp_path / "narrative_registry.reviewed.json"
+    payload = json.loads(_reviewed_registry_text())
+    payload["narratives"][0]["reviewed_by"] = None
+    registry_path.write_text(json.dumps(payload), encoding="utf-8")
+    provider = ReviewedNarrativeRegistryProvider(registry_path=registry_path)
+
+    try:
+        provider.get_narrative_registry()
+    except ValueError as exc:
+        assert "narratives[0].reviewed_by" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for unreviewed approved narrative")
 
 
 def test_reviewed_narrative_registry_provider_rejects_non_object_store(tmp_path):
@@ -127,12 +162,7 @@ def test_reviewed_narrative_registry_provider_rejects_missing_store(tmp_path):
 
 def test_reviewed_stock_mapping_provider_loads_validated_store(tmp_path):
     mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
-    mappings_path.write_text(
-        (FIXTURE_DIR / "stock_narrative_mappings.json")
-        .read_text(encoding="utf-8")
-        .replace('"method": "fixture_rule"', '"method": "reviewed_mapping"'),
-        encoding="utf-8",
-    )
+    mappings_path.write_text(_reviewed_mapping_text(), encoding="utf-8")
     provider = ReviewedStockNarrativeMappingProvider(mappings_path=mappings_path)
 
     mappings = provider.get_stock_narrative_mappings()
@@ -151,12 +181,44 @@ def test_reviewed_stock_mapping_provider_loads_validated_store(tmp_path):
     assert layer["is_mock"] is False
 
 
-def test_reviewed_stock_mapping_provider_rejects_non_reviewed_methods(tmp_path):
+def test_reviewed_stock_mapping_provider_rejects_missing_audit_metadata(tmp_path):
     mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
     mappings_path.write_text(
-        (FIXTURE_DIR / "stock_narrative_mappings.json").read_text(encoding="utf-8"),
+        (FIXTURE_DIR / "stock_narrative_mappings.json")
+        .read_text(encoding="utf-8")
+        .replace('"method": "fixture_rule"', '"method": "reviewed_mapping"'),
         encoding="utf-8",
     )
+    provider = ReviewedStockNarrativeMappingProvider(mappings_path=mappings_path)
+
+    try:
+        provider.get_stock_narrative_mappings()
+    except ValueError as exc:
+        assert "review_metadata" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for missing mapping audit metadata")
+
+
+def test_reviewed_stock_mapping_provider_rejects_unapproved_mapping_review(tmp_path):
+    mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
+    payload = json.loads(_reviewed_mapping_text())
+    payload["mappings"][0]["review"]["status"] = "pending"
+    mappings_path.write_text(json.dumps(payload), encoding="utf-8")
+    provider = ReviewedStockNarrativeMappingProvider(mappings_path=mappings_path)
+
+    try:
+        provider.get_stock_narrative_mappings()
+    except ValueError as exc:
+        assert "review.status must be approved" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for unapproved mapping review")
+
+
+def test_reviewed_stock_mapping_provider_rejects_non_reviewed_methods(tmp_path):
+    mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
+    payload = json.loads(_reviewed_mapping_text())
+    payload["mappings"][0]["method"] = "fixture_rule"
+    mappings_path.write_text(json.dumps(payload), encoding="utf-8")
     provider = ReviewedStockNarrativeMappingProvider(mappings_path=mappings_path)
 
     try:
@@ -218,3 +280,36 @@ def test_reserved_mock_source_providers_return_stable_empty_payloads():
         "evidence": [],
         "missing_narrative_ids": ["N_AI_INFRA"],
     }
+
+
+def _reviewed_registry_text() -> str:
+    payload = json.loads((FIXTURE_DIR / "narrative_registry.json").read_text())
+    payload["review_metadata"] = {
+        "review_schema_version": "review-metadata-v1",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded reviewed registry for V1 provider validation.",
+    }
+    for narrative in payload["narratives"]:
+        narrative["reviewed_by"] = "seed-curation"
+        narrative["reviewed_at"] = "2026-05-15"
+    return json.dumps(payload, ensure_ascii=False)
+
+
+def _reviewed_mapping_text() -> str:
+    payload = json.loads((FIXTURE_DIR / "stock_narrative_mappings.json").read_text())
+    payload["review_metadata"] = {
+        "review_schema_version": "review-metadata-v1",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded reviewed mappings for V1 provider validation.",
+    }
+    for mapping in payload["mappings"]:
+        mapping["method"] = "reviewed_mapping"
+        mapping["review"] = {
+            "status": "approved",
+            "reviewed_by": "seed-curation",
+            "reviewed_at": "2026-05-15",
+            "review_note": "Seeded from accepted V1 mapping fixture.",
+        }
+    return json.dumps(payload, ensure_ascii=False)

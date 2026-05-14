@@ -136,6 +136,10 @@ def _run_acceptance(
         ]
     )
     _run_cli(["--validate-artifact-contracts", str(output_dir)])
+    _validate_reviewed_store_metadata(
+        narrative_registry_path=narrative_registry_path,
+        stock_mappings_path=stock_mappings_path,
+    )
     validate_acceptance_outputs(
         output_dir=output_dir,
         fund_code=fund_code,
@@ -234,6 +238,48 @@ def _read_json(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise AcceptanceError(f"{path} must contain a JSON object")
     return payload
+
+
+def _validate_reviewed_store_metadata(
+    narrative_registry_path: Path,
+    stock_mappings_path: Path,
+) -> None:
+    registry = _read_json(narrative_registry_path)
+    mappings = _read_json(stock_mappings_path)
+    _require_review_metadata(registry, "registry.review_metadata")
+    _require_review_metadata(mappings, "mappings.review_metadata")
+    for index, narrative in enumerate(registry.get("narratives") or []):
+        if narrative.get("human_review_status") == "approved":
+            _require_review_fields(narrative, f"registry.narratives[{index}]")
+    for index, mapping in enumerate(mappings.get("mappings") or []):
+        review = mapping.get("review")
+        _require(isinstance(review, dict), f"mappings[{index}] must include review")
+        _require(review.get("status") == "approved", f"mappings[{index}] must be approved")
+        _require_review_fields(review, f"mappings[{index}].review")
+
+
+def _require_review_metadata(payload: dict[str, Any], context: str) -> None:
+    metadata = payload.get("review_metadata")
+    _require(isinstance(metadata, dict), f"{context} must be present")
+    _require_review_fields(metadata, context)
+    _require(
+        metadata.get("review_schema_version") == "review-metadata-v1",
+        f"{context}.review_schema_version must be review-metadata-v1",
+    )
+    review_note = metadata.get("review_note")
+    _require(
+        isinstance(review_note, str) and bool(review_note.strip()),
+        f"{context}.review_note must be a non-empty string",
+    )
+
+
+def _require_review_fields(payload: dict[str, Any], context: str) -> None:
+    for field in ("reviewed_by", "reviewed_at"):
+        value = payload.get(field)
+        _require(
+            isinstance(value, str) and bool(value.strip()),
+            f"{context}.{field} must be a non-empty string",
+        )
 
 
 def _contains_all(value: str, expected_fragments: tuple[str, ...]) -> bool:

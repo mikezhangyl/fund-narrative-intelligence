@@ -100,6 +100,7 @@ Expected artifacts:
 - `python scripts/validate_reviewed_registry_enriched_acceptance.py --output-dir outputs/reviewed_registry_enriched_161725` is the strict live-provider acceptance command for the first no-mock-core-intelligence enriched path: Eastmoney holdings, reviewed registry, registry-rule mappings, provider-derived evidence/signals, CNINFO announcements, and market quotes.
 - `--stock-mapping-mode reviewed` loads explicit stock-to-narrative mappings from `data/registry/stock_narrative_mappings.reviewed.json` or `--stock-mappings-path`, uses mapping method `reviewed_mapping`, and replaces the `Stock Mappings` provider layer with non-mock `reviewed-mapping-store`.
 - `python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725` is the strict live-provider acceptance command for the enriched path with reviewed registry and reviewed mappings; it rejects `fixture_rule` and `registry_term_rule` selected mappings.
+- Reviewed registry and reviewed mapping providers require store-level `review_metadata`; active reviewed narratives require non-empty `reviewed_by` and `reviewed_at`; reviewed mapping rows require `review.status=approved`, `reviewed_by`, and `reviewed_at`.
 - Narrative reports include deterministic stage, risk, and confidence interpretation notes; these are explanatory and non-advisory.
 - Real-fund smoke summaries isolate failures per fund, write summary artifacts, include concrete unmapped holding details, and return non-zero when any fund fails or falls below coverage threshold.
 - Real-fund smoke summaries also include `multi_mapped_holdings` so 100% mapping coverage does not hide broad or cross-domain registry matches.
@@ -147,6 +148,7 @@ Expected artifacts:
 - Latest announcement-evidence probe for `161725` with CNINFO start date `2026-01-01` returned 56 announcements and 56 converted evidence records, while still disclosing the mixed Eastmoney/CNINFO + Mock intelligence foundation as `partial`.
 - Latest reviewed-registry enriched acceptance for `161725` passed with no mock provider-foundation layers; effective data quality remains `partial` because registry-rule stock mappings are derived rather than a fully reviewed mapping provider.
 - Latest reviewed-mapping enriched acceptance for `161725` passed with all selected mappings using `reviewed_mapping`; `603198` 迎驾贡酒 and `600702` 舍得酒业 were added to the reviewed mapping store to avoid registry-rule fallback.
+- Reviewed-store audit metadata is seeded with `review_schema_version=review-metadata-v1` and reviewer `seed-curation` until future web approvals replace it with user-level approval metadata.
 
 ## Deferred Scope
 
@@ -184,6 +186,7 @@ Expected artifacts:
 - `python scripts/validate_real_enriched_acceptance.py --output-dir outputs/real_enriched_161725` is the strict combined live-provider acceptance command for Eastmoney holdings, CNINFO announcements/evidence, market quotes, and both derived-signal sources. It still requires registry, mapping, base-evidence, and base-signal layers to disclose Mock fixtures. Eastmoney-to-Yahoo quote fallback is allowed only as a recorded and disclosed provider fallback.
 - Reviewed-registry workflow data is intentionally separate from `data/fixtures/`. The current store is file-backed so future web approval flows can write reviewed registry snapshots without changing the pipeline contract.
 - Reviewed stock mapping workflow data is also separate from `data/fixtures/`. The reviewed mapping store uses `reviewed_mapping` so future web approval screens can distinguish persisted mapping records from runtime registry-term fallback.
+- Reviewed stores should fail fast when audit metadata is missing rather than silently presenting fixture-derived data as reviewed.
 
 ## Open Questions
 

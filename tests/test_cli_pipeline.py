@@ -841,10 +841,7 @@ def test_registry_rule_stock_mapping_mode_uses_runtime_mapping_layer(
 
 def test_reviewed_narrative_registry_mode_uses_store_layer(tmp_path):
     registry_path = tmp_path / "narrative_registry.reviewed.json"
-    registry_path.write_text(
-        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
-        encoding="utf-8",
-    )
+    registry_path.write_text(_reviewed_registry_text(), encoding="utf-8")
 
     artifacts = run_pipeline(
         fund_code="000001",
@@ -875,12 +872,7 @@ def test_reviewed_narrative_registry_mode_uses_store_layer(tmp_path):
 
 def test_reviewed_stock_mapping_mode_uses_store_layer(tmp_path):
     mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
-    mappings_path.write_text(
-        (FIXTURE_DIR / "stock_narrative_mappings.json")
-        .read_text(encoding="utf-8")
-        .replace('"method": "fixture_rule"', '"method": "reviewed_mapping"'),
-        encoding="utf-8",
-    )
+    mappings_path.write_text(_reviewed_mapping_text(), encoding="utf-8")
 
     artifacts = run_pipeline(
         fund_code="000001",
@@ -914,6 +906,7 @@ def test_reviewed_stock_mapping_mode_does_not_fallback_to_registry_rule(tmp_path
         json.dumps(
             {
                 "version": "mapping-v1",
+                "review_metadata": _review_metadata(),
                 "mappings": [
                     {
                         "stock_code": "NVDA",
@@ -921,6 +914,7 @@ def test_reviewed_stock_mapping_mode_does_not_fallback_to_registry_rule(tmp_path
                         "mapping_weight": 0.9,
                         "confidence": 0.86,
                         "method": "reviewed_mapping",
+                        "review": _review_entry(),
                     }
                 ],
             },
@@ -1460,3 +1454,39 @@ def test_report_generation_handles_unmapped_real_holdings(tmp_path):
     markdown = paths["markdown"].read_text()
     assert "No mapped narrative exposure" in markdown
     assert "不构成投资建议" in markdown
+
+
+def _review_metadata() -> dict:
+    return {
+        "review_schema_version": "review-metadata-v1",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Test reviewed store metadata.",
+    }
+
+
+def _review_entry() -> dict:
+    return {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Test reviewed entry metadata.",
+    }
+
+
+def _reviewed_registry_text() -> str:
+    payload = json.loads((FIXTURE_DIR / "narrative_registry.json").read_text())
+    payload["review_metadata"] = _review_metadata()
+    for narrative in payload["narratives"]:
+        narrative["reviewed_by"] = "seed-curation"
+        narrative["reviewed_at"] = "2026-05-15"
+    return json.dumps(payload, ensure_ascii=False)
+
+
+def _reviewed_mapping_text() -> str:
+    payload = json.loads((FIXTURE_DIR / "stock_narrative_mappings.json").read_text())
+    payload["review_metadata"] = _review_metadata()
+    for mapping in payload["mappings"]:
+        mapping["method"] = "reviewed_mapping"
+        mapping["review"] = _review_entry()
+    return json.dumps(payload, ensure_ascii=False)

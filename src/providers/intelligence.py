@@ -107,6 +107,7 @@ class ReviewedNarrativeRegistryProvider:
     def get_narrative_registry(self) -> dict[str, Any]:
         payload = _load_json_object(self.registry_path)
         validate_registry_payload(payload)
+        _require_reviewed_registry_metadata(payload)
         return deepcopy(payload)
 
     def get_provider_layer(self) -> dict[str, Any]:
@@ -132,6 +133,8 @@ class ReviewedStockNarrativeMappingProvider:
     def get_stock_narrative_mappings(self) -> list[dict[str, Any]]:
         payload = _load_json_object(self.mappings_path, label="reviewed mappings")
         validate_mapping_payload(payload)
+        _require_reviewed_store_metadata(payload, context="reviewed mappings")
+        _require_reviewed_mapping_entry_metadata(payload["mappings"])
         _require_reviewed_mapping_methods(payload["mappings"])
         return deepcopy(payload["mappings"])
 
@@ -333,6 +336,51 @@ def _load_json_object(path: Path, label: str = "reviewed registry") -> dict[str,
 
 def _reviewed_registry_source_url(path: Path) -> str:
     return _reviewed_source_url(scheme="reviewed-registry", path=path)
+
+
+def _require_reviewed_registry_metadata(payload: dict[str, Any]) -> None:
+    _require_reviewed_store_metadata(payload, context="reviewed registry")
+    for index, narrative in enumerate(payload["narratives"]):
+        if narrative.get("human_review_status") != "approved":
+            continue
+        _require_review_fields(narrative, context=f"narratives[{index}]")
+
+
+def _require_reviewed_store_metadata(payload: dict[str, Any], context: str) -> None:
+    metadata = payload.get("review_metadata")
+    if not isinstance(metadata, dict):
+        raise ValueError(f"{context} must include review_metadata")
+    required = {"review_schema_version", "reviewed_by", "reviewed_at", "review_note"}
+    missing = sorted(required - set(metadata))
+    if missing:
+        raise ValueError(
+            f"{context}.review_metadata missing fields: {', '.join(missing)}"
+        )
+    if metadata.get("review_schema_version") != "review-metadata-v1":
+        raise ValueError(
+            f"{context}.review_metadata.review_schema_version must be review-metadata-v1"
+        )
+    _require_review_fields(metadata, context=f"{context}.review_metadata")
+    review_note = metadata.get("review_note")
+    if not isinstance(review_note, str) or not review_note.strip():
+        raise ValueError(f"{context}.review_metadata.review_note must be a non-empty string")
+
+
+def _require_reviewed_mapping_entry_metadata(mappings: list[dict[str, Any]]) -> None:
+    for index, mapping in enumerate(mappings):
+        review = mapping.get("review")
+        if not isinstance(review, dict):
+            raise ValueError(f"mappings[{index}] must include review metadata")
+        if review.get("status") != "approved":
+            raise ValueError(f"mappings[{index}].review.status must be approved")
+        _require_review_fields(review, context=f"mappings[{index}].review")
+
+
+def _require_review_fields(payload: dict[str, Any], context: str) -> None:
+    for field in ("reviewed_by", "reviewed_at"):
+        value = payload.get(field)
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{context}.{field} must be a non-empty string")
 
 
 def _require_reviewed_mapping_methods(mappings: list[dict[str, Any]]) -> None:

@@ -13,8 +13,8 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
     calls = []
     registry_path = tmp_path / "narrative_registry.reviewed.json"
     mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
-    registry_path.write_text("{}", encoding="utf-8")
-    mappings_path.write_text("{}", encoding="utf-8")
+    registry_path.write_text(_reviewed_registry_text(), encoding="utf-8")
+    mappings_path.write_text(_reviewed_mapping_text(), encoding="utf-8")
 
     def fake_main(args: list[str]) -> int:
         calls.append(args)
@@ -222,3 +222,51 @@ def _source_url(layer: str) -> str:
 
 def _write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+
+def _reviewed_registry_text() -> str:
+    payload = {
+        "review_metadata": _review_metadata(),
+        "narratives": [
+            {
+                "narrative_id": "N_BAIJIU_CONSUMPTION",
+                "human_review_status": "approved",
+                "reviewed_by": "seed-curation",
+                "reviewed_at": "2026-05-15",
+            }
+        ],
+    }
+    return json.dumps(payload, ensure_ascii=False)
+
+
+def _reviewed_mapping_text() -> str:
+    payload = {
+        "review_metadata": _review_metadata(),
+        "mappings": [
+            {
+                "stock_code": "600519",
+                "narrative_id": "N_BAIJIU_CONSUMPTION",
+                "method": "reviewed_mapping",
+                "review": _review_entry(),
+            }
+        ],
+    }
+    return json.dumps(payload, ensure_ascii=False)
+
+
+def _review_metadata() -> dict:
+    return {
+        "review_schema_version": "review-metadata-v1",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Test reviewed store metadata.",
+    }
+
+
+def _review_entry() -> dict:
+    return {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Test reviewed mapping metadata.",
+    }

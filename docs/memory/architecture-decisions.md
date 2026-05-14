@@ -1000,3 +1000,34 @@ Consequences:
   diagnostics, batch/smoke, validation, and review-action commands.
 - The reviewed-mapping enriched acceptance path rejects selected mappings with
   `fixture_rule` or `registry_term_rule`.
+
+## ADR-0041: Require Audit Metadata in Reviewed Stores
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Require reviewed registry and reviewed mapping stores to include store-level
+`review_metadata`, and require reviewed entries to carry entry-level approval
+metadata.
+
+Rationale:
+
+- Future web approval screens need to display who approved a registry or mapping
+  entry and when.
+- A file being stored under `data/registry/` is not enough to prove review
+  status.
+- Provider validation should fail fast when reviewed-store provenance is missing
+  instead of letting reports overstate approval quality.
+
+Consequences:
+
+- Reviewed registry active narratives must have non-empty `reviewed_by` and
+  `reviewed_at`.
+- Reviewed mapping rows must include `review.status=approved`, `reviewed_by`,
+  and `reviewed_at`.
+- Reviewed mapping live acceptance validates the source store metadata before
+  validating generated artifacts.
+- Mock fixtures remain unchanged; audit metadata is required only for reviewed
+  store providers.
