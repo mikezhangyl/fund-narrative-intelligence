@@ -90,6 +90,7 @@ Expected artifacts:
 - Candidate review actions support explicit `approve`, `reject`, and `defer` transitions. Only `approve` with promotion metadata appends an active narrative; report generation never promotes candidates automatically.
 - Raw/scoring JSON includes `candidate_review_queue`, a read-ready queue for future web approval screens with available actions, related exclusions, and promotion action templates.
 - Pipeline outputs include `fund_<code>_review_queue.json`, a dedicated future-workspace artifact containing the queue plus candidate/exclusion context.
+- `python -m src.main --validate-review-queue path/to/fund_000001_review_queue.json` validates a review queue artifact without requiring `--fund-code`.
 - `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.
 - Review-action preview artifacts are validated before write; the reusable validator checks preview metadata, summary, registry delta, and result registry shape.

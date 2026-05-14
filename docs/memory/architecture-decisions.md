@@ -530,6 +530,7 @@ Consequences:
 
 - `run_pipeline` returns a `review_queue` artifact path.
 - The artifact includes metadata, fund identity, provider foundation, queue items, candidate narratives, and excluded mapping candidates.
+- Review queue artifacts can be validated directly through the CLI before future web workspace loading.
 - Existing raw/scoring queue fields remain for snapshot reproducibility.
 
 ## ADR-0026: Preview Review Actions Before Registry Persistence

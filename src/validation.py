@@ -86,39 +86,7 @@ def validate_registry_payload(payload: dict[str, Any]) -> None:
     if not isinstance(candidate_narratives, list):
         raise ProviderContractError("candidate_narratives must be a list")
     for index, candidate in enumerate(candidate_narratives):
-        context = f"candidate_narratives[{index}]"
-        _require_mapping(candidate, context)
-        _require_keys(
-            candidate,
-            {
-                "candidate_narrative_id",
-                "name",
-                "canonical_taxonomy",
-                "status",
-                "source",
-                "triggering_stock_codes",
-                "related_exclusion_ids",
-                "aliases",
-                "related_terms",
-                "rationale",
-                "human_review_status",
-                "reviewed_by",
-                "reviewed_at",
-                "first_seen_at",
-                "last_updated_at",
-            },
-            context,
-        )
-        _require_string_list(
-            candidate["triggering_stock_codes"],
-            f"{context}.triggering_stock_codes",
-        )
-        _require_string_list(
-            candidate["related_exclusion_ids"],
-            f"{context}.related_exclusion_ids",
-        )
-        _require_string_list(candidate["aliases"], f"{context}.aliases")
-        _require_string_list(candidate["related_terms"], f"{context}.related_terms")
+        _validate_candidate_narrative(candidate, f"candidate_narratives[{index}]")
 
 
 def validate_mapping_payload(payload: dict[str, Any]) -> None:
@@ -292,6 +260,57 @@ def validate_review_action_persistence_result_payload(payload: dict[str, Any]) -
     _validate_review_action_registry_delta(payload["registry_delta"])
 
 
+def validate_review_queue_artifact_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "review queue artifact")
+    _require_keys(
+        payload,
+        {
+            "metadata",
+            "fund",
+            "provider_foundation",
+            "candidate_review_queue",
+            "candidate_narratives",
+            "excluded_mapping_candidates",
+        },
+        "review queue artifact",
+    )
+    _require_mapping(payload["metadata"], "review queue artifact metadata")
+    _require_mapping(payload["fund"], "review queue artifact fund")
+    _require_mapping(
+        payload["provider_foundation"],
+        "review queue artifact provider_foundation",
+    )
+
+    candidate_narratives = payload["candidate_narratives"]
+    if not isinstance(candidate_narratives, list):
+        raise ProviderContractError("candidate_narratives must be a list")
+    candidate_ids = set()
+    for index, candidate in enumerate(candidate_narratives):
+        candidate_id = _validate_candidate_narrative(
+            candidate,
+            f"candidate_narratives[{index}]",
+        )
+        if candidate_id in candidate_ids:
+            raise ProviderContractError(
+                f"candidate_narratives[{index}].candidate_narrative_id must be unique"
+            )
+        candidate_ids.add(candidate_id)
+
+    excluded_mapping_candidates = payload["excluded_mapping_candidates"]
+    if not isinstance(excluded_mapping_candidates, list):
+        raise ProviderContractError("excluded_mapping_candidates must be a list")
+    for index, exclusion in enumerate(excluded_mapping_candidates):
+        _validate_review_queue_exclusion(
+            exclusion,
+            f"excluded_mapping_candidates[{index}]",
+        )
+
+    _validate_candidate_review_queue(
+        payload["candidate_review_queue"],
+        candidate_ids,
+    )
+
+
 def _require_mapping(value: Any, context: str) -> None:
     if not isinstance(value, dict):
         raise ProviderContractError(f"{context} must be an object")
@@ -315,6 +334,231 @@ def _require_string_list(value: Any, context: str) -> None:
         raise ProviderContractError(f"{context} must be a list")
     if not all(isinstance(item, str) for item in value):
         raise ProviderContractError(f"{context} must contain strings only")
+
+
+def _validate_candidate_narrative(candidate: Any, context: str) -> str:
+    _require_mapping(candidate, context)
+    _require_keys(
+        candidate,
+        {
+            "candidate_narrative_id",
+            "name",
+            "canonical_taxonomy",
+            "status",
+            "source",
+            "triggering_stock_codes",
+            "related_exclusion_ids",
+            "aliases",
+            "related_terms",
+            "rationale",
+            "human_review_status",
+            "reviewed_by",
+            "reviewed_at",
+            "first_seen_at",
+            "last_updated_at",
+        },
+        context,
+    )
+    candidate_id = candidate["candidate_narrative_id"]
+    if not isinstance(candidate_id, str) or not candidate_id:
+        raise ProviderContractError(f"{context}.candidate_narrative_id must be a non-empty string")
+    _require_string_list(
+        candidate["triggering_stock_codes"],
+        f"{context}.triggering_stock_codes",
+    )
+    _require_string_list(
+        candidate["related_exclusion_ids"],
+        f"{context}.related_exclusion_ids",
+    )
+    _require_string_list(candidate["aliases"], f"{context}.aliases")
+    _require_string_list(candidate["related_terms"], f"{context}.related_terms")
+    return candidate_id
+
+
+def _validate_review_queue_exclusion(exclusion: Any, context: str) -> None:
+    _require_mapping(exclusion, context)
+    _require_keys(
+        exclusion,
+        {
+            "exclusion_id",
+            "stock_code",
+            "stock_name",
+            "narrative_id",
+            "narrative_name",
+            "method",
+            "reason",
+            "recommended_action",
+        },
+        context,
+    )
+    for field in {
+        "exclusion_id",
+        "stock_code",
+        "stock_name",
+        "narrative_id",
+        "narrative_name",
+        "method",
+        "reason",
+        "recommended_action",
+    }:
+        if not isinstance(exclusion[field], str) or not exclusion[field]:
+            raise ProviderContractError(f"{context}.{field} must be a non-empty string")
+
+
+def _validate_candidate_review_queue(queue: Any, candidate_ids: set[str]) -> None:
+    _require_mapping(queue, "candidate_review_queue")
+    _require_keys(queue, {"version", "summary", "items"}, "candidate_review_queue")
+    if queue["version"] != "candidate-review-queue-v1":
+        raise ProviderContractError("candidate_review_queue version is unsupported")
+    items = queue["items"]
+    if not isinstance(items, list):
+        raise ProviderContractError("candidate_review_queue.items must be a list")
+    item_candidate_ids = []
+    for index, item in enumerate(items):
+        item_candidate_ids.append(
+            _validate_candidate_review_queue_item(
+                item,
+                candidate_ids,
+                f"candidate_review_queue.items[{index}]",
+            )
+        )
+    if len(set(item_candidate_ids)) != len(item_candidate_ids):
+        raise ProviderContractError(
+            "candidate_review_queue.items candidate_narrative_id values must be unique"
+        )
+    if set(item_candidate_ids) != candidate_ids:
+        raise ProviderContractError(
+            "candidate_review_queue.items must match candidate_narratives"
+        )
+    _validate_candidate_review_queue_summary(queue["summary"], items)
+
+
+def _validate_candidate_review_queue_summary(
+    summary: Any,
+    items: list[Any],
+) -> None:
+    _require_mapping(summary, "candidate_review_queue.summary")
+    _require_keys(
+        summary,
+        {"total_count", "pending_count", "action_required"},
+        "candidate_review_queue.summary",
+    )
+    pending_count = sum(
+        1
+        for item in items
+        if isinstance(item, dict) and item.get("human_review_status") == "candidate"
+    )
+    if summary["total_count"] != len(items):
+        raise ProviderContractError(
+            "candidate_review_queue.summary.total_count must match item count"
+        )
+    if summary["pending_count"] != pending_count:
+        raise ProviderContractError(
+            "candidate_review_queue.summary.pending_count must match pending items"
+        )
+    if summary["action_required"] != (pending_count > 0):
+        raise ProviderContractError(
+            "candidate_review_queue.summary.action_required must match pending_count"
+        )
+
+
+def _validate_candidate_review_queue_item(
+    item: Any,
+    candidate_ids: set[str],
+    context: str,
+) -> str:
+    _require_mapping(item, context)
+    _require_keys(
+        item,
+        {
+            "review_item_id",
+            "item_type",
+            "candidate_narrative_id",
+            "name",
+            "canonical_taxonomy",
+            "status",
+            "human_review_status",
+            "source",
+            "rationale",
+            "triggering_stock_codes",
+            "related_exclusion_ids",
+            "related_exclusions",
+            "available_actions",
+            "default_action",
+            "requires_promotion_metadata",
+            "promotion_action_template",
+        },
+        context,
+    )
+    candidate_id = item["candidate_narrative_id"]
+    if not isinstance(candidate_id, str) or not candidate_id:
+        raise ProviderContractError(f"{context}.candidate_narrative_id must be a non-empty string")
+    if candidate_id not in candidate_ids:
+        raise ProviderContractError(
+            f"{context}.candidate_narrative_id must exist in candidate_narratives"
+        )
+    if item["review_item_id"] != f"RQ_{candidate_id}":
+        raise ProviderContractError(f"{context}.review_item_id must match candidate")
+    if item["item_type"] != "candidate_narrative":
+        raise ProviderContractError(f"{context}.item_type is unsupported")
+    _require_string_list(item["triggering_stock_codes"], f"{context}.triggering_stock_codes")
+    _require_string_list(item["related_exclusion_ids"], f"{context}.related_exclusion_ids")
+    related_exclusions = item["related_exclusions"]
+    if not isinstance(related_exclusions, list):
+        raise ProviderContractError(f"{context}.related_exclusions must be a list")
+    for index, exclusion in enumerate(related_exclusions):
+        _validate_review_queue_exclusion(
+            exclusion,
+            f"{context}.related_exclusions[{index}]",
+        )
+    if item["available_actions"] != ["approve", "reject", "defer"]:
+        raise ProviderContractError(f"{context}.available_actions is unsupported")
+    if item["default_action"] not in item["available_actions"]:
+        raise ProviderContractError(f"{context}.default_action must be available")
+    if not isinstance(item["requires_promotion_metadata"], bool):
+        raise ProviderContractError(f"{context}.requires_promotion_metadata must be boolean")
+    _validate_review_queue_promotion_template(
+        item["promotion_action_template"],
+        candidate_id,
+        f"{context}.promotion_action_template",
+    )
+    return candidate_id
+
+
+def _validate_review_queue_promotion_template(
+    template: Any,
+    candidate_id: str,
+    context: str,
+) -> None:
+    _require_mapping(template, context)
+    _require_keys(
+        template,
+        {
+            "action_id",
+            "candidate_narrative_id",
+            "action",
+            "reviewed_by",
+            "reviewed_at",
+            "review_note",
+            "promotion",
+        },
+        context,
+    )
+    if template["candidate_narrative_id"] != candidate_id:
+        raise ProviderContractError(f"{context}.candidate_narrative_id must match item")
+    if template["action"] != "approve":
+        raise ProviderContractError(f"{context}.action must be approve")
+    promotion = template["promotion"]
+    _require_mapping(promotion, f"{context}.promotion")
+    _require_keys(
+        promotion,
+        {"narrative_id", "parent_id", "level", "aliases", "related_terms"},
+        f"{context}.promotion",
+    )
+    if not isinstance(promotion["level"], int) or promotion["level"] <= 0:
+        raise ProviderContractError(f"{context}.promotion.level must be positive integer")
+    _require_string_list(promotion["aliases"], f"{context}.promotion.aliases")
+    _require_string_list(promotion["related_terms"], f"{context}.promotion.related_terms")
 
 
 def _validate_review_action_preview_summary(summary: Any) -> None:

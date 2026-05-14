@@ -182,6 +182,15 @@ outputs/fund_<fund_code>_review_queue.json
 
 This artifact should include `metadata`, `fund`, `provider_foundation`, `candidate_review_queue`, `candidate_narratives`, and `excluded_mapping_candidates`.
 
+V1 should expose direct review queue validation:
+
+```bash
+python -m src.main --validate-review-queue path/to/fund_000001_review_queue.json
+```
+
+This command validates the workspace-facing queue artifact contract and exits
+without requiring `--fund-code`.
+
 V1 should also expose a safe local preview wrapper for future web review-action
 submissions:
 
