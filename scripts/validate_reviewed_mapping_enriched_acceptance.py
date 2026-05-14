@@ -132,6 +132,8 @@ def _run_acceptance(
             announcement_start_date,
             "--include-market-quotes",
             "--include-valuation-snapshots",
+            "--valuation-source",
+            "eastmoney",
             "--include-news-evidence",
             "--output-dir",
             str(output_dir),
@@ -235,28 +237,31 @@ def validate_acceptance_outputs(
         "raw/scoring valuation_snapshots mismatch",
     )
     _require(
-        valuation_snapshots.get("provider_name") == "quote-derived-valuation",
-        "valuation_snapshots provider must be quote-derived-valuation",
+        valuation_snapshots.get("provider_name") == "eastmoney-valuation",
+        "valuation_snapshots provider must be eastmoney-valuation",
     )
     _require(
-        valuation_snapshots.get("valuation_basis") == "quote_derived_context",
-        "valuation_snapshots must use quote_derived_context",
+        valuation_snapshots.get("valuation_basis") == "provider_valuation_metrics",
+        "valuation_snapshots must use provider_valuation_metrics",
     )
     _require(
-        valuation_layer.get("provider_name") == "quote-derived-valuation",
-        "valuation layer must use quote-derived-valuation",
+        valuation_layer.get("provider_name") == "eastmoney-valuation",
+        "valuation layer must use eastmoney-valuation",
     )
     _require(valuation_layer.get("is_mock") is False, "valuation layer must not be mock")
     _require(
-        valuation_layer.get("source_url") == "derived://market-quotes/valuation-context",
-        "valuation layer source_url must disclose quote-derived context",
+        str(valuation_layer.get("source_url") or "").startswith(
+            "https://push2.eastmoney.com/api/qt/stock/get"
+        )
+        or valuation_layer.get("source_url") == "multiple://valuation",
+        "valuation layer source_url must disclose Eastmoney valuation source",
     )
     expected = (
         "reviewed-registry-store",
         "reviewed-mapping-store",
         "provider-derived-evidence",
         "provider-derived-signals",
-        "quote-derived-valuation",
+        "eastmoney-valuation",
     )
     _require(_contains_all(markdown, expected), "Markdown reviewed mapping mismatch")
     _require(_contains_all(html, expected), "HTML reviewed mapping mismatch")
@@ -364,7 +369,7 @@ def _print_success(
     print("signals=provider_derived")
     print("announcements=fresh")
     print("market_quotes=fresh")
-    print("valuation=quote_derived")
+    print("valuation=eastmoney")
     print("mock_layers=none")
     print("effective_data_quality=partial")
     print(f"workspace_snapshot=fund_{fund_code}_workspace_snapshot.json")

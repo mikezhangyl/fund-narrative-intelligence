@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-docs-workspace-acceptance-sync",
+  "latest_run": "20260515-eastmoney-valuation-provider",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "sync product docs with workspace snapshot acceptance and reviewed-mapping valuation gate"
+  "next_step": "add Eastmoney valuation metrics provider behind valuation snapshot contract"
 }

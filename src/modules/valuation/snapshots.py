@@ -39,8 +39,17 @@ def valuation_provider_layer(payload: dict[str, Any]) -> dict[str, Any]:
         "data_quality": str(payload["data_quality"]),
         "source_url": str(payload["source_url"]),
         "is_mock": payload["data_quality"] == "mock",
-        "note": "Quote-derived valuation context; not a full fundamental valuation feed.",
+        "note": _valuation_layer_note(str(payload["valuation_basis"])),
     }
+
+
+def _valuation_layer_note(valuation_basis: str) -> str:
+    if valuation_basis == "provider_valuation_metrics":
+        return (
+            "Eastmoney valuation metrics; not a full financial statement or "
+            "historical percentile valuation feed."
+        )
+    return "Quote-derived valuation context; not a full fundamental valuation feed."
 
 
 def _valuation_from_quote(quote: dict[str, Any]) -> dict[str, Any]:

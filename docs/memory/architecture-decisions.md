@@ -1201,3 +1201,34 @@ Consequences:
 - Negative news snippets become `language_decay`.
 - `Derived Signals` provider foundation can now report `news-derived-signals`
   or `mixed-derived-signals` when combined with CNINFO/market quote signals.
+
+## ADR-0048: Add Explicit Eastmoney Valuation Metrics Source
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add an explicit `--valuation-source eastmoney` option that fetches Eastmoney
+quote-detail valuation metrics into the existing `valuation-snapshot-v1`
+contract.
+
+Rationale:
+
+- The existing `--include-valuation-snapshots` default is documented as
+  quote-derived context, and changing that default would blur backwards
+  compatibility.
+- Eastmoney can provide PE/PB/market-cap-style metrics without credentials,
+  which reduces the placeholder surface for the valuation dimension.
+- The payload must still avoid overclaiming: Eastmoney quote-detail metrics are
+  not a full financial statement feed or historical valuation percentile model.
+
+Consequences:
+
+- `valuation-snapshot-v1` now accepts both `quote-derived-valuation` with
+  `valuation_basis = quote_derived_context` and `eastmoney-valuation` with
+  `valuation_basis = provider_valuation_metrics`.
+- Reviewed-mapping enriched acceptance uses `--valuation-source eastmoney`.
+- Reports and source tables disclose the Eastmoney valuation provider note.
+- Scoring weights remain unchanged until a later valuation-scoring calibration
+  slice consumes the richer metrics.

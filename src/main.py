@@ -19,6 +19,8 @@ from src.orchestrator import (
     NARRATIVE_REGISTRY_MODES,
     STOCK_MAPPING_MODE_FIXTURE,
     STOCK_MAPPING_MODES,
+    VALUATION_SNAPSHOT_SOURCES,
+    VALUATION_SOURCE_QUOTE_DERIVED,
     inspect_provider_foundation,
     run_all_fixture_pipelines,
     run_pipeline,
@@ -224,6 +226,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optionally derive lightweight valuation context from market quote snapshots.",
     )
     parser.add_argument(
+        "--valuation-source",
+        choices=sorted(VALUATION_SNAPSHOT_SOURCES),
+        default=VALUATION_SOURCE_QUOTE_DERIVED,
+        help=(
+            "Valuation snapshot source. quote-derived uses market quote context; "
+            "eastmoney fetches Eastmoney valuation metrics."
+        ),
+    )
+    parser.add_argument(
         "--include-news-evidence",
         action="store_true",
         help="Optionally fetch RSS-derived news evidence for mapped narratives.",
@@ -242,8 +253,16 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(
             "--announcement-start-date requires --include-cninfo-announcements"
         )
-    if args.include_valuation_snapshots and not args.include_market_quotes:
+    if (
+        args.include_valuation_snapshots
+        and args.valuation_source == VALUATION_SOURCE_QUOTE_DERIVED
+        and not args.include_market_quotes
+    ):
         parser.error("--include-valuation-snapshots requires --include-market-quotes")
+    if args.valuation_source != VALUATION_SOURCE_QUOTE_DERIVED and (
+        not args.include_valuation_snapshots
+    ):
+        parser.error("--valuation-source requires --include-valuation-snapshots")
     if (
         args.narrative_registry_path
         and args.narrative_registry_mode != NARRATIVE_REGISTRY_MODE_REVIEWED
@@ -730,6 +749,7 @@ def main(argv: list[str] | None = None) -> int:
             announcement_start_date=args.announcement_start_date,
             include_market_quotes=args.include_market_quotes,
             include_valuation_snapshots=args.include_valuation_snapshots,
+            valuation_snapshot_source=args.valuation_source,
             include_news_evidence=args.include_news_evidence,
             narrative_registry_mode=args.narrative_registry_mode,
             narrative_registry_path=args.narrative_registry_path,

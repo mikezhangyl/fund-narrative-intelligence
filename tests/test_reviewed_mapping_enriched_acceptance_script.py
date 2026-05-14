@@ -51,6 +51,7 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
     captured = capsys.readouterr()
     assert exit_code == 0
     assert "Reviewed-mapping enriched acceptance passed:" in captured.out
+    assert "valuation=eastmoney" in captured.out
     assert "workspace_snapshot=fund_161725_workspace_snapshot.json" in captured.out
     assert calls[0] == [
         "--fund-code",
@@ -72,6 +73,8 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
         "2026-01-01",
         "--include-market-quotes",
         "--include-valuation-snapshots",
+        "--valuation-source",
+        "eastmoney",
         "--include-news-evidence",
         "--output-dir",
         str(tmp_path),
@@ -146,7 +149,7 @@ def _write_outputs(
             "announcements": _real_layer("announcements", "cninfo-announcement"),
             "market_quotes": _real_layer("market_quotes", "yahoo-chart"),
             **(
-                {"valuation": _real_layer("valuation", "quote-derived-valuation")}
+                {"valuation": _real_layer("valuation", "eastmoney-valuation")}
                 if include_valuation
                 else {}
             ),
@@ -182,23 +185,28 @@ def _write_outputs(
     }
     valuation_snapshots = {
         "version": "valuation-snapshot-v1",
-        "provider_name": "quote-derived-valuation",
-        "provider_version": "quote-derived-valuation-v1",
+        "provider_name": "eastmoney-valuation",
+        "provider_version": "eastmoney-valuation-v1",
         "data_quality": "fresh",
-        "source_url": "derived://market-quotes/valuation-context",
+        "source_url": "https://push2.eastmoney.com/api/qt/stock/get?secid=1.600519",
         "retrieved_at": "2026-05-14T00:00:00+00:00",
-        "valuation_basis": "quote_derived_context",
+        "valuation_basis": "provider_valuation_metrics",
         "valuations": [
             {
                 "stock_code": "600519",
                 "stock_name": "贵州茅台",
-                "source": "market_quote",
-                "source_provider": "yahoo-chart",
-                "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS",
+                "source": "provider_valuation_metrics",
+                "source_provider": "eastmoney-valuation",
+                "source_url": "https://push2.eastmoney.com/api/qt/stock/get?secid=1.600519",
                 "latest_price": 1600.0,
                 "change_percent": 3.4,
                 "valuation_pressure": "elevated",
                 "retrieved_at": "2026-05-14T00:00:00+00:00",
+                "pe_ttm": 42.0,
+                "pb": 8.2,
+                "market_cap": 1680759514466.55,
+                "float_market_cap": 1680759514466.55,
+                "turnover_rate": 0.44,
             }
         ],
         "missing_stock_codes": [],
@@ -291,7 +299,7 @@ def _write_outputs(
     notice = (
         "reviewed-registry-store\nreviewed-mapping-store\n"
         "provider-derived-evidence\nprovider-derived-signals\n"
-        "quote-derived-valuation\n"
+        "eastmoney-valuation\n"
     )
     (output_dir / "fund_161725_report.md").write_text(notice, encoding="utf-8")
     (output_dir / "fund_161725_report.html").write_text(notice, encoding="utf-8")
@@ -324,7 +332,7 @@ def _source_url(layer: str) -> str:
         "holdings": "https://fundmobapi.eastmoney.com/FundMNewApi/FundMNInverstPosition?FCODE=161725",
         "announcements": "https://www.cninfo.com.cn/new/hisAnnouncement/query",
         "market_quotes": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS",
-        "valuation": "derived://market-quotes/valuation-context",
+        "valuation": "https://push2.eastmoney.com/api/qt/stock/get?secid=1.600519",
         "news_evidence": "https://news.google.com/rss/search",
     }[layer]
 

@@ -51,3 +51,10 @@ The workspace snapshot includes top-level `data_source_notice` and
 `approval_workflow` fields so a future web UI can display mock/partial source
 warnings and review-action state without rebuilding them from lower-level
 artifacts.
+
+The strict reviewed-mapping enriched acceptance path now uses explicit
+Eastmoney valuation metrics:
+
+```bash
+python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725
+```

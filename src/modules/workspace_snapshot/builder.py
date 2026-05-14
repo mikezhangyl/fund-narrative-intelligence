@@ -10,6 +10,7 @@ from src.validation import (
     validate_pipeline_artifact_manifest_payload,
     validate_review_queue_artifact_payload,
     validate_source_table_artifact_payload,
+    validate_valuation_snapshot_payload,
     validate_workspace_snapshot_payload,
 )
 
@@ -271,6 +272,13 @@ def _require_bundle_identity(
 
 
 def _validate_optional_bundle_payloads(raw: dict[str, Any], scoring: dict[str, Any]) -> None:
+    raw_valuation = raw.get("valuation_snapshots")
+    scoring_valuation = scoring.get("valuation_snapshots")
+    if raw_valuation is not None or scoring_valuation is not None:
+        if raw_valuation != scoring_valuation:
+            raise ValueError("workspace snapshot valuation_snapshots mismatch")
+        validate_valuation_snapshot_payload(raw_valuation)
+
     raw_news = raw.get("news_evidence")
     scoring_news = scoring.get("news_evidence")
     if raw_news is None and scoring_news is None:

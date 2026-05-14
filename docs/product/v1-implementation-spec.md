@@ -595,7 +595,7 @@ include:
 The strict reviewed-mapping enriched acceptance command exercises the current
 no-mock-core server path with Eastmoney holdings, reviewed registry, reviewed
 stock mappings, provider-derived evidence/signals, CNINFO announcements, market
-quotes, quote-derived valuation snapshots, news evidence, and workspace snapshot
+quotes, Eastmoney valuation metrics, news evidence, and workspace snapshot
 validation:
 
 ```bash
@@ -614,6 +614,19 @@ and the payload must include `valuation_basis = quote_derived_context`; it is
 not a substitute for full PE/PB/DCF or financial-report valuation data. Reports
 and source tables must surface this limitation in the provider note so users do
 not mistake quote-derived context for fundamental valuation.
+
+V1 can also fetch first-pass Eastmoney valuation metrics explicitly:
+
+```bash
+python -m src.main --fund-code 000001 --include-valuation-snapshots --valuation-source eastmoney
+```
+
+This keeps the same `valuation-snapshot-v1` artifact contract but uses
+`provider_name = eastmoney-valuation` and
+`valuation_basis = provider_valuation_metrics`. The payload can include PE, PB,
+market-cap, float-market-cap, and turnover-style metrics when Eastmoney returns
+them. It is still not a full financial-statement valuation model or historical
+valuation percentile.
 
 V1 can also fetch RSS-derived news evidence for mapped narratives:
 

@@ -267,15 +267,22 @@ def validate_valuation_snapshot_payload(payload: dict[str, Any]) -> None:
     )
     if payload["version"] != "valuation-snapshot-v1":
         raise ProviderContractError("valuation snapshots version is unsupported")
-    if payload["provider_name"] != "quote-derived-valuation":
+    if payload["provider_name"] not in {"quote-derived-valuation", "eastmoney-valuation"}:
         raise ProviderContractError(
-            "valuation snapshots provider_name must be quote-derived-valuation"
+            "valuation snapshots provider_name must be quote-derived-valuation or eastmoney-valuation"
         )
-    if payload["provider_version"] != "quote-derived-valuation-v1":
+    expected_versions = {
+        "quote-derived-valuation": "quote-derived-valuation-v1",
+        "eastmoney-valuation": "eastmoney-valuation-v1",
+    }
+    if payload["provider_version"] != expected_versions[payload["provider_name"]]:
         raise ProviderContractError(
-            "valuation snapshots provider_version must be quote-derived-valuation-v1"
+            "valuation snapshots provider_version must match provider_name"
         )
-    if payload["valuation_basis"] != "quote_derived_context":
+    if payload["valuation_basis"] not in {
+        "quote_derived_context",
+        "provider_valuation_metrics",
+    }:
         raise ProviderContractError("valuation snapshots valuation_basis is unsupported")
     if payload["data_quality"] not in {"fresh", "partial", "mock", "unavailable"}:
         raise ProviderContractError(
@@ -318,8 +325,10 @@ def _validate_valuation_snapshot_item(item: Any, context: str) -> None:
         raise ProviderContractError(f"{context}.stock_code must be non-empty")
     if item["valuation_pressure"] not in {"elevated", "neutral", "discounted", "unknown"}:
         raise ProviderContractError(f"{context}.valuation_pressure is unsupported")
-    if item["source"] != "market_quote":
-        raise ProviderContractError(f"{context}.source must be market_quote")
+    if item["source"] not in {"market_quote", "provider_valuation_metrics"}:
+        raise ProviderContractError(
+            f"{context}.source must be market_quote or provider_valuation_metrics"
+        )
     for field in {"source_provider", "source_url", "retrieved_at"}:
         if not isinstance(item[field], str) or not item[field]:
             raise ProviderContractError(f"{context}.{field} must be a non-empty string")

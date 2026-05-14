@@ -36,6 +36,7 @@ from src.providers.cninfo import (
     CNInfoAnnouncementProvider,
 )
 from src.providers.eastmoney_market import EastmoneyMarketDataProvider
+from src.providers.eastmoney_valuation import EastmoneyValuationProvider
 from src.providers.factory import select_data_provider
 from src.providers.intelligence import (
     ReviewedNarrativeRegistryProvider,
@@ -70,6 +71,12 @@ BASE_INTELLIGENCE_MODES = {
     BASE_INTELLIGENCE_MODE_FIXTURE,
     BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED,
 }
+VALUATION_SOURCE_QUOTE_DERIVED = "quote-derived"
+VALUATION_SOURCE_EASTMONEY = "eastmoney"
+VALUATION_SNAPSHOT_SOURCES = {
+    VALUATION_SOURCE_QUOTE_DERIVED,
+    VALUATION_SOURCE_EASTMONEY,
+}
 
 
 def run_pipeline(
@@ -82,6 +89,8 @@ def run_pipeline(
     include_market_quotes: bool = False,
     market_data_provider: Any | None = None,
     include_valuation_snapshots: bool = False,
+    valuation_snapshot_source: str = VALUATION_SOURCE_QUOTE_DERIVED,
+    valuation_provider: Any | None = None,
     include_news_evidence: bool = False,
     news_evidence_provider: Any | None = None,
     narrative_registry_mode: str = NARRATIVE_REGISTRY_MODE_FIXTURE,
@@ -108,6 +117,11 @@ def run_pipeline(
         raise ValueError(
             "base_intelligence_mode must be one of: "
             f"{', '.join(sorted(BASE_INTELLIGENCE_MODES))}"
+        )
+    if valuation_snapshot_source not in VALUATION_SNAPSHOT_SOURCES:
+        raise ValueError(
+            "valuation_snapshot_source must be one of: "
+            f"{', '.join(sorted(VALUATION_SNAPSHOT_SOURCES))}"
         )
     if (
         base_intelligence_mode == BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED
@@ -225,13 +239,33 @@ def run_pipeline(
             *degradation_events,
             *market_result["degradation_events"],
         ]
-        if include_valuation_snapshots:
+        if (
+            include_valuation_snapshots
+            and valuation_snapshot_source == VALUATION_SOURCE_QUOTE_DERIVED
+        ):
             valuation_snapshots_payload = build_quote_derived_valuation_snapshots(
                 market_quotes_payload
             )
             valuation_layer = valuation_provider_layer(valuation_snapshots_payload)
-    elif include_valuation_snapshots:
+    elif (
+        include_valuation_snapshots
+        and valuation_snapshot_source == VALUATION_SOURCE_QUOTE_DERIVED
+    ):
         raise ValueError("include_valuation_snapshots requires include_market_quotes")
+    if (
+        include_valuation_snapshots
+        and valuation_snapshot_source == VALUATION_SOURCE_EASTMONEY
+    ):
+        valuation_result = _run_valuation_snapshots(
+            stock_codes=[holding["stock_code"] for holding in holdings],
+            valuation_provider=valuation_provider,
+        )
+        valuation_snapshots_payload = valuation_result["valuation_snapshots"]
+        valuation_layer = valuation_result["provider_layer"]
+        degradation_events = [
+            *degradation_events,
+            *valuation_result["degradation_events"],
+        ]
     if include_announcement_evidence:
         announcement_result = _run_announcement_evidence(
             stock_codes=[holding["stock_code"] for holding in holdings],
@@ -674,6 +708,19 @@ def _run_market_quotes(
             provider=provider,
             market_quotes_payload=market_quotes_payload,
         ),
+        "degradation_events": getattr(provider, "degradation_events", []),
+    }
+
+
+def _run_valuation_snapshots(
+    stock_codes: list[str],
+    valuation_provider: Any | None,
+) -> dict[str, Any]:
+    provider = valuation_provider or EastmoneyValuationProvider()
+    valuation_snapshots_payload = provider.get_valuation_snapshots(stock_codes=stock_codes)
+    return {
+        "valuation_snapshots": valuation_snapshots_payload,
+        "provider_layer": valuation_provider_layer(valuation_snapshots_payload),
         "degradation_events": getattr(provider, "degradation_events", []),
     }
 
