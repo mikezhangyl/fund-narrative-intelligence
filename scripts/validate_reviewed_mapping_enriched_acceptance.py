@@ -136,7 +136,12 @@ def _run_acceptance(
             str(output_dir),
         ]
     )
+    workspace_snapshot_path = output_dir / f"fund_{fund_code}_workspace_snapshot.json"
+    if workspace_snapshot_path.exists():
+        workspace_snapshot_path.unlink()
     _run_cli(["--validate-artifact-contracts", str(output_dir)])
+    _run_cli(["--build-workspace-snapshot", str(output_dir)])
+    _run_cli(["--validate-workspace-snapshot", str(workspace_snapshot_path)])
     _validate_reviewed_store_metadata(
         narrative_registry_path=narrative_registry_path,
         stock_mappings_path=stock_mappings_path,
@@ -332,6 +337,7 @@ def _print_success(
     print("market_quotes=fresh")
     print("mock_layers=none")
     print("effective_data_quality=partial")
+    print(f"workspace_snapshot=fund_{fund_code}_workspace_snapshot.json")
 
 
 if __name__ == "__main__":

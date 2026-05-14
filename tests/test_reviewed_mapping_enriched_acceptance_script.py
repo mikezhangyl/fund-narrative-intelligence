@@ -13,13 +13,22 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
     calls = []
     registry_path = tmp_path / "narrative_registry.reviewed.json"
     mappings_path = tmp_path / "stock_narrative_mappings.reviewed.json"
+    snapshot_path = tmp_path / "fund_161725_workspace_snapshot.json"
     registry_path.write_text(_reviewed_registry_text(), encoding="utf-8")
     mappings_path.write_text(_reviewed_mapping_text(), encoding="utf-8")
+    snapshot_path.write_text('{"version": "old-workspace-snapshot"}', encoding="utf-8")
 
     def fake_main(args: list[str]) -> int:
         calls.append(args)
         if args[:2] == ["--fund-code", "161725"]:
             _write_outputs(tmp_path)
+        if args == ["--validate-artifact-contracts", str(tmp_path)]:
+            assert not snapshot_path.exists()
+        if args == ["--build-workspace-snapshot", str(tmp_path)]:
+            assert not snapshot_path.exists()
+            snapshot_path.write_text('{"version": "workspace-snapshot-v1"}', encoding="utf-8")
+        if args == ["--validate-workspace-snapshot", str(snapshot_path)]:
+            assert snapshot_path.exists()
         return 0
 
     monkeypatch.setattr(
@@ -42,6 +51,7 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
     captured = capsys.readouterr()
     assert exit_code == 0
     assert "Reviewed-mapping enriched acceptance passed:" in captured.out
+    assert "workspace_snapshot=fund_161725_workspace_snapshot.json" in captured.out
     assert calls[0] == [
         "--fund-code",
         "161725",
@@ -64,6 +74,12 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
         "--include-news-evidence",
         "--output-dir",
         str(tmp_path),
+    ]
+    assert calls[1] == ["--validate-artifact-contracts", str(tmp_path)]
+    assert calls[2] == ["--build-workspace-snapshot", str(tmp_path)]
+    assert calls[3] == [
+        "--validate-workspace-snapshot",
+        str(snapshot_path),
     ]
 
 

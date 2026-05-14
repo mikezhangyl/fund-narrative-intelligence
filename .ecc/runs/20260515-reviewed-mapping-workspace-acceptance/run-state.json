@@ -1,0 +1,32 @@
+{
+  "task_run_id": "20260515-reviewed-mapping-workspace-acceptance",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/reviewed-mapping-workspace-acceptance",
+  "worktree": "main",
+  "base_commit": "4810c14",
+  "head_commit": "commit-containing-this-run-state",
+  "merge_base": "4810c14",
+  "quality_reviewed_commit": "parent-reviewed",
+  "reviewed_snapshot_type": "parent-review",
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "commit_and_merge",
+  "review_outcome": "parent review completed; reviewed-mapping acceptance now builds and validates workspace snapshot",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "not_required",
+  "decisions": [
+    {
+      "id": "RMWA-001",
+      "date": "2026-05-15",
+      "decision": "Strengthen the existing strict acceptance script instead of adding a separate workspace-only acceptance command.",
+      "rationale": "The reviewed-mapping enriched path is the current closest end-to-end no-mock-core server flow, so it is the right gate for future web loader readiness."
+    }
+  ]
+}

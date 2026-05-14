@@ -67,3 +67,4 @@
 - [news-derived-signals.md](./news-derived-signals.md)
 - [reviewed-mapping-news-acceptance.md](./reviewed-mapping-news-acceptance.md)
 - [workspace-approval-readiness.md](./workspace-approval-readiness.md)
+- [reviewed-mapping-workspace-acceptance.md](./reviewed-mapping-workspace-acceptance.md)
