@@ -8,6 +8,7 @@ from src.modules.narrative_review.preview import (
     build_review_action_preview,
     write_review_action_preview,
 )
+from src.validation import validate_review_action_preview_payload
 
 FIXTURE_DIR = Path("data/fixtures")
 
@@ -80,6 +81,7 @@ def test_build_review_action_preview_applies_action_without_mutating_registry():
     assert preview["result_registry"]["narratives"][-1]["narrative_id"] == (
         "N_CONSUMER_ELECTRONICS_GLOBALIZATION"
     )
+    validate_review_action_preview_payload(preview)
 
 
 def test_build_review_action_preview_summarizes_reject_without_promotion():
@@ -109,6 +111,29 @@ def test_build_review_action_preview_summarizes_reject_without_promotion():
     assert preview["registry_delta"]["candidate_changes"]["after"]["status"] == (
         "rejected"
     )
+    validate_review_action_preview_payload(preview)
+
+
+def test_validate_review_action_preview_rejects_missing_top_level_fields():
+    preview = build_review_action_preview(_registry_payload(), _approve_action())
+    del preview["registry_delta"]
+
+    with pytest.raises(
+        ProviderContractError,
+        match="review action preview missing required fields",
+    ):
+        validate_review_action_preview_payload(preview)
+
+
+def test_validate_review_action_preview_rejects_malformed_registry_delta():
+    preview = build_review_action_preview(_registry_payload(), _approve_action())
+    preview["registry_delta"]["candidate_changes"]["after"] = []
+
+    with pytest.raises(
+        ProviderContractError,
+        match="candidate_changes.after must be an object",
+    ):
+        validate_review_action_preview_payload(preview)
 
 
 def test_write_review_action_preview_uses_default_filename_and_preserves_registry(

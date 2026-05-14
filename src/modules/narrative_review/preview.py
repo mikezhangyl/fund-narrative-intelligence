@@ -8,6 +8,7 @@ from typing import Any
 
 from src.modules.narrative_review.promotion import apply_candidate_review_action
 from src.modules.snapshot_writer.writer import write_json_artifact
+from src.validation import validate_review_action_preview_payload
 
 
 def build_review_action_preview(
@@ -70,6 +71,7 @@ def write_review_action_preview(
         output_path=output_path,
     )
     _validate_output_path(path, output_root, registry_file, action_file)
+    validate_review_action_preview_payload(preview)
     path.parent.mkdir(parents=True, exist_ok=True)
     return write_json_artifact(preview, path)
 

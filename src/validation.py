@@ -218,6 +218,33 @@ def validate_signal_payload(payload: dict[str, Any]) -> None:
             raise ProviderContractError(f"{context}.half_life_days must be positive")
 
 
+def validate_review_action_preview_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "review action preview")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "status",
+            "source_registry_mutated",
+            "action",
+            "summary",
+            "registry_delta",
+            "result_registry",
+        },
+        "review action preview",
+    )
+    if payload["version"] != "candidate-review-action-preview-v1":
+        raise ProviderContractError("review action preview version is unsupported")
+    if payload["status"] != "previewed":
+        raise ProviderContractError("review action preview status must be previewed")
+    if not isinstance(payload["source_registry_mutated"], bool):
+        raise ProviderContractError("source_registry_mutated must be boolean")
+    _require_mapping(payload["action"], "review action preview action")
+    _validate_review_action_preview_summary(payload["summary"])
+    _validate_review_action_registry_delta(payload["registry_delta"])
+    validate_registry_payload(payload["result_registry"])
+
+
 def _require_mapping(value: Any, context: str) -> None:
     if not isinstance(value, dict):
         raise ProviderContractError(f"{context} must be an object")
@@ -241,3 +268,109 @@ def _require_string_list(value: Any, context: str) -> None:
         raise ProviderContractError(f"{context} must be a list")
     if not all(isinstance(item, str) for item in value):
         raise ProviderContractError(f"{context} must contain strings only")
+
+
+def _validate_review_action_preview_summary(summary: Any) -> None:
+    _require_mapping(summary, "review action preview summary")
+    _require_keys(
+        summary,
+        {
+            "action",
+            "candidate_narrative_id",
+            "candidate_status_after",
+            "human_review_status_after",
+            "active_narrative_count_before",
+            "active_narrative_count_after",
+            "promotion_target_id",
+            "source_registry_written",
+            "requires_explicit_persistence_step",
+        },
+        "review action preview summary",
+    )
+    if summary["action"] not in {"approve", "reject", "defer"}:
+        raise ProviderContractError("review action preview summary action is invalid")
+    for field in {
+        "candidate_narrative_id",
+        "candidate_status_after",
+        "human_review_status_after",
+    }:
+        if not isinstance(summary[field], str) or not summary[field]:
+            raise ProviderContractError(
+                f"review action preview summary {field} must be a non-empty string"
+            )
+    for field in {"active_narrative_count_before", "active_narrative_count_after"}:
+        if not isinstance(summary[field], int) or summary[field] < 0:
+            raise ProviderContractError(
+                f"review action preview summary {field} must be a non-negative integer"
+            )
+    if summary["promotion_target_id"] is not None and not isinstance(
+        summary["promotion_target_id"], str
+    ):
+        raise ProviderContractError(
+            "review action preview summary promotion_target_id must be null or string"
+        )
+    for field in {"source_registry_written", "requires_explicit_persistence_step"}:
+        if not isinstance(summary[field], bool):
+            raise ProviderContractError(
+                f"review action preview summary {field} must be boolean"
+            )
+
+
+def _validate_review_action_registry_delta(delta: Any) -> None:
+    _require_mapping(delta, "review action preview registry_delta")
+    _require_keys(
+        delta,
+        {
+            "active_narrative_ids_added",
+            "active_narrative_count_change",
+            "candidate_changes",
+        },
+        "review action preview registry_delta",
+    )
+    _require_string_list(
+        delta["active_narrative_ids_added"],
+        "review action preview registry_delta.active_narrative_ids_added",
+    )
+    if not isinstance(delta["active_narrative_count_change"], int):
+        raise ProviderContractError(
+            "review action preview registry_delta.active_narrative_count_change must be integer"
+        )
+    _validate_review_action_candidate_changes(delta["candidate_changes"])
+
+
+def _validate_review_action_candidate_changes(candidate_changes: Any) -> None:
+    _require_mapping(candidate_changes, "review action preview candidate_changes")
+    _require_keys(
+        candidate_changes,
+        {"candidate_narrative_id", "before", "after"},
+        "review action preview candidate_changes",
+    )
+    if not isinstance(candidate_changes["candidate_narrative_id"], str) or not (
+        candidate_changes["candidate_narrative_id"]
+    ):
+        raise ProviderContractError(
+            "review action preview candidate_changes.candidate_narrative_id must be a non-empty string"
+        )
+    _validate_candidate_review_projection(
+        candidate_changes["before"],
+        "review action preview candidate_changes.before",
+    )
+    _validate_candidate_review_projection(
+        candidate_changes["after"],
+        "review action preview candidate_changes.after",
+    )
+
+
+def _validate_candidate_review_projection(projection: Any, context: str) -> None:
+    _require_mapping(projection, context)
+    _require_keys(
+        projection,
+        {
+            "status",
+            "human_review_status",
+            "reviewed_by",
+            "reviewed_at",
+            "promotion_target_id",
+        },
+        context,
+    )

@@ -92,6 +92,7 @@ Expected artifacts:
 - Pipeline outputs include `fund_<code>_review_queue.json`, a dedicated future-workspace artifact containing the queue plus candidate/exclusion context.
 - `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.
+- Review-action preview artifacts are validated before write; the reusable validator checks preview metadata, summary, registry delta, and result registry shape.
 - `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, `candidate_narratives=<count>`, and `review_queue=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 

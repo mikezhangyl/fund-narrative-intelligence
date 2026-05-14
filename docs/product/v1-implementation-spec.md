@@ -202,6 +202,10 @@ workflow is explicitly added and approved. If an explicit `--review-action-outpu
 path is provided, it must remain inside `--output-dir` and must not overwrite the
 registry or action input files.
 
+Preview artifacts should be validated with the same contract before writing and
+before any future API persistence step. The validator must check top-level
+version/status, summary fields, `registry_delta`, and `result_registry`.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
