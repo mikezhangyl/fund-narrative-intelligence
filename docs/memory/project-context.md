@@ -64,6 +64,7 @@ Expected artifacts:
 - Standard setup command: `python -m pip install -e ".[dev]"`.
 - Standard quality commands: `python -m ruff check .`, `python -m coverage run -m pytest -q`, `python -m coverage report`, and `python -m compileall -q src tests scripts`.
 - Standard V1 acceptance command: `python scripts/validate_v1_acceptance.py`.
+- Strict live Eastmoney holdings acceptance command: `python scripts/validate_real_holdings_acceptance.py --output-dir outputs/real_161725`.
 - GitHub Actions CI runs the standard quality gates on pushes to `main` and pull requests.
 - Data: local JSON fixtures and mock providers.
 - Future UI: Node.js / Next.js can be added later as a separate workspace layer. Candidate narrative review and approval will eventually happen in a web UI, so V1 structured outputs should remain directly renderable and action-ready for a future review workspace.
@@ -75,6 +76,7 @@ Expected artifacts:
 - Optional CNINFO announcement evidence command: `python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01`.
 - Provider payloads are validated before orchestration proceeds.
 - Real holdings adapter: `python -m src.main --fund-code 161725 --provider-mode eastmoney` tries Eastmoney/Tiantian Fund fund holdings and keeps local fixtures for all other V1 intelligence layers.
+- Strict real-holdings acceptance validates fund `161725` with Eastmoney holdings and fixture-backed registry/mapping/evidence/signal layers. It fails on provider fallback instead of accepting mock degradation.
 - Provider foundation metadata separates holdings, narrative registry, stock mappings, evidence, and signals so mixed real/mock runs are marked `partial` instead of `fresh`.
 - Mock intelligence layer providers now expose separate interfaces for registry, stock mappings, evidence, signals, and reserved market/valuation/announcement/news sources.
 - Optional `CNInfoAnnouncementProvider` exists as the first real intelligence-source adapter foundation; it is not wired into the default report pipeline.

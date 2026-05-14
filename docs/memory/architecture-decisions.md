@@ -619,3 +619,32 @@ Consequences:
 - Manifest artifacts can be validated directly through the CLI before future web workspace loading.
 - Generated artifact directories can be validated through one CLI command before a future web workspace loads them.
 - Existing artifact names and payload contracts remain unchanged.
+
+## ADR-0029: Add Strict Eastmoney Real Holdings Acceptance
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add `scripts/validate_real_holdings_acceptance.py` as a manual live-provider
+acceptance command for fund `161725`.
+
+Rationale:
+
+- V1 is now reducing mock surface one layer at a time, starting with fund
+  holdings.
+- The normal `eastmoney` run can degrade to mock when the provider is
+  unavailable, but acceptance needs to prove that live holdings actually arrived.
+- Future web loading depends on the same raw, scoring, review queue, manifest,
+  Markdown, and HTML artifacts being internally consistent.
+
+Consequences:
+
+- The script runs `--provider-mode eastmoney`, validates artifact contracts, and
+  then rejects any fallback to mock holdings.
+- Registry, stock mappings, evidence, and signals intentionally remain
+  mock-backed in this check, so overall quality is `partial`.
+- Markdown and HTML reports must disclose mixed Eastmoney and Mock fixture data.
+- The command remains outside CI because it depends on live network and provider
+  availability.

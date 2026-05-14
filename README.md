@@ -33,6 +33,16 @@ Run the live Eastmoney smoke set:
 python -m src.main --run-real-smoke
 ```
 
+Run the strict live Eastmoney holdings acceptance path:
+
+```bash
+python scripts/validate_real_holdings_acceptance.py --output-dir outputs/real_161725
+```
+
+This is a manual live-provider check, not a CI gate. It must fail if fund
+holdings fall back to mock data, while still verifying that fixture-backed
+registry, mapping, evidence, and signal layers are disclosed as Mock fixtures.
+
 Run the live Eastmoney + CNINFO announcement evidence smoke:
 
 ```bash
@@ -132,6 +142,17 @@ python -m src.main --fund-code 161725 --provider-mode eastmoney
 ```
 
 If the Eastmoney request fails, the provider records a `provider_fallback` event and falls back to local mock fixtures when a matching fixture exists.
+
+For the canonical live-holdings acceptance fund, use the strict script:
+
+```bash
+python scripts/validate_real_holdings_acceptance.py --output-dir outputs/real_161725
+```
+
+Unlike normal report generation, this script rejects fallback. It verifies that
+fund holdings are fresh Eastmoney data and that all remaining mock intelligence
+layers are marked with `mock://fixtures/...` source URLs and a visible mixed
+source notice.
 
 Reports always disclose mock or degraded data in a `Data Source Notice` section. A pure mock run is marked as `mock`; an Eastmoney holdings run with fixture-backed registry, mappings, evidence, and signals is marked as `partial` so users do not mistake it for a fully real environment.
 
