@@ -1,5 +1,8 @@
+import json
+
 import pytest
 from src import main as main_module
+from src.config import FIXTURE_DIR
 from src.errors import ProviderFetchError
 
 
@@ -29,6 +32,94 @@ def test_main_requires_fund_code_when_no_batch_flag():
         main_module.main([])
 
     assert exc.value.code == 2
+
+
+def test_main_previews_review_action_without_fund_code(tmp_path, capsys):
+    action_path = tmp_path / "action.json"
+    registry_path = tmp_path / "registry.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    action_path.write_text(
+        json.dumps(
+            {
+                "action_id": "ACT_REJECT_TEST",
+                "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
+                "action": "reject",
+                "reviewed_by": "reviewer@example.com",
+                "reviewed_at": "2026-05-14T11:00:00+00:00",
+                "review_note": "Reject in CLI preview test.",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = main_module.main(
+        [
+            "--preview-review-action",
+            str(action_path),
+            "--registry-path",
+            str(registry_path),
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    expected_path = tmp_path / "candidate_review_action_ACT_REJECT_TEST_preview.json"
+    assert exit_code == 0
+    assert "Review action preview:" in captured.out
+    assert str(expected_path) in captured.out
+    assert expected_path.exists()
+
+
+def test_main_preview_review_action_uses_project_root_default_registry(
+    tmp_path, monkeypatch, capsys
+):
+    action_path = tmp_path / "action.json"
+    action_path.write_text(
+        json.dumps(
+            {
+                "action_id": "ACT_DEFER_DEFAULT_REGISTRY",
+                "candidate_narrative_id": "C_COMMUNICATION_POWER_INFRASTRUCTURE",
+                "action": "defer",
+                "reviewed_by": "reviewer@example.com",
+                "reviewed_at": "2026-05-14T11:00:00+00:00",
+                "review_note": "Defer in default registry path test.",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    outside_repo = tmp_path / "outside"
+    outside_repo.mkdir()
+    monkeypatch.chdir(outside_repo)
+
+    exit_code = main_module.main(
+        [
+            "--preview-review-action",
+            str(action_path),
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "candidate_review_action_ACT_DEFER_DEFAULT_REGISTRY_preview.json" in (
+        captured.out
+    )
+
+
+def test_main_preview_review_action_rejects_missing_file(capsys):
+    with pytest.raises(SystemExit) as exc:
+        main_module.main(["--preview-review-action", "missing-action.json"])
+
+    captured = capsys.readouterr()
+    assert exc.value.code == 2
+    assert "does not exist" in captured.err
 
 
 def test_main_returns_controlled_error_for_missing_fixture(tmp_path, capsys):

@@ -182,6 +182,23 @@ outputs/fund_<fund_code>_review_queue.json
 
 This artifact should include `metadata`, `fund`, `provider_foundation`, `candidate_review_queue`, `candidate_narratives`, and `excluded_mapping_candidates`.
 
+V1 should also expose a safe local preview wrapper for future web review-action
+submissions:
+
+```bash
+python -m src.main --preview-review-action path/to/action.json
+```
+
+The wrapper reads a review action JSON payload, applies it to a copy of the
+registry, and writes a `candidate_review_action_<action_id>_preview.json`
+artifact. The preview includes the submitted action, summary fields,
+`source_registry_mutated`, `source_registry_written`,
+`requires_explicit_persistence_step`, and `result_registry`. It must not write
+back to `data/fixtures/narrative_registry.json` unless a separate future
+persistence workflow is explicitly added and approved. If an explicit
+`--review-action-output` path is provided, it must remain inside `--output-dir`
+and must not overwrite the registry or action input files.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
@@ -197,6 +214,7 @@ This artifact should include `metadata`, `fund`, `provider_foundation`, `candida
 | Scoring Service | narrative exposures, signal states, data quality | dimension scores, sustainability score, stage, confidence | no | yes | yes |
 | Report Writer | fund, holdings, narratives, scores, evidence | Markdown and HTML reports | optional for wording | yes | yes |
 | Snapshot Writer | all structured run data | raw JSON and scoring JSON artifacts | no | yes | yes |
+| Candidate Review Workflow | candidate review action, registry payload | preview artifact or immutable result registry | no | yes | yes |
 
 ## V1 Scoring Rules
 
@@ -391,6 +409,18 @@ python -m src.main --run-announcement-smoke
 ```
 
 The smoke command should validate an A-share fund example with Eastmoney holdings plus CNINFO announcement metadata. It must fail if CNINFO returns no announcements, if announcement metadata is not converted into evidence, if the provider foundation lacks a non-mock `Announcements` layer, or if the report data lacks a visible mixed/mock data-source notice.
+
+V1 should support previewing a future web candidate-review action without
+requiring a fund code:
+
+```bash
+python -m src.main --preview-review-action path/to/action.json
+```
+
+The preview command must write a preview artifact only. It must not mutate the
+source registry fixture, must reject output paths that overwrite source inputs or
+escape `--output-dir`, and must not silently promote a candidate during normal
+report generation.
 
 And can explicitly try the Eastmoney holdings adapter:
 

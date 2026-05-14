@@ -531,3 +531,27 @@ Consequences:
 - `run_pipeline` returns a `review_queue` artifact path.
 - The artifact includes metadata, fund identity, provider foundation, queue items, candidate narratives, and excluded mapping candidates.
 - Existing raw/scoring queue fields remain for snapshot reproducibility.
+
+## ADR-0026: Preview Review Actions Before Registry Persistence
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add a CLI-backed review-action preview wrapper that reads the same JSON action
+payload future web approval screens will submit, applies it to a registry copy,
+and writes a preview artifact without mutating the source registry.
+
+Rationale:
+
+- The project needs a concrete backend contract before building the web approval workspace.
+- Candidate promotion changes taxonomy state, so local preview must stay separate from persistence.
+- Reusing the same action payload shape avoids inventing a different CLI-only workflow.
+
+Consequences:
+
+- `python -m src.main --preview-review-action <action.json>` does not require `--fund-code`.
+- Preview output includes the original action, summary, mutation-safety metadata, and result registry.
+- The source registry fixture is never written by this command; explicit output paths must stay inside `--output-dir` and must not overwrite registry/action inputs.
+- Future persistence/API work must be explicit.

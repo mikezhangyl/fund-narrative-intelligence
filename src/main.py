@@ -3,10 +3,12 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from src.announcement_smoke import run_announcement_evidence_smoke
-from src.config import DEFAULT_OUTPUT_DIR
+from src.config import DEFAULT_OUTPUT_DIR, FIXTURE_DIR
 from src.errors import PipelineError
+from src.modules.narrative_review.preview import write_review_action_preview
 from src.orchestrator import (
     inspect_provider_foundation,
     run_all_fixture_pipelines,
@@ -58,6 +60,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="Print provider foundation diagnostics as JSON without generating report artifacts.",
     )
     parser.add_argument(
+        "--preview-review-action",
+        help=(
+            "Preview one candidate narrative review action JSON without mutating the "
+            "source registry."
+        ),
+    )
+    parser.add_argument(
+        "--registry-path",
+        default=str(FIXTURE_DIR / "narrative_registry.json"),
+        help="Narrative registry JSON used by --preview-review-action.",
+    )
+    parser.add_argument(
+        "--review-action-output",
+        help="Optional explicit output path for --preview-review-action.",
+    )
+    parser.add_argument(
         "--include-cninfo-announcements",
         action="store_true",
         help="Optionally fetch CNINFO announcement metadata and convert it into evidence records.",
@@ -76,6 +94,34 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(
             "--announcement-start-date requires --include-cninfo-announcements"
         )
+    if args.review_action_output and not args.preview_review_action:
+        parser.error("--review-action-output requires --preview-review-action")
+
+    if args.preview_review_action:
+        if args.include_cninfo_announcements:
+            parser.error("--include-cninfo-announcements is not supported with --preview-review-action")
+        try:
+            output_path = write_review_action_preview(
+                registry_path=Path(args.registry_path),
+                action_path=Path(args.preview_review_action),
+                output_dir=Path(args.output_dir),
+                output_path=Path(args.review_action_output)
+                if args.review_action_output
+                else None,
+            )
+        except PipelineError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        except Exception as exc:
+            print(f"Unrecoverable review action preview error: {exc}", file=sys.stderr)
+            return 1
+
+        print("Review action preview:")
+        print(output_path)
+        return 0
 
     if args.list_fixtures:
         if args.include_cninfo_announcements:

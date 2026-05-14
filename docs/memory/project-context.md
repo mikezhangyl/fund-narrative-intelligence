@@ -90,6 +90,7 @@ Expected artifacts:
 - Candidate review actions support explicit `approve`, `reject`, and `defer` transitions. Only `approve` with promotion metadata appends an active narrative; report generation never promotes candidates automatically.
 - Raw/scoring JSON includes `candidate_review_queue`, a read-ready queue for future web approval screens with available actions, related exclusions, and promotion action templates.
 - Pipeline outputs include `fund_<code>_review_queue.json`, a dedicated future-workspace artifact containing the queue plus candidate/exclusion context.
+- `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, `candidate_narratives=<count>`, and `review_queue=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 
@@ -131,6 +132,7 @@ Expected artifacts:
 - Human review is required before AI-proposed candidates change core registries.
 - Human review will eventually be performed in a web UI; current CLI/report outputs must preserve enough structured state for that future approval workflow.
 - Candidate review workflow code should stay pure and immutable so future web endpoints can call it without hidden side effects.
+- Review action preview artifacts should use the same action payload contract expected from the future web UI, but remain non-persistent until a human explicitly approves a registry write workflow.
 - V1 outputs must include version metadata for provider set, narrative registry, signal schema, scoring model, and report template.
 - Data provider failures should degrade output quality and confidence instead of crashing the pipeline when mock fallback or partial data is available.
 - Mock data and mock fallback must be explicitly disclosed in user-facing report output; no UI or report should present mock-backed analysis as a fully real environment.
