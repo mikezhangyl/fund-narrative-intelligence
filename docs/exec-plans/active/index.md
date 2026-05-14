@@ -48,3 +48,4 @@
 - [ci-quality-workflow.md](./ci-quality-workflow.md)
 - [real-holdings-acceptance.md](./real-holdings-acceptance.md)
 - [announcement-acceptance.md](./announcement-acceptance.md)
+- [market-quotes-provider.md](./market-quotes-provider.md)

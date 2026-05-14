@@ -677,3 +677,35 @@ Consequences:
   mappings, base evidence, and signals remain mock-backed.
 - The command remains outside CI because it depends on live provider
   availability.
+
+## ADR-0031: Add Optional Market Quote Snapshot Layer
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add an optional `--include-market-quotes` path that writes current holding quote
+snapshots into raw and scoring artifacts and adds a `Market Quotes` provider
+layer.
+
+Rationale:
+
+- Quote data is a natural next non-mock layer after holdings and announcement
+  metadata, but V1 scoring should not silently change until the scoring model is
+  explicitly recalibrated.
+- Eastmoney quote endpoints can be intermittently unavailable, so a Yahoo chart
+  fallback keeps the server-side artifact path useful without requiring API
+  credentials.
+- Future web screens need the quote source and fallback state in structured
+  provider-foundation metadata.
+
+Consequences:
+
+- Quote snapshots are generated only when requested.
+- Raw and scoring JSON include `market_quotes`; reports disclose the quote
+  provider layer.
+- Quote provider failures record degradation events and lower effective data
+  quality instead of crashing the run.
+- V1 scoring remains driven by existing signal events until a later scoring
+  calibration explicitly consumes quote data.

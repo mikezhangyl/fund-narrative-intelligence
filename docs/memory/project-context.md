@@ -75,6 +75,7 @@ Expected artifacts:
 - Live Eastmoney + CNINFO announcement smoke command: `python -m src.main --run-announcement-smoke`.
 - Provider diagnostics command: `python -m src.main --fund-code 000001 --provider-diagnostics` prints provider foundation JSON without generating report artifacts.
 - Optional CNINFO announcement evidence command: `python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01`.
+- Optional market quote snapshot command: `python -m src.main --fund-code 161725 --provider-mode eastmoney --include-market-quotes`.
 - Provider payloads are validated before orchestration proceeds.
 - Real holdings adapter: `python -m src.main --fund-code 161725 --provider-mode eastmoney` tries Eastmoney/Tiantian Fund fund holdings and keeps local fixtures for all other V1 intelligence layers.
 - Strict real-holdings acceptance validates fund `161725` with Eastmoney holdings and fixture-backed registry/mapping/evidence/signal layers. It fails on provider fallback instead of accepting mock degradation.
@@ -164,6 +165,7 @@ Expected artifacts:
 - Real source adapters should use injectable fetchers and return controlled unavailable/partial payloads on provider failure.
 - Announcement evidence generation must disclose that V1 classifies metadata only and does not parse source PDFs.
 - Optional real announcement runs must add an `Announcements` provider-foundation layer so users can see whether CNINFO data was fresh, partial, or unavailable.
+- Optional market quote runs must add a `Market Quotes` provider-foundation layer and preserve provider fallback/degradation events; quote snapshots are artifact/display data only until scoring explicitly consumes them.
 
 ## Open Questions
 

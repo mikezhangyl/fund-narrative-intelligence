@@ -141,6 +141,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optionally fetch CNINFO announcement metadata and convert it into evidence records.",
     )
     parser.add_argument(
+        "--include-market-quotes",
+        "--include-eastmoney-quotes",
+        dest="include_market_quotes",
+        action="store_true",
+        help="Optionally fetch real market quote snapshots for current holdings.",
+    )
+    parser.add_argument(
         "--announcement-start-date",
         help="Optional ISO start date for CNINFO announcement search when --include-cninfo-announcements is set.",
     )
@@ -318,6 +325,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.preview_review_action:
         if args.include_cninfo_announcements:
             parser.error("--include-cninfo-announcements is not supported with --preview-review-action")
+        if args.include_market_quotes:
+            parser.error("--include-market-quotes is not supported with --preview-review-action")
         try:
             output_path = write_review_action_preview(
                 registry_path=Path(args.registry_path),
@@ -344,6 +353,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.persist_review_action:
         if args.include_cninfo_announcements:
             parser.error("--include-cninfo-announcements is not supported with --persist-review-action")
+        if args.include_market_quotes:
+            parser.error("--include-market-quotes is not supported with --persist-review-action")
         if not args.registry_output:
             parser.error("--registry-output is required with --persist-review-action")
         try:
@@ -381,6 +392,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.list_fixtures:
         if args.include_cninfo_announcements:
             parser.error("--include-cninfo-announcements requires --fund-code")
+        if args.include_market_quotes:
+            parser.error("--include-market-quotes requires --fund-code")
         for fund_code in MockDataProvider().list_fund_codes():
             print(fund_code)
         return 0
@@ -388,6 +401,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.run_all_fixtures:
         if args.include_cninfo_announcements:
             parser.error("--include-cninfo-announcements is not supported with --run-all-fixtures")
+        if args.include_market_quotes:
+            parser.error("--include-market-quotes is not supported with --run-all-fixtures")
         try:
             results = run_all_fixture_pipelines(
                 provider_mode=args.provider_mode,
@@ -410,6 +425,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.run_real_smoke:
         if args.include_cninfo_announcements:
             parser.error("--include-cninfo-announcements is not supported with --run-real-smoke")
+        if args.include_market_quotes:
+            parser.error("--include-market-quotes is not supported with --run-real-smoke")
         try:
             summary = run_real_fund_smoke(output_dir=args.output_dir)
         except PipelineError as exc:
@@ -436,6 +453,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.run_announcement_smoke:
         if args.include_cninfo_announcements:
             parser.error("--include-cninfo-announcements is not supported with --run-announcement-smoke")
+        if args.include_market_quotes:
+            parser.error("--include-market-quotes is not supported with --run-announcement-smoke")
         try:
             summary = run_announcement_evidence_smoke(output_dir=args.output_dir)
         except PipelineError as exc:
@@ -460,6 +479,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.provider_diagnostics:
         if args.include_cninfo_announcements:
             parser.error("--include-cninfo-announcements is not supported with --provider-diagnostics")
+        if args.include_market_quotes:
+            parser.error("--include-market-quotes is not supported with --provider-diagnostics")
         if not args.fund_code:
             parser.error("--fund-code is required with --provider-diagnostics")
             return 2
@@ -494,6 +515,7 @@ def main(argv: list[str] | None = None) -> int:
             output_dir=args.output_dir,
             include_announcement_evidence=args.include_cninfo_announcements,
             announcement_start_date=args.announcement_start_date,
+            include_market_quotes=args.include_market_quotes,
         )
     except PipelineError as exc:
         print(str(exc), file=sys.stderr)

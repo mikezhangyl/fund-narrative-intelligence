@@ -280,6 +280,39 @@ def test_cli_include_cninfo_announcements_passes_options_to_pipeline(
     assert captured["announcement_start_date"] == "2026-05-01"
 
 
+def test_cli_include_market_quotes_passes_options_to_pipeline(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--provider-mode",
+            "eastmoney",
+            "--include-market-quotes",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["fund_code"] == "161725"
+    assert captured["include_market_quotes"] is True
+
+
 def test_cli_rejects_announcement_start_date_without_cninfo_opt_in(tmp_path):
     command = [
         sys.executable,
@@ -298,6 +331,69 @@ def test_cli_rejects_announcement_start_date_without_cninfo_opt_in(tmp_path):
     assert result.returncode == 2
     assert "--announcement-start-date requires --include-cninfo-announcements" in result.stderr
     assert not list(tmp_path.glob("*"))
+
+
+def test_optional_eastmoney_quotes_are_disclosed_and_added_to_outputs(tmp_path):
+    class FakeMarketDataProvider:
+        provider_name = "eastmoney-market-quote"
+        provider_version = "eastmoney-market-quote-v1"
+        source_url = "https://push2.eastmoney.com/api/qt/ulist.np/get"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_stock_quotes(self, stock_codes: list[str]) -> dict:
+            assert "NVDA" in stock_codes
+            return {
+                "version": self.provider_version,
+                "provider_name": self.provider_name,
+                "provider_version": self.provider_version,
+                "data_quality": "fresh",
+                "source_url": self.source_url,
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+                "quotes": [
+                    {
+                        "stock_code": "NVDA",
+                        "stock_name": "NVIDIA",
+                        "latest_price": 1000.0,
+                        "change_percent": 1.5,
+                        "change_amount": 14.7,
+                        "volume": 100,
+                        "amount": 100000.0,
+                        "high": 1005.0,
+                        "low": 990.0,
+                        "open": 995.0,
+                        "previous_close": 985.3,
+                        "retrieved_at": "2026-05-14T00:00:00+00:00",
+                    }
+                ],
+                "missing_stock_codes": [],
+            }
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_market_quotes=True,
+        market_data_provider=FakeMarketDataProvider(),
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+    html = artifacts["html"].read_text()
+
+    quote_layer = scoring["provider_foundation"]["layers"]["market_quotes"]
+
+    assert raw["market_quotes"] == scoring["market_quotes"]
+    assert raw["market_quotes"]["data_quality"] == "fresh"
+    assert raw["market_quotes"]["quotes"][0]["stock_code"] == "NVDA"
+    assert scoring["metadata"]["data_quality"] == "partial"
+    assert quote_layer["provider_name"] == "eastmoney-market-quote"
+    assert quote_layer["data_quality"] == "fresh"
+    assert quote_layer["is_mock"] is False
+    assert "Market Quotes" in markdown
+    assert "eastmoney-market-quote" in markdown
+    assert "Market Quotes" in html
+    assert "eastmoney-market-quote" in html
 
 
 def test_eastmoney_holdings_with_mock_intelligence_is_disclosed_as_partial(

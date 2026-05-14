@@ -186,6 +186,55 @@ def validate_signal_payload(payload: dict[str, Any]) -> None:
             raise ProviderContractError(f"{context}.half_life_days must be positive")
 
 
+def validate_market_quote_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "market quotes")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "provider_name",
+            "provider_version",
+            "data_quality",
+            "source_url",
+            "retrieved_at",
+            "quotes",
+            "missing_stock_codes",
+        },
+        "market quotes",
+    )
+    if payload["data_quality"] not in {"fresh", "partial", "unavailable"}:
+        raise ProviderContractError(
+            "market quotes data_quality must be fresh, partial, or unavailable"
+        )
+    if not isinstance(payload["quotes"], list):
+        raise ProviderContractError("market quotes quotes must be a list")
+    if not isinstance(payload["missing_stock_codes"], list):
+        raise ProviderContractError("market quotes missing_stock_codes must be a list")
+    for index, quote in enumerate(payload["quotes"]):
+        context = f"quotes[{index}]"
+        _require_mapping(quote, context)
+        _require_keys(
+            quote,
+            {
+                "stock_code",
+                "stock_name",
+                "latest_price",
+                "change_percent",
+                "change_amount",
+                "volume",
+                "amount",
+                "high",
+                "low",
+                "open",
+                "previous_close",
+                "retrieved_at",
+            },
+            context,
+        )
+        if not quote["stock_code"]:
+            raise ProviderContractError(f"{context}.stock_code must be non-empty")
+
+
 def validate_review_action_preview_payload(payload: dict[str, Any]) -> None:
     _require_mapping(payload, "review action preview")
     _require_keys(

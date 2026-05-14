@@ -71,6 +71,12 @@ Optionally include CNINFO announcement metadata as evidence:
 python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01
 ```
 
+Optionally include real market quote snapshots for current holdings:
+
+```bash
+python -m src.main --fund-code 161725 --provider-mode eastmoney --include-market-quotes
+```
+
 Generated artifacts:
 
 ```text
@@ -115,6 +121,7 @@ requests.
 - Optional CNINFO announcement provider adapter with injectable fetcher; it is not part of the default report pipeline yet.
 - Optional announcement-to-evidence conversion layer; it classifies announcement metadata into V1 evidence records without parsing PDFs.
 - Optional CNINFO announcement evidence orchestration behind `--include-cninfo-announcements`; default runs do not call CNINFO.
+- Optional market quote snapshots behind `--include-market-quotes`; default runs do not call quote providers.
 - Narrative registry loading.
 - Stock-to-narrative mapping.
 - Fund narrative aggregation.
@@ -168,11 +175,15 @@ Reports always disclose mock or degraded data in a `Data Source Notice` section.
 
 When `--include-cninfo-announcements` is enabled, reports add an `Announcements` provider layer and generated evidence summaries state that V1 classified announcement metadata only; source PDFs are not parsed.
 
+When `--include-market-quotes` is enabled, raw and scoring artifacts add a `market_quotes` payload and reports add a `Market Quotes` provider layer. V1 records quote snapshots for future analysis and web display, but does not use them in scoring yet.
+
 For CNINFO announcement search, V1 sends Shanghai and Shenzhen stock selectors in `code,orgId` form, such as `600519,gssh0600519` and `000001,gssz0000001`. This is covered by unit tests and by the live announcement smoke command.
 
 ## Real Provider Status
 
 The first real provider adapter is `eastmoney`, covering fund holdings only. It normalizes Eastmoney fields such as stock code, stock name, holding percentage, holding change, industry, and public holding date into the same V1 fund-holdings contract used by mock providers.
+
+The optional market quote adapter attempts Eastmoney daily quote data for current holdings and falls back to Yahoo chart data when Eastmoney is unavailable. Quote provider failures are recorded as degradation events and do not crash report generation.
 
 ## Real Fund Smoke Set
 

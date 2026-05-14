@@ -18,6 +18,7 @@ from src.providers.cninfo import (
     CNINFO_ANNOUNCEMENT_QUERY_URL,
     CNInfoAnnouncementProvider,
 )
+from src.providers.eastmoney_market import EastmoneyMarketDataProvider
 from src.providers.factory import select_data_provider
 from src.providers.mock import MockDataProvider
 from src.providers.provenance import build_provider_foundation
@@ -30,6 +31,8 @@ def run_pipeline(
     include_announcement_evidence: bool = False,
     announcement_start_date: str | None = None,
     announcement_provider: Any | None = None,
+    include_market_quotes: bool = False,
+    market_data_provider: Any | None = None,
 ) -> dict[str, Any]:
     if not fund_code.isdigit():
         raise ValueError("fund_code must contain digits only")
@@ -76,6 +79,19 @@ def run_pipeline(
     announcements_payload: dict[str, Any] | None = None
     announcement_evidence_payload: dict[str, Any] | None = None
     announcement_layer: dict[str, Any] | None = None
+    market_quotes_payload: dict[str, Any] | None = None
+    market_quotes_layer: dict[str, Any] | None = None
+    if include_market_quotes:
+        market_result = _run_market_quotes(
+            stock_codes=[holding["stock_code"] for holding in holdings],
+            market_data_provider=market_data_provider,
+        )
+        market_quotes_payload = market_result["market_quotes"]
+        market_quotes_layer = market_result["provider_layer"]
+        degradation_events = [
+            *degradation_events,
+            *market_result["degradation_events"],
+        ]
     if include_announcement_evidence:
         announcement_result = _run_announcement_evidence(
             stock_codes=[holding["stock_code"] for holding in holdings],
@@ -101,6 +117,7 @@ def run_pipeline(
         fund_provider_metadata=fund["provider_metadata"],
         degradation_events=degradation_events,
         announcement_layer=announcement_layer,
+        market_quotes_layer=market_quotes_layer,
     )
     effective_data_quality = provider_foundation["effective_data_quality"]
     exposures = aggregate_fund_narratives(
@@ -153,6 +170,8 @@ def run_pipeline(
     if announcements_payload is not None and announcement_evidence_payload is not None:
         raw_payload["announcements"] = announcements_payload
         raw_payload["announcement_evidence"] = announcement_evidence_payload
+    if market_quotes_payload is not None:
+        raw_payload["market_quotes"] = market_quotes_payload
 
     scoring_payload = {
         "metadata": metadata,
@@ -179,6 +198,8 @@ def run_pipeline(
     }
     if announcement_evidence_payload is not None:
         scoring_payload["announcement_evidence"] = announcement_evidence_payload
+    if market_quotes_payload is not None:
+        scoring_payload["market_quotes"] = market_quotes_payload
 
     review_queue_payload = {
         "metadata": metadata,
@@ -381,22 +402,68 @@ def _run_announcement_evidence(
     }
 
 
+def _run_market_quotes(
+    stock_codes: list[str],
+    market_data_provider: Any | None,
+) -> dict[str, Any]:
+    provider = market_data_provider or EastmoneyMarketDataProvider()
+    market_quotes_payload = provider.get_stock_quotes(stock_codes=stock_codes)
+    return {
+        "market_quotes": market_quotes_payload,
+        "provider_layer": _market_quotes_provider_layer(
+            provider=provider,
+            market_quotes_payload=market_quotes_payload,
+        ),
+        "degradation_events": getattr(provider, "degradation_events", []),
+    }
+
+
 def _provider_foundation_with_optional_announcement_layer(
     provider: Any,
     fund_provider_metadata: dict[str, Any],
     degradation_events: list[dict[str, str]],
     announcement_layer: dict[str, Any] | None,
+    market_quotes_layer: dict[str, Any] | None,
 ) -> dict[str, Any]:
     foundation = provider.get_provider_foundation(
         fund_provider_metadata=fund_provider_metadata,
         degradation_events=degradation_events,
     )
-    if announcement_layer is None:
+    if announcement_layer is None and market_quotes_layer is None:
         return foundation
+    layers = foundation["layers"]
+    if market_quotes_layer is not None:
+        layers = {**layers, "market_quotes": market_quotes_layer}
+    if announcement_layer is not None:
+        layers = {**layers, "announcements": announcement_layer}
     return build_provider_foundation(
-        layers={**foundation["layers"], "announcements": announcement_layer},
+        layers=layers,
         degradation_events=degradation_events,
     )
+
+
+def _market_quotes_provider_layer(
+    provider: Any,
+    market_quotes_payload: dict[str, Any],
+) -> dict[str, Any]:
+    provider_name = str(
+        market_quotes_payload.get("provider_name")
+        or getattr(provider, "provider_name", "market-data-provider")
+    )
+    data_quality = str(market_quotes_payload.get("data_quality") or "unavailable")
+    return {
+        "layer": "market_quotes",
+        "provider_name": provider_name,
+        "provider_version": str(
+            market_quotes_payload.get("provider_version")
+            or getattr(provider, "provider_version", market_quotes_payload["version"])
+        ),
+        "data_quality": data_quality,
+        "source_url": market_quotes_payload.get("source_url")
+        or getattr(provider, "source_url", None),
+        "is_mock": provider_name.startswith("mock") or data_quality == "mock",
+        "note": "Optional market quote snapshot for current holdings; V1 does not use quotes for scoring yet.",
+    }
 
 
 def _announcement_provider_layer(

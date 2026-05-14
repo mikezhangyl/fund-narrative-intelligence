@@ -20,6 +20,7 @@ LAYER_DISPLAY_NAMES = {
     "evidence": "Evidence",
     "signals": "Signals",
     "announcements": "Announcements",
+    "market_quotes": "Market Quotes",
 }
 
 
