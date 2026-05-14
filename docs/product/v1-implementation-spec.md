@@ -206,6 +206,15 @@ Preview artifacts should be validated with the same contract before writing and
 before any future API persistence step. The validator must check top-level
 version/status, summary fields, `registry_delta`, and `result_registry`.
 
+V1 should expose direct preview validation:
+
+```bash
+python -m src.main --validate-review-preview path/to/preview.json
+```
+
+This command validates the review preview contract and exits without requiring
+`--fund-code`.
+
 After human confirmation, V1 should expose a separate persistence wrapper:
 
 ```bash

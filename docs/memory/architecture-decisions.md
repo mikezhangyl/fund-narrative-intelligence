@@ -555,6 +555,7 @@ Consequences:
 - Preview output includes the original action, summary, mutation-safety metadata, `registry_delta`, and result registry.
 - The source registry fixture is never written by this command; explicit output paths must stay inside `--output-dir` and must not overwrite registry/action inputs.
 - Preview artifacts are contract-validated before they are written.
+- Preview artifacts can also be validated directly through the CLI without applying or persisting a review action.
 - Future persistence/API work must be explicit.
 
 ## ADR-0027: Require Explicit Registry Persistence For Review Actions

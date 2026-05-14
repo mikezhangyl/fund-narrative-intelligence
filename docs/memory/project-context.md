@@ -93,6 +93,7 @@ Expected artifacts:
 - `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.
 - Review-action preview artifacts are validated before write; the reusable validator checks preview metadata, summary, registry delta, and result registry shape.
+- `python -m src.main --validate-review-preview path/to/preview.json` validates a review preview artifact without requiring `--fund-code`.
 - `python -m src.main --persist-review-action path/to/action.json --registry-output path/to/registry.next.json` writes an explicitly reviewed registry result without requiring `--fund-code`; in-place overwrite requires `--allow-registry-overwrite`, and overwriting an existing non-source output requires `--allow-registry-output-overwrite`.
 - Review-action persistence writes a separate `candidate_review_action_<action_id>_persistence.json` audit artifact under `--output-dir` by default, or to `--persistence-result-output` when provided.
 - Review-action persistence requires an audit output path or directory even for direct API callers; registry and audit writes are rollback-protected so audit write failure does not leave a new registry output behind.
