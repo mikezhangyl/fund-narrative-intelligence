@@ -131,6 +131,7 @@ def _run_acceptance(
             "--announcement-start-date",
             announcement_start_date,
             "--include-market-quotes",
+            "--include-valuation-snapshots",
             "--include-news-evidence",
             "--output-dir",
             str(output_dir),
@@ -178,8 +179,10 @@ def validate_acceptance_outputs(
     layers = foundation.get("layers", {})
     registry_layer = layers.get("narrative_registry", {})
     mapping_layer = layers.get("stock_mappings", {})
+    valuation_layer = layers.get("valuation", {})
     mappings = raw.get("stock_narrative_mappings") or []
     coverage = raw.get("mapping_coverage", {})
+    valuation_snapshots = raw.get("valuation_snapshots")
 
     _require(
         raw.get("stock_mapping_mode") == DEFAULT_STOCK_MAPPING_MODE,
@@ -223,11 +226,37 @@ def validate_acceptance_outputs(
         "#sha256=" in str(mapping_layer.get("source_url") or ""),
         "stock mappings layer source_url must include a content hash",
     )
+    _require(
+        isinstance(valuation_snapshots, dict) and valuation_snapshots,
+        "valuation_snapshots is required",
+    )
+    _require(
+        valuation_snapshots == scoring.get("valuation_snapshots"),
+        "raw/scoring valuation_snapshots mismatch",
+    )
+    _require(
+        valuation_snapshots.get("provider_name") == "quote-derived-valuation",
+        "valuation_snapshots provider must be quote-derived-valuation",
+    )
+    _require(
+        valuation_snapshots.get("valuation_basis") == "quote_derived_context",
+        "valuation_snapshots must use quote_derived_context",
+    )
+    _require(
+        valuation_layer.get("provider_name") == "quote-derived-valuation",
+        "valuation layer must use quote-derived-valuation",
+    )
+    _require(valuation_layer.get("is_mock") is False, "valuation layer must not be mock")
+    _require(
+        valuation_layer.get("source_url") == "derived://market-quotes/valuation-context",
+        "valuation layer source_url must disclose quote-derived context",
+    )
     expected = (
         "reviewed-registry-store",
         "reviewed-mapping-store",
         "provider-derived-evidence",
         "provider-derived-signals",
+        "quote-derived-valuation",
     )
     _require(_contains_all(markdown, expected), "Markdown reviewed mapping mismatch")
     _require(_contains_all(html, expected), "HTML reviewed mapping mismatch")
@@ -335,6 +364,7 @@ def _print_success(
     print("signals=provider_derived")
     print("announcements=fresh")
     print("market_quotes=fresh")
+    print("valuation=quote_derived")
     print("mock_layers=none")
     print("effective_data_quality=partial")
     print(f"workspace_snapshot=fund_{fund_code}_workspace_snapshot.json")

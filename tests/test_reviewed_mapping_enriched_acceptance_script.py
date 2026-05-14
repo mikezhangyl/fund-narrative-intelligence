@@ -71,6 +71,7 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
         "--announcement-start-date",
         "2026-01-01",
         "--include-market-quotes",
+        "--include-valuation-snapshots",
         "--include-news-evidence",
         "--output-dir",
         str(tmp_path),
@@ -92,7 +93,20 @@ def test_reviewed_mapping_enriched_acceptance_rejects_registry_rule_mapping(tmp_
     assert "all selected mappings must use reviewed_mapping" in str(exc.value)
 
 
-def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -> None:
+def test_reviewed_mapping_enriched_acceptance_rejects_missing_valuation(tmp_path):
+    _write_outputs(tmp_path, include_valuation=False)
+
+    with pytest.raises(validate_reviewed_mapping_enriched_acceptance.AcceptanceError) as exc:
+        validate_reviewed_mapping_enriched_acceptance.validate_acceptance_outputs(tmp_path)
+
+    assert "valuation_snapshots is required" in str(exc.value)
+
+
+def _write_outputs(
+    output_dir: Path,
+    mapping_method: str = "reviewed_mapping",
+    include_valuation: bool = True,
+) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     provider_foundation = {
         "effective_data_quality": "partial",
@@ -131,6 +145,11 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
             ),
             "announcements": _real_layer("announcements", "cninfo-announcement"),
             "market_quotes": _real_layer("market_quotes", "yahoo-chart"),
+            **(
+                {"valuation": _real_layer("valuation", "quote-derived-valuation")}
+                if include_valuation
+                else {}
+            ),
             "news_evidence": _real_layer("news_evidence", "google-news-rss"),
             "derived_signals": _real_layer(
                 "derived_signals",
@@ -159,6 +178,29 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
         "provider_name": "yahoo-chart",
         "data_quality": "fresh",
         "quotes": [{"stock_code": "600519"}],
+        "missing_stock_codes": [],
+    }
+    valuation_snapshots = {
+        "version": "valuation-snapshot-v1",
+        "provider_name": "quote-derived-valuation",
+        "provider_version": "quote-derived-valuation-v1",
+        "data_quality": "fresh",
+        "source_url": "derived://market-quotes/valuation-context",
+        "retrieved_at": "2026-05-14T00:00:00+00:00",
+        "valuation_basis": "quote_derived_context",
+        "valuations": [
+            {
+                "stock_code": "600519",
+                "stock_name": "贵州茅台",
+                "source": "market_quote",
+                "source_provider": "yahoo-chart",
+                "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS",
+                "latest_price": 1600.0,
+                "change_percent": 3.4,
+                "valuation_pressure": "elevated",
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+            }
+        ],
         "missing_stock_codes": [],
     }
     news_evidence = {
@@ -213,6 +255,7 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
         "announcement_evidence": announcement_evidence,
         "news_evidence": news_evidence,
         "market_quotes": market_quotes,
+        **({"valuation_snapshots": valuation_snapshots} if include_valuation else {}),
         "evidence": [*announcement_evidence["evidence"], *news_evidence["evidence"]],
         "derived_signal_events": derived_signal_events,
         "signal_events": derived_signal_events,
@@ -225,6 +268,7 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
         "base_intelligence_mode": "provider-derived",
         "stock_mapping_mode": "reviewed",
         "news_evidence": news_evidence,
+        **({"valuation_snapshots": valuation_snapshots} if include_valuation else {}),
         "derived_signal_events": derived_signal_events,
     }
     manifest = {
@@ -247,6 +291,7 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
     notice = (
         "reviewed-registry-store\nreviewed-mapping-store\n"
         "provider-derived-evidence\nprovider-derived-signals\n"
+        "quote-derived-valuation\n"
     )
     (output_dir / "fund_161725_report.md").write_text(notice, encoding="utf-8")
     (output_dir / "fund_161725_report.html").write_text(notice, encoding="utf-8")
@@ -279,6 +324,7 @@ def _source_url(layer: str) -> str:
         "holdings": "https://fundmobapi.eastmoney.com/FundMNewApi/FundMNInverstPosition?FCODE=161725",
         "announcements": "https://www.cninfo.com.cn/new/hisAnnouncement/query",
         "market_quotes": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS",
+        "valuation": "derived://market-quotes/valuation-context",
         "news_evidence": "https://news.google.com/rss/search",
     }[layer]
 
