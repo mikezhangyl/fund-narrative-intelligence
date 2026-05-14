@@ -535,6 +535,15 @@ The generated artifacts must satisfy:
 - `report.html` renders semantic HTML sections and tables rather than displaying raw Markdown syntax.
 - The command exits non-zero only for invalid user input or unrecoverable local errors.
 - Provider unavailability produces degraded output instead of an unhandled exception.
+
+Manifest artifacts should also support direct validation:
+
+```bash
+python -m src.main --validate-artifact-manifest path/to/fund_000001_manifest.json
+```
+
+This command validates the artifact discovery contract without requiring
+`--fund-code`.
 - Missing local mock fixtures and invalid provider payloads produce controlled errors.
 - The mock-provider path includes multiple scenario funds so lifecycle stages are not validated only against one happy path.
 - The `eastmoney` provider mode can normalize no-key fund holdings while keeping non-holdings intelligence layers local in V1.

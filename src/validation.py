@@ -311,6 +311,43 @@ def validate_review_queue_artifact_payload(payload: dict[str, Any]) -> None:
     )
 
 
+def validate_pipeline_artifact_manifest_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "pipeline artifact manifest")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "fund_code",
+            "as_of_date",
+            "provider_mode",
+            "data_quality",
+            "web_ready",
+            "provider_foundation",
+            "degradation_events",
+            "artifacts",
+        },
+        "pipeline artifact manifest",
+    )
+    if payload["version"] != "pipeline-artifact-manifest-v1":
+        raise ProviderContractError("pipeline artifact manifest version is unsupported")
+    for field in {"fund_code", "as_of_date", "provider_mode", "data_quality"}:
+        if not isinstance(payload[field], str) or not payload[field]:
+            raise ProviderContractError(
+                f"pipeline artifact manifest {field} must be a non-empty string"
+            )
+    if not isinstance(payload["web_ready"], bool):
+        raise ProviderContractError("pipeline artifact manifest web_ready must be boolean")
+    _require_mapping(
+        payload["provider_foundation"],
+        "pipeline artifact manifest provider_foundation",
+    )
+    if not isinstance(payload["degradation_events"], list):
+        raise ProviderContractError(
+            "pipeline artifact manifest degradation_events must be a list"
+        )
+    _validate_pipeline_manifest_artifacts(payload["artifacts"])
+
+
 def _require_mapping(value: Any, context: str) -> None:
     if not isinstance(value, dict):
         raise ProviderContractError(f"{context} must be an object")
@@ -373,6 +410,34 @@ def _validate_candidate_narrative(candidate: Any, context: str) -> str:
     _require_string_list(candidate["aliases"], f"{context}.aliases")
     _require_string_list(candidate["related_terms"], f"{context}.related_terms")
     return candidate_id
+
+
+def _validate_pipeline_manifest_artifacts(artifacts: Any) -> None:
+    _require_mapping(artifacts, "pipeline artifact manifest artifacts")
+    expected_formats = {
+        "raw": "json",
+        "scoring": "json",
+        "review_queue": "json",
+        "markdown": "markdown",
+        "html": "html",
+    }
+    _require_keys(
+        artifacts,
+        set(expected_formats),
+        "pipeline artifact manifest artifacts",
+    )
+    for key, expected_format in expected_formats.items():
+        context = f"pipeline artifact manifest artifacts.{key}"
+        artifact = artifacts[key]
+        _require_mapping(artifact, context)
+        _require_keys(artifact, {"path", "format"}, context)
+        path = artifact["path"]
+        if not isinstance(path, str) or not path:
+            raise ProviderContractError(f"{context}.path must be a non-empty string")
+        if path.startswith("/") or ".." in path.split("/"):
+            raise ProviderContractError(f"{context}.path must be a relative file path")
+        if artifact["format"] != expected_format:
+            raise ProviderContractError(f"{context}.format must be {expected_format}")
 
 
 def _validate_review_queue_exclusion(exclusion: Any, context: str) -> None:

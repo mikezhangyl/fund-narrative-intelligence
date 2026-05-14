@@ -616,4 +616,5 @@ Consequences:
 
 - `run_pipeline` returns a `manifest` artifact path.
 - Manifest artifacts include raw, scoring, review queue, Markdown, and HTML paths.
+- Manifest artifacts can be validated directly through the CLI before future web workspace loading.
 - Existing artifact names and payload contracts remain unchanged.

@@ -93,6 +93,7 @@ Expected artifacts:
 - Raw/scoring JSON includes `candidate_review_queue`, a read-ready queue for future web approval screens with available actions, related exclusions, and promotion action templates.
 - Pipeline outputs include `fund_<code>_review_queue.json`, a dedicated future-workspace artifact containing the queue plus candidate/exclusion context.
 - Pipeline outputs include `fund_<code>_manifest.json`, a web-ready discovery artifact with relative artifact paths, provider foundation, data quality, and degradation events.
+- `python -m src.main --validate-artifact-manifest path/to/fund_000001_manifest.json` validates a manifest artifact without requiring `--fund-code`.
 - `python -m src.main --validate-review-queue path/to/fund_000001_review_queue.json` validates a review queue artifact without requiring `--fund-code`.
 - `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.

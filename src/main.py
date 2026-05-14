@@ -18,6 +18,7 @@ from src.orchestrator import (
 from src.providers.mock import MockDataProvider
 from src.real_fund_smoke import run_real_fund_smoke
 from src.validation import (
+    validate_pipeline_artifact_manifest_payload,
     validate_review_action_persistence_result_payload,
     validate_review_action_preview_payload,
     validate_review_queue_artifact_payload,
@@ -124,6 +125,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate a fund review-queue artifact and exit.",
     )
     parser.add_argument(
+        "--validate-artifact-manifest",
+        help="Validate a pipeline artifact manifest and exit.",
+    )
+    parser.add_argument(
         "--include-cninfo-announcements",
         action="store_true",
         help="Optionally fetch CNINFO announcement metadata and convert it into evidence records.",
@@ -174,6 +179,12 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(
             "--validate-review-queue cannot be combined with review action execution"
         )
+    if args.validate_artifact_manifest and (
+        args.preview_review_action or args.persist_review_action
+    ):
+        parser.error(
+            "--validate-artifact-manifest cannot be combined with review action execution"
+        )
 
     if args.validate_review_preview:
         try:
@@ -215,6 +226,27 @@ def main(argv: list[str] | None = None) -> int:
 
         print("Review queue valid:")
         print(Path(args.validate_review_queue))
+        return 0
+
+    if args.validate_artifact_manifest:
+        try:
+            payload = _read_json_object(Path(args.validate_artifact_manifest))
+            validate_pipeline_artifact_manifest_payload(payload)
+        except PipelineError as exc:
+            parser.error(str(exc))
+            return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        except Exception as exc:
+            print(
+                f"Unrecoverable artifact manifest validation error: {exc}",
+                file=sys.stderr,
+            )
+            return 1
+
+        print("Artifact manifest valid:")
+        print(Path(args.validate_artifact_manifest))
         return 0
 
     if args.validate_persistence_result:
