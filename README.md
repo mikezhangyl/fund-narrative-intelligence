@@ -84,6 +84,17 @@ Run the strict live market quote acceptance path:
 python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_quotes_161725
 ```
 
+Run the strict combined live enriched acceptance path:
+
+```bash
+python scripts/validate_real_enriched_acceptance.py --output-dir outputs/real_enriched_161725
+```
+
+This is the current end-to-end live-provider gate for one fund: Eastmoney
+holdings, CNINFO announcement evidence, market quote snapshots, derived signals,
+and explicit Mock fixture disclosure for the intelligence layers not yet backed
+by real providers.
+
 Generated artifacts:
 
 ```text
@@ -193,6 +204,19 @@ python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_
 The strict command rejects missing quote rows, missing derived quote signals,
 mock quote layers, and reports that do not disclose the mixed real
 holdings/quotes plus Mock fixture foundation.
+
+For the combined live enriched path, run:
+
+```bash
+python scripts/validate_real_enriched_acceptance.py --output-dir outputs/real_enriched_161725
+```
+
+This command runs Eastmoney holdings, CNINFO announcements, market quote
+snapshots, and both derived-signal paths together. It rejects missing real
+provider layers, missing announcement or quote-derived signals, and reports that
+hide the remaining Mock fixture foundation. Market quote fallback from
+Eastmoney to Yahoo is allowed only when it is recorded as a provider fallback
+and disclosed in the provider foundation.
 
 For CNINFO announcement search, V1 sends Shanghai and Shenzhen stock selectors in `code,orgId` form, such as `600519,gssh0600519` and `000001,gssz0000001`. This is covered by unit tests and by the live announcement smoke command.
 

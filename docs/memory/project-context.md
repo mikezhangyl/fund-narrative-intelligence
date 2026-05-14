@@ -172,6 +172,7 @@ Expected artifacts:
 - Strict market quote acceptance validates generated artifacts directly: holdings must be fresh Eastmoney data, market quotes must contain real non-mock rows, and remaining registry/mapping/base-evidence/signal layers must disclose `mock://fixtures/...`.
 - Derived announcement signals are exposed as `derived_signal_events` in raw/scoring JSON and as a non-mock `Derived Signals` provider layer. Base fixture signals remain present and explicitly mock-backed until a later provider replaces them.
 - Market quote derived signals share the same `derived_signal_events` contract and are included in raw `signal_events` plus scoring input. The `Market Quotes` and `Derived Signals` layers stay separate in provider foundation metadata.
+- `python scripts/validate_real_enriched_acceptance.py --output-dir outputs/real_enriched_161725` is the strict combined live-provider acceptance command for Eastmoney holdings, CNINFO announcements/evidence, market quotes, and both derived-signal sources. It still requires registry, mapping, base-evidence, and base-signal layers to disclose Mock fixtures. Eastmoney-to-Yahoo quote fallback is allowed only as a recorded and disclosed provider fallback.
 
 ## Open Questions
 

@@ -798,3 +798,37 @@ Consequences:
   derived quote signals.
 - Provider foundation keeps `Market Quotes` and `Derived Signals` as separate
   non-mock layers while base `Signals` remains mock-backed.
+
+## ADR-0035: Add Strict Combined Real Enriched Acceptance
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add `scripts/validate_real_enriched_acceptance.py` as the manual acceptance
+gate for the combined optional real-provider path.
+
+Rationale:
+
+- Separate holdings, announcement, and market quote checks prove individual
+  adapters, but future server and web flows need the whole enriched artifact
+  bundle to run together.
+- The acceptance contract must keep users informed when a report mixes real
+  provider data with fixture-backed intelligence layers.
+- Derived signals should be traceable to both CNINFO announcement evidence and
+  market quote snapshots before more mock layers are removed.
+
+Consequences:
+
+- The command runs Eastmoney holdings, CNINFO announcements, market quotes, and
+  artifact contract validation.
+- It rejects missing announcement evidence, missing quote rows, missing derived
+  signal sources, mock real-provider layers, and hidden Mock fixture disclosure.
+- Eastmoney-to-Yahoo quote fallback is allowed only as a recorded and disclosed
+  provider fallback because the Eastmoney quote endpoint is intermittently
+  unavailable.
+- Registry, mappings, base evidence, and base signals intentionally remain
+  mock-backed in this acceptance until later provider work replaces them.
+- The command remains outside CI because it depends on live provider
+  availability.

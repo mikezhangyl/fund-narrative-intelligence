@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-market-quote-derived-signals",
+  "latest_run": "20260514-real-enriched-acceptance",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "continue reducing mock layers after announcement and market quote data now derive scoring signals"
+  "next_step": "continue reducing mock registry, mapping, base-evidence, and base-signal layers after strict combined real enriched acceptance"
 }
