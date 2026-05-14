@@ -43,3 +43,4 @@
 - [mock-data-source-url-disclosure.md](./mock-data-source-url-disclosure.md)
 - [pipeline-artifact-manifest.md](./pipeline-artifact-manifest.md)
 - [validate-artifact-manifest-cli.md](./validate-artifact-manifest-cli.md)
+- [validate-artifact-contracts-cli.md](./validate-artifact-contracts-cli.md)

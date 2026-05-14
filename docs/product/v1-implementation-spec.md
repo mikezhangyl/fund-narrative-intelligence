@@ -544,6 +544,17 @@ python -m src.main --validate-artifact-manifest path/to/fund_000001_manifest.jso
 
 This command validates the artifact discovery contract without requiring
 `--fund-code`.
+
+V1 should also expose one-command contract validation for generated outputs:
+
+```bash
+python -m src.main --validate-artifact-contracts outputs/
+```
+
+When given a directory, this command validates all known contract artifacts in
+that directory: fund manifests, review queue artifacts, review-action previews,
+and review-action persistence results. When given a manifest file, it validates
+the manifest and every file referenced by it.
 - Missing local mock fixtures and invalid provider payloads produce controlled errors.
 - The mock-provider path includes multiple scenario funds so lifecycle stages are not validated only against one happy path.
 - The `eastmoney` provider mode can normalize no-key fund holdings while keeping non-holdings intelligence layers local in V1.

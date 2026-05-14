@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-validate-artifact-manifest-cli",
+  "latest_run": "20260514-validate-artifact-contracts-cli",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "expose pipeline artifact manifest validation through CLI"
+  "next_step": "expose one-command artifact contract validation for future web loading"
 }

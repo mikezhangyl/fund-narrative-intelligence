@@ -129,6 +129,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate a pipeline artifact manifest and exit.",
     )
     parser.add_argument(
+        "--validate-artifact-contracts",
+        help=(
+            "Validate all known artifact contracts from a manifest file or output "
+            "directory and exit."
+        ),
+    )
+    parser.add_argument(
         "--include-cninfo-announcements",
         action="store_true",
         help="Optionally fetch CNINFO announcement metadata and convert it into evidence records.",
@@ -184,6 +191,12 @@ def main(argv: list[str] | None = None) -> int:
     ):
         parser.error(
             "--validate-artifact-manifest cannot be combined with review action execution"
+        )
+    if args.validate_artifact_contracts and (
+        args.preview_review_action or args.persist_review_action
+    ):
+        parser.error(
+            "--validate-artifact-contracts cannot be combined with review action execution"
         )
 
     if args.validate_review_preview:
@@ -247,6 +260,38 @@ def main(argv: list[str] | None = None) -> int:
 
         print("Artifact manifest valid:")
         print(Path(args.validate_artifact_manifest))
+        return 0
+
+    if args.validate_artifact_contracts:
+        try:
+            summary = _validate_artifact_contracts(
+                Path(args.validate_artifact_contracts)
+            )
+        except PipelineError as exc:
+            parser.error(str(exc))
+            return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        except Exception as exc:
+            print(
+                f"Unrecoverable artifact contract validation error: {exc}",
+                file=sys.stderr,
+            )
+            return 1
+
+        print("Artifact contracts valid:")
+        print(Path(args.validate_artifact_contracts))
+        print(
+            " ".join(
+                [
+                    f"manifests={summary['manifests']}",
+                    f"review_queues={summary['review_queues']}",
+                    f"review_previews={summary['review_previews']}",
+                    f"persistence_results={summary['persistence_results']}",
+                ]
+            )
+        )
         return 0
 
     if args.validate_persistence_result:
@@ -473,6 +518,107 @@ def _read_json_object(path: Path) -> dict:
     if not isinstance(payload, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return payload
+
+
+def _validate_artifact_contracts(path: Path) -> dict[str, int]:
+    if path.is_dir():
+        return _validate_artifact_contract_directory(path)
+    if path.is_file():
+        summary = _empty_contract_summary()
+        _validate_manifest_bundle(path)
+        summary["manifests"] = 1
+        return summary
+    raise ValueError(f"{path} does not exist")
+
+
+def _validate_artifact_contract_directory(path: Path) -> dict[str, int]:
+    summary = _empty_contract_summary()
+
+    for manifest_path in sorted(path.glob("fund_*_manifest.json")):
+        _validate_manifest_bundle(manifest_path)
+        summary["manifests"] += 1
+    for queue_path in sorted(path.glob("fund_*_review_queue.json")):
+        validate_review_queue_artifact_payload(_read_json_object(queue_path))
+        summary["review_queues"] += 1
+    for preview_path in sorted(path.glob("candidate_review_action_*_preview.json")):
+        validate_review_action_preview_payload(_read_json_object(preview_path))
+        summary["review_previews"] += 1
+    for result_path in sorted(path.glob("candidate_review_action_*_persistence.json")):
+        validate_review_action_persistence_result_payload(
+            _read_json_object(result_path)
+        )
+        summary["persistence_results"] += 1
+
+    if not any(summary.values()):
+        raise ValueError(f"{path} contains no known artifact contracts")
+    return summary
+
+
+def _validate_manifest_bundle(manifest_path: Path) -> None:
+    manifest = _read_json_object(manifest_path)
+    validate_pipeline_artifact_manifest_payload(manifest)
+    artifact_root = manifest_path.parent
+    for artifact_key, artifact in manifest["artifacts"].items():
+        artifact_path = artifact_root / artifact["path"]
+        if not artifact_path.exists():
+            raise ValueError(
+                f"manifest artifact {artifact_key} does not exist: {artifact_path}"
+            )
+        if not artifact_path.is_file():
+            raise ValueError(
+                f"manifest artifact {artifact_key} must be a file: {artifact_path}"
+            )
+        _validate_manifest_referenced_artifact(
+            artifact_key=artifact_key,
+            artifact_path=artifact_path,
+            manifest=manifest,
+        )
+
+
+def _validate_manifest_referenced_artifact(
+    artifact_key: str,
+    artifact_path: Path,
+    manifest: dict,
+) -> None:
+    if artifact_key == "review_queue":
+        validate_review_queue_artifact_payload(_read_json_object(artifact_path))
+        return
+    if artifact_key in {"raw", "scoring"}:
+        payload = _read_json_object(artifact_path)
+        _validate_manifest_json_metadata(
+            payload=payload,
+            manifest=manifest,
+            artifact_key=artifact_key,
+        )
+        return
+    text = artifact_path.read_text(encoding="utf-8")
+    if not text.strip():
+        raise ValueError(f"manifest artifact {artifact_key} must not be empty")
+
+
+def _validate_manifest_json_metadata(
+    payload: dict,
+    manifest: dict,
+    artifact_key: str,
+) -> None:
+    metadata = payload.get("metadata")
+    if not isinstance(metadata, dict):
+        raise ValueError(f"manifest artifact {artifact_key} missing metadata object")
+    if metadata.get("fund_code") != manifest["fund_code"]:
+        raise ValueError(f"manifest artifact {artifact_key} fund_code mismatch")
+    if payload.get("provider_foundation") != manifest["provider_foundation"]:
+        raise ValueError(
+            f"manifest artifact {artifact_key} provider_foundation mismatch"
+        )
+
+
+def _empty_contract_summary() -> dict[str, int]:
+    return {
+        "manifests": 0,
+        "review_queues": 0,
+        "review_previews": 0,
+        "persistence_results": 0,
+    }
 
 
 if __name__ == "__main__":

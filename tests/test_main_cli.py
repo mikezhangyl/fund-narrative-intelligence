@@ -179,6 +179,82 @@ def test_main_validate_artifact_manifest_rejects_malformed_file(tmp_path, capsys
     assert "pipeline artifact manifest missing required fields" in captured.err
 
 
+def test_main_validates_artifact_contract_directory(tmp_path, capsys):
+    main_module.main(["--fund-code", "000001", "--output-dir", str(tmp_path)])
+    registry_path = tmp_path / "registry.json"
+    action_path = tmp_path / "action.json"
+    registry_output_path = tmp_path / "registry.next.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    action_path.write_text(
+        json.dumps(
+            {
+                "action_id": "ACT_CONTRACTS_VALIDATE",
+                "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
+                "action": "reject",
+                "reviewed_by": "reviewer@example.com",
+                "reviewed_at": "2026-05-14T11:00:00+00:00",
+                "review_note": "Reject in artifact contract directory test.",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    main_module.main(
+        [
+            "--preview-review-action",
+            str(action_path),
+            "--registry-path",
+            str(registry_path),
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+    main_module.main(
+        [
+            "--persist-review-action",
+            str(action_path),
+            "--registry-path",
+            str(registry_path),
+            "--registry-output",
+            str(registry_output_path),
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    exit_code = main_module.main(["--validate-artifact-contracts", str(tmp_path)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Artifact contracts valid:" in captured.out
+    assert "manifests=1" in captured.out
+    assert "review_queues=1" in captured.out
+    assert "review_previews=1" in captured.out
+    assert "persistence_results=1" in captured.out
+
+
+def test_main_validate_artifact_contracts_rejects_missing_manifest_file(
+    tmp_path, capsys
+):
+    main_module.main(["--fund-code", "000001", "--output-dir", str(tmp_path)])
+    (tmp_path / "fund_000001_raw.json").unlink()
+
+    with pytest.raises(SystemExit) as exc:
+        main_module.main(
+            [
+                "--validate-artifact-contracts",
+                str(tmp_path / "fund_000001_manifest.json"),
+            ]
+        )
+
+    captured = capsys.readouterr()
+    assert exc.value.code == 2
+    assert "manifest artifact raw does not exist" in captured.err
+
+
 def test_main_preview_review_action_uses_project_root_default_registry(
     tmp_path, monkeypatch, capsys
 ):
