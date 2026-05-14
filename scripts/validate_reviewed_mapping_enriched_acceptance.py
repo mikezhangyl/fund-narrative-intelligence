@@ -169,6 +169,7 @@ def validate_acceptance_outputs(
     html = (output_dir / f"fund_{fund_code}_report.html").read_text(encoding="utf-8")
     foundation = scoring.get("provider_foundation", {})
     layers = foundation.get("layers", {})
+    registry_layer = layers.get("narrative_registry", {})
     mapping_layer = layers.get("stock_mappings", {})
     mappings = raw.get("stock_narrative_mappings") or []
     coverage = raw.get("mapping_coverage", {})
@@ -197,6 +198,8 @@ def validate_acceptance_outputs(
         mapping_layer.get("provider_name") == "reviewed-mapping-store",
         "stock mappings layer must use reviewed-mapping-store",
     )
+    _require_layer_review_metadata(registry_layer, "narrative_registry")
+    _require_layer_review_metadata(mapping_layer, "stock_mappings")
     _require(
         mapping_layer.get("data_quality") == "partial",
         "stock mappings layer data_quality must be partial for V1 reviewed store",
@@ -280,6 +283,12 @@ def _require_review_fields(payload: dict[str, Any], context: str) -> None:
             isinstance(value, str) and bool(value.strip()),
             f"{context}.{field} must be a non-empty string",
         )
+
+
+def _require_layer_review_metadata(layer: dict[str, Any], layer_name: str) -> None:
+    metadata = layer.get("review_metadata")
+    _require(isinstance(metadata, dict), f"{layer_name} layer must include review_metadata")
+    _require_review_metadata({"review_metadata": metadata}, f"{layer_name}.review_metadata")
 
 
 def _contains_all(value: str, expected_fragments: tuple[str, ...]) -> bool:

@@ -97,6 +97,8 @@ def test_reviewed_narrative_registry_provider_loads_validated_store(tmp_path):
     assert layer["source_url"].startswith("reviewed-registry://external/")
     assert "/narrative_registry.reviewed.json#sha256=" in layer["source_url"]
     assert layer["is_mock"] is False
+    assert layer["review_metadata"]["reviewed_by"] == "seed-curation"
+    assert layer["review_metadata"]["review_schema_version"] == "review-metadata-v1"
 
 
 def test_reviewed_narrative_registry_provider_rejects_missing_audit_metadata(
@@ -179,6 +181,8 @@ def test_reviewed_stock_mapping_provider_loads_validated_store(tmp_path):
     assert layer["source_url"].startswith("reviewed-mapping://external/")
     assert "/stock_narrative_mappings.reviewed.json#sha256=" in layer["source_url"]
     assert layer["is_mock"] is False
+    assert layer["review_metadata"]["reviewed_by"] == "seed-curation"
+    assert layer["review_metadata"]["review_schema_version"] == "review-metadata-v1"
 
 
 def test_reviewed_stock_mapping_provider_rejects_missing_audit_metadata(tmp_path):

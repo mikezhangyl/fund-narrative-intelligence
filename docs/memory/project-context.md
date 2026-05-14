@@ -101,6 +101,7 @@ Expected artifacts:
 - `--stock-mapping-mode reviewed` loads explicit stock-to-narrative mappings from `data/registry/stock_narrative_mappings.reviewed.json` or `--stock-mappings-path`, uses mapping method `reviewed_mapping`, and replaces the `Stock Mappings` provider layer with non-mock `reviewed-mapping-store`.
 - `python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725` is the strict live-provider acceptance command for the enriched path with reviewed registry and reviewed mappings; it rejects `fixture_rule` and `registry_term_rule` selected mappings.
 - Reviewed registry and reviewed mapping providers require store-level `review_metadata`; active reviewed narratives require non-empty `reviewed_by` and `reviewed_at`; reviewed mapping rows require `review.status=approved`, `reviewed_by`, and `reviewed_at`.
+- Reviewed provider foundation layers preserve store-level `review_metadata` so raw/scoring/review-queue/manifest artifacts can power future web source tables without reopening reviewed store files.
 - Narrative reports include deterministic stage, risk, and confidence interpretation notes; these are explanatory and non-advisory.
 - Real-fund smoke summaries isolate failures per fund, write summary artifacts, include concrete unmapped holding details, and return non-zero when any fund fails or falls below coverage threshold.
 - Real-fund smoke summaries also include `multi_mapped_holdings` so 100% mapping coverage does not hide broad or cross-domain registry matches.
@@ -187,6 +188,7 @@ Expected artifacts:
 - Reviewed-registry workflow data is intentionally separate from `data/fixtures/`. The current store is file-backed so future web approval flows can write reviewed registry snapshots without changing the pipeline contract.
 - Reviewed stock mapping workflow data is also separate from `data/fixtures/`. The reviewed mapping store uses `reviewed_mapping` so future web approval screens can distinguish persisted mapping records from runtime registry-term fallback.
 - Reviewed stores should fail fast when audit metadata is missing rather than silently presenting fixture-derived data as reviewed.
+- Future web source tables should read provider layer `source_url`, `data_quality`, `is_mock`, and optional `review_metadata` directly from generated artifacts.
 
 ## Open Questions
 

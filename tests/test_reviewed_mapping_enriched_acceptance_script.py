@@ -90,6 +90,7 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
                     "reviewed-registry://data/registry/"
                     "narrative_registry.reviewed.json#sha256=123456789abc"
                 ),
+                review_metadata=_review_metadata(),
             ),
             "stock_mappings": _real_layer(
                 "stock_mappings",
@@ -99,6 +100,7 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
                     "stock_narrative_mappings.reviewed.json#sha256=123456789abc"
                 ),
                 data_quality="partial",
+                review_metadata=_review_metadata(),
             ),
             "evidence": _real_layer(
                 "evidence",
@@ -199,8 +201,9 @@ def _real_layer(
     provider_name: str,
     source_url: str | None = None,
     data_quality: str = "fresh",
+    review_metadata: dict | None = None,
 ) -> dict:
-    return {
+    payload = {
         "layer": layer,
         "display_name": layer.replace("_", " ").title(),
         "provider_name": provider_name,
@@ -210,6 +213,9 @@ def _real_layer(
         "is_mock": False,
         "note": "",
     }
+    if review_metadata is not None:
+        payload["review_metadata"] = review_metadata
+    return payload
 
 
 def _source_url(layer: str) -> str:

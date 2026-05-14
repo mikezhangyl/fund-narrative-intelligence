@@ -103,7 +103,7 @@ def mock_layer(
 def _normalize_layer(layer: str, payload: dict[str, Any]) -> dict[str, Any]:
     provider_name = str(payload["provider_name"])
     data_quality = str(payload["data_quality"])
-    return {
+    normalized = {
         "layer": layer,
         "display_name": LAYER_DISPLAY_NAMES.get(layer, layer.replace("_", " ").title()),
         "provider_name": provider_name,
@@ -114,6 +114,10 @@ def _normalize_layer(layer: str, payload: dict[str, Any]) -> dict[str, Any]:
         or _is_mock(provider_name=provider_name, data_quality=data_quality),
         "note": str(payload.get("note") or ""),
     }
+    review_metadata = payload.get("review_metadata")
+    if isinstance(review_metadata, dict):
+        normalized["review_metadata"] = dict(review_metadata)
+    return normalized
 
 
 def _effective_data_quality(layers: dict[str, dict[str, Any]]) -> str:

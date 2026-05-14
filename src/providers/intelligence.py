@@ -111,6 +111,8 @@ class ReviewedNarrativeRegistryProvider:
         return deepcopy(payload)
 
     def get_provider_layer(self) -> dict[str, Any]:
+        payload = _load_json_object(self.registry_path)
+        _require_reviewed_store_metadata(payload, context="reviewed registry")
         return {
             "layer": "narrative_registry",
             "provider_name": self.provider_name,
@@ -119,6 +121,7 @@ class ReviewedNarrativeRegistryProvider:
             "source_url": _reviewed_registry_source_url(self.registry_path),
             "is_mock": False,
             "note": "Loaded from file-backed Narrative Registry store for reviewed workflows.",
+            "review_metadata": deepcopy(payload["review_metadata"]),
         }
 
 
@@ -139,6 +142,8 @@ class ReviewedStockNarrativeMappingProvider:
         return deepcopy(payload["mappings"])
 
     def get_provider_layer(self) -> dict[str, Any]:
+        payload = _load_json_object(self.mappings_path, label="reviewed mappings")
+        _require_reviewed_store_metadata(payload, context="reviewed mappings")
         return {
             "layer": "stock_mappings",
             "provider_name": self.provider_name,
@@ -150,6 +155,7 @@ class ReviewedStockNarrativeMappingProvider:
             ),
             "is_mock": False,
             "note": "Loaded from file-backed stock-to-narrative mapping store for reviewed workflows.",
+            "review_metadata": deepcopy(payload["review_metadata"]),
         }
 
 

@@ -1031,3 +1031,31 @@ Consequences:
   validating generated artifacts.
 - Mock fixtures remain unchanged; audit metadata is required only for reviewed
   store providers.
+
+## ADR-0042: Preserve Review Metadata in Provider Foundation Layers
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Preserve optional `review_metadata` on normalized provider-foundation layers and
+emit reviewed registry/mapping store metadata through generated artifacts.
+
+Rationale:
+
+- Future web source tables should not need to reopen or parse reviewed store
+  files to show approval provenance.
+- Provider foundation is already the shared source-of-truth object across raw,
+  scoring, review queue, manifest, and reports.
+- Keeping metadata optional avoids imposing reviewed-store fields on mock and
+  live market/announcement providers.
+
+Consequences:
+
+- Reviewed registry and stock mapping provider layers include store-level
+  `review_metadata`.
+- Provider foundation normalization preserves `review_metadata` when present.
+- Reviewed-mapping acceptance now verifies emitted provider-foundation layer
+  metadata in addition to validating source store metadata.
+- Non-reviewed providers remain unchanged.

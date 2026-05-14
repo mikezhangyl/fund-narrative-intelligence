@@ -864,6 +864,7 @@ def test_reviewed_narrative_registry_mode_uses_store_layer(tmp_path):
     assert registry_layer["source_url"].startswith("reviewed-registry://external/")
     assert "/narrative_registry.reviewed.json#sha256=" in registry_layer["source_url"]
     assert registry_layer["is_mock"] is False
+    assert registry_layer["review_metadata"]["reviewed_by"] == "seed-curation"
     assert scoring["provider_foundation"]["effective_data_quality"] == "partial"
     assert "Narrative Registry 来自 reviewed-registry-store" in markdown
     assert "reviewed-registry://external/" in markdown
@@ -884,6 +885,8 @@ def test_reviewed_stock_mapping_mode_uses_store_layer(tmp_path):
 
     raw = json.loads(artifacts["raw"].read_text())
     scoring = json.loads(artifacts["scoring"].read_text())
+    review_queue = json.loads(artifacts["review_queue"].read_text())
+    manifest = json.loads(artifacts["manifest"].read_text())
     markdown = artifacts["markdown"].read_text()
     mapping_layer = scoring["provider_foundation"]["layers"]["stock_mappings"]
 
@@ -897,6 +900,10 @@ def test_reviewed_stock_mapping_mode_uses_store_layer(tmp_path):
     assert mapping_layer["data_quality"] == "partial"
     assert mapping_layer["is_mock"] is False
     assert mapping_layer["source_url"].startswith("reviewed-mapping://external/")
+    assert mapping_layer["review_metadata"]["reviewed_by"] == "seed-curation"
+    assert raw["provider_foundation"] == scoring["provider_foundation"]
+    assert review_queue["provider_foundation"] == scoring["provider_foundation"]
+    assert manifest["provider_foundation"] == scoring["provider_foundation"]
     assert "Stock Mappings 来自 reviewed-mapping-store" in markdown
 
 
