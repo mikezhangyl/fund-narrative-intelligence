@@ -45,3 +45,4 @@
 - [validate-artifact-manifest-cli.md](./validate-artifact-manifest-cli.md)
 - [validate-artifact-contracts-cli.md](./validate-artifact-contracts-cli.md)
 - [v1-acceptance-script.md](./v1-acceptance-script.md)
+- [ci-quality-workflow.md](./ci-quality-workflow.md)

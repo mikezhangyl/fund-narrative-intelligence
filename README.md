@@ -84,6 +84,9 @@ python -m coverage report
 python -m compileall -q src tests scripts
 ```
 
+GitHub Actions runs the same quality gates on pushes to `main` and pull
+requests.
+
 ## Current Scope
 
 - Python CLI.

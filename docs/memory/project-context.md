@@ -64,6 +64,7 @@ Expected artifacts:
 - Standard setup command: `python -m pip install -e ".[dev]"`.
 - Standard quality commands: `python -m ruff check .`, `python -m coverage run -m pytest -q`, `python -m coverage report`, and `python -m compileall -q src tests scripts`.
 - Standard V1 acceptance command: `python scripts/validate_v1_acceptance.py`.
+- GitHub Actions CI runs the standard quality gates on pushes to `main` and pull requests.
 - Data: local JSON fixtures and mock providers.
 - Future UI: Node.js / Next.js can be added later as a separate workspace layer. Candidate narrative review and approval will eventually happen in a web UI, so V1 structured outputs should remain directly renderable and action-ready for a future review workspace.
 - CLI fixture discovery: `python -m src.main --list-fixtures`.
