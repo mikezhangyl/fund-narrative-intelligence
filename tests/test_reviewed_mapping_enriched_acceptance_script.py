@@ -61,6 +61,7 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
         "--announcement-start-date",
         "2026-01-01",
         "--include-market-quotes",
+        "--include-news-evidence",
         "--output-dir",
         str(tmp_path),
     ]
@@ -114,6 +115,7 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
             ),
             "announcements": _real_layer("announcements", "cninfo-announcement"),
             "market_quotes": _real_layer("market_quotes", "yahoo-chart"),
+            "news_evidence": _real_layer("news_evidence", "google-news-rss"),
             "derived_signals": _real_layer(
                 "derived_signals",
                 "mixed-derived-signals",
@@ -143,8 +145,35 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
         "quotes": [{"stock_code": "600519"}],
         "missing_stock_codes": [],
     }
+    news_evidence = {
+        "version": "news-evidence-v1",
+        "provider_name": "google-news-rss",
+        "provider_version": "google-news-rss-v1",
+        "data_quality": "fresh",
+        "source_url": "https://news.google.com/rss/search",
+        "retrieved_at": "2026-05-14T00:00:00+00:00",
+        "query_scope": {
+            "requested_narrative_ids": ["premium_baijiu_consumption"],
+            "queried_narrative_ids": ["premium_baijiu_consumption"],
+            "omitted_narrative_ids": [],
+            "query_limit": 4,
+        },
+        "evidence": [
+            {
+                "evidence_id": "news-premium-baijiu-0",
+                "narrative_id": "premium_baijiu_consumption",
+                "type": "news",
+                "source": "google_news_rss",
+                "source_url": "https://example.com/news",
+            }
+        ],
+        "missing_narrative_ids": [],
+        "skipped_item_count": 0,
+        "degradation_events": [],
+    }
     derived_signal_events = [
         {"signal_id": "SIG_ANN_cninfo-600519-0", "source": "cninfo_announcement"},
+        {"signal_id": "SIG_NEWS_news-premium-baijiu-0", "source": "news_evidence"},
         {
             "signal_id": "SIG_QUOTE_600519_premium_baijiu_consumption",
             "source": "market_quote",
@@ -166,8 +195,9 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
             "missing_stock_codes": [],
         },
         "announcement_evidence": announcement_evidence,
+        "news_evidence": news_evidence,
         "market_quotes": market_quotes,
-        "evidence": announcement_evidence["evidence"],
+        "evidence": [*announcement_evidence["evidence"], *news_evidence["evidence"]],
         "derived_signal_events": derived_signal_events,
         "signal_events": derived_signal_events,
     }
@@ -178,6 +208,7 @@ def _write_outputs(output_dir: Path, mapping_method: str = "reviewed_mapping") -
         "narrative_registry_mode": "reviewed",
         "base_intelligence_mode": "provider-derived",
         "stock_mapping_mode": "reviewed",
+        "news_evidence": news_evidence,
         "derived_signal_events": derived_signal_events,
     }
     manifest = {
@@ -232,6 +263,7 @@ def _source_url(layer: str) -> str:
         "holdings": "https://fundmobapi.eastmoney.com/FundMNewApi/FundMNInverstPosition?FCODE=161725",
         "announcements": "https://www.cninfo.com.cn/new/hisAnnouncement/query",
         "market_quotes": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS",
+        "news_evidence": "https://news.google.com/rss/search",
     }[layer]
 
 

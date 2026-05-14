@@ -65,3 +65,4 @@
 - [valuation-snapshot-provider.md](./valuation-snapshot-provider.md)
 - [news-evidence-provider.md](./news-evidence-provider.md)
 - [news-derived-signals.md](./news-derived-signals.md)
+- [reviewed-mapping-news-acceptance.md](./reviewed-mapping-news-acceptance.md)

@@ -131,6 +131,7 @@ def _run_acceptance(
             "--announcement-start-date",
             announcement_start_date,
             "--include-market-quotes",
+            "--include-news-evidence",
             "--output-dir",
             str(output_dir),
         ]
@@ -162,6 +163,7 @@ def validate_acceptance_outputs(
         stock_mapping_mode=DEFAULT_STOCK_MAPPING_MODE,
         stock_mapping_provider_name="reviewed-mapping-store",
         stock_mapping_method="reviewed_mapping",
+        require_news_evidence=True,
     )
     raw = _read_json(output_dir / f"fund_{fund_code}_raw.json")
     scoring = _read_json(output_dir / f"fund_{fund_code}_scoring.json")
