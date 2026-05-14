@@ -133,6 +133,8 @@ If multiple precision concerns apply, `multi_match_fallback` takes precedence be
 
 V1 can also use explicit `mapping_exclusions` for known-bad fallback candidates. Exclusions apply to fallback candidates only, not curated fixture mappings. Excluded candidates must not enter narrative aggregation or scoring. Raw JSON, scoring JSON, reports, and real-smoke summaries should include `excluded_mapping_candidates` with stock, candidate narrative, matched terms, reason, and `recommended_action`.
 
+V1 preserves review-only `candidate_narratives` in the registry. Candidate narratives can be linked to exclusions through `related_exclusion_ids` and `triggering_stock_codes`; in-scope candidates should be emitted in raw/scoring JSON and reports, but they must not enter active stock mapping, aggregation, scoring, or lifecycle-stage output until human review promotes them into `narratives`.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
@@ -291,7 +293,7 @@ V1 does not implement these capabilities, but it must preserve fields and model 
 | Historical replay | no full replay engine | save raw and scoring snapshots with version metadata and `as_of_date`. |
 | Alerting | no notifications or monitors | include nullable `previous_state`, `state_change`, and `state_change_reason`. |
 | Workspace UI | no frontend workspace | keep output JSON normalized and workspace-ready. |
-| Auto narrative discovery | no automatic registry mutation | include `candidate_narrative` shape and `human_review_status`. |
+| Auto narrative discovery | no automatic registry mutation | include `candidate_narratives` with `human_review_status`, `related_exclusion_ids`, and `triggering_stock_codes`. |
 | Signal governance | no automatic signal promotion | include `signal_schema_version` and allow unknown signals to become candidates. |
 | Human review workflow | no review UI | include `human_review_status`, `reviewed_by`, and `reviewed_at` as nullable fields where applicable. |
 
@@ -375,7 +377,7 @@ The generated artifacts must satisfy:
 - The real-fund smoke set records coverage, primary narrative, stage, concrete unmapped holding details, and pass/fail status.
 - The real-fund smoke set records multi-mapped holdings so high coverage does not hide possible registry precision risks.
 - The real-fund smoke set records mapping precision flags so broad-industry and multi-match curation work is visible in the summary JSON and Markdown.
-- The real-fund smoke CLI output prints per-fund precision flag and excluded candidate counts so terminal logs do not hide mapping precision work behind coverage numbers.
+- The real-fund smoke CLI output prints per-fund precision flag, excluded candidate, and candidate narrative counts so terminal logs do not hide mapping precision or taxonomy review work behind coverage numbers.
 - The real-fund smoke set writes summary artifacts even when an individual fund fails, marking only that fund as failed and returning a non-zero exit code for the overall smoke command.
 - The announcement-evidence smoke set writes summary artifacts and returns non-zero when CNINFO metadata, evidence conversion, announcement provider disclosure, or mock/mixed data-source notice checks fail.
 - The mock-provider path is deterministic enough for repeatable tests.

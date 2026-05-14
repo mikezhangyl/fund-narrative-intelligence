@@ -480,6 +480,30 @@ def test_pipeline_excludes_known_bad_mapping_candidates(tmp_path, monkeypatch):
 
     assert raw["stock_narrative_mappings"] == []
     assert raw["mapping_coverage"]["coverage_ratio"] == 0
+    assert raw["candidate_narrative_registry_version"] == "registry-v1"
+    assert raw["candidate_narratives"] == scoring["candidate_narratives"]
+    assert raw["candidate_narratives"] == [
+        {
+            "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+            "name": "Consumer Electronics Globalization",
+            "canonical_taxonomy": "Technology Hardware",
+            "status": "candidate",
+            "source": "mapping_exclusion_review",
+            "triggering_stock_codes": ["688036"],
+            "related_exclusion_ids": ["EX_SEMI_688036"],
+            "aliases": ["consumer electronics exports", "device globalization"],
+            "related_terms": ["消费电子", "终端设备", "海外手机"],
+            "rationale": (
+                "Transsion is a device and overseas-market exposure candidate, "
+                "not a semiconductor capex exposure."
+            ),
+            "human_review_status": "candidate",
+            "reviewed_by": None,
+            "reviewed_at": None,
+            "first_seen_at": "2026-05-14",
+            "last_updated_at": "2026-05-14",
+        }
+    ]
     assert raw["excluded_mapping_candidates"] == scoring[
         "excluded_mapping_candidates"
     ]
@@ -503,8 +527,11 @@ def test_pipeline_excludes_known_bad_mapping_candidates(tmp_path, monkeypatch):
         }
     ]
     assert "Excluded Mapping Candidates" in markdown
+    assert "Candidate Narratives For Review" in markdown
+    assert "Consumer Electronics Globalization" in markdown
     assert "传音控股" in markdown
     assert "candidate_narrative_review" in html
+    assert '<section class="candidate-narratives">' in html
 
 
 def test_report_generation_handles_unmapped_real_holdings(tmp_path):

@@ -18,6 +18,18 @@ def test_mock_intelligence_provider_set_loads_validated_fixture_layers():
     signals = providers.get_signal_events()
 
     assert registry["version"] == "registry-v1"
+    assert {
+        item["candidate_narrative_id"]
+        for item in registry["candidate_narratives"]
+    } >= {
+        "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+        "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
+        "C_COMMUNICATION_POWER_INFRASTRUCTURE",
+    }
+    assert all(
+        item["human_review_status"] == "candidate"
+        for item in registry["candidate_narratives"]
+    )
     assert mappings
     assert exclusions["version"] == "mapping-exclusions-v1"
     assert {

@@ -317,5 +317,90 @@
       "last_updated_at": "2026-05-14"
     }
   ],
-  "candidate_narratives": []
+  "candidate_narratives": [
+    {
+      "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+      "name": "Consumer Electronics Globalization",
+      "canonical_taxonomy": "Technology Hardware",
+      "status": "candidate",
+      "source": "mapping_exclusion_review",
+      "triggering_stock_codes": [
+        "688036"
+      ],
+      "related_exclusion_ids": [
+        "EX_SEMI_688036"
+      ],
+      "aliases": [
+        "consumer electronics exports",
+        "device globalization"
+      ],
+      "related_terms": [
+        "消费电子",
+        "终端设备",
+        "海外手机"
+      ],
+      "rationale": "Transsion is a device and overseas-market exposure candidate, not a semiconductor capex exposure.",
+      "human_review_status": "candidate",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2026-05-14",
+      "last_updated_at": "2026-05-14"
+    },
+    {
+      "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
+      "name": "Domestic Database Infrastructure",
+      "canonical_taxonomy": "Enterprise Software",
+      "status": "candidate",
+      "source": "mapping_exclusion_review",
+      "triggering_stock_codes": [
+        "688692"
+      ],
+      "related_exclusion_ids": [
+        "EX_SEMI_688692"
+      ],
+      "aliases": [
+        "domestic database software",
+        "xinchuang database"
+      ],
+      "related_terms": [
+        "数据库",
+        "基础软件",
+        "信创"
+      ],
+      "rationale": "Dameng Data is a domestic database and infrastructure-software exposure candidate, not a semiconductor capex exposure.",
+      "human_review_status": "candidate",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2026-05-14",
+      "last_updated_at": "2026-05-14"
+    },
+    {
+      "candidate_narrative_id": "C_COMMUNICATION_POWER_INFRASTRUCTURE",
+      "name": "Communication And Power Infrastructure",
+      "canonical_taxonomy": "Infrastructure Equipment",
+      "status": "candidate",
+      "source": "mapping_exclusion_review",
+      "triggering_stock_codes": [
+        "600522"
+      ],
+      "related_exclusion_ids": [
+        "EX_SEMI_600522"
+      ],
+      "aliases": [
+        "communication infrastructure",
+        "power cable infrastructure"
+      ],
+      "related_terms": [
+        "通信",
+        "电力电缆",
+        "海缆"
+      ],
+      "rationale": "Zhongtian Technology is a communication and power-cable infrastructure exposure candidate, not a semiconductor capex exposure.",
+      "human_review_status": "candidate",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "first_seen_at": "2026-05-14",
+      "last_updated_at": "2026-05-14"
+    }
+  ]
 }

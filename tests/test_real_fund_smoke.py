@@ -96,6 +96,27 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
                             "recommended_action": "candidate_narrative_review",
                         }
                     ],
+                    "candidate_narratives": [
+                        {
+                            "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+                            "name": "Consumer Electronics Globalization",
+                            "canonical_taxonomy": "Technology Hardware",
+                            "status": "candidate",
+                            "source": "mapping_exclusion_review",
+                            "triggering_stock_codes": ["688036"],
+                            "related_exclusion_ids": ["EX_SEMI_688036"],
+                            "aliases": ["consumer electronics exports"],
+                            "related_terms": ["消费电子"],
+                            "rationale": (
+                                "Device exposure candidate, not semiconductor capex."
+                            ),
+                            "human_review_status": "candidate",
+                            "reviewed_by": None,
+                            "reviewed_at": None,
+                            "first_seen_at": "2026-05-14",
+                            "last_updated_at": "2026-05-14",
+                        }
+                    ],
                     "degradation_events": [],
                     "provider_foundation": {
                         "effective_data_quality": "partial",
@@ -217,6 +238,20 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
             "recommended_action": "candidate_narrative_review",
         }
     ]
+    assert summary["funds"][0]["candidate_narrative_count"] == 1
+    assert summary["funds"][0]["candidate_narratives"] == [
+        {
+            "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+            "name": "Consumer Electronics Globalization",
+            "canonical_taxonomy": "Technology Hardware",
+            "status": "candidate",
+            "source": "mapping_exclusion_review",
+            "triggering_stock_codes": ["688036"],
+            "related_exclusion_ids": ["EX_SEMI_688036"],
+            "human_review_status": "candidate",
+            "rationale": "Device exposure candidate, not semiconductor capex.",
+        }
+    ]
     assert (tmp_path / "real_fund_smoke_summary.json").exists()
     assert (tmp_path / "real_fund_smoke_summary.md").exists()
 
@@ -234,6 +269,8 @@ def test_real_fund_smoke_summary_uses_runner_outputs(tmp_path):
     assert "curation_review" in summary_markdown
     assert "## Excluded Mapping Candidates" in summary_markdown
     assert "candidate_narrative_review" in summary_markdown
+    assert "## Candidate Narratives For Review" in summary_markdown
+    assert "Consumer Electronics Globalization" in summary_markdown
 
 
 def test_real_fund_smoke_summary_fails_when_coverage_is_below_threshold(tmp_path):

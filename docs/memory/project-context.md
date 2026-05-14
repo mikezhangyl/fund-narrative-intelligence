@@ -83,7 +83,8 @@ Expected artifacts:
 - Real-fund smoke summaries also include `multi_mapped_holdings` so 100% mapping coverage does not hide broad or cross-domain registry matches.
 - Real-fund smoke summaries also aggregate `mapping_precision_flags` into JSON and Markdown so registry curation work items are visible without opening each fund report.
 - Explicit mapping exclusions prevent known-bad fallback candidates from entering scoring; excluded candidates are emitted in raw/scoring JSON, reports, and real-smoke summaries.
-- `python -m src.main --run-real-smoke` prints `precision_flags=<count>` and `excluded_candidates=<count>` per fund in stdout.
+- Review-only candidate narratives are emitted for related exclusions but do not enter active scoring until promoted by human review.
+- `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, and `candidate_narratives=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 
 ## Mock Scenario Fixtures
@@ -100,6 +101,7 @@ Expected artifacts:
 - Latest registry curation replaced 21 clear broad industry-only real-smoke fallback mappings with company-level terms; `600522` 中天科技, `688036` 传音控股, and `688692` 达梦数据 are now explicit excluded candidates for Semiconductor Capex.
 - Current multi-match diagnostics flag `300604` 长川科技 as Semiconductor + Defense and `600482` 中国动力 as New Energy + Defense.
 - Current excluded mapping candidates are `688036` 传音控股, `688692` 达梦数据, and `600522` 中天科技 as excluded candidates for Semiconductor Capex.
+- Current candidate narratives are Consumer Electronics Globalization for `688036`, Domestic Database Infrastructure for `688692`, and Communication And Power Infrastructure for `600522`.
 - Latest announcement-evidence probe for `161725` with CNINFO start date `2026-01-01` returned 56 announcements and 56 converted evidence records, while still disclosing the mixed Eastmoney/CNINFO + Mock intelligence foundation as `partial`.
 
 ## Deferred Scope

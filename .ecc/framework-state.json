@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-mapping-exclusions",
+  "latest_run": "20260514-candidate-narratives",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "decide whether excluded technology/software stocks should become candidate narratives in a separate taxonomy pass"
+  "next_step": "decide whether any candidate narrative should be promoted after human review"
 }

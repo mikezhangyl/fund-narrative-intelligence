@@ -424,3 +424,25 @@ Consequences:
 - Exclusions apply to fallback candidates only, not explicit curated fixture mappings.
 - Excluded candidates are omitted from `stock_narrative_mappings`, then emitted as `excluded_mapping_candidates`.
 - Real-smoke summary JSON/Markdown includes excluded candidates, and CLI output includes `excluded_candidates=<count>`.
+
+## ADR-0021: Keep Candidate Narratives Review-Only
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Store candidate narratives in the registry and emit only the candidates related to current exclusions, without using them for active mapping, aggregation, or scoring.
+
+Rationale:
+
+- Exclusions identify taxonomy gaps, but immediately promoting new narratives would change the product interpretation layer without human review.
+- Candidate narratives give users and maintainers a concrete answer to "what might this stock belong to?" while keeping the scored report conservative.
+- Linking candidates to `related_exclusion_ids` and `triggering_stock_codes` makes the review trail reproducible from raw output.
+
+Consequences:
+
+- `candidate_narratives` is validated as part of `narrative_registry.json`.
+- Raw/scoring JSON and reports include in-scope candidate narratives when related exclusions are present.
+- Candidate narratives do not enter `stock_narrative_mappings`, `all_narratives`, primary/secondary narrative selection, or lifecycle scoring.
+- Real-smoke summaries and CLI output include candidate narrative counts for taxonomy-review visibility.

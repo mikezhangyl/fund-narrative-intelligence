@@ -162,9 +162,11 @@ The summary also reports `multi_mapped_holdings` when one holding maps to multip
 
 The summary also aggregates `mapping_precision_flags` into a `Mapping Precision Flags` section so curation work items from the fixed real-smoke set are visible without opening every fund report.
 
-The `--run-real-smoke` terminal output includes `precision_flags=<count>` and `excluded_candidates=<count>` for each fund so CI logs and quick local runs show whether coverage is clean or still has mapping precision or exclusion work.
+The `--run-real-smoke` terminal output includes `precision_flags=<count>`, `excluded_candidates=<count>`, and `candidate_narratives=<count>` for each fund so CI logs and quick local runs show whether coverage is clean or still has mapping precision, exclusion, or taxonomy review work.
 
 Known-bad fallback candidates can be listed in `mapping_exclusions.json`. These candidates are not used for scoring or aggregation; instead, raw/scoring JSON, reports, and real-smoke summaries show them as `Excluded Mapping Candidates` with the review reason.
+
+Review-only candidate narratives live in the registry's `candidate_narratives` list. They are shown in raw/scoring JSON, reports, and real-smoke summaries when related exclusions appear, but they are not part of active stock mapping, aggregation, or scoring until human review promotes them into the active registry.
 
 When a fallback registry-term match maps one holding to multiple narratives, V1 keeps all mappings but lowers their confidence from `0.52` to `0.42`, marks each mapping with `needs_review`, and writes `mapping_precision_flags` into raw/scoring JSON plus the Markdown/HTML report.
 

@@ -126,7 +126,8 @@ def main(argv: list[str] | None = None) -> int:
                 f"{result['primary_narrative']} {result['stage']} "
                 f"coverage={result['coverage_ratio']:.0%} "
                 f"precision_flags={result.get('mapping_precision_flag_count', 0)} "
-                f"excluded_candidates={result.get('excluded_mapping_candidate_count', 0)}"
+                f"excluded_candidates={result.get('excluded_mapping_candidate_count', 0)} "
+                f"candidate_narratives={result.get('candidate_narrative_count', 0)}"
             )
         return 0 if summary["status"] == "passed" else 1
 

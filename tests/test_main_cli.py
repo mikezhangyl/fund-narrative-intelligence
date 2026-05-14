@@ -63,6 +63,7 @@ def test_main_run_real_smoke_returns_status(monkeypatch, tmp_path, capsys):
                     "coverage_ratio": 1.0,
                     "mapping_precision_flag_count": 2,
                     "excluded_mapping_candidate_count": 1,
+                    "candidate_narrative_count": 1,
                 }
             ],
         }
@@ -82,6 +83,7 @@ def test_main_run_real_smoke_returns_status(monkeypatch, tmp_path, capsys):
     assert "coverage=100%" in captured.out
     assert "precision_flags=2" in captured.out
     assert "excluded_candidates=1" in captured.out
+    assert "candidate_narratives=1" in captured.out
 
 
 def test_main_run_real_smoke_returns_nonzero_for_failed_summary(

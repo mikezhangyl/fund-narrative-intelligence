@@ -51,6 +51,7 @@ def run_pipeline(
     holdings = fund_payload["holdings"]
     as_of_date = fund_payload["as_of_date"]
     registry_items = registry_payload["narratives"]
+    candidate_narratives = registry_payload.get("candidate_narratives", [])
     registry_by_id = {item["narrative_id"]: item for item in registry_items}
     mapping_result = build_mapping_result(
         holdings=holdings,
@@ -59,6 +60,10 @@ def run_pipeline(
         exclusions=mapping_exclusions_payload["exclusions"],
     )
     selected_mappings = mapping_result["mappings"]
+    in_scope_candidate_narratives = _candidate_narratives_for_excluded_candidates(
+        candidate_narratives=candidate_narratives,
+        excluded_mapping_candidates=mapping_result["excluded_mapping_candidates"],
+    )
     degradation_events = [
         *provider_selection.degradation_events,
         *getattr(provider, "degradation_events", []),
@@ -123,6 +128,8 @@ def run_pipeline(
         "provider_foundation": provider_foundation,
         "narrative_registry_version": registry_payload["version"],
         "narrative_registry": registry_items,
+        "candidate_narrative_registry_version": registry_payload["version"],
+        "candidate_narratives": in_scope_candidate_narratives,
         "stock_narrative_mappings": selected_mappings,
         "mapping_exclusions_version": mapping_exclusions_payload["version"],
         "mapping_exclusions": mapping_exclusions_payload["exclusions"],
@@ -155,6 +162,7 @@ def run_pipeline(
         "excluded_mapping_candidates": mapping_result[
             "excluded_mapping_candidates"
         ],
+        "candidate_narratives": in_scope_candidate_narratives,
         "unmapped_holdings": mapping_result["unmapped_holdings"],
         "supporting_evidence": _top_evidence(
             evidence, narrative_results, sentiments={"positive", "mixed"}
@@ -177,6 +185,29 @@ def run_pipeline(
         "markdown": report_paths["markdown"],
         "html": report_paths["html"],
     }
+
+
+def _candidate_narratives_for_excluded_candidates(
+    candidate_narratives: list[dict[str, Any]],
+    excluded_mapping_candidates: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    exclusion_ids = {
+        str(candidate["exclusion_id"])
+        for candidate in excluded_mapping_candidates
+        if candidate.get("exclusion_id")
+    }
+    stock_codes = {
+        str(candidate["stock_code"])
+        for candidate in excluded_mapping_candidates
+        if candidate.get("stock_code")
+    }
+    in_scope = []
+    for candidate_narrative in candidate_narratives:
+        related_exclusion_ids = set(candidate_narrative.get("related_exclusion_ids", []))
+        triggering_stock_codes = set(candidate_narrative.get("triggering_stock_codes", []))
+        if related_exclusion_ids & exclusion_ids or triggering_stock_codes & stock_codes:
+            in_scope.append(candidate_narrative)
+    return in_scope
 
 
 def run_all_fixture_pipelines(

@@ -82,6 +82,43 @@ def validate_registry_payload(payload: dict[str, Any]) -> None:
             },
             context,
         )
+    candidate_narratives = payload.get("candidate_narratives", [])
+    if not isinstance(candidate_narratives, list):
+        raise ProviderContractError("candidate_narratives must be a list")
+    for index, candidate in enumerate(candidate_narratives):
+        context = f"candidate_narratives[{index}]"
+        _require_mapping(candidate, context)
+        _require_keys(
+            candidate,
+            {
+                "candidate_narrative_id",
+                "name",
+                "canonical_taxonomy",
+                "status",
+                "source",
+                "triggering_stock_codes",
+                "related_exclusion_ids",
+                "aliases",
+                "related_terms",
+                "rationale",
+                "human_review_status",
+                "reviewed_by",
+                "reviewed_at",
+                "first_seen_at",
+                "last_updated_at",
+            },
+            context,
+        )
+        _require_string_list(
+            candidate["triggering_stock_codes"],
+            f"{context}.triggering_stock_codes",
+        )
+        _require_string_list(
+            candidate["related_exclusion_ids"],
+            f"{context}.related_exclusion_ids",
+        )
+        _require_string_list(candidate["aliases"], f"{context}.aliases")
+        _require_string_list(candidate["related_terms"], f"{context}.related_terms")
 
 
 def validate_mapping_payload(payload: dict[str, Any]) -> None:
@@ -197,3 +234,10 @@ def _require_probability(value: Any, context: str) -> None:
         raise ProviderContractError(f"{context} must be numeric")
     if value < 0 or value > 1:
         raise ProviderContractError(f"{context} must be within [0, 1]")
+
+
+def _require_string_list(value: Any, context: str) -> None:
+    if not isinstance(value, list):
+        raise ProviderContractError(f"{context} must be a list")
+    if not all(isinstance(item, str) for item in value):
+        raise ProviderContractError(f"{context} must contain strings only")
