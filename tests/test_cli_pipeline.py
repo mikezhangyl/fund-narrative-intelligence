@@ -326,6 +326,40 @@ def test_cli_include_market_quotes_passes_options_to_pipeline(tmp_path, monkeypa
     assert captured["include_market_quotes"] is True
 
 
+def test_cli_base_intelligence_mode_passes_option_to_pipeline(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--provider-mode",
+            "eastmoney",
+            "--include-cninfo-announcements",
+            "--base-intelligence-mode",
+            "provider-derived",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["base_intelligence_mode"] == "provider-derived"
+
+
 def test_cli_stock_mapping_mode_passes_option_to_pipeline(tmp_path, monkeypatch):
     captured = {}
 
@@ -358,6 +392,152 @@ def test_cli_stock_mapping_mode_passes_option_to_pipeline(tmp_path, monkeypatch)
     assert exit_code == 0
     assert captured["fund_code"] == "161725"
     assert captured["stock_mapping_mode"] == "registry-rule"
+
+
+def test_provider_derived_intelligence_excludes_fixture_evidence_and_signals(
+    tmp_path,
+):
+    class FakeAnnouncementProvider:
+        provider_name = "cninfo-announcement"
+        provider_version = "cninfo-announcement-v1"
+        source_url = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_announcements(
+            self,
+            stock_codes: list[str],
+            as_of_date: str,
+            start_date: str | None = None,
+        ) -> dict:
+            del stock_codes
+            del as_of_date
+            del start_date
+            return {
+                "version": self.provider_version,
+                "data_quality": "fresh",
+                "announcements": [
+                    {
+                        "stock_code": "NVDA",
+                        "stock_name": "NVIDIA",
+                        "title": "2026年度业绩预增公告",
+                        "category": "业绩预告",
+                        "announcement_date": "2026-05-12",
+                        "source": "cninfo",
+                        "source_url": "https://static.cninfo.com.cn/finalpage/1.PDF",
+                    }
+                ],
+                "missing_stock_codes": [],
+            }
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_announcement_evidence=True,
+        announcement_start_date="2026-05-01",
+        announcement_provider=FakeAnnouncementProvider(),
+        base_intelligence_mode="provider-derived",
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    markdown = artifacts["markdown"].read_text()
+
+    foundation = scoring["provider_foundation"]
+    evidence_layer = foundation["layers"]["evidence"]
+    signals_layer = foundation["layers"]["signals"]
+
+    assert raw["base_intelligence_mode"] == "provider-derived"
+    assert scoring["base_intelligence_mode"] == "provider-derived"
+    assert raw["evidence"] == raw["announcement_evidence"]["evidence"]
+    assert all(item["source"] == "cninfo_announcement" for item in raw["evidence"])
+    assert raw["signal_events"] == raw["derived_signal_events"]
+    assert raw["signal_events"] == scoring["derived_signal_events"]
+    assert all(item["source"] == "cninfo_announcement" for item in raw["signal_events"])
+    assert evidence_layer["provider_name"] == "provider-derived-evidence"
+    assert evidence_layer["data_quality"] == "fresh"
+    assert evidence_layer["is_mock"] is False
+    assert signals_layer["provider_name"] == "provider-derived-signals"
+    assert signals_layer["data_quality"] == "fresh"
+    assert signals_layer["is_mock"] is False
+    assert "Evidence 来自 provider-derived-evidence" in markdown
+    assert "Signals 来自 provider-derived-signals" in markdown
+    assert "Mock fixtures" in markdown
+
+
+def test_provider_derived_intelligence_requires_announcements(tmp_path):
+    try:
+        run_pipeline(
+            fund_code="000001",
+            provider_mode="mock",
+            output_dir=tmp_path,
+            base_intelligence_mode="provider-derived",
+        )
+    except ValueError as exc:
+        assert "base_intelligence_mode=provider-derived requires" in str(exc)
+    else:
+        raise AssertionError("expected ValueError for provider-derived without announcements")
+
+
+def test_provider_derived_intelligence_preserves_fresh_empty_signal_provenance(
+    tmp_path,
+):
+    class FakeAnnouncementProvider:
+        provider_name = "cninfo-announcement"
+        provider_version = "cninfo-announcement-v1"
+        source_url = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_announcements(
+            self,
+            stock_codes: list[str],
+            as_of_date: str,
+            start_date: str | None = None,
+        ) -> dict:
+            del stock_codes
+            del as_of_date
+            del start_date
+            return {
+                "version": self.provider_version,
+                "data_quality": "fresh",
+                "announcements": [
+                    {
+                        "stock_code": "NVDA",
+                        "stock_name": "NVIDIA",
+                        "title": "2026年度普通公告",
+                        "category": "其他",
+                        "announcement_date": "2026-05-12",
+                        "source": "cninfo",
+                        "source_url": "https://static.cninfo.com.cn/finalpage/1.PDF",
+                    }
+                ],
+                "missing_stock_codes": [],
+            }
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_announcement_evidence=True,
+        announcement_start_date="2026-05-01",
+        announcement_provider=FakeAnnouncementProvider(),
+        base_intelligence_mode="provider-derived",
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    signals_layer = scoring["provider_foundation"]["layers"]["signals"]
+    derived_layer = scoring["provider_foundation"]["layers"]["derived_signals"]
+
+    assert raw["announcement_evidence"]["data_quality"] == "fresh"
+    assert raw["derived_signal_events"] == []
+    assert scoring["derived_signal_events"] == []
+    assert raw["signal_events"] == []
+    assert signals_layer["provider_name"] == "provider-derived-signals"
+    assert signals_layer["data_quality"] == "fresh"
+    assert "cninfo-derived-signals" in signals_layer["note"]
+    assert derived_layer["provider_name"] == "cninfo-derived-signals"
+    assert derived_layer["data_quality"] == "fresh"
 
 
 def test_cli_rejects_announcement_start_date_without_cninfo_opt_in(tmp_path):

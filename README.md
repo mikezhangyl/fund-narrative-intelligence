@@ -116,6 +116,16 @@ python scripts/validate_registry_rule_enriched_acceptance.py --output-dir output
 This requires all selected mappings to come from `registry_term_rule` and keeps
 the remaining Mock-backed registry, evidence, and base signal layers visible.
 
+Run the enriched path without static stock mapping, evidence, or signal fixtures:
+
+```bash
+python scripts/validate_provider_derived_enriched_acceptance.py --output-dir outputs/provider_derived_enriched_161725
+```
+
+This adds `--base-intelligence-mode provider-derived`, so evidence comes from
+CNINFO announcement conversion and signal input is exactly the derived provider
+signals. The Narrative Registry remains Mock-backed and visibly disclosed.
+
 Generated artifacts:
 
 ```text
@@ -249,6 +259,17 @@ This command adds `--stock-mapping-mode registry-rule` to the enriched live
 path. It rejects static `fixture_rule` mappings and checks that reports disclose
 runtime stock mappings plus the remaining Mock fixture foundation.
 
+For the strict provider-derived enriched path, run:
+
+```bash
+python scripts/validate_provider_derived_enriched_acceptance.py --output-dir outputs/provider_derived_enriched_161725
+```
+
+This command adds `--base-intelligence-mode provider-derived` to the
+registry-rule enriched path. It rejects fixture evidence/signal leakage by
+requiring raw `evidence` to equal generated announcement evidence and raw
+`signal_events` to equal `derived_signal_events`.
+
 For CNINFO announcement search, V1 sends Shanghai and Shenzhen stock selectors in `code,orgId` form, such as `600519,gssh0600519` and `000001,gssz0000001`. This is covered by unit tests and by the live announcement smoke command.
 
 ## Real Provider Status
@@ -310,6 +331,13 @@ non-fixture mapping service; the registry layer is still Mock-backed and remains
 disclosed in provider foundation metadata and reports. A fully mock-backed run
 still remains `mock`; runtime mapping does not upgrade mock inputs into a mixed
 real environment.
+
+For single enriched pipeline runs, `--base-intelligence-mode provider-derived`
+skips base evidence and signal fixtures. It requires
+`--include-cninfo-announcements`, then uses generated announcement evidence and
+derived provider signals as the only evidence/signal inputs. This is the current
+bridge toward removing static evidence and signal fixtures while the Narrative
+Registry is still fixture-backed.
 
 The latest registry curation pass replaced clear broad industry-only matches with company-level terms for baijiu, healthcare, defense, new energy, real estate chain, and selected semiconductor equipment/EDA holdings. The remaining ambiguous semiconductor candidates are explicitly excluded and left for narrative reassessment rather than forced into the current registry.
 

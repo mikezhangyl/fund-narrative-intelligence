@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-registry-rule-enriched-acceptance",
+  "latest_run": "20260514-provider-derived-intelligence-mode",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "continue replacing base evidence and signal fixtures after strict registry-rule enriched acceptance"
+  "next_step": "continue replacing the mock Narrative Registry layer with a reviewed registry store after provider-derived enriched acceptance"
 }

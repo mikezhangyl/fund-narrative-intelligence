@@ -35,6 +35,12 @@ STOCK_MAPPING_MODES = {
     STOCK_MAPPING_MODE_FIXTURE,
     STOCK_MAPPING_MODE_REGISTRY_RULE,
 }
+BASE_INTELLIGENCE_MODE_FIXTURE = "fixture"
+BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED = "provider-derived"
+BASE_INTELLIGENCE_MODES = {
+    BASE_INTELLIGENCE_MODE_FIXTURE,
+    BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED,
+}
 
 
 def run_pipeline(
@@ -47,6 +53,7 @@ def run_pipeline(
     include_market_quotes: bool = False,
     market_data_provider: Any | None = None,
     stock_mapping_mode: str = STOCK_MAPPING_MODE_FIXTURE,
+    base_intelligence_mode: str = BASE_INTELLIGENCE_MODE_FIXTURE,
 ) -> dict[str, Any]:
     if not fund_code.isdigit():
         raise ValueError("fund_code must contain digits only")
@@ -56,6 +63,19 @@ def run_pipeline(
         raise ValueError(
             "stock_mapping_mode must be one of: "
             f"{', '.join(sorted(STOCK_MAPPING_MODES))}"
+        )
+    if base_intelligence_mode not in BASE_INTELLIGENCE_MODES:
+        raise ValueError(
+            "base_intelligence_mode must be one of: "
+            f"{', '.join(sorted(BASE_INTELLIGENCE_MODES))}"
+        )
+    if (
+        base_intelligence_mode == BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED
+        and not include_announcement_evidence
+    ):
+        raise ValueError(
+            "base_intelligence_mode=provider-derived requires "
+            "--include-cninfo-announcements"
         )
 
     output_path = Path(output_dir)
@@ -70,8 +90,14 @@ def run_pipeline(
         stock_mapping_mode=stock_mapping_mode,
     )
     mapping_exclusions_payload = provider.get_mapping_exclusions()
-    evidence = provider.get_evidence()
-    signal_events = provider.get_signal_events()
+    evidence = _base_evidence_inputs(
+        provider=provider,
+        base_intelligence_mode=base_intelligence_mode,
+    )
+    signal_events = _base_signal_inputs(
+        provider=provider,
+        base_intelligence_mode=base_intelligence_mode,
+    )
 
     fund = fund_payload["fund"]
     holdings = fund_payload["holdings"]
@@ -110,6 +136,8 @@ def run_pipeline(
     derived_signal_provider_names: list[str] = []
     derived_signal_data_qualities: list[str] = []
     derived_signals_layer: dict[str, Any] | None = None
+    evidence_layer: dict[str, Any] | None = None
+    signals_layer: dict[str, Any] | None = None
     market_quotes_payload: dict[str, Any] | None = None
     market_quotes_layer: dict[str, Any] | None = None
     if include_market_quotes:
@@ -124,6 +152,10 @@ def run_pipeline(
             stock_mappings=selected_mappings,
             as_of_date=as_of_date,
         )
+        derived_signal_provider_names.append(MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER)
+        derived_signal_data_qualities.append(
+            str(market_quotes_payload.get("data_quality") or "unavailable")
+        )
         if market_quote_signal_events:
             derived_signal_events = [
                 *derived_signal_events,
@@ -133,10 +165,6 @@ def run_pipeline(
                 *signal_events,
                 *market_quote_signal_events,
             ]
-            derived_signal_provider_names.append(MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER)
-            derived_signal_data_qualities.append(
-                str(market_quotes_payload.get("data_quality") or "unavailable")
-            )
         degradation_events = [
             *degradation_events,
             *market_result["degradation_events"],
@@ -163,6 +191,10 @@ def run_pipeline(
         announcement_signal_events = derive_announcement_signal_events(
             announcement_evidence_payload["evidence"]
         )
+        derived_signal_provider_names.append(ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER)
+        derived_signal_data_qualities.append(
+            str(announcement_evidence_payload.get("data_quality") or "unavailable")
+        )
         if announcement_signal_events:
             derived_signal_events = [
                 *derived_signal_events,
@@ -172,16 +204,17 @@ def run_pipeline(
                 *signal_events,
                 *announcement_signal_events,
             ]
-            derived_signal_provider_names.append(ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER)
-            derived_signal_data_qualities.append(
-                str(
-                    announcement_evidence_payload.get("data_quality")
-                    or "unavailable"
-                )
-            )
 
     if derived_signal_provider_names:
         derived_signals_layer = _derived_signals_provider_layer(
+            provider_names=derived_signal_provider_names,
+            data_qualities=derived_signal_data_qualities,
+        )
+    if base_intelligence_mode == BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED:
+        evidence_layer = _provider_derived_evidence_layer(
+            announcement_evidence_payload=announcement_evidence_payload,
+        )
+        signals_layer = _provider_derived_signals_layer(
             provider_names=derived_signal_provider_names,
             data_qualities=derived_signal_data_qualities,
         )
@@ -194,6 +227,8 @@ def run_pipeline(
         derived_signals_layer=derived_signals_layer,
         market_quotes_layer=market_quotes_layer,
         stock_mapping_layer=stock_mapping_layer,
+        evidence_layer=evidence_layer,
+        signals_layer=signals_layer,
     )
     effective_data_quality = provider_foundation["effective_data_quality"]
     exposures = aggregate_fund_narratives(
@@ -229,6 +264,7 @@ def run_pipeline(
         "candidate_narrative_registry_version": registry_payload["version"],
         "candidate_narratives": in_scope_candidate_narratives,
         "candidate_review_queue": candidate_review_queue,
+        "base_intelligence_mode": base_intelligence_mode,
         "stock_mapping_mode": stock_mapping_mode,
         "stock_narrative_mappings": selected_mappings,
         "mapping_exclusions_version": mapping_exclusions_payload["version"],
@@ -261,6 +297,7 @@ def run_pipeline(
         "all_narratives": narrative_results,
         "provider_foundation": provider_foundation,
         "mapping_coverage": mapping_result["coverage"],
+        "base_intelligence_mode": base_intelligence_mode,
         "stock_mapping_mode": stock_mapping_mode,
         "mapping_rationales": mapping_result["mapping_rationales"],
         "mapping_precision_flags": mapping_result["mapping_precision_flags"],
@@ -508,6 +545,8 @@ def _provider_foundation_with_optional_announcement_layer(
     derived_signals_layer: dict[str, Any] | None,
     market_quotes_layer: dict[str, Any] | None,
     stock_mapping_layer: dict[str, Any] | None,
+    evidence_layer: dict[str, Any] | None,
+    signals_layer: dict[str, Any] | None,
 ) -> dict[str, Any]:
     foundation = provider.get_provider_foundation(
         fund_provider_metadata=fund_provider_metadata,
@@ -518,9 +557,15 @@ def _provider_foundation_with_optional_announcement_layer(
         and derived_signals_layer is None
         and market_quotes_layer is None
         and stock_mapping_layer is None
+        and evidence_layer is None
+        and signals_layer is None
     ):
         return foundation
     layers = foundation["layers"]
+    if evidence_layer is not None:
+        layers = {**layers, "evidence": evidence_layer}
+    if signals_layer is not None:
+        layers = {**layers, "signals": signals_layer}
     if stock_mapping_layer is not None:
         layers = {**layers, "stock_mappings": stock_mapping_layer}
     if market_quotes_layer is not None:
@@ -532,6 +577,28 @@ def _provider_foundation_with_optional_announcement_layer(
     return build_provider_foundation(
         layers=layers,
         degradation_events=degradation_events,
+    )
+
+
+def _base_evidence_inputs(provider: Any, base_intelligence_mode: str) -> list[dict[str, Any]]:
+    if base_intelligence_mode == BASE_INTELLIGENCE_MODE_FIXTURE:
+        return provider.get_evidence()
+    if base_intelligence_mode == BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED:
+        return []
+    raise ValueError(
+        "base_intelligence_mode must be one of: "
+        f"{', '.join(sorted(BASE_INTELLIGENCE_MODES))}"
+    )
+
+
+def _base_signal_inputs(provider: Any, base_intelligence_mode: str) -> list[dict[str, Any]]:
+    if base_intelligence_mode == BASE_INTELLIGENCE_MODE_FIXTURE:
+        return provider.get_signal_events()
+    if base_intelligence_mode == BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED:
+        return []
+    raise ValueError(
+        "base_intelligence_mode must be one of: "
+        f"{', '.join(sorted(BASE_INTELLIGENCE_MODES))}"
     )
 
 
@@ -576,6 +643,49 @@ def _stock_mapping_provider_layer(
             f"and Narrative Registry terms; coverage {covered}/{total}, "
             f"review flags {review_count}. Registry provenance is disclosed "
             "separately."
+        ),
+    }
+
+
+def _provider_derived_evidence_layer(
+    announcement_evidence_payload: dict[str, Any] | None,
+) -> dict[str, Any]:
+    data_quality = (
+        str(announcement_evidence_payload.get("data_quality") or "unavailable")
+        if announcement_evidence_payload is not None
+        else "unavailable"
+    )
+    evidence_count = len(announcement_evidence_payload.get("evidence") or []) if announcement_evidence_payload else 0
+    return {
+        "layer": "evidence",
+        "provider_name": "provider-derived-evidence",
+        "provider_version": "provider-derived-evidence-v1",
+        "data_quality": data_quality,
+        "source_url": "derived://provider-evidence",
+        "is_mock": False,
+        "note": (
+            "Evidence input excludes base fixtures and uses provider-derived "
+            f"evidence records only; evidence count {evidence_count}."
+        ),
+    }
+
+
+def _provider_derived_signals_layer(
+    provider_names: list[str],
+    data_qualities: list[str],
+) -> dict[str, Any]:
+    data_quality = _derived_signal_data_quality(data_qualities)
+    source_summary = ", ".join(sorted(set(provider_names))) if provider_names else "none"
+    return {
+        "layer": "signals",
+        "provider_name": "provider-derived-signals",
+        "provider_version": "provider-derived-signals-v1",
+        "data_quality": data_quality,
+        "source_url": "derived://provider-signals",
+        "is_mock": False,
+        "note": (
+            "Signal input excludes base fixtures and uses provider-derived "
+            f"signal events only; source providers: {source_summary}."
         ),
     }
 

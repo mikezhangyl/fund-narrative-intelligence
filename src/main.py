@@ -11,6 +11,8 @@ from src.errors import PipelineError
 from src.modules.narrative_review.persistence import persist_review_action_registry
 from src.modules.narrative_review.preview import write_review_action_preview
 from src.orchestrator import (
+    BASE_INTELLIGENCE_MODE_FIXTURE,
+    BASE_INTELLIGENCE_MODES,
     STOCK_MAPPING_MODE_FIXTURE,
     STOCK_MAPPING_MODES,
     inspect_provider_foundation,
@@ -46,6 +48,16 @@ def build_parser() -> argparse.ArgumentParser:
             "Stock-to-narrative mapping mode. Default uses explicit fixture "
             "mappings plus registry-rule fallback; registry-rule derives "
             "mappings from current holdings and Narrative Registry terms only."
+        ),
+    )
+    parser.add_argument(
+        "--base-intelligence-mode",
+        choices=sorted(BASE_INTELLIGENCE_MODES),
+        default=BASE_INTELLIGENCE_MODE_FIXTURE,
+        help=(
+            "Evidence/signal input mode. Default uses fixture base evidence and "
+            "signals; provider-derived excludes base fixtures and uses provider "
+            "evidence plus derived signals."
         ),
     )
     parser.add_argument(
@@ -223,6 +235,13 @@ def main(argv: list[str] | None = None) -> int:
     ):
         parser.error(
             "--stock-mapping-mode is only supported with single --fund-code report generation"
+        )
+    if (
+        args.base_intelligence_mode != BASE_INTELLIGENCE_MODE_FIXTURE
+        and _uses_non_pipeline_action(args)
+    ):
+        parser.error(
+            "--base-intelligence-mode is only supported with single --fund-code report generation"
         )
 
     if args.validate_review_preview:
@@ -536,6 +555,7 @@ def main(argv: list[str] | None = None) -> int:
             announcement_start_date=args.announcement_start_date,
             include_market_quotes=args.include_market_quotes,
             stock_mapping_mode=args.stock_mapping_mode,
+            base_intelligence_mode=args.base_intelligence_mode,
         )
     except PipelineError as exc:
         print(str(exc), file=sys.stderr)

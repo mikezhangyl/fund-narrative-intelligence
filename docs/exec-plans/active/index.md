@@ -55,3 +55,4 @@
 - [real-enriched-acceptance.md](./real-enriched-acceptance.md)
 - [registry-rule-mapping-mode.md](./registry-rule-mapping-mode.md)
 - [registry-rule-enriched-acceptance.md](./registry-rule-enriched-acceptance.md)
+- [provider-derived-intelligence-mode.md](./provider-derived-intelligence-mode.md)

@@ -895,3 +895,35 @@ Consequences:
 - It requires `stock_mapping_mode=registry-rule`, `registry_term_rule` mapping
   methods, and a `registry-rule-stock-mapping` provider layer.
 - It remains outside CI because it depends on live provider availability.
+
+## ADR-0038: Add Optional Provider-Derived Base Intelligence Mode
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Add `--base-intelligence-mode provider-derived` for single enriched report runs
+and `scripts/validate_provider_derived_enriched_acceptance.py` as its strict
+manual live acceptance gate.
+
+Rationale:
+
+- After holdings, announcements, market quotes, derived signals, and
+  registry-rule stock mappings are available, base evidence and signal fixtures
+  are the next mock layers to remove.
+- The first removal path should be opt-in and acceptance-gated so default V1
+  behavior remains stable.
+- Future web source tables need evidence and signal inputs that can be loaded
+  without guessing whether fixture data leaked into a provider-derived run.
+
+Consequences:
+
+- Default runs still use fixture evidence and signals.
+- Provider-derived mode requires CNINFO announcements.
+- Raw `evidence` equals generated announcement evidence.
+- Raw `signal_events` equals `derived_signal_events`.
+- Provider foundation marks `Evidence` as `provider-derived-evidence` and
+  `Signals` as `provider-derived-signals`.
+- The Narrative Registry remains Mock-backed and visibly disclosed until a real
+  registry store replaces it.

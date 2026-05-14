@@ -11,73 +11,57 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.validate_real_enriched_acceptance import (  # noqa: E402
+from scripts.validate_registry_rule_enriched_acceptance import (  # noqa: E402
     DEFAULT_ANNOUNCEMENT_START_DATE,
     DEFAULT_FUND_CODE,
     DEFAULT_MIN_ANNOUNCEMENT_COUNT,
     DEFAULT_MIN_QUOTE_COUNT,
+    DEFAULT_STOCK_MAPPING_MODE,
     AcceptanceError,
 )
-from scripts.validate_real_enriched_acceptance import (  # noqa: E402
-    validate_acceptance_outputs as validate_real_enriched_outputs,
+from scripts.validate_registry_rule_enriched_acceptance import (  # noqa: E402
+    validate_acceptance_outputs as validate_registry_rule_enriched_outputs,
 )
 from src import main as pipeline_main  # noqa: E402
 
-DEFAULT_STOCK_MAPPING_MODE = "registry-rule"
+DEFAULT_BASE_INTELLIGENCE_MODE = "provider-derived"
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Run strict V1 acceptance for the enriched real path with "
-            "registry-rule stock mappings."
+            "Run strict V1 acceptance for enriched real provider-derived "
+            "evidence/signals and registry-rule mappings."
         )
     )
-    parser.add_argument(
-        "--fund-code",
-        default=DEFAULT_FUND_CODE,
-        help=f"Fund code to validate. Defaults to {DEFAULT_FUND_CODE}.",
-    )
+    parser.add_argument("--fund-code", default=DEFAULT_FUND_CODE)
     parser.add_argument(
         "--announcement-start-date",
         default=DEFAULT_ANNOUNCEMENT_START_DATE,
-        help=(
-            "CNINFO announcement start date. Defaults to "
-            f"{DEFAULT_ANNOUNCEMENT_START_DATE}."
-        ),
     )
     parser.add_argument(
         "--min-announcement-count",
         type=int,
         default=DEFAULT_MIN_ANNOUNCEMENT_COUNT,
-        help=(
-            "Minimum announcement and evidence count. Defaults to "
-            f"{DEFAULT_MIN_ANNOUNCEMENT_COUNT}."
-        ),
     )
     parser.add_argument(
         "--min-quote-count",
         type=int,
         default=DEFAULT_MIN_QUOTE_COUNT,
-        help=f"Minimum market quote count. Defaults to {DEFAULT_MIN_QUOTE_COUNT}.",
     )
-    parser.add_argument(
-        "--output-dir",
-        help="Optional output directory. If omitted, a temporary directory is used.",
-    )
+    parser.add_argument("--output-dir")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-
     try:
-        if args.output_dir:
-            output_dir = Path(args.output_dir)
-            output_dir.mkdir(parents=True, exist_ok=True)
-        else:
-            output_dir = Path(tempfile.mkdtemp(prefix="fni-registry-rule-enriched-"))
-
+        output_dir = (
+            Path(args.output_dir)
+            if args.output_dir
+            else Path(tempfile.mkdtemp(prefix="fni-provider-derived-enriched-"))
+        )
+        output_dir.mkdir(parents=True, exist_ok=True)
         _run_acceptance(
             fund_code=args.fund_code,
             announcement_start_date=args.announcement_start_date,
@@ -94,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
     except AcceptanceError as exc:
-        print("Registry-rule enriched acceptance failed:", file=sys.stderr)
+        print("Provider-derived enriched acceptance failed:", file=sys.stderr)
         print(str(exc), file=sys.stderr)
         return 1
 
@@ -114,6 +98,8 @@ def _run_acceptance(
             "eastmoney",
             "--stock-mapping-mode",
             DEFAULT_STOCK_MAPPING_MODE,
+            "--base-intelligence-mode",
+            DEFAULT_BASE_INTELLIGENCE_MODE,
             "--include-cninfo-announcements",
             "--announcement-start-date",
             announcement_start_date,
@@ -136,77 +122,71 @@ def validate_acceptance_outputs(
     fund_code: str = DEFAULT_FUND_CODE,
     min_announcement_count: int = DEFAULT_MIN_ANNOUNCEMENT_COUNT,
     min_quote_count: int = DEFAULT_MIN_QUOTE_COUNT,
-    base_intelligence_mode: str = "fixture",
 ) -> None:
-    validate_real_enriched_outputs(
+    validate_registry_rule_enriched_outputs(
         output_dir=output_dir,
         fund_code=fund_code,
         min_announcement_count=min_announcement_count,
         min_quote_count=min_quote_count,
-        stock_mapping_mode=DEFAULT_STOCK_MAPPING_MODE,
-        base_intelligence_mode=base_intelligence_mode,
+        base_intelligence_mode=DEFAULT_BASE_INTELLIGENCE_MODE,
     )
-
     raw = _read_json(output_dir / f"fund_{fund_code}_raw.json")
     scoring = _read_json(output_dir / f"fund_{fund_code}_scoring.json")
     markdown = (output_dir / f"fund_{fund_code}_report.md").read_text(encoding="utf-8")
     html = (output_dir / f"fund_{fund_code}_report.html").read_text(encoding="utf-8")
     foundation = scoring.get("provider_foundation", {})
-    mapping_layer = foundation.get("layers", {}).get("stock_mappings", {})
-    mappings = raw.get("stock_narrative_mappings") or []
-    coverage = raw.get("mapping_coverage", {})
+    layers = foundation.get("layers", {})
+    evidence_layer = layers.get("evidence", {})
+    signals_layer = layers.get("signals", {})
+    evidence_items = raw.get("evidence") or []
+    signal_events = raw.get("signal_events") or []
+    derived_signal_events = raw.get("derived_signal_events") or []
 
     _require(
-        raw.get("stock_mapping_mode") == DEFAULT_STOCK_MAPPING_MODE,
-        "raw stock_mapping_mode must be registry-rule",
+        raw.get("base_intelligence_mode") == DEFAULT_BASE_INTELLIGENCE_MODE,
+        "raw base_intelligence_mode must be provider-derived",
     )
     _require(
-        scoring.get("stock_mapping_mode") == DEFAULT_STOCK_MAPPING_MODE,
-        "scoring stock_mapping_mode must be registry-rule",
+        scoring.get("base_intelligence_mode") == DEFAULT_BASE_INTELLIGENCE_MODE,
+        "scoring base_intelligence_mode must be provider-derived",
     )
     _require(
-        raw.get("mapping_coverage") == scoring.get("mapping_coverage"),
-        "scoring mapping coverage must match raw mapping coverage",
+        evidence_items == raw.get("announcement_evidence", {}).get("evidence"),
+        "evidence must match announcement_evidence records",
     )
     _require(
-        isinstance(mappings, list) and len(mappings) > 0,
-        "registry-rule acceptance requires selected mappings",
+        all(item.get("source") == "cninfo_announcement" for item in evidence_items),
+        "evidence must come from cninfo_announcement",
     )
     _require(
-        all(item.get("method") == "registry_term_rule" for item in mappings),
-        "all selected mappings must use registry_term_rule",
+        signal_events == derived_signal_events,
+        "signal_events must match derived_signal_events",
     )
     _require(
-        set((coverage.get("mapping_methods") or {}).keys()) == {"registry_term_rule"},
-        "mapping coverage methods must only contain registry_term_rule",
+        signal_events == scoring.get("derived_signal_events"),
+        "scoring derived signals must match raw signal events",
     )
     _require(
-        mapping_layer.get("provider_name") == "registry-rule-stock-mapping",
-        "stock mappings layer must use registry-rule-stock-mapping",
+        evidence_layer.get("provider_name") == "provider-derived-evidence",
+        "evidence layer must use provider-derived-evidence",
     )
     _require(
-        mapping_layer.get("data_quality") == "partial",
-        "stock mappings layer data_quality must be partial for real holdings plus mock registry",
+        evidence_layer.get("data_quality") == "fresh",
+        "evidence layer data_quality must be fresh",
+    )
+    _require(evidence_layer.get("is_mock") is False, "evidence layer must not be mock")
+    _require(
+        signals_layer.get("provider_name") == "provider-derived-signals",
+        "signals layer must use provider-derived-signals",
     )
     _require(
-        mapping_layer.get("source_url") == "derived://registry-term-rule-stock-mapping",
-        "stock mappings layer source_url must identify registry-rule derivation",
+        signals_layer.get("data_quality") == "fresh",
+        "signals layer data_quality must be fresh",
     )
-    _require(
-        mapping_layer.get("is_mock") is False,
-        "stock mappings layer must not be mock in real registry-rule mode",
-    )
-    _require(
-        "registry-rule-stock-mapping" in str(foundation.get("disclosure_message") or ""),
-        "provider disclosure must mention registry-rule-stock-mapping",
-    )
-    _require(
-        "Narrative Registry" in str(foundation.get("disclosure_message") or ""),
-        "provider disclosure must still mention mock Narrative Registry",
-    )
-    expected = ("registry-rule-stock-mapping", "Stock Mappings", "Mock fixtures")
-    _require(_contains_all(markdown, expected), "Markdown registry-rule disclosure mismatch")
-    _require(_contains_all(html, expected), "HTML registry-rule disclosure mismatch")
+    _require(signals_layer.get("is_mock") is False, "signals layer must not be mock")
+    expected = ("provider-derived-evidence", "provider-derived-signals", "Mock fixtures")
+    _require(_contains_all(markdown, expected), "Markdown provider-derived disclosure mismatch")
+    _require(_contains_all(html, expected), "HTML provider-derived disclosure mismatch")
 
 
 def _run_cli(args: list[str]) -> None:
@@ -240,20 +220,22 @@ def _print_success(
     min_quote_count: int,
     output_dir: Path,
 ) -> None:
-    print("Registry-rule enriched acceptance passed:")
+    print("Provider-derived enriched acceptance passed:")
     print(output_dir)
     print(f"fund_code={fund_code}")
     print("provider_mode=eastmoney")
     print("stock_mapping_mode=registry-rule")
+    print("base_intelligence_mode=provider-derived")
     print(f"announcement_start_date={announcement_start_date}")
     print(f"min_announcement_count={min_announcement_count}")
     print(f"min_quote_count={min_quote_count}")
     print("holdings=fresh")
     print("stock_mappings=registry_rule")
+    print("evidence=provider_derived")
+    print("signals=provider_derived")
     print("announcements=fresh")
     print("market_quotes=fresh")
-    print("derived_signals=fresh")
-    print("remaining_intelligence_layers=mock")
+    print("remaining_registry_layer=mock")
     print("effective_data_quality=partial")
 
 
