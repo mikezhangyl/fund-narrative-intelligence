@@ -70,3 +70,4 @@
 - [reviewed-mapping-workspace-acceptance.md](./reviewed-mapping-workspace-acceptance.md)
 - [v1-workspace-snapshot-acceptance.md](./v1-workspace-snapshot-acceptance.md)
 - [reviewed-mapping-valuation-acceptance.md](./reviewed-mapping-valuation-acceptance.md)
+- [docs-workspace-acceptance-sync.md](./docs-workspace-acceptance-sync.md)

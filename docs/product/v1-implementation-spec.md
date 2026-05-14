@@ -442,9 +442,10 @@ The first implementation milestone is accepted when this command works without r
 python scripts/validate_v1_acceptance.py
 ```
 
-The script generates fund `000001`, validates generated artifact contracts, and
-checks that mock-backed outputs are visibly disclosed through both data quality
-and `mock://fixtures/...` source identifiers.
+The script generates fund `000001`, validates generated artifact contracts,
+builds and validates a workspace snapshot, and checks that mock-backed outputs
+are visibly disclosed through data quality, `mock://fixtures/...` source
+identifiers, report notices, and workspace `data_source_notice`.
 
 The CLI should also expose available local fixtures:
 
@@ -528,6 +529,7 @@ outputs/fund_000001_source_table.json
 outputs/fund_000001_manifest.json
 outputs/fund_000001_report.md
 outputs/fund_000001_report.html
+outputs/fund_000001_workspace_snapshot.json
 ```
 
 The generated artifacts must satisfy:
@@ -539,6 +541,7 @@ The generated artifacts must satisfy:
 - `manifest.json` includes artifact paths, provider foundation, data quality, and web-readiness metadata so a future web workspace can discover outputs without reconstructing file names.
 - `report.md` and `report.html` include fund basics, top holdings, one primary narrative, two to three secondary narratives, evidence summaries, risk evidence, confidence/data-quality notes, and a non-investment-advice disclaimer.
 - `report.html` renders semantic HTML sections and tables rather than displaying raw Markdown syntax.
+- `workspace_snapshot.json` includes the server-side loader contract for future web source review and approval screens; it is built explicitly by the acceptance script or `--build-workspace-snapshot`.
 - The command exits non-zero only for invalid user input or unrecoverable local errors.
 - Provider unavailability produces degraded output instead of an unhandled exception.
 
@@ -583,6 +586,21 @@ include:
 - primary/secondary narrative summaries and mapping context
 - report artifact references
 - `approval_workflow.status = ready_for_future_web`
+- top-level `data_source_notice` with display requirement, severity, message,
+  mock/unavailable/degradation counts, and source-layer rows requiring
+  disclosure
+- `approval_workflow.review_queue_summary`, `available_actions`, and item counts
+  so future web approval routing can load without re-deriving queue state
+
+The strict reviewed-mapping enriched acceptance command exercises the current
+no-mock-core server path with Eastmoney holdings, reviewed registry, reviewed
+stock mappings, provider-derived evidence/signals, CNINFO announcements, market
+quotes, quote-derived valuation snapshots, news evidence, and workspace snapshot
+validation:
+
+```bash
+python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725
+```
 
 V1 can also derive lightweight valuation context from market quotes:
 

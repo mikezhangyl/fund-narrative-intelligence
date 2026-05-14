@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-reviewed-mapping-valuation-acceptance",
+  "latest_run": "20260515-docs-workspace-acceptance-sync",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "include quote-derived valuation snapshots in reviewed-mapping enriched acceptance"
+  "next_step": "sync product docs with workspace snapshot acceptance and reviewed-mapping valuation gate"
 }
