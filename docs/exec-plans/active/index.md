@@ -72,3 +72,4 @@
 - [reviewed-mapping-valuation-acceptance.md](./reviewed-mapping-valuation-acceptance.md)
 - [docs-workspace-acceptance-sync.md](./docs-workspace-acceptance-sync.md)
 - [eastmoney-valuation-provider.md](./eastmoney-valuation-provider.md)
+- [valuation-derived-signals.md](./valuation-derived-signals.md)

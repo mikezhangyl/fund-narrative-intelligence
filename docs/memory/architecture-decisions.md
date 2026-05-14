@@ -1232,3 +1232,31 @@ Consequences:
 - Reports and source tables disclose the Eastmoney valuation provider note.
 - Scoring weights remain unchanged until a later valuation-scoring calibration
   slice consumes the richer metrics.
+
+## ADR-0049: Derive Valuation Risk Signals From Provider Valuation Metrics
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Convert Eastmoney provider valuation snapshots into deterministic
+`valuation-derived-signals` before scoring, instead of reading valuation
+snapshots directly inside the scoring engine.
+
+Rationale:
+
+- The scoring model is intentionally signal-driven across all dimensions.
+- Keeping valuation as derived signal events preserves source provenance,
+  stock-level mapping, and future web traceability.
+- Restricting derivation to `provider_valuation_metrics` avoids treating
+  quote-derived context as a full valuation source.
+
+Consequences:
+
+- Elevated provider valuation metrics become `valuation_extreme` signals.
+- Discounted provider valuation metrics become `valuation_reset` signals.
+- Raw/scoring artifacts include these valuation signals in both
+  `derived_signal_events` and scoring `signal_events`.
+- Reviewed-mapping enriched acceptance now requires Eastmoney valuation
+  snapshots to produce valuation-derived signals.

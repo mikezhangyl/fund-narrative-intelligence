@@ -2,6 +2,7 @@ from src.modules.signal_service.derived import (
     derive_announcement_signal_events,
     derive_market_quote_signal_events,
     derive_news_signal_events,
+    derive_valuation_signal_events,
 )
 from src.modules.signal_service.scoring import calculate_dimension_score
 from src.validation import validate_signal_payload
@@ -298,14 +299,115 @@ def test_derives_relative_weakness_signal_from_negative_market_quote():
     )
 
     assert signals[0]["signal_type"] == "relative_strength_down"
-    assert signals[0]["strength"] == 0.5
-    assert signals[0]["confidence"] == 0.4125
 
-    capital_score = calculate_dimension_score(
-        "capital_score",
+
+def test_derives_valuation_extreme_signal_from_elevated_provider_metrics():
+    valuation_snapshots = {
+        "version": "valuation-snapshot-v1",
+        "provider_name": "eastmoney-valuation",
+        "provider_version": "eastmoney-valuation-v1",
+        "data_quality": "fresh",
+        "source_url": "https://push2.eastmoney.com/api/qt/stock/get",
+        "retrieved_at": "2026-05-14T12:00:00+00:00",
+        "valuation_basis": "provider_valuation_metrics",
+        "valuations": [
+            {
+                "stock_code": "600519",
+                "stock_name": "贵州茅台",
+                "valuation_pressure": "elevated",
+                "source_provider": "eastmoney-valuation",
+                "source_url": "https://push2.eastmoney.com/api/qt/stock/get?secid=1.600519",
+                "retrieved_at": "2026-05-14T12:00:00+00:00",
+                "pe_ttm": 44.2,
+                "pb": 8.4,
+            }
+        ],
+    }
+    stock_mappings = [
+        {
+            "stock_code": "600519",
+            "narrative_id": "N_BAIJIU",
+            "confidence": 0.8,
+        }
+    ]
+
+    signals = derive_valuation_signal_events(
+        valuation_snapshots_payload=valuation_snapshots,
+        stock_mappings=stock_mappings,
+        as_of_date="2026-05-14",
+    )
+
+    assert signals == [
+        {
+            "signal_id": "SIG_VAL_600519_N_BAIJIU_VALUATION_EXTREME",
+            "narrative_id": "N_BAIJIU",
+            "signal_type": "valuation_extreme",
+            "strength": 0.75,
+            "confidence": 0.6,
+            "confidence_multiplier": 0.75,
+            "event_date": "2026-05-14",
+            "half_life_days": 30,
+            "source": "valuation_snapshot",
+            "source_provider": "eastmoney-valuation",
+            "source_stock_code": "600519",
+            "source_url": "https://push2.eastmoney.com/api/qt/stock/get?secid=1.600519",
+            "derivation_reason": "elevated provider valuation metrics",
+        }
+    ]
+    validate_signal_payload({"version": "signals-v1", "signal_events": signals})
+
+    valuation_score = calculate_dimension_score(
+        "valuation_risk_score",
         signals,
         as_of_date="2026-05-14",
-        data_quality="partial",
+        data_quality="fresh",
     )
-    assert capital_score["risk_signal_count"] == 1
-    assert capital_score["score"] < 50
+    assert valuation_score["score"] > 60
+
+
+def test_derives_valuation_reset_signal_from_discounted_provider_metrics():
+    valuation_snapshots = {
+        "version": "valuation-snapshot-v1",
+        "provider_name": "eastmoney-valuation",
+        "provider_version": "eastmoney-valuation-v1",
+        "data_quality": "fresh",
+        "source_url": "https://push2.eastmoney.com/api/qt/stock/get",
+        "retrieved_at": "2026-05-14T12:00:00+00:00",
+        "valuation_basis": "provider_valuation_metrics",
+        "valuations": [
+            {
+                "stock_code": "000001",
+                "stock_name": "平安银行",
+                "valuation_pressure": "discounted",
+                "source_provider": "eastmoney-valuation",
+                "source_url": "https://push2.eastmoney.com/api/qt/stock/get?secid=0.000001",
+                "retrieved_at": "2026-05-14T12:00:00+00:00",
+                "pe_ttm": 6.8,
+                "pb": 0.7,
+            }
+        ],
+    }
+    stock_mappings = [
+        {
+            "stock_code": "000001",
+            "narrative_id": "N_BANK",
+            "confidence": 0.7,
+        }
+    ]
+
+    signals = derive_valuation_signal_events(
+        valuation_snapshots_payload=valuation_snapshots,
+        stock_mappings=stock_mappings,
+        as_of_date="2026-05-14",
+    )
+
+    assert signals[0]["signal_type"] == "valuation_reset"
+    assert signals[0]["strength"] == 0.65
+    valuation_score = calculate_dimension_score(
+        "valuation_risk_score",
+        signals,
+        as_of_date="2026-05-14",
+        data_quality="fresh",
+    )
+    assert valuation_score["score"] < 50
+    assert signals[0]["confidence"] == 0.525

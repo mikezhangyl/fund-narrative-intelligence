@@ -1032,12 +1032,42 @@ def test_optional_valuation_snapshots_can_use_eastmoney_metrics(tmp_path):
     source_table = json.loads(artifacts["source_table"].read_text())
     valuation = raw["valuation_snapshots"]
     valuation_layer = scoring["provider_foundation"]["layers"]["valuation"]
+    valuation_signals = [
+        item
+        for item in raw["derived_signal_events"]
+        if item["source"] == "valuation_snapshot"
+        and item["narrative_id"] == "N_AI_INFRA"
+    ]
 
     assert valuation == scoring["valuation_snapshots"]
+    assert raw["derived_signal_events"] == scoring["derived_signal_events"]
     assert valuation["provider_name"] == "eastmoney-valuation"
     assert valuation["valuation_basis"] == "provider_valuation_metrics"
     assert valuation["valuations"][0]["pe_ttm"] == 54.2
     assert valuation["valuations"][0]["source"] == "provider_valuation_metrics"
+    assert valuation_signals == [
+        {
+            "signal_id": "SIG_VAL_NVDA_N_AI_INFRA_VALUATION_EXTREME",
+            "narrative_id": "N_AI_INFRA",
+            "signal_type": "valuation_extreme",
+            "strength": 1.0,
+            "confidence": 0.645,
+            "confidence_multiplier": 0.75,
+            "event_date": "2026-05-14",
+            "half_life_days": 30,
+            "source": "valuation_snapshot",
+            "source_provider": "eastmoney-valuation",
+            "source_stock_code": "NVDA",
+            "source_url": "https://push2.eastmoney.com/api/qt/stock/get",
+            "derivation_reason": "elevated provider valuation metrics",
+        }
+    ]
+    assert any(
+        item["signal_type"] == "valuation_extreme" for item in raw["signal_events"]
+    )
+    assert scoring["primary_narrative"]["state"]["dimensions"][
+        "valuation_risk_score"
+    ]["score"] > 60
     assert valuation_layer["provider_name"] == "eastmoney-valuation"
     assert valuation_layer["is_mock"] is False
     assert {layer["layer"] for layer in source_table["layers"]} >= {"valuation"}

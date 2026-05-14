@@ -21,9 +21,11 @@ from src.modules.signal_service.derived import (
     ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER,
     MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER,
     NEWS_DERIVED_SIGNAL_PROVIDER,
+    VALUATION_DERIVED_SIGNAL_PROVIDER,
     derive_announcement_signal_events,
     derive_market_quote_signal_events,
     derive_news_signal_events,
+    derive_valuation_signal_events,
 )
 from src.modules.signal_service.scoring import score_narrative_state
 from src.modules.snapshot_writer.writer import write_json_artifact
@@ -266,6 +268,25 @@ def run_pipeline(
             *degradation_events,
             *valuation_result["degradation_events"],
         ]
+    if valuation_snapshots_payload is not None:
+        valuation_signal_events = derive_valuation_signal_events(
+            valuation_snapshots_payload=valuation_snapshots_payload,
+            stock_mappings=selected_mappings,
+            as_of_date=as_of_date,
+        )
+        if valuation_signal_events:
+            derived_signal_provider_names.append(VALUATION_DERIVED_SIGNAL_PROVIDER)
+            derived_signal_data_qualities.append(
+                str(valuation_snapshots_payload.get("data_quality") or "unavailable")
+            )
+            derived_signal_events = [
+                *derived_signal_events,
+                *valuation_signal_events,
+            ]
+            signal_events = [
+                *signal_events,
+                *valuation_signal_events,
+            ]
     if include_announcement_evidence:
         announcement_result = _run_announcement_evidence(
             stock_codes=[holding["stock_code"] for holding in holdings],
@@ -1034,8 +1055,8 @@ def _derived_signals_provider_layer(
         "source_url": f"derived://{provider_name}",
         "is_mock": False,
         "note": (
-            "Derived from real provider evidence, news evidence, or quote "
-            "snapshots; V1 keeps base fixture signals separately."
+            "Derived from real provider evidence, news evidence, quote snapshots, "
+            "or valuation snapshots; V1 keeps base fixture signals separately."
         ),
     }
 

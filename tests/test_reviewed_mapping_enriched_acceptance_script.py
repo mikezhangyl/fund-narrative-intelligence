@@ -244,6 +244,12 @@ def _write_outputs(
             "signal_id": "SIG_QUOTE_600519_premium_baijiu_consumption",
             "source": "market_quote",
         },
+        {
+            "signal_id": "SIG_VAL_600519_premium_baijiu_consumption_VALUATION_EXTREME",
+            "source": "valuation_snapshot",
+            "source_provider": "eastmoney-valuation",
+            "signal_type": "valuation_extreme",
+        },
     ]
     raw = {
         "metadata": {"fund_code": "161725", "data_quality": "partial"},

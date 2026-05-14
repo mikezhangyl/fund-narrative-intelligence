@@ -185,6 +185,12 @@ def validate_acceptance_outputs(
     mappings = raw.get("stock_narrative_mappings") or []
     coverage = raw.get("mapping_coverage", {})
     valuation_snapshots = raw.get("valuation_snapshots")
+    derived_signal_events = raw.get("derived_signal_events") or []
+    valuation_signal_events = [
+        item
+        for item in derived_signal_events
+        if item.get("source") == "valuation_snapshot"
+    ]
 
     _require(
         raw.get("stock_mapping_mode") == DEFAULT_STOCK_MAPPING_MODE,
@@ -255,6 +261,24 @@ def validate_acceptance_outputs(
         )
         or valuation_layer.get("source_url") == "multiple://valuation",
         "valuation layer source_url must disclose Eastmoney valuation source",
+    )
+    _require(
+        derived_signal_events == scoring.get("derived_signal_events"),
+        "raw/scoring derived_signal_events mismatch",
+    )
+    _require(
+        any(
+            item.get("signal_type") in {"valuation_extreme", "valuation_reset"}
+            for item in valuation_signal_events
+        ),
+        "valuation_snapshots must produce valuation-derived signal events",
+    )
+    _require(
+        all(
+            item.get("source_provider") == "eastmoney-valuation"
+            for item in valuation_signal_events
+        ),
+        "valuation-derived signal events must disclose eastmoney-valuation",
     )
     expected = (
         "reviewed-registry-store",

@@ -5,6 +5,7 @@ from typing import Any
 ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER = "cninfo-derived-signals"
 MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER = "market-quote-derived-signals"
 NEWS_DERIVED_SIGNAL_PROVIDER = "news-derived-signals"
+VALUATION_DERIVED_SIGNAL_PROVIDER = "valuation-derived-signals"
 
 _ANNOUNCEMENT_SIGNAL_MAP = {
     ("earnings", "positive"): (
@@ -104,6 +105,41 @@ def derive_market_quote_signal_events(
             quote=quote,
             stock_mappings=mappings_by_stock.get(str(quote.get("stock_code") or ""), []),
             data_quality=str(market_quotes_payload.get("data_quality") or "unavailable"),
+            as_of_date=as_of_date,
+        )
+    ]
+    return sorted(
+        signals,
+        key=lambda item: (
+            item["narrative_id"],
+            item["event_date"],
+            item["signal_id"],
+        ),
+    )
+
+
+def derive_valuation_signal_events(
+    valuation_snapshots_payload: dict[str, Any],
+    stock_mappings: list[dict[str, Any]],
+    as_of_date: str,
+) -> list[dict[str, Any]]:
+    if valuation_snapshots_payload.get("valuation_basis") != "provider_valuation_metrics":
+        return []
+    valuations = valuation_snapshots_payload.get("valuations")
+    if not isinstance(valuations, list):
+        return []
+    mappings_by_stock = _mappings_by_stock(stock_mappings)
+    signals = [
+        signal
+        for valuation in valuations
+        for signal in _valuation_signals(
+            valuation=valuation,
+            stock_mappings=mappings_by_stock.get(
+                str(valuation.get("stock_code") or ""), []
+            ),
+            data_quality=str(valuation_snapshots_payload.get("data_quality") or "unavailable"),
+            fallback_provider=str(valuation_snapshots_payload.get("provider_name") or ""),
+            fallback_url=valuation_snapshots_payload.get("source_url"),
             as_of_date=as_of_date,
         )
     ]
@@ -236,6 +272,81 @@ def _quote_signals(
         for mapping in stock_mappings
         if mapping.get("narrative_id")
     ]
+
+
+def _valuation_signals(
+    valuation: dict[str, Any],
+    stock_mappings: list[dict[str, Any]],
+    data_quality: str,
+    fallback_provider: str,
+    fallback_url: Any,
+    as_of_date: str,
+) -> list[dict[str, Any]]:
+    profile = _valuation_signal_profile(valuation)
+    if profile is None:
+        return []
+    signal_type, suffix, strength, reason = profile
+    stock_code = str(valuation.get("stock_code") or "")
+    source_provider = str(valuation.get("source_provider") or fallback_provider)
+    source_url = valuation.get("source_url") or fallback_url
+    event_date = _quote_event_date(quote=valuation, as_of_date=as_of_date)
+    data_quality_confidence = _data_quality_confidence(data_quality)
+    return [
+        {
+            "signal_id": f"SIG_VAL_{stock_code}_{mapping['narrative_id']}_{suffix}",
+            "narrative_id": str(mapping["narrative_id"]),
+            "signal_type": signal_type,
+            "strength": strength,
+            "confidence": round(float(mapping.get("confidence", 0)) * data_quality_confidence, 4),
+            "confidence_multiplier": 0.75,
+            "event_date": event_date,
+            "half_life_days": 30,
+            "source": "valuation_snapshot",
+            "source_provider": source_provider,
+            "source_stock_code": stock_code,
+            "source_url": source_url,
+            "derivation_reason": reason,
+        }
+        for mapping in stock_mappings
+        if mapping.get("narrative_id")
+    ]
+
+
+def _valuation_signal_profile(
+    valuation: dict[str, Any],
+) -> tuple[str, str, float, str] | None:
+    pressure = str(valuation.get("valuation_pressure") or "")
+    if pressure == "elevated":
+        return (
+            "valuation_extreme",
+            "VALUATION_EXTREME",
+            _elevated_valuation_strength(valuation),
+            "elevated provider valuation metrics",
+        )
+    if pressure == "discounted":
+        return (
+            "valuation_reset",
+            "VALUATION_RESET",
+            0.65,
+            "discounted provider valuation metrics",
+        )
+    return None
+
+
+def _elevated_valuation_strength(valuation: dict[str, Any]) -> float:
+    pe_ttm = _optional_float(valuation.get("pe_ttm"))
+    pb = _optional_float(valuation.get("pb"))
+    if (pe_ttm is not None and pe_ttm >= 60) or (pb is not None and pb >= 12):
+        return 1.0
+    return 0.75
+
+
+def _data_quality_confidence(data_quality: str) -> float:
+    if data_quality == "fresh":
+        return 0.75
+    if data_quality == "partial":
+        return 0.6
+    return 0.4
 
 
 def _confidence(value: Any) -> float:
