@@ -68,3 +68,4 @@
 - [reviewed-mapping-news-acceptance.md](./reviewed-mapping-news-acceptance.md)
 - [workspace-approval-readiness.md](./workspace-approval-readiness.md)
 - [reviewed-mapping-workspace-acceptance.md](./reviewed-mapping-workspace-acceptance.md)
+- [v1-workspace-snapshot-acceptance.md](./v1-workspace-snapshot-acceptance.md)

@@ -22,6 +22,7 @@ EXPECTED_ARTIFACTS = {
     "manifest": f"fund_{FUND_CODE}_manifest.json",
     "markdown": f"fund_{FUND_CODE}_report.md",
     "html": f"fund_{FUND_CODE}_report.html",
+    "workspace_snapshot": f"fund_{FUND_CODE}_workspace_snapshot.json",
 }
 
 
@@ -65,7 +66,13 @@ def main(argv: list[str] | None = None) -> int:
 
 def _run_acceptance(output_dir: Path) -> None:
     _run_cli(["--fund-code", FUND_CODE, "--output-dir", str(output_dir)])
+    workspace_snapshot_path = output_dir / EXPECTED_ARTIFACTS["workspace_snapshot"]
+    if workspace_snapshot_path.exists():
+        workspace_snapshot_path.unlink()
     _run_cli(["--validate-artifact-contracts", str(output_dir)])
+    _run_cli(["--build-workspace-snapshot", str(output_dir)])
+    _run_cli(["--validate-artifact-contracts", str(output_dir)])
+    _run_cli(["--validate-workspace-snapshot", str(workspace_snapshot_path)])
     validate_acceptance_outputs(output_dir)
 
 
@@ -74,6 +81,8 @@ def validate_acceptance_outputs(output_dir: Path) -> None:
         key: output_dir / filename for key, filename in EXPECTED_ARTIFACTS.items()
     }
     for key, path in artifacts.items():
+        if key == "workspace_snapshot":
+            continue
         if not path.is_file():
             raise AcceptanceError(f"missing {key} artifact: {path}")
 
@@ -121,7 +130,7 @@ def validate_acceptance_outputs(output_dir: Path) -> None:
     _require(manifest.get("web_ready") is True, "manifest must be web_ready")
     manifest_artifacts = manifest.get("artifacts", {})
     for key, filename in EXPECTED_ARTIFACTS.items():
-        if key == "manifest":
+        if key in {"manifest", "workspace_snapshot"}:
             continue
         artifact = manifest_artifacts.get(key)
         _require(isinstance(artifact, dict), f"manifest missing artifact: {key}")
@@ -163,6 +172,36 @@ def validate_acceptance_outputs(output_dir: Path) -> None:
         "mock://fixtures/fund_000001.json" in html,
         "HTML report must show mock fixture source URL",
     )
+    if not artifacts["workspace_snapshot"].is_file():
+        raise AcceptanceError(
+            f"missing workspace_snapshot artifact: {artifacts['workspace_snapshot']}"
+        )
+    workspace_snapshot = _read_json(artifacts["workspace_snapshot"])
+    _require(
+        workspace_snapshot.get("version") == "workspace-snapshot-v1",
+        "workspace snapshot version mismatch",
+    )
+    notice = workspace_snapshot.get("data_source_notice", {})
+    _require(
+        notice.get("display_required") is True,
+        "workspace snapshot must require data source notice display",
+    )
+    _require(
+        notice.get("severity") == "mock",
+        "workspace snapshot data source notice must be mock severity",
+    )
+    _require(
+        notice.get("mock_layer_count", 0) > 0,
+        "workspace snapshot data source notice must count mock layers",
+    )
+    _require(
+        any(
+            _mock_source_url(layer.get("source_url"))
+            for layer in notice.get("layers_requiring_disclosure", [])
+            if isinstance(layer, dict)
+        ),
+        "workspace snapshot data source notice must expose mock source URLs",
+    )
 
 
 def _run_cli(args: list[str]) -> None:
@@ -200,6 +239,7 @@ def _print_success(output_dir: Path) -> None:
         "manifest",
         "markdown",
         "html",
+        "workspace_snapshot",
     ):
         print(EXPECTED_ARTIFACTS[key])
 

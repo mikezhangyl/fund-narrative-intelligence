@@ -44,8 +44,9 @@ Experienced individual investors or researchers who want to understand what mark
 `python scripts/validate_v1_acceptance.py`
 
 The script generates fund `000001` into a temporary directory, runs
-`--validate-artifact-contracts`, and checks mock source URL disclosure, manifest
-web-readiness, review queue/source table presence, and report data-source
+`--validate-artifact-contracts`, builds and validates a workspace snapshot, and
+checks mock source URL disclosure, manifest web-readiness, review queue/source
+table presence, workspace mock `data_source_notice`, and report data-source
 notices.
 
 Expected artifacts:
@@ -57,6 +58,7 @@ Expected artifacts:
 - `outputs/fund_000001_manifest.json`
 - `outputs/fund_000001_report.md`
 - `outputs/fund_000001_report.html`
+- `outputs/fund_000001_workspace_snapshot.json` (built by the acceptance script)
 
 ## Technical Stack
 
@@ -123,7 +125,7 @@ Expected artifacts:
 - `python -m src.main --validate-artifact-contracts path/to/outputs_or_manifest` validates known generated artifact contracts in one command before future web workspace loading, including manifest-referenced source-table artifacts and generated workspace snapshots.
 - `python -m src.main --build-workspace-snapshot path/to/outputs_or_manifest` writes `fund_<code>_workspace_snapshot.json`, a future-web loader artifact that bundles the manifest, provider foundation, source table, review queue, narrative summaries, report paths, and approval workflow readiness metadata.
 - `python -m src.main --validate-workspace-snapshot path/to/fund_000001_workspace_snapshot.json` validates that loader artifact without building UI.
-- Workspace snapshots include a top-level `data_source_notice` object so future web screens can immediately display mock/partial/unavailable/degraded source warnings instead of inferring them from provider layers. They also include `approval_workflow.review_queue_summary`, `available_actions`, and item counts for future web approval routing.
+- Workspace snapshots include a top-level `data_source_notice` object so future web screens can immediately display mock/partial/unavailable/degraded source warnings instead of inferring them from provider layers. They also include `approval_workflow.review_queue_summary`, `available_actions`, and item counts for future web approval routing. The V1 acceptance script explicitly validates this for the mock baseline so mock-backed web loader data cannot be mistaken for a real environment.
 - `python -m src.main --validate-review-queue path/to/fund_000001_review_queue.json` validates a review queue artifact without requiring `--fund-code`.
 - `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.

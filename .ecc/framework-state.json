@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-reviewed-mapping-workspace-acceptance",
+  "latest_run": "20260515-v1-workspace-snapshot-acceptance",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "wire reviewed-mapping enriched acceptance into workspace snapshot build and validation"
+  "next_step": "extend V1 acceptance to build and validate mock workspace snapshot disclosure"
 }

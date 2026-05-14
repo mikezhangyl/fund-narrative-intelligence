@@ -18,6 +18,8 @@ def test_validate_v1_acceptance_script_passes_with_explicit_output_dir(
     assert str(tmp_path) in captured.out
     assert (tmp_path / "fund_000001_manifest.json").exists()
     assert (tmp_path / "fund_000001_review_queue.json").exists()
+    assert (tmp_path / "fund_000001_workspace_snapshot.json").exists()
+    assert "fund_000001_workspace_snapshot.json" in captured.out
 
 
 def test_validate_v1_acceptance_script_runs_as_file(tmp_path):
@@ -35,6 +37,7 @@ def test_validate_v1_acceptance_script_runs_as_file(tmp_path):
 
     assert result.returncode == 0, result.stderr
     assert "V1 acceptance passed:" in result.stdout
+    assert "fund_000001_workspace_snapshot.json" in result.stdout
 
 
 def test_validate_acceptance_outputs_rejects_missing_mock_source_url(tmp_path):
