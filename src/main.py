@@ -98,6 +98,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Allow --persist-review-action to overwrite an existing non-source registry output file.",
     )
     parser.add_argument(
+        "--persistence-result-output",
+        help="Optional explicit persistence result artifact path for --persist-review-action.",
+    )
+    parser.add_argument(
+        "--allow-persistence-result-overwrite",
+        action="store_true",
+        help="Allow --persist-review-action to overwrite an existing persistence result artifact.",
+    )
+    parser.add_argument(
         "--include-cninfo-announcements",
         action="store_true",
         help="Optionally fetch CNINFO announcement metadata and convert it into evidence records.",
@@ -124,6 +133,10 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--allow-registry-overwrite requires --persist-review-action")
     if args.allow_registry_output_overwrite and not args.persist_review_action:
         parser.error("--allow-registry-output-overwrite requires --persist-review-action")
+    if args.persistence_result_output and not args.persist_review_action:
+        parser.error("--persistence-result-output requires --persist-review-action")
+    if args.allow_persistence_result_overwrite and not args.persist_review_action:
+        parser.error("--allow-persistence-result-overwrite requires --persist-review-action")
     if args.preview_review_action and args.persist_review_action:
         parser.error("--preview-review-action and --persist-review-action are mutually exclusive")
 
@@ -163,8 +176,13 @@ def main(argv: list[str] | None = None) -> int:
                 registry_path=Path(args.registry_path),
                 action_path=Path(args.persist_review_action),
                 registry_output_path=Path(args.registry_output),
+                result_output_path=Path(args.persistence_result_output)
+                if args.persistence_result_output
+                else None,
+                result_output_dir=Path(args.output_dir),
                 allow_registry_overwrite=args.allow_registry_overwrite,
                 allow_output_overwrite=args.allow_registry_output_overwrite,
+                allow_result_overwrite=args.allow_persistence_result_overwrite,
             )
         except PipelineError as exc:
             print(str(exc), file=sys.stderr)
@@ -181,6 +199,8 @@ def main(argv: list[str] | None = None) -> int:
 
         print("Review action persisted:")
         print(result["registry_output_path"])
+        if "persistence_result_path" in result:
+            print(result["persistence_result_path"])
         return 0
 
     if args.list_fixtures:

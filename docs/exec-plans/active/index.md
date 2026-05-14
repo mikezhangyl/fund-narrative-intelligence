@@ -35,3 +35,4 @@
 - [review-action-delta.md](./review-action-delta.md)
 - [review-preview-validation.md](./review-preview-validation.md)
 - [review-action-persistence.md](./review-action-persistence.md)
+- [review-action-audit-artifact.md](./review-action-audit-artifact.md)

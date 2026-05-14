@@ -583,5 +583,8 @@ Consequences:
 - The persistence path validates the preview and final registry before writing.
 - The action input file cannot be overwritten.
 - Existing non-source output files cannot be overwritten unless `--allow-registry-output-overwrite` is present.
+- Persistence writes a separate result artifact by default so registry updates have an audit record outside the registry file.
+- Direct persistence callers must supply an audit output location; registry and audit writes use rollback so audit failure does not leave an unaudited registry output.
+- Persistence result artifacts record the overwrite policy flags used for the write.
 - In-place registry overwrite requires `--allow-registry-overwrite`.
 - Normal report generation never calls review-action persistence.

@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-review-action-persistence",
+  "latest_run": "20260514-review-action-audit-artifact",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "add guarded explicit registry persistence for approved review actions"
+  "next_step": "write durable review-action persistence audit artifacts"
 }

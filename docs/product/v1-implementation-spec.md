@@ -220,6 +220,24 @@ unless `--allow-registry-output-overwrite` is passed. It must also reject
 in-place registry overwrite unless `--allow-registry-overwrite` is passed. Normal
 fund report generation must never call this persistence path.
 
+Persistence should also write a durable result artifact under `--output-dir` by
+default:
+
+```text
+candidate_review_action_<action_id>_persistence.json
+```
+
+The result artifact should include the action ID, candidate ID, source registry
+path, registry output path, overwrite policy flags, and `registry_delta`. An explicit
+`--persistence-result-output` path may be supplied. Existing persistence-result
+artifacts must not be overwritten unless `--allow-persistence-result-overwrite`
+is passed, and result artifacts must not overwrite the action input, source
+registry, or registry output file. The lower-level persistence function must
+also receive a result output path or directory; callers should not be able to
+persist a registry update without an audit artifact. Registry and audit writes
+should be treated as one operation: if the audit write fails, the registry output
+must be rolled back or removed.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
@@ -455,7 +473,8 @@ The persistence command must write the updated registry only to
 `--registry-output` by default. In-place overwrite of `--registry-path` is allowed
 only when `--allow-registry-overwrite` is present. Overwriting any other existing
 registry output file is allowed only when `--allow-registry-output-overwrite` is
-present.
+present. The command must also write a persistence-result audit artifact under
+`--output-dir` unless `--persistence-result-output` is provided.
 
 And can explicitly try the Eastmoney holdings adapter:
 

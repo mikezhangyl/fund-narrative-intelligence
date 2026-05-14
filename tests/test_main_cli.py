@@ -153,15 +153,66 @@ def test_main_persists_review_action_to_explicit_registry_output(tmp_path, capsy
             str(registry_path),
             "--registry-output",
             str(registry_output_path),
+            "--output-dir",
+            str(tmp_path),
         ]
     )
 
     captured = capsys.readouterr()
     persisted_registry = json.loads(registry_output_path.read_text(encoding="utf-8"))
+    audit_path = tmp_path / "candidate_review_action_ACT_REJECT_PERSIST_TEST_persistence.json"
+    audit_payload = json.loads(audit_path.read_text(encoding="utf-8"))
     assert exit_code == 0
     assert "Review action persisted:" in captured.out
     assert str(registry_output_path) in captured.out
+    assert str(audit_path) in captured.out
     assert persisted_registry["candidate_narratives"][1]["status"] == "rejected"
+    assert audit_payload["candidate_narrative_id"] == (
+        "C_DOMESTIC_DATABASE_INFRASTRUCTURE"
+    )
+
+
+def test_main_persists_review_action_to_explicit_result_output(tmp_path, capsys):
+    registry_path = tmp_path / "registry.json"
+    action_path = tmp_path / "action.json"
+    registry_output_path = tmp_path / "registry.promoted.json"
+    result_output_path = tmp_path / "audit" / "persistence.json"
+    registry_path.write_text(
+        (FIXTURE_DIR / "narrative_registry.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    action_path.write_text(
+        json.dumps(
+            {
+                "action_id": "ACT_REJECT_PERSIST_EXPLICIT_RESULT",
+                "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
+                "action": "reject",
+                "reviewed_by": "reviewer@example.com",
+                "reviewed_at": "2026-05-14T11:00:00+00:00",
+                "review_note": "Reject in CLI explicit result test.",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = main_module.main(
+        [
+            "--persist-review-action",
+            str(action_path),
+            "--registry-path",
+            str(registry_path),
+            "--registry-output",
+            str(registry_output_path),
+            "--persistence-result-output",
+            str(result_output_path),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert str(result_output_path) in captured.out
+    assert result_output_path.exists()
 
 
 def test_main_persist_review_action_rejects_directory_output(tmp_path, capsys):

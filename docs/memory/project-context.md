@@ -94,6 +94,8 @@ Expected artifacts:
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.
 - Review-action preview artifacts are validated before write; the reusable validator checks preview metadata, summary, registry delta, and result registry shape.
 - `python -m src.main --persist-review-action path/to/action.json --registry-output path/to/registry.next.json` writes an explicitly reviewed registry result without requiring `--fund-code`; in-place overwrite requires `--allow-registry-overwrite`, and overwriting an existing non-source output requires `--allow-registry-output-overwrite`.
+- Review-action persistence writes a separate `candidate_review_action_<action_id>_persistence.json` audit artifact under `--output-dir` by default, or to `--persistence-result-output` when provided.
+- Review-action persistence requires an audit output path or directory even for direct API callers; registry and audit writes are rollback-protected so audit write failure does not leave a new registry output behind.
 - `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, `candidate_narratives=<count>`, and `review_queue=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 
