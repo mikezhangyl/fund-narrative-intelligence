@@ -20,10 +20,12 @@ The system must not present output as investment advice or produce buy/sell sign
 The first engineering acceptance command is:
 
 ```bash
-python -m src.main --fund-code 000001
+python scripts/validate_v1_acceptance.py
 ```
 
-It must produce raw JSON, scoring JSON, Markdown report, and HTML report artifacts under `outputs/`.
+It must generate fund `000001`, validate generated artifact contracts, confirm
+mock data is visibly disclosed, and produce raw JSON, scoring JSON, review queue,
+manifest, Markdown report, and HTML report artifacts.
 
 V1 can also list available mock fixtures:
 

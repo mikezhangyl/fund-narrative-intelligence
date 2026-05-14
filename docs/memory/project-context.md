@@ -40,7 +40,11 @@ Experienced individual investors or researchers who want to understand what mark
 
 ## V1 Acceptance Command
 
-`python -m src.main --fund-code 000001`
+`python scripts/validate_v1_acceptance.py`
+
+The script generates fund `000001` into a temporary directory, runs
+`--validate-artifact-contracts`, and checks mock source URL disclosure, manifest
+web-readiness, review queue presence, and report data-source notices.
 
 Expected artifacts:
 
@@ -59,6 +63,7 @@ Expected artifacts:
 - Development quality tools: pytest, ruff, and coverage are declared in `pyproject.toml` under the `dev` extra.
 - Standard setup command: `python -m pip install -e ".[dev]"`.
 - Standard quality commands: `python -m ruff check .`, `python -m coverage run -m pytest -q`, `python -m coverage report`, and `python -m compileall -q src tests scripts`.
+- Standard V1 acceptance command: `python scripts/validate_v1_acceptance.py`.
 - Data: local JSON fixtures and mock providers.
 - Future UI: Node.js / Next.js can be added later as a separate workspace layer. Candidate narrative review and approval will eventually happen in a web UI, so V1 structured outputs should remain directly renderable and action-ready for a future review workspace.
 - CLI fixture discovery: `python -m src.main --list-fixtures`.

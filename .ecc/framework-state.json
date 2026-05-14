@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-validate-artifact-contracts-cli",
+  "latest_run": "20260514-v1-acceptance-script",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "expose one-command artifact contract validation for future web loading"
+  "next_step": "use scripts/validate_v1_acceptance.py as the standard V1 acceptance command"
 }

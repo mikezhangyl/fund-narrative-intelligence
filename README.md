@@ -15,8 +15,11 @@ python -m src.main --list-fixtures
 Run the V1 acceptance command:
 
 ```bash
-python -m src.main --fund-code 000001
+python scripts/validate_v1_acceptance.py
 ```
+
+This generates fund `000001` into a temporary directory, validates generated
+artifact contracts, and checks that mock-backed outputs are visibly disclosed.
 
 Run all mock fixtures:
 
@@ -53,6 +56,8 @@ Generated artifacts:
 ```text
 outputs/fund_000001_raw.json
 outputs/fund_000001_scoring.json
+outputs/fund_000001_review_queue.json
+outputs/fund_000001_manifest.json
 outputs/fund_000001_report.md
 outputs/fund_000001_report.html
 ```
@@ -73,6 +78,7 @@ Run quality gates:
 
 ```bash
 python -m ruff check .
+python scripts/validate_v1_acceptance.py
 python -m coverage run -m pytest -q
 python -m coverage report
 python -m compileall -q src tests scripts

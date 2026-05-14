@@ -439,8 +439,12 @@ V1 does not implement these capabilities, but it must preserve fields and model 
 The first implementation milestone is accepted when this command works without real API credentials:
 
 ```bash
-python -m src.main --fund-code 000001
+python scripts/validate_v1_acceptance.py
 ```
+
+The script generates fund `000001`, validates generated artifact contracts, and
+checks that mock-backed outputs are visibly disclosed through both data quality
+and `mock://fixtures/...` source identifiers.
 
 The CLI should also expose available local fixtures:
 
