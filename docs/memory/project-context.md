@@ -36,6 +36,7 @@ Experienced individual investors or researchers who want to understand what mark
 - Generate Markdown / HTML reports with evidence and an explicit non-investment-advice disclaimer.
 - Support mock providers so V1 runs without real API credentials.
 - Emit raw JSON, scoring JSON, Markdown report, and HTML report artifacts under `outputs/`.
+- Emit a dedicated review queue JSON artifact for future web approval workspace loading.
 
 ## V1 Acceptance Command
 
@@ -45,6 +46,7 @@ Expected artifacts:
 
 - `outputs/fund_000001_raw.json`
 - `outputs/fund_000001_scoring.json`
+- `outputs/fund_000001_review_queue.json`
 - `outputs/fund_000001_report.md`
 - `outputs/fund_000001_report.html`
 
@@ -87,6 +89,7 @@ Expected artifacts:
 - Future candidate-narrative approval is expected to be a web workflow. V1 does not need web interaction yet, but candidate/exclusion objects should preserve stable IDs, review status, rationale, related stock/exclusion links, and nullable reviewer metadata for later UI actions.
 - Candidate review actions support explicit `approve`, `reject`, and `defer` transitions. Only `approve` with promotion metadata appends an active narrative; report generation never promotes candidates automatically.
 - Raw/scoring JSON includes `candidate_review_queue`, a read-ready queue for future web approval screens with available actions, related exclusions, and promotion action templates.
+- Pipeline outputs include `fund_<code>_review_queue.json`, a dedicated future-workspace artifact containing the queue plus candidate/exclusion context.
 - `python -m src.main --run-real-smoke` prints `precision_flags=<count>`, `excluded_candidates=<count>`, `candidate_narratives=<count>`, and `review_queue=<count>` per fund in stdout.
 - Announcement-evidence smoke summaries check real CNINFO metadata count, converted evidence count, the non-mock `Announcements` layer, and visible mixed/mock data-source disclosure.
 

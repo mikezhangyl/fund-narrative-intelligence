@@ -475,6 +475,7 @@ def test_pipeline_excludes_known_bad_mapping_candidates(tmp_path, monkeypatch):
 
     raw = json.loads(artifacts["raw"].read_text())
     scoring = json.loads(artifacts["scoring"].read_text())
+    review_queue = json.loads(artifacts["review_queue"].read_text())
     markdown = artifacts["markdown"].read_text()
     html = artifacts["html"].read_text()
 
@@ -505,6 +506,17 @@ def test_pipeline_excludes_known_bad_mapping_candidates(tmp_path, monkeypatch):
         }
     ]
     assert raw["candidate_review_queue"] == scoring["candidate_review_queue"]
+    assert artifacts["review_queue"].name == "fund_320007_review_queue.json"
+    assert review_queue["metadata"] == scoring["metadata"]
+    assert review_queue["fund"] == scoring["fund"]
+    assert review_queue["provider_foundation"] == scoring["provider_foundation"]
+    assert review_queue["candidate_review_queue"] == scoring[
+        "candidate_review_queue"
+    ]
+    assert review_queue["candidate_narratives"] == scoring["candidate_narratives"]
+    assert review_queue["excluded_mapping_candidates"] == scoring[
+        "excluded_mapping_candidates"
+    ]
     assert raw["candidate_review_queue"]["summary"] == {
         "total_count": 1,
         "pending_count": 1,

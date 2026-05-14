@@ -510,3 +510,24 @@ Consequences:
 - Queue items are read-ready and deterministic.
 - Queue emission does not persist actions, call promotion, or change scoring.
 - Real-smoke summaries include queue item counts so taxonomy-review workload remains visible in CLI and CI output.
+
+## ADR-0025: Write Dedicated Review Queue Artifact
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Write `fund_<code>_review_queue.json` beside raw, scoring, Markdown, and HTML artifacts.
+
+Rationale:
+
+- A future web approval workspace should not have to parse full raw/scoring snapshots to load review work.
+- Keeping a dedicated artifact makes the queue contract easier to test and preserve.
+- The artifact remains read-only and does not imply persistence of review decisions.
+
+Consequences:
+
+- `run_pipeline` returns a `review_queue` artifact path.
+- The artifact includes metadata, fund identity, provider foundation, queue items, candidate narratives, and excluded mapping candidates.
+- Existing raw/scoring queue fields remain for snapshot reproducibility.

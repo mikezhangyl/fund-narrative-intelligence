@@ -174,6 +174,14 @@ V1 should emit a `candidate_review_queue` object whenever in-scope candidate nar
 
 This queue is read-ready for a future web workspace. It should not persist review actions or mutate the registry by itself.
 
+The pipeline should also write a dedicated review queue artifact:
+
+```text
+outputs/fund_<fund_code>_review_queue.json
+```
+
+This artifact should include `metadata`, `fund`, `provider_foundation`, `candidate_review_queue`, `candidate_narratives`, and `excluded_mapping_candidates`.
+
 ## Module Responsibility Matrix
 
 | Module | Input | Output | Calls LLM | Mockable | V1 |
@@ -395,6 +403,7 @@ It must create:
 ```text
 outputs/fund_000001_raw.json
 outputs/fund_000001_scoring.json
+outputs/fund_000001_review_queue.json
 outputs/fund_000001_report.md
 outputs/fund_000001_report.html
 ```
@@ -403,6 +412,7 @@ The generated artifacts must satisfy:
 
 - `raw.json` includes fund profile, holdings, provider metadata, narrative registry version, evidence records, and signal events or states.
 - `scoring.json` includes narrative exposures, five dimension scores, sustainability score, lifecycle stage, confidence, data quality, and version metadata.
+- `review_queue.json` includes the workspace-ready candidate review queue and the candidate/exclusion context needed to render it.
 - `report.md` and `report.html` include fund basics, top holdings, one primary narrative, two to three secondary narratives, evidence summaries, risk evidence, confidence/data-quality notes, and a non-investment-advice disclaimer.
 - `report.html` renders semantic HTML sections and tables rather than displaying raw Markdown syntax.
 - The command exits non-zero only for invalid user input or unrecoverable local errors.

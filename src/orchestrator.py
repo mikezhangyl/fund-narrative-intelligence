@@ -180,15 +180,29 @@ def run_pipeline(
     if announcement_evidence_payload is not None:
         scoring_payload["announcement_evidence"] = announcement_evidence_payload
 
+    review_queue_payload = {
+        "metadata": metadata,
+        "fund": fund,
+        "provider_foundation": provider_foundation,
+        "candidate_review_queue": candidate_review_queue,
+        "candidate_narratives": in_scope_candidate_narratives,
+        "excluded_mapping_candidates": mapping_result[
+            "excluded_mapping_candidates"
+        ],
+    }
+
     raw_path = output_path / f"fund_{fund_code}_raw.json"
     scoring_path = output_path / f"fund_{fund_code}_scoring.json"
+    review_queue_path = output_path / f"fund_{fund_code}_review_queue.json"
     write_json_artifact(raw_payload, raw_path)
     write_json_artifact(scoring_payload, scoring_path)
+    write_json_artifact(review_queue_payload, review_queue_path)
     report_paths = write_reports(scoring_payload, output_path)
 
     return {
         "raw": raw_path,
         "scoring": scoring_path,
+        "review_queue": review_queue_path,
         "markdown": report_paths["markdown"],
         "html": report_paths["html"],
     }

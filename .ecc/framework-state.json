@@ -9,7 +9,7 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-candidate-review-queue",
+  "latest_run": "20260514-review-queue-artifact",
   "qa_mode": "optional_library",
   "automation_ready": false,
   "next_step": "add persistence/API wrapper for candidate review actions when web workspace begins"

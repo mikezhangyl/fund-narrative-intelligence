@@ -30,3 +30,4 @@
 - [candidate-narratives.md](./candidate-narratives.md)
 - [candidate-promotion-workflow.md](./candidate-promotion-workflow.md)
 - [candidate-review-queue.md](./candidate-review-queue.md)
+- [review-queue-artifact.md](./review-queue-artifact.md)

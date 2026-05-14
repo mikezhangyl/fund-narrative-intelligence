@@ -172,6 +172,8 @@ Candidate promotion is an explicit review action. The backend supports approve/r
 
 Raw/scoring JSON also includes a `candidate_review_queue` object. This is a read-ready queue for a future web workspace: each item links a candidate narrative to related exclusions, exposes available actions, and includes an approval action template. It does not persist actions or change scoring by itself.
 
+The pipeline also writes `outputs/fund_<code>_review_queue.json` as a dedicated future-workspace artifact so a web review surface can load candidate review work without parsing the full raw or scoring snapshots.
+
 When a fallback registry-term match maps one holding to multiple narratives, V1 keeps all mappings but lowers their confidence from `0.52` to `0.42`, marks each mapping with `needs_review`, and writes `mapping_precision_flags` into raw/scoring JSON plus the Markdown/HTML report.
 
 When a fallback mapping is supported only by a broad industry term, V1 keeps the mapping but lowers confidence from `0.52` to `0.48`, marks it with `broad_industry_fallback`, and recommends `curation_review`. This catches cases such as a generic `电子` industry match before it is treated like a more specific stock-name or product-term match.
