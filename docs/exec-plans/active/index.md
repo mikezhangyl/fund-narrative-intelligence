@@ -32,3 +32,4 @@
 - [candidate-review-queue.md](./candidate-review-queue.md)
 - [review-queue-artifact.md](./review-queue-artifact.md)
 - [review-action-preview.md](./review-action-preview.md)
+- [review-action-delta.md](./review-action-delta.md)

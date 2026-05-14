@@ -56,6 +56,27 @@ def test_build_review_action_preview_applies_action_without_mutating_registry():
         "source_registry_written": False,
         "requires_explicit_persistence_step": True,
     }
+    assert preview["registry_delta"] == {
+        "active_narrative_ids_added": ["N_CONSUMER_ELECTRONICS_GLOBALIZATION"],
+        "active_narrative_count_change": 1,
+        "candidate_changes": {
+            "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+            "before": {
+                "status": "candidate",
+                "human_review_status": "candidate",
+                "reviewed_by": None,
+                "reviewed_at": None,
+                "promotion_target_id": None,
+            },
+            "after": {
+                "status": "promoted",
+                "human_review_status": "approved",
+                "reviewed_by": "reviewer@example.com",
+                "reviewed_at": "2026-05-14T10:00:00+00:00",
+                "promotion_target_id": "N_CONSUMER_ELECTRONICS_GLOBALIZATION",
+            },
+        },
+    }
     assert preview["result_registry"]["narratives"][-1]["narrative_id"] == (
         "N_CONSUMER_ELECTRONICS_GLOBALIZATION"
     )
@@ -80,6 +101,14 @@ def test_build_review_action_preview_summarizes_reject_without_promotion():
         registry["narratives"]
     )
     assert preview["summary"]["promotion_target_id"] is None
+    assert preview["registry_delta"]["active_narrative_ids_added"] == []
+    assert preview["registry_delta"]["active_narrative_count_change"] == 0
+    assert preview["registry_delta"]["candidate_changes"]["before"]["status"] == (
+        "candidate"
+    )
+    assert preview["registry_delta"]["candidate_changes"]["after"]["status"] == (
+        "rejected"
+    )
 
 
 def test_write_review_action_preview_uses_default_filename_and_preserves_registry(

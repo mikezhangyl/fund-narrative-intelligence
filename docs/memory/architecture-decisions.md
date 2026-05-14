@@ -552,6 +552,6 @@ Rationale:
 Consequences:
 
 - `python -m src.main --preview-review-action <action.json>` does not require `--fund-code`.
-- Preview output includes the original action, summary, mutation-safety metadata, and result registry.
+- Preview output includes the original action, summary, mutation-safety metadata, `registry_delta`, and result registry.
 - The source registry fixture is never written by this command; explicit output paths must stay inside `--output-dir` and must not overwrite registry/action inputs.
 - Future persistence/API work must be explicit.

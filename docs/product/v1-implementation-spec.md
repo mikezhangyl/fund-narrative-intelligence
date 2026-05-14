@@ -193,11 +193,14 @@ The wrapper reads a review action JSON payload, applies it to a copy of the
 registry, and writes a `candidate_review_action_<action_id>_preview.json`
 artifact. The preview includes the submitted action, summary fields,
 `source_registry_mutated`, `source_registry_written`,
-`requires_explicit_persistence_step`, and `result_registry`. It must not write
-back to `data/fixtures/narrative_registry.json` unless a separate future
-persistence workflow is explicitly added and approved. If an explicit
-`--review-action-output` path is provided, it must remain inside `--output-dir`
-and must not overwrite the registry or action input files.
+`requires_explicit_persistence_step`, `registry_delta`, and `result_registry`.
+`registry_delta` should list active narrative IDs added, active narrative count
+change, and before/after candidate review state so future web screens can render
+the effect without diffing the full registry. It must not write back to
+`data/fixtures/narrative_registry.json` unless a separate future persistence
+workflow is explicitly added and approved. If an explicit `--review-action-output`
+path is provided, it must remain inside `--output-dir` and must not overwrite the
+registry or action input files.
 
 ## Module Responsibility Matrix
 

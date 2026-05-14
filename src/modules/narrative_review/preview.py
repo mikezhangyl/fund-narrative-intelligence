@@ -21,6 +21,10 @@ def build_review_action_preview(
         result_registry["candidate_narratives"],
         action_payload["candidate_narrative_id"],
     )
+    original_candidate = _find_candidate(
+        original_registry["candidate_narratives"],
+        action_payload["candidate_narrative_id"],
+    )
     return {
         "version": "candidate-review-action-preview-v1",
         "status": "previewed",
@@ -37,6 +41,12 @@ def build_review_action_preview(
             "source_registry_written": False,
             "requires_explicit_persistence_step": True,
         },
+        "registry_delta": _registry_delta(
+            original_registry=original_registry,
+            result_registry=result_registry,
+            original_candidate=original_candidate,
+            reviewed_candidate=reviewed_candidate,
+        ),
         "result_registry": result_registry,
     }
 
@@ -112,6 +122,47 @@ def _validate_output_path(
         raise ValueError("review action output must stay inside output_dir")
     if output_path in {registry_file, action_file}:
         raise ValueError("review action output must not overwrite registry or action input")
+
+
+def _registry_delta(
+    *,
+    original_registry: dict[str, Any],
+    result_registry: dict[str, Any],
+    original_candidate: dict[str, Any],
+    reviewed_candidate: dict[str, Any],
+) -> dict[str, Any]:
+    original_narrative_ids = {
+        narrative["narrative_id"] for narrative in original_registry["narratives"]
+    }
+    result_narrative_ids = [
+        narrative["narrative_id"] for narrative in result_registry["narratives"]
+    ]
+    added_ids = [
+        narrative_id
+        for narrative_id in result_narrative_ids
+        if narrative_id not in original_narrative_ids
+    ]
+    return {
+        "active_narrative_ids_added": added_ids,
+        "active_narrative_count_change": (
+            len(result_registry["narratives"]) - len(original_registry["narratives"])
+        ),
+        "candidate_changes": {
+            "candidate_narrative_id": reviewed_candidate["candidate_narrative_id"],
+            "before": _candidate_review_projection(original_candidate),
+            "after": _candidate_review_projection(reviewed_candidate),
+        },
+    }
+
+
+def _candidate_review_projection(candidate: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "status": candidate.get("status"),
+        "human_review_status": candidate.get("human_review_status"),
+        "reviewed_by": candidate.get("reviewed_by"),
+        "reviewed_at": candidate.get("reviewed_at"),
+        "promotion_target_id": candidate.get("promotion_target_id"),
+    }
 
 
 def _find_candidate(
