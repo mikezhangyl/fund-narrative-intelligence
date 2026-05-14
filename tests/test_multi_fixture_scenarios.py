@@ -41,7 +41,14 @@ def test_run_all_fixture_pipelines_generates_artifacts_for_every_fixture(tmp_pat
 
     assert sorted(results) == ["000001", "000002", "000003"]
     for fund_code in results:
-        for suffix in ["raw.json", "scoring.json", "report.md", "report.html"]:
+        for suffix in [
+            "raw.json",
+            "scoring.json",
+            "review_queue.json",
+            "manifest.json",
+            "report.md",
+            "report.html",
+        ]:
             assert (tmp_path / f"fund_{fund_code}_{suffix}").exists()
 
 

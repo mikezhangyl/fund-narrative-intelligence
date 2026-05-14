@@ -41,3 +41,4 @@
 - [validate-review-preview-cli.md](./validate-review-preview-cli.md)
 - [validate-review-queue-cli.md](./validate-review-queue-cli.md)
 - [mock-data-source-url-disclosure.md](./mock-data-source-url-disclosure.md)
+- [pipeline-artifact-manifest.md](./pipeline-artifact-manifest.md)

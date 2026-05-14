@@ -520,6 +520,7 @@ It must create:
 outputs/fund_000001_raw.json
 outputs/fund_000001_scoring.json
 outputs/fund_000001_review_queue.json
+outputs/fund_000001_manifest.json
 outputs/fund_000001_report.md
 outputs/fund_000001_report.html
 ```
@@ -529,6 +530,7 @@ The generated artifacts must satisfy:
 - `raw.json` includes fund profile, holdings, provider metadata, narrative registry version, evidence records, and signal events or states.
 - `scoring.json` includes narrative exposures, five dimension scores, sustainability score, lifecycle stage, confidence, data quality, and version metadata.
 - `review_queue.json` includes the workspace-ready candidate review queue and the candidate/exclusion context needed to render it.
+- `manifest.json` includes artifact paths, provider foundation, data quality, and web-readiness metadata so a future web workspace can discover outputs without reconstructing file names.
 - `report.md` and `report.html` include fund basics, top holdings, one primary narrative, two to three secondary narratives, evidence summaries, risk evidence, confidence/data-quality notes, and a non-investment-advice disclaimer.
 - `report.html` renders semantic HTML sections and tables rather than displaying raw Markdown syntax.
 - The command exits non-zero only for invalid user input or unrecoverable local errors.

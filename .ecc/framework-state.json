@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260514-mock-data-source-url-disclosure",
+  "latest_run": "20260514-pipeline-artifact-manifest",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "make mock data sources visible in source_url fields and report source tables"
+  "next_step": "write a pipeline artifact manifest for future web workspace loading"
 }

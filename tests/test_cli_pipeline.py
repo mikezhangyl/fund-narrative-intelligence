@@ -24,14 +24,16 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
 
     raw_path = tmp_path / "fund_000001_raw.json"
     scoring_path = tmp_path / "fund_000001_scoring.json"
+    manifest_path = tmp_path / "fund_000001_manifest.json"
     markdown_path = tmp_path / "fund_000001_report.md"
     html_path = tmp_path / "fund_000001_report.html"
 
-    for path in [raw_path, scoring_path, markdown_path, html_path]:
+    for path in [raw_path, scoring_path, manifest_path, markdown_path, html_path]:
         assert path.exists(), f"missing {path}"
 
     raw = json.loads(raw_path.read_text())
     scoring = json.loads(scoring_path.read_text())
+    manifest = json.loads(manifest_path.read_text())
     markdown = markdown_path.read_text()
     html = html_path.read_text()
 
@@ -50,6 +52,18 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
     assert scoring["provider_foundation"]["layers"]["narrative_registry"][
         "source_url"
     ] == "mock://fixtures/narrative_registry.json"
+    assert manifest["version"] == "pipeline-artifact-manifest-v1"
+    assert manifest["fund_code"] == "000001"
+    assert manifest["data_quality"] == "mock"
+    assert manifest["web_ready"] is True
+    assert manifest["artifacts"]["raw"]["path"] == "fund_000001_raw.json"
+    assert manifest["artifacts"]["scoring"]["path"] == "fund_000001_scoring.json"
+    assert manifest["artifacts"]["review_queue"]["path"] == (
+        "fund_000001_review_queue.json"
+    )
+    assert manifest["artifacts"]["markdown"]["path"] == "fund_000001_report.md"
+    assert manifest["artifacts"]["html"]["path"] == "fund_000001_report.html"
+    assert manifest["provider_foundation"] == scoring["provider_foundation"]
     assert scoring["primary_narrative"]["narrative_id"]
     assert "interpretation" in scoring["primary_narrative"]
     assert len(scoring["secondary_narratives"]) >= 2

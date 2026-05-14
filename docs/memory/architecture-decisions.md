@@ -593,3 +593,27 @@ Consequences:
 - Persistence result artifacts can also be validated directly through the CLI without running a fund report.
 - In-place registry overwrite requires `--allow-registry-overwrite`.
 - Normal report generation never calls review-action persistence.
+
+## ADR-0028: Write Pipeline Artifact Manifest For Web Loading
+
+- Status: accepted
+- Date: 2026-05-14
+
+Decision:
+
+Write `fund_<code>_manifest.json` beside raw, scoring, review queue, Markdown,
+and HTML artifacts.
+
+Rationale:
+
+- A future web workspace should discover run outputs from one small contract
+  rather than reconstructing filenames.
+- The manifest can expose data quality, provider foundation, and degradation
+  events before the web UI loads larger payloads.
+- Relative artifact names keep local outputs portable across output directories.
+
+Consequences:
+
+- `run_pipeline` returns a `manifest` artifact path.
+- Manifest artifacts include raw, scoring, review queue, Markdown, and HTML paths.
+- Existing artifact names and payload contracts remain unchanged.

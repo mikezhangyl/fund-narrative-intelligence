@@ -194,15 +194,33 @@ def run_pipeline(
     raw_path = output_path / f"fund_{fund_code}_raw.json"
     scoring_path = output_path / f"fund_{fund_code}_scoring.json"
     review_queue_path = output_path / f"fund_{fund_code}_review_queue.json"
+    manifest_path = output_path / f"fund_{fund_code}_manifest.json"
     write_json_artifact(raw_payload, raw_path)
     write_json_artifact(scoring_payload, scoring_path)
     write_json_artifact(review_queue_payload, review_queue_path)
     report_paths = write_reports(scoring_payload, output_path)
+    manifest_payload = _artifact_manifest(
+        fund_code=fund_code,
+        as_of_date=as_of_date,
+        provider_mode=provider_mode,
+        data_quality=effective_data_quality,
+        provider_foundation=provider_foundation,
+        degradation_events=degradation_events,
+        artifact_paths={
+            "raw": raw_path,
+            "scoring": scoring_path,
+            "review_queue": review_queue_path,
+            "markdown": report_paths["markdown"],
+            "html": report_paths["html"],
+        },
+    )
+    write_json_artifact(manifest_payload, manifest_path)
 
     return {
         "raw": raw_path,
         "scoring": scoring_path,
         "review_queue": review_queue_path,
+        "manifest": manifest_path,
         "markdown": report_paths["markdown"],
         "html": report_paths["html"],
     }
@@ -229,6 +247,44 @@ def _candidate_narratives_for_excluded_candidates(
         if related_exclusion_ids & exclusion_ids or triggering_stock_codes & stock_codes:
             in_scope.append(candidate_narrative)
     return in_scope
+
+
+def _artifact_manifest(
+    fund_code: str,
+    as_of_date: str,
+    provider_mode: str,
+    data_quality: str,
+    provider_foundation: dict[str, Any],
+    degradation_events: list[dict[str, str]],
+    artifact_paths: dict[str, Path],
+) -> dict[str, Any]:
+    return {
+        "version": "pipeline-artifact-manifest-v1",
+        "fund_code": fund_code,
+        "as_of_date": as_of_date,
+        "provider_mode": provider_mode,
+        "data_quality": data_quality,
+        "web_ready": True,
+        "provider_foundation": provider_foundation,
+        "degradation_events": degradation_events,
+        "artifacts": {
+            key: {
+                "path": path.name,
+                "format": _artifact_format(path),
+            }
+            for key, path in artifact_paths.items()
+        },
+    }
+
+
+def _artifact_format(path: Path) -> str:
+    if path.suffix == ".json":
+        return "json"
+    if path.suffix == ".md":
+        return "markdown"
+    if path.suffix == ".html":
+        return "html"
+    return path.suffix.removeprefix(".") or "unknown"
 
 
 def run_all_fixture_pipelines(
