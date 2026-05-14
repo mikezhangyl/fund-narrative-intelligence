@@ -374,10 +374,19 @@ def run_pipeline(
     raw_path = output_path / f"fund_{fund_code}_raw.json"
     scoring_path = output_path / f"fund_{fund_code}_scoring.json"
     review_queue_path = output_path / f"fund_{fund_code}_review_queue.json"
+    source_table_path = output_path / f"fund_{fund_code}_source_table.json"
     manifest_path = output_path / f"fund_{fund_code}_manifest.json"
     write_json_artifact(raw_payload, raw_path)
     write_json_artifact(scoring_payload, scoring_path)
     write_json_artifact(review_queue_payload, review_queue_path)
+    write_json_artifact(
+        _source_table_payload(
+            fund_code=fund_code,
+            as_of_date=as_of_date,
+            provider_foundation=provider_foundation,
+        ),
+        source_table_path,
+    )
     report_paths = write_reports(scoring_payload, output_path)
     manifest_payload = _artifact_manifest(
         fund_code=fund_code,
@@ -390,6 +399,7 @@ def run_pipeline(
             "raw": raw_path,
             "scoring": scoring_path,
             "review_queue": review_queue_path,
+            "source_table": source_table_path,
             "markdown": report_paths["markdown"],
             "html": report_paths["html"],
         },
@@ -400,6 +410,7 @@ def run_pipeline(
         "raw": raw_path,
         "scoring": scoring_path,
         "review_queue": review_queue_path,
+        "source_table": source_table_path,
         "manifest": manifest_path,
         "markdown": report_paths["markdown"],
         "html": report_paths["html"],
@@ -454,6 +465,22 @@ def _artifact_manifest(
             }
             for key, path in artifact_paths.items()
         },
+    }
+
+
+def _source_table_payload(
+    fund_code: str,
+    as_of_date: str,
+    provider_foundation: dict[str, Any],
+) -> dict[str, Any]:
+    layers = list(provider_foundation["layers"].values())
+    return {
+        "version": "source-table-v1",
+        "fund_code": fund_code,
+        "as_of_date": as_of_date,
+        "provider_foundation": provider_foundation,
+        "layers": layers,
+        "degradation_events": provider_foundation["degradation_events"],
     }
 
 

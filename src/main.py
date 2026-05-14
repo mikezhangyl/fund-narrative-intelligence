@@ -29,6 +29,7 @@ from src.validation import (
     validate_review_action_persistence_result_payload,
     validate_review_action_preview_payload,
     validate_review_queue_artifact_payload,
+    validate_source_table_artifact_payload,
 )
 
 
@@ -381,6 +382,7 @@ def main(argv: list[str] | None = None) -> int:
             " ".join(
                 [
                     f"manifests={summary['manifests']}",
+                    f"source_tables={summary['source_tables']}",
                     f"review_queues={summary['review_queues']}",
                     f"review_previews={summary['review_previews']}",
                     f"persistence_results={summary['persistence_results']}",
@@ -675,6 +677,9 @@ def _validate_artifact_contract_directory(path: Path) -> dict[str, int]:
     for queue_path in sorted(path.glob("fund_*_review_queue.json")):
         validate_review_queue_artifact_payload(_read_json_object(queue_path))
         summary["review_queues"] += 1
+    for source_table_path in sorted(path.glob("fund_*_source_table.json")):
+        validate_source_table_artifact_payload(_read_json_object(source_table_path))
+        summary["source_tables"] += 1
     for preview_path in sorted(path.glob("candidate_review_action_*_preview.json")):
         validate_review_action_preview_payload(_read_json_object(preview_path))
         summary["review_previews"] += 1
@@ -718,6 +723,18 @@ def _validate_manifest_referenced_artifact(
     if artifact_key == "review_queue":
         validate_review_queue_artifact_payload(_read_json_object(artifact_path))
         return
+    if artifact_key == "source_table":
+        payload = _read_json_object(artifact_path)
+        validate_source_table_artifact_payload(payload)
+        if payload.get("fund_code") != manifest["fund_code"]:
+            raise ValueError("manifest artifact source_table fund_code mismatch")
+        if payload.get("as_of_date") != manifest["as_of_date"]:
+            raise ValueError("manifest artifact source_table as_of_date mismatch")
+        if payload.get("provider_foundation") != manifest["provider_foundation"]:
+            raise ValueError(
+                "manifest artifact source_table provider_foundation mismatch"
+            )
+        return
     if artifact_key in {"raw", "scoring"}:
         payload = _read_json_object(artifact_path)
         _validate_manifest_json_metadata(
@@ -750,6 +767,7 @@ def _validate_manifest_json_metadata(
 def _empty_contract_summary() -> dict[str, int]:
     return {
         "manifests": 0,
+        "source_tables": 0,
         "review_queues": 0,
         "review_previews": 0,
         "persistence_results": 0,

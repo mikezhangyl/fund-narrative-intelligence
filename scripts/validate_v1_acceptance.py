@@ -18,6 +18,7 @@ EXPECTED_ARTIFACTS = {
     "raw": f"fund_{FUND_CODE}_raw.json",
     "scoring": f"fund_{FUND_CODE}_scoring.json",
     "review_queue": f"fund_{FUND_CODE}_review_queue.json",
+    "source_table": f"fund_{FUND_CODE}_source_table.json",
     "manifest": f"fund_{FUND_CODE}_manifest.json",
     "markdown": f"fund_{FUND_CODE}_report.md",
     "html": f"fund_{FUND_CODE}_report.html",
@@ -80,6 +81,7 @@ def validate_acceptance_outputs(output_dir: Path) -> None:
     scoring = _read_json(artifacts["scoring"])
     manifest = _read_json(artifacts["manifest"])
     review_queue = _read_json(artifacts["review_queue"])
+    source_table = _read_json(artifacts["source_table"])
     markdown = artifacts["markdown"].read_text(encoding="utf-8")
     html = artifacts["html"].read_text(encoding="utf-8")
 
@@ -134,6 +136,18 @@ def validate_acceptance_outputs(output_dir: Path) -> None:
         "review queue version mismatch",
     )
     _require(
+        source_table.get("version") == "source-table-v1",
+        "source table version mismatch",
+    )
+    _require(
+        source_table.get("fund_code") == FUND_CODE,
+        "source table fund_code mismatch",
+    )
+    _require(
+        source_table.get("provider_foundation") == foundation,
+        "source table provider foundation mismatch",
+    )
+    _require(
         "Data Source Notice" in markdown and "Mock 数据" in markdown,
         "Markdown report must disclose mock data",
     )
@@ -178,7 +192,15 @@ def _require(condition: bool, message: str) -> None:
 def _print_success(output_dir: Path) -> None:
     print("V1 acceptance passed:")
     print(output_dir)
-    for key in ("raw", "scoring", "review_queue", "manifest", "markdown", "html"):
+    for key in (
+        "raw",
+        "scoring",
+        "review_queue",
+        "source_table",
+        "manifest",
+        "markdown",
+        "html",
+    ):
         print(EXPECTED_ARTIFACTS[key])
 
 

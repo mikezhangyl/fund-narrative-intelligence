@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from src.errors import FixtureNotFoundError, ProviderContractError
 from src.providers.mock import MockDataProvider
-from src.validation import validate_fund_payload
+from src.validation import validate_fund_payload, validate_source_table_artifact_payload
 
 
 def test_mock_provider_lists_available_fund_codes():
@@ -66,6 +66,104 @@ def test_fund_payload_validation_rejects_holding_weight_outside_range():
         validate_fund_payload(payload, fund_code="000001")
 
     assert "weight" in str(exc.value)
+
+
+def test_source_table_validation_rejects_layers_that_do_not_match_foundation():
+    payload = {
+        "version": "source-table-v1",
+        "fund_code": "000001",
+        "as_of_date": "2026-05-13",
+        "provider_foundation": {
+            "layers": {"holdings": _source_table_layer()},
+            "degradation_events": [],
+        },
+        "layers": [_source_table_layer(layer="stock_mappings")],
+        "degradation_events": [],
+    }
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_source_table_artifact_payload(payload)
+
+    assert "layers must match provider_foundation" in str(exc.value)
+
+
+def test_source_table_validation_rejects_malformed_foundation_layers():
+    payload = {
+        "version": "source-table-v1",
+        "fund_code": "000001",
+        "as_of_date": "2026-05-13",
+        "provider_foundation": {
+            "layers": [],
+            "degradation_events": [],
+        },
+        "layers": [_source_table_layer()],
+        "degradation_events": [],
+    }
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_source_table_artifact_payload(payload)
+
+    assert "provider_foundation.layers must be an object" in str(exc.value)
+
+
+def test_source_table_validation_rejects_duplicate_layers():
+    payload = {
+        "version": "source-table-v1",
+        "fund_code": "000001",
+        "as_of_date": "2026-05-13",
+        "provider_foundation": {
+            "layers": {"holdings": _source_table_layer()},
+            "degradation_events": [],
+        },
+        "layers": [
+            _source_table_layer(provider_name="bad"),
+            _source_table_layer(),
+        ],
+        "degradation_events": [],
+    }
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_source_table_artifact_payload(payload)
+
+    assert "must be unique" in str(exc.value)
+
+
+def test_source_table_validation_rejects_layer_missing_render_fields():
+    layer = _source_table_layer()
+    del layer["source_url"]
+    payload = {
+        "version": "source-table-v1",
+        "fund_code": "000001",
+        "as_of_date": "2026-05-13",
+        "provider_foundation": {
+            "layers": {"holdings": layer},
+            "degradation_events": [],
+        },
+        "layers": [layer],
+        "degradation_events": [],
+    }
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_source_table_artifact_payload(payload)
+
+    assert "missing required fields" in str(exc.value)
+
+
+def _source_table_layer(
+    layer: str = "holdings",
+    **overrides: object,
+) -> dict[str, object]:
+    return {
+        "layer": layer,
+        "display_name": layer.replace("_", " ").title(),
+        "provider_name": "mock-fixture-provider",
+        "provider_version": "mock-v1",
+        "data_quality": "mock",
+        "source_url": f"mock://fixtures/{layer}",
+        "is_mock": True,
+        "note": "test layer",
+        **overrides,
+    }
 
 
 def test_cli_lists_available_fixtures():

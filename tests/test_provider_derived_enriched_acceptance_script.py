@@ -186,6 +186,14 @@ def _write_outputs(output_dir: Path, include_fixture_signal: bool = False) -> No
         "provider_foundation": provider_foundation,
         "candidate_review_queue": scoring["candidate_review_queue"],
     }
+    source_table = {
+        "version": "source-table-v1",
+        "fund_code": "161725",
+        "as_of_date": "2026-03-31",
+        "provider_foundation": provider_foundation,
+        "layers": list(provider_foundation["layers"].values()),
+        "degradation_events": provider_foundation["degradation_events"],
+    }
     manifest = {
         "provider_mode": "eastmoney",
         "data_quality": "partial",
@@ -194,6 +202,7 @@ def _write_outputs(output_dir: Path, include_fixture_signal: bool = False) -> No
     _write_json(output_dir / "fund_161725_raw.json", raw)
     _write_json(output_dir / "fund_161725_scoring.json", scoring)
     _write_json(output_dir / "fund_161725_review_queue.json", review_queue)
+    _write_json(output_dir / "fund_161725_source_table.json", source_table)
     _write_json(output_dir / "fund_161725_manifest.json", manifest)
     notice = (
         "混合数据源\nEastmoney\nCNINFO\nMarket Quotes\nDerived Signals\n"

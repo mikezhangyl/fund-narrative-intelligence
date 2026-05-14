@@ -141,6 +141,7 @@ def validate_acceptance_outputs(
     artifacts = {
         "raw": output_dir / f"fund_{fund_code}_raw.json",
         "scoring": output_dir / f"fund_{fund_code}_scoring.json",
+        "source_table": output_dir / f"fund_{fund_code}_source_table.json",
         "manifest": output_dir / f"fund_{fund_code}_manifest.json",
         "markdown": output_dir / f"fund_{fund_code}_report.md",
         "html": output_dir / f"fund_{fund_code}_report.html",
@@ -150,6 +151,7 @@ def validate_acceptance_outputs(
 
     raw = _read_json(artifacts["raw"])
     scoring = _read_json(artifacts["scoring"])
+    source_table = _read_json(artifacts["source_table"])
     manifest = _read_json(artifacts["manifest"])
     markdown = artifacts["markdown"].read_text(encoding="utf-8")
     html = artifacts["html"].read_text(encoding="utf-8")
@@ -169,6 +171,11 @@ def validate_acceptance_outputs(
     _require(raw.get("metadata", {}).get("fund_code") == fund_code, "raw fund_code mismatch")
     _require(raw.get("provider_foundation") == foundation, "raw/scoring foundation mismatch")
     _require(manifest.get("provider_foundation") == foundation, "manifest foundation mismatch")
+    _require(source_table.get("fund_code") == fund_code, "source table fund_code mismatch")
+    _require(
+        source_table.get("provider_foundation") == foundation,
+        "source table provider_foundation mismatch",
+    )
     _require(
         raw.get("narrative_registry_mode") == DEFAULT_NARRATIVE_REGISTRY_MODE,
         "raw narrative_registry_mode must be reviewed",

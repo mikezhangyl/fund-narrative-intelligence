@@ -25,16 +25,27 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
 
     raw_path = tmp_path / "fund_000001_raw.json"
     scoring_path = tmp_path / "fund_000001_scoring.json"
+    review_queue_path = tmp_path / "fund_000001_review_queue.json"
     manifest_path = tmp_path / "fund_000001_manifest.json"
+    source_table_path = tmp_path / "fund_000001_source_table.json"
     markdown_path = tmp_path / "fund_000001_report.md"
     html_path = tmp_path / "fund_000001_report.html"
 
-    for path in [raw_path, scoring_path, manifest_path, markdown_path, html_path]:
+    for path in [
+        raw_path,
+        scoring_path,
+        review_queue_path,
+        manifest_path,
+        source_table_path,
+        markdown_path,
+        html_path,
+    ]:
         assert path.exists(), f"missing {path}"
 
     raw = json.loads(raw_path.read_text())
     scoring = json.loads(scoring_path.read_text())
     manifest = json.loads(manifest_path.read_text())
+    source_table = json.loads(source_table_path.read_text())
     markdown = markdown_path.read_text()
     html = html_path.read_text()
 
@@ -62,9 +73,20 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
     assert manifest["artifacts"]["review_queue"]["path"] == (
         "fund_000001_review_queue.json"
     )
+    assert manifest["artifacts"]["source_table"]["path"] == (
+        "fund_000001_source_table.json"
+    )
+    assert manifest["artifacts"]["source_table"]["format"] == "json"
     assert manifest["artifacts"]["markdown"]["path"] == "fund_000001_report.md"
     assert manifest["artifacts"]["html"]["path"] == "fund_000001_report.html"
     assert manifest["provider_foundation"] == scoring["provider_foundation"]
+    assert source_table["version"] == "source-table-v1"
+    assert source_table["fund_code"] == "000001"
+    assert source_table["provider_foundation"] == scoring["provider_foundation"]
+    assert source_table["layers"][0]["layer"] == "holdings"
+    assert source_table["layers"][0]["display_name"] == "Holdings"
+    assert source_table["layers"][0]["source_url"] == "mock://fixtures/fund_000001.json"
+    assert source_table["degradation_events"] == scoring["degradation_events"]
     assert scoring["primary_narrative"]["narrative_id"]
     assert "interpretation" in scoring["primary_narrative"]
     assert len(scoring["secondary_narratives"]) >= 2
@@ -84,6 +106,54 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
     assert "Interpretation" in markdown
     assert "Interpretation" in html
     assert "AI Infrastructure" in markdown
+
+
+def test_artifact_contracts_reject_source_table_identity_mismatch(tmp_path):
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+    )
+    source_table = json.loads(artifacts["source_table"].read_text())
+    source_table["fund_code"] = "999999"
+    artifacts["source_table"].write_text(
+        json.dumps(source_table, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    command = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--validate-artifact-contracts",
+        str(tmp_path),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 2
+    assert "source_table fund_code mismatch" in result.stderr
+
+
+def test_artifact_contracts_reject_source_table_as_of_date_mismatch(tmp_path):
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+    )
+    source_table = json.loads(artifacts["source_table"].read_text())
+    source_table["as_of_date"] = "1900-01-01"
+    artifacts["source_table"].write_text(
+        json.dumps(source_table, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    try:
+        main_module._validate_artifact_contracts(tmp_path)
+    except ValueError as exc:
+        assert "source_table as_of_date mismatch" in str(exc)
+    else:
+        raise AssertionError("expected source_table as_of_date mismatch")
 
 
 def test_real_provider_mode_degrades_to_mock_without_crashing(tmp_path):
@@ -886,6 +956,7 @@ def test_reviewed_stock_mapping_mode_uses_store_layer(tmp_path):
     raw = json.loads(artifacts["raw"].read_text())
     scoring = json.loads(artifacts["scoring"].read_text())
     review_queue = json.loads(artifacts["review_queue"].read_text())
+    source_table = json.loads(artifacts["source_table"].read_text())
     manifest = json.loads(artifacts["manifest"].read_text())
     markdown = artifacts["markdown"].read_text()
     mapping_layer = scoring["provider_foundation"]["layers"]["stock_mappings"]
@@ -903,6 +974,16 @@ def test_reviewed_stock_mapping_mode_uses_store_layer(tmp_path):
     assert mapping_layer["review_metadata"]["reviewed_by"] == "seed-curation"
     assert raw["provider_foundation"] == scoring["provider_foundation"]
     assert review_queue["provider_foundation"] == scoring["provider_foundation"]
+    assert source_table["provider_foundation"] == scoring["provider_foundation"]
+    assert {layer["layer"]: layer for layer in source_table["layers"]} == {
+        layer["layer"]: layer
+        for layer in scoring["provider_foundation"]["layers"].values()
+    }
+    assert {layer["layer"]: layer for layer in source_table["layers"]}[
+        "stock_mappings"
+    ]["review_metadata"]["reviewed_by"] == (
+        "seed-curation"
+    )
     assert manifest["provider_foundation"] == scoring["provider_foundation"]
     assert "Stock Mappings 来自 reviewed-mapping-store" in markdown
 

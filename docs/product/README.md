@@ -25,7 +25,7 @@ python scripts/validate_v1_acceptance.py
 
 It must generate fund `000001`, validate generated artifact contracts, confirm
 mock data is visibly disclosed, and produce raw JSON, scoring JSON, review queue,
-manifest, Markdown report, and HTML report artifacts.
+source table, manifest, Markdown report, and HTML report artifacts.
 
 V1 can also list available mock fixtures:
 

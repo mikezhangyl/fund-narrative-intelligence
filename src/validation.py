@@ -24,6 +24,18 @@ PROVIDER_METADATA_REQUIRED_FIELDS = {
 
 HOLDING_REQUIRED_FIELDS = {"stock_code", "stock_name", "weight"}
 
+SOURCE_TABLE_LAYER_REQUIRED_FIELDS = {
+    "layer",
+    "display_name",
+    "provider_name",
+    "provider_version",
+    "data_quality",
+    "source_url",
+    "is_mock",
+}
+
+SOURCE_TABLE_LAYER_DATA_QUALITIES = {"fresh", "partial", "mock", "unavailable"}
+
 
 def validate_fund_payload(payload: dict[str, Any], fund_code: str) -> None:
     _require_mapping(payload, "fund payload")
@@ -397,9 +409,84 @@ def validate_pipeline_artifact_manifest_payload(payload: dict[str, Any]) -> None
     _validate_pipeline_manifest_artifacts(payload["artifacts"])
 
 
+def validate_source_table_artifact_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "source table artifact")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "fund_code",
+            "as_of_date",
+            "provider_foundation",
+            "layers",
+            "degradation_events",
+        },
+        "source table artifact",
+    )
+    if payload["version"] != "source-table-v1":
+        raise ProviderContractError("source table artifact version is unsupported")
+    for field in {"fund_code", "as_of_date"}:
+        if not isinstance(payload[field], str) or not payload[field]:
+            raise ProviderContractError(
+                f"source table artifact {field} must be a non-empty string"
+            )
+    _require_mapping(payload["provider_foundation"], "source table provider_foundation")
+    if not isinstance(payload["layers"], list) or not payload["layers"]:
+        raise ProviderContractError("source table layers must be a non-empty list")
+    if not isinstance(payload["degradation_events"], list):
+        raise ProviderContractError("source table degradation_events must be a list")
+    foundation_layers = payload["provider_foundation"].get("layers")
+    _require_mapping(foundation_layers, "source table provider_foundation.layers")
+    expected_layers = _layers_by_name(list(foundation_layers.values()))
+    if _layers_by_name(payload["layers"]) != expected_layers:
+        raise ProviderContractError("source table layers must match provider_foundation")
+    if payload["degradation_events"] != payload["provider_foundation"].get(
+        "degradation_events"
+    ):
+        raise ProviderContractError(
+            "source table degradation_events must match provider_foundation"
+        )
+
+
 def _require_mapping(value: Any, context: str) -> None:
     if not isinstance(value, dict):
         raise ProviderContractError(f"{context} must be an object")
+
+
+def _layers_by_name(layers: list[Any]) -> dict[str, Any]:
+    result = {}
+    for layer in layers:
+        _require_mapping(layer, "source table layer")
+        _require_keys(layer, SOURCE_TABLE_LAYER_REQUIRED_FIELDS, "source table layer")
+        layer_name = layer.get("layer")
+        if not isinstance(layer_name, str) or not layer_name:
+            raise ProviderContractError("source table layer.layer must be a non-empty string")
+        for field in {
+            "display_name",
+            "provider_name",
+            "provider_version",
+            "source_url",
+        }:
+            if not isinstance(layer[field], str) or not layer[field]:
+                raise ProviderContractError(
+                    f"source table layer.{field} must be a non-empty string"
+                )
+        if layer["data_quality"] not in SOURCE_TABLE_LAYER_DATA_QUALITIES:
+            raise ProviderContractError(
+                "source table layer.data_quality must be fresh, partial, mock, "
+                "or unavailable"
+            )
+        if not isinstance(layer["is_mock"], bool):
+            raise ProviderContractError("source table layer.is_mock must be boolean")
+        review_metadata = layer.get("review_metadata")
+        if review_metadata is not None:
+            _require_mapping(review_metadata, "source table layer.review_metadata")
+        if layer_name in result:
+            raise ProviderContractError(
+                f"source table layer.layer must be unique: {layer_name}"
+            )
+        result[layer_name] = layer
+    return result
 
 
 def _require_keys(value: dict[str, Any], required: set[str], context: str) -> None:
@@ -467,6 +554,7 @@ def _validate_pipeline_manifest_artifacts(artifacts: Any) -> None:
         "raw": "json",
         "scoring": "json",
         "review_queue": "json",
+        "source_table": "json",
         "markdown": "markdown",
         "html": "html",
     }

@@ -37,6 +37,7 @@ Experienced individual investors or researchers who want to understand what mark
 - Support mock providers so V1 runs without real API credentials.
 - Emit raw JSON, scoring JSON, Markdown report, and HTML report artifacts under `outputs/`.
 - Emit a dedicated review queue JSON artifact for future web approval workspace loading.
+- Emit a dedicated source table JSON artifact for future web source/provenance table rendering.
 
 ## V1 Acceptance Command
 
@@ -44,13 +45,15 @@ Experienced individual investors or researchers who want to understand what mark
 
 The script generates fund `000001` into a temporary directory, runs
 `--validate-artifact-contracts`, and checks mock source URL disclosure, manifest
-web-readiness, review queue presence, and report data-source notices.
+web-readiness, review queue/source table presence, and report data-source
+notices.
 
 Expected artifacts:
 
 - `outputs/fund_000001_raw.json`
 - `outputs/fund_000001_scoring.json`
 - `outputs/fund_000001_review_queue.json`
+- `outputs/fund_000001_source_table.json`
 - `outputs/fund_000001_manifest.json`
 - `outputs/fund_000001_report.md`
 - `outputs/fund_000001_report.html`
@@ -112,9 +115,10 @@ Expected artifacts:
 - Candidate review actions support explicit `approve`, `reject`, and `defer` transitions. Only `approve` with promotion metadata appends an active narrative; report generation never promotes candidates automatically.
 - Raw/scoring JSON includes `candidate_review_queue`, a read-ready queue for future web approval screens with available actions, related exclusions, and promotion action templates.
 - Pipeline outputs include `fund_<code>_review_queue.json`, a dedicated future-workspace artifact containing the queue plus candidate/exclusion context.
+- Pipeline outputs include `fund_<code>_source_table.json`, a dedicated future-workspace artifact containing provider-foundation source rows, mock flags, data quality, degradation events, and reviewed-store metadata when present.
 - Pipeline outputs include `fund_<code>_manifest.json`, a web-ready discovery artifact with relative artifact paths, provider foundation, data quality, and degradation events.
 - `python -m src.main --validate-artifact-manifest path/to/fund_000001_manifest.json` validates a manifest artifact without requiring `--fund-code`.
-- `python -m src.main --validate-artifact-contracts path/to/outputs_or_manifest` validates known generated artifact contracts in one command before future web workspace loading.
+- `python -m src.main --validate-artifact-contracts path/to/outputs_or_manifest` validates known generated artifact contracts in one command before future web workspace loading, including manifest-referenced source-table artifacts.
 - `python -m src.main --validate-review-queue path/to/fund_000001_review_queue.json` validates a review queue artifact without requiring `--fund-code`.
 - `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.

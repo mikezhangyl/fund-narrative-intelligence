@@ -1059,3 +1059,32 @@ Consequences:
 - Reviewed-mapping acceptance now verifies emitted provider-foundation layer
   metadata in addition to validating source store metadata.
 - Non-reviewed providers remain unchanged.
+
+## ADR-0043: Emit Source Table Artifact
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Write `fund_<code>_source_table.json` beside raw, scoring, review queue,
+manifest, Markdown, and HTML artifacts.
+
+Rationale:
+
+- The future web workspace will render source/provenance tables and approval
+  context visually, so it needs stable rows that do not require parsing reports.
+- Provider foundation already normalizes source URLs, mock flags, data quality,
+  degradation events, and optional reviewed-store metadata.
+- A dedicated artifact gives `--validate-artifact-contracts` a clear contract
+  to protect before web loading exists.
+
+Consequences:
+
+- The manifest includes `source_table` with JSON format metadata.
+- The source table carries `fund_code` and `as_of_date`; manifest bundle
+  validation rejects identity drift.
+- Source-table validation rejects malformed `provider_foundation.layers`,
+  duplicate layer names, layer/foundation drift, and degradation-event drift.
+- V1 still performs approvals through CLI/file artifacts only; web interaction
+  remains a later slice.

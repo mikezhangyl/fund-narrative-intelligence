@@ -44,6 +44,7 @@ def test_validate_acceptance_outputs_rejects_missing_mock_source_url(tmp_path):
     scoring_path = output_dir / "fund_000001_scoring.json"
     manifest_path = output_dir / "fund_000001_manifest.json"
     review_queue_path = output_dir / "fund_000001_review_queue.json"
+    source_table_path = output_dir / "fund_000001_source_table.json"
     markdown_path = output_dir / "fund_000001_report.md"
     html_path = output_dir / "fund_000001_report.html"
 
@@ -90,6 +91,16 @@ def test_validate_acceptance_outputs_rejects_missing_mock_source_url(tmp_path):
     )
     review_queue_path.write_text(
         json.dumps({"candidate_review_queue": {"version": "candidate-review-queue-v1"}}),
+        encoding="utf-8",
+    )
+    source_table_path.write_text(
+        json.dumps(
+            {
+                "version": "source-table-v1",
+                "fund_code": "000001",
+                "provider_foundation": {},
+            }
+        ),
         encoding="utf-8",
     )
     markdown_path.write_text("Data Source Notice\nMock 数据\n", encoding="utf-8")

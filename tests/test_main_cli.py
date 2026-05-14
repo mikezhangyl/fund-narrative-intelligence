@@ -231,9 +231,27 @@ def test_main_validates_artifact_contract_directory(tmp_path, capsys):
     assert exit_code == 0
     assert "Artifact contracts valid:" in captured.out
     assert "manifests=1" in captured.out
+    assert "source_tables=1" in captured.out
     assert "review_queues=1" in captured.out
     assert "review_previews=1" in captured.out
     assert "persistence_results=1" in captured.out
+
+
+def test_main_validate_artifact_contracts_discovers_standalone_source_table(
+    tmp_path,
+    capsys,
+):
+    main_module.main(["--fund-code", "000001", "--output-dir", str(tmp_path)])
+    (tmp_path / "fund_000001_manifest.json").unlink()
+    (tmp_path / "fund_000001_review_queue.json").unlink()
+
+    exit_code = main_module.main(["--validate-artifact-contracts", str(tmp_path)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "manifests=0" in captured.out
+    assert "source_tables=1" in captured.out
+    assert "review_queues=0" in captured.out
 
 
 def test_main_validate_artifact_contracts_rejects_missing_manifest_file(

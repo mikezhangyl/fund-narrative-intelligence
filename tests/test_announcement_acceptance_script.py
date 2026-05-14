@@ -199,6 +199,14 @@ def _write_announcement_outputs(
         "candidate_narratives": [],
         "excluded_mapping_candidates": [],
     }
+    source_table = {
+        "version": "source-table-v1",
+        "fund_code": "161725",
+        "as_of_date": "2026-03-31",
+        "provider_foundation": provider_foundation,
+        "layers": list(provider_foundation["layers"].values()),
+        "degradation_events": provider_foundation["degradation_events"],
+    }
     manifest = {
         "version": "pipeline-artifact-manifest-v1",
         "fund_code": "161725",
@@ -215,6 +223,10 @@ def _write_announcement_outputs(
                 "path": "fund_161725_review_queue.json",
                 "format": "json",
             },
+            "source_table": {
+                "path": "fund_161725_source_table.json",
+                "format": "json",
+            },
             "markdown": {"path": "fund_161725_report.md", "format": "markdown"},
             "html": {"path": "fund_161725_report.html", "format": "html"},
         },
@@ -223,6 +235,7 @@ def _write_announcement_outputs(
     _write_json(output_dir / "fund_161725_raw.json", raw)
     _write_json(output_dir / "fund_161725_scoring.json", scoring)
     _write_json(output_dir / "fund_161725_review_queue.json", review_queue)
+    _write_json(output_dir / "fund_161725_source_table.json", source_table)
     _write_json(output_dir / "fund_161725_manifest.json", manifest)
     (output_dir / "fund_161725_report.md").write_text(
         "Data Source Notice\n混合数据源\nEastmoney\nCNINFO\nMock fixtures\n",
