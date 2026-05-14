@@ -613,6 +613,7 @@ def validate_workspace_snapshot_payload(payload: dict[str, Any]) -> None:
             "web_ready",
             "artifact_manifest",
             "provider_foundation",
+            "data_source_notice",
             "source_table",
             "review_queue",
             "narratives",
@@ -635,9 +636,13 @@ def validate_workspace_snapshot_payload(payload: dict[str, Any]) -> None:
     validate_review_queue_artifact_payload(payload["review_queue"])
     _require_mapping(payload["provider_foundation"], "workspace snapshot provider_foundation")
     _validate_workspace_snapshot_identity(payload)
+    _validate_workspace_snapshot_data_source_notice(payload)
     _validate_workspace_snapshot_narratives(payload["narratives"])
     _validate_workspace_snapshot_reports(payload["reports"])
-    _validate_workspace_snapshot_approval_workflow(payload["approval_workflow"])
+    _validate_workspace_snapshot_approval_workflow(
+        payload["approval_workflow"],
+        payload["review_queue"],
+    )
 
 
 def _validate_workspace_snapshot_identity(payload: dict[str, Any]) -> None:
@@ -765,7 +770,96 @@ def _validate_workspace_snapshot_reports(reports: Any) -> None:
             )
 
 
-def _validate_workspace_snapshot_approval_workflow(approval_workflow: Any) -> None:
+def _validate_workspace_snapshot_data_source_notice(payload: dict[str, Any]) -> None:
+    notice = payload["data_source_notice"]
+    foundation = payload["provider_foundation"]
+    _require_mapping(notice, "workspace snapshot data_source_notice")
+    _require_keys(
+        notice,
+        {
+            "display_required",
+            "severity",
+            "effective_data_quality",
+            "message",
+            "mock_layer_count",
+            "unavailable_layer_count",
+            "degradation_event_count",
+            "layers_requiring_disclosure",
+        },
+        "workspace snapshot data_source_notice",
+    )
+    if not isinstance(notice["display_required"], bool):
+        raise ProviderContractError(
+            "workspace snapshot data_source_notice.display_required must be boolean"
+        )
+    if notice["display_required"] != foundation.get("disclosure_required"):
+        raise ProviderContractError("data_source_notice display_required mismatch")
+    if notice["effective_data_quality"] != foundation.get("effective_data_quality"):
+        raise ProviderContractError("data_source_notice effective_data_quality mismatch")
+    if notice["message"] != foundation.get("disclosure_message"):
+        raise ProviderContractError("data_source_notice message mismatch")
+    layers = list(foundation.get("layers", {}).values())
+    expected_layers = [
+        _workspace_notice_layer(layer)
+        for layer in layers
+        if layer.get("is_mock") or layer.get("data_quality") != "fresh"
+    ]
+    if notice["layers_requiring_disclosure"] != expected_layers:
+        raise ProviderContractError("data_source_notice layers mismatch")
+    mock_layer_count = sum(1 for layer in layers if layer.get("is_mock"))
+    unavailable_layer_count = sum(
+        1 for layer in layers if layer.get("data_quality") == "unavailable"
+    )
+    if notice["mock_layer_count"] != mock_layer_count:
+        raise ProviderContractError("data_source_notice mock_layer_count mismatch")
+    if notice["unavailable_layer_count"] != unavailable_layer_count:
+        raise ProviderContractError(
+            "data_source_notice unavailable_layer_count mismatch"
+        )
+    if notice["degradation_event_count"] != len(
+        foundation.get("degradation_events", [])
+    ):
+        raise ProviderContractError(
+            "data_source_notice degradation_event_count mismatch"
+        )
+    if notice["severity"] != _workspace_notice_severity(
+        str(foundation.get("effective_data_quality")),
+        mock_layer_count=mock_layer_count,
+        unavailable_layer_count=unavailable_layer_count,
+    ):
+        raise ProviderContractError("data_source_notice severity mismatch")
+
+
+def _workspace_notice_layer(layer: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "layer": layer["layer"],
+        "display_name": layer["display_name"],
+        "provider_name": layer["provider_name"],
+        "data_quality": layer["data_quality"],
+        "source_url": layer["source_url"],
+        "is_mock": layer["is_mock"],
+    }
+
+
+def _workspace_notice_severity(
+    effective_data_quality: str,
+    *,
+    mock_layer_count: int,
+    unavailable_layer_count: int,
+) -> str:
+    if unavailable_layer_count or effective_data_quality == "unavailable":
+        return "unavailable"
+    if mock_layer_count or effective_data_quality == "mock":
+        return "mock"
+    if effective_data_quality == "partial":
+        return "partial"
+    return "fresh"
+
+
+def _validate_workspace_snapshot_approval_workflow(
+    approval_workflow: Any,
+    review_queue: dict[str, Any],
+) -> None:
     _require_mapping(approval_workflow, "workspace snapshot approval_workflow")
     _require_keys(
         approval_workflow,
@@ -775,6 +869,10 @@ def _validate_workspace_snapshot_approval_workflow(approval_workflow: Any) -> No
             "requires_user_approval",
             "preview_command",
             "persist_command",
+            "review_queue_summary",
+            "available_actions",
+            "review_item_count",
+            "pending_review_item_count",
         },
         "workspace snapshot approval_workflow",
     )
@@ -787,6 +885,26 @@ def _validate_workspace_snapshot_approval_workflow(approval_workflow: Any) -> No
             raise ProviderContractError(
                 f"workspace snapshot approval_workflow.{field} must be boolean"
             )
+    queue = review_queue["candidate_review_queue"]
+    items = queue["items"]
+    if approval_workflow["review_queue_summary"] != queue["summary"]:
+        raise ProviderContractError("approval_workflow review_queue_summary mismatch")
+    if approval_workflow["review_item_count"] != len(items):
+        raise ProviderContractError("approval_workflow review_item_count mismatch")
+    pending_count = sum(
+        1 for item in items if item.get("human_review_status") == "candidate"
+    )
+    if approval_workflow["pending_review_item_count"] != pending_count:
+        raise ProviderContractError(
+            "approval_workflow pending_review_item_count mismatch"
+        )
+    expected_actions = []
+    for item in items:
+        for action in item.get("available_actions", []):
+            if action not in expected_actions:
+                expected_actions.append(action)
+    if approval_workflow["available_actions"] != expected_actions:
+        raise ProviderContractError("approval_workflow available_actions mismatch")
 
 
 def _require_mapping(value: Any, context: str) -> None:

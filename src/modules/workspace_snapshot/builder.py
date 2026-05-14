@@ -72,6 +72,7 @@ def _workspace_snapshot_payload(
         "manifest_path": manifest_path.name,
         "artifact_manifest": manifest,
         "provider_foundation": manifest["provider_foundation"],
+        "data_source_notice": _data_source_notice(manifest["provider_foundation"]),
         "source_table": source_table,
         "review_queue": review_queue,
         "narratives": {
@@ -89,14 +90,87 @@ def _workspace_snapshot_payload(
             "markdown": manifest["artifacts"]["markdown"],
             "html": manifest["artifacts"]["html"],
         },
-        "approval_workflow": {
-            "status": "ready_for_future_web",
-            "read_only": True,
-            "requires_user_approval": True,
-            "preview_command": "python -m src.main --preview-review-action",
-            "persist_command": "python -m src.main --persist-review-action",
-        },
+        "approval_workflow": _approval_workflow(review_queue),
     }
+
+
+def _data_source_notice(provider_foundation: dict[str, Any]) -> dict[str, Any]:
+    layers = list(provider_foundation["layers"].values())
+    mock_layers = [layer for layer in layers if layer["is_mock"]]
+    unavailable_layers = [
+        layer for layer in layers if layer["data_quality"] == "unavailable"
+    ]
+    return {
+        "display_required": bool(provider_foundation["disclosure_required"]),
+        "severity": _data_source_notice_severity(
+            provider_foundation["effective_data_quality"],
+            mock_layer_count=len(mock_layers),
+            unavailable_layer_count=len(unavailable_layers),
+        ),
+        "effective_data_quality": provider_foundation["effective_data_quality"],
+        "message": provider_foundation["disclosure_message"],
+        "mock_layer_count": len(mock_layers),
+        "unavailable_layer_count": len(unavailable_layers),
+        "degradation_event_count": len(provider_foundation["degradation_events"]),
+        "layers_requiring_disclosure": [
+            _notice_layer(layer)
+            for layer in layers
+            if layer["is_mock"] or layer["data_quality"] != "fresh"
+        ],
+    }
+
+
+def _data_source_notice_severity(
+    effective_data_quality: str,
+    *,
+    mock_layer_count: int,
+    unavailable_layer_count: int,
+) -> str:
+    if unavailable_layer_count or effective_data_quality == "unavailable":
+        return "unavailable"
+    if mock_layer_count or effective_data_quality == "mock":
+        return "mock"
+    if effective_data_quality == "partial":
+        return "partial"
+    return "fresh"
+
+
+def _notice_layer(layer: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "layer": layer["layer"],
+        "display_name": layer["display_name"],
+        "provider_name": layer["provider_name"],
+        "data_quality": layer["data_quality"],
+        "source_url": layer["source_url"],
+        "is_mock": layer["is_mock"],
+    }
+
+
+def _approval_workflow(review_queue: dict[str, Any]) -> dict[str, Any]:
+    candidate_queue = review_queue["candidate_review_queue"]
+    items = candidate_queue["items"]
+    return {
+        "status": "ready_for_future_web",
+        "read_only": True,
+        "requires_user_approval": True,
+        "preview_command": "python -m src.main --preview-review-action",
+        "persist_command": "python -m src.main --persist-review-action",
+        "review_queue_summary": candidate_queue["summary"],
+        "available_actions": _available_actions(items),
+        "review_item_count": len(items),
+        "pending_review_item_count": sum(
+            1 for item in items if item.get("human_review_status") == "candidate"
+        ),
+    }
+
+
+def _available_actions(items: list[dict[str, Any]]) -> list[str]:
+    actions = []
+    for item in items:
+        for action in item.get("available_actions", []):
+            if action not in actions:
+                actions.append(action)
+    return actions
 
 
 def _resolve_manifest_path(path: Path) -> Path:

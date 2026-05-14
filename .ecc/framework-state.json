@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-reviewed-mapping-news-acceptance",
+  "latest_run": "20260515-workspace-approval-readiness",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "keep strict reviewed-mapping acceptance aligned with news-enabled provider-derived evidence and signals"
+  "next_step": "make workspace snapshot directly renderable for future web source notice and approval review surfaces"
 }

@@ -23,11 +23,39 @@ def test_build_workspace_snapshot_from_output_directory(tmp_path):
     assert snapshot["source_table"]["layers"][0]["source_url"].startswith(
         "mock://fixtures/"
     )
+    assert snapshot["data_source_notice"] == {
+        "display_required": True,
+        "severity": "mock",
+        "effective_data_quality": "mock",
+        "message": snapshot["provider_foundation"]["disclosure_message"],
+        "mock_layer_count": 5,
+        "unavailable_layer_count": 0,
+        "degradation_event_count": 0,
+        "layers_requiring_disclosure": [
+            {
+                "layer": layer["layer"],
+                "display_name": layer["display_name"],
+                "provider_name": layer["provider_name"],
+                "data_quality": layer["data_quality"],
+                "source_url": layer["source_url"],
+                "is_mock": layer["is_mock"],
+            }
+            for layer in snapshot["provider_foundation"]["layers"].values()
+        ],
+    }
     assert snapshot["review_queue"]["candidate_review_queue"]["version"] == (
         "candidate-review-queue-v1"
     )
     assert snapshot["approval_workflow"]["status"] == "ready_for_future_web"
     assert snapshot["approval_workflow"]["read_only"] is True
+    assert snapshot["approval_workflow"]["review_queue_summary"] == {
+        "total_count": 0,
+        "pending_count": 0,
+        "action_required": False,
+    }
+    assert snapshot["approval_workflow"]["available_actions"] == []
+    assert snapshot["approval_workflow"]["review_item_count"] == 0
+    assert snapshot["approval_workflow"]["pending_review_item_count"] == 0
     assert snapshot["narratives"]["primary"]["narrative_id"]
 
 
@@ -186,6 +214,30 @@ def test_workspace_snapshot_validation_rejects_identity_drift(tmp_path):
         validate_workspace_snapshot_payload(snapshot)
 
     assert "source table fund_code mismatch" in str(exc.value)
+
+
+def test_workspace_snapshot_validation_rejects_source_notice_drift(tmp_path):
+    run_pipeline(fund_code="000001", provider_mode="mock", output_dir=tmp_path)
+    snapshot_path = build_workspace_snapshot(tmp_path)
+    snapshot = json.loads(snapshot_path.read_text())
+    snapshot["data_source_notice"]["display_required"] = False
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_workspace_snapshot_payload(snapshot)
+
+    assert "data_source_notice display_required mismatch" in str(exc.value)
+
+
+def test_workspace_snapshot_validation_rejects_approval_summary_drift(tmp_path):
+    run_pipeline(fund_code="000001", provider_mode="mock", output_dir=tmp_path)
+    snapshot_path = build_workspace_snapshot(tmp_path)
+    snapshot = json.loads(snapshot_path.read_text())
+    snapshot["approval_workflow"]["review_item_count"] = 99
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_workspace_snapshot_payload(snapshot)
+
+    assert "approval_workflow review_item_count mismatch" in str(exc.value)
 
 
 def test_build_workspace_snapshot_rejects_missing_report_file(tmp_path):
