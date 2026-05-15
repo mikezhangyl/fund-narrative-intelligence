@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import math
 from pathlib import Path
 from typing import Any
 
@@ -21,10 +22,47 @@ STAGE_ZH = {
 DIMENSION_ZH = {
     "earnings_score": "盈利验证",
     "capital_score": "资金强化",
-    "valuation_risk_score": "估值压力",
+    "valuation_risk_score": "估值风险强度",
     "momentum_score": "叙事动量",
-    "counter_evidence_risk_score": "反向证据风险",
+    "counter_evidence_risk_score": "反向证据强度",
 }
+RADAR_DIMENSIONS = [
+    {
+        "key": "earnings_score",
+        "zh": "盈利验证",
+        "en": "Earnings validation",
+        "help_zh": "盈利和财务数据是否支持该叙事。分数越高，盈利证据越支持叙事。",
+        "help_en": "Whether earnings and financial data support the narrative. Higher means stronger earnings support.",
+    },
+    {
+        "key": "capital_score",
+        "zh": "资金强化",
+        "en": "Capital reinforcement",
+        "help_zh": "资金流、行情和资本市场信号是否强化该叙事。分数越高，资金支持越强。",
+        "help_en": "Whether market and capital signals reinforce the narrative. Higher means stronger capital support.",
+    },
+    {
+        "key": "valuation_risk_score",
+        "zh": "估值风险强度",
+        "en": "Valuation risk strength",
+        "help_zh": "估值压力或拥挤程度。这里分数越高代表风险越强，不代表越好。",
+        "help_en": "Valuation pressure or crowding. Higher means stronger risk here, not a better condition.",
+    },
+    {
+        "key": "momentum_score",
+        "zh": "叙事动量",
+        "en": "Narrative momentum",
+        "help_zh": "新闻、公告、行情等信号是否显示叙事仍有热度。分数越高，动量越强。",
+        "help_en": "Whether news, announcements, and market signals show the narrative still has momentum. Higher means stronger momentum.",
+    },
+    {
+        "key": "counter_evidence_risk_score",
+        "zh": "反向证据强度",
+        "en": "Counter-evidence strength",
+        "help_zh": "和叙事相反的风险证据强度。这里分数越高代表反向证据越强，不代表越好。",
+        "help_en": "Strength of evidence against the narrative. Higher means stronger counter-evidence here, not a better condition.",
+    },
+]
 QUALITY_ZH = {
     "fresh": "新鲜",
     "partial": "部分",
@@ -220,6 +258,7 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     dimension_rows = "".join(
         _dimension_row(name, value) for name, value in dimensions.items()
     )
+    radar_chart = _radar_chart(primary)
     announcement_rows = "".join(
         _evidence_row(row) for row in payload["evidence"]["announcements"]
     )
@@ -291,6 +330,18 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     .ok {{ border-left-color: var(--green); }}
     .muted {{ color: var(--muted); }}
     .two-col {{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }}
+    .radar-layout {{ align-items: center; display: grid; grid-template-columns: minmax(320px, 430px) 1fr; gap: 24px; }}
+    .radar-chart svg {{ display: block; height: auto; max-width: 100%; }}
+    .radar-grid {{ fill: none; stroke: var(--line); stroke-width: 1; }}
+    .radar-axis {{ stroke: #b8c0c8; stroke-width: 1; }}
+    .radar-area {{ fill: rgba(36, 93, 143, 0.2); stroke: var(--blue); stroke-width: 2; }}
+    .radar-point {{ fill: var(--blue); stroke: #fff; stroke-width: 1.5; }}
+    .radar-label {{ fill: var(--ink); font-size: 12px; font-weight: 650; }}
+    .radar-score {{ fill: var(--muted); font-size: 11px; }}
+    .radar-note {{ color: var(--muted); margin-top: 8px; }}
+    .axis-list {{ display: grid; gap: 8px; margin-top: 12px; }}
+    .axis-item {{ align-items: center; display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding: 7px 0; }}
+    .axis-value {{ font-weight: 720; }}
     .tag {{ display: inline-block; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; }}
     .right {{ min-width: 260px; text-align: right; }}
     .right .term {{ justify-content: flex-end; }}
@@ -355,7 +406,7 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     html[lang="en"] .lang-zh {{ display: none; }}
     @media (max-width: 860px) {{
       main {{ padding: 18px 14px 40px; }}
-      header, .summary-grid, .two-col {{ grid-template-columns: 1fr; }}
+      header, .summary-grid, .two-col, .radar-layout {{ grid-template-columns: 1fr; }}
       table {{ display: block; overflow-x: auto; white-space: nowrap; }}
       .language-switch {{ justify-content: flex-start; }}
       .help-card {{ max-width: min(320px, calc(100vw - 48px)); }}
@@ -401,6 +452,8 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
       <tbody>{holding_rows}</tbody>
     </table>
   </section>
+
+  {radar_chart}
 
   <section>
     <div class="two-col">
@@ -643,6 +696,152 @@ def _dimension_row(name: str, value: Any) -> str:
         f"<td>{_pct(value.get('confidence'))}</td>"
         "</tr>"
     )
+
+
+def _radar_chart(primary: dict[str, Any]) -> str:
+    dimensions = primary.get("dimensions") or {}
+    scores = [
+        _dimension_score(dimensions, str(item["key"])) for item in RADAR_DIMENSIONS
+    ]
+    axis_items = "".join(
+        _radar_axis_item(item, score)
+        for item, score in zip(RADAR_DIMENSIONS, scores, strict=True)
+    )
+    return f"""
+  <section>
+    <h2>{_term("五维雷达图", "Five-Dimension Radar", "把持续性评分拆成五个维度展示。注意：估值风险强度和反向证据强度是风险轴，分数越高代表风险越强。", "Breaks the sustainability score into five dimensions. Note: valuation risk strength and counter-evidence strength are risk axes, where higher means stronger risk.")}</h2>
+    <div class="radar-layout">
+      <div class="radar-chart" aria-label="{_h('五维雷达图 / Five-dimension radar chart')}">
+        {_radar_svg(scores)}
+      </div>
+      <div>
+        <p class="radar-note">{_bi("雷达图展示评分模型的原始维度，不改变持续性评分计算。风险轴已经明确标注为风险强度，不能按“越高越好”解读。", "The radar chart shows raw model dimensions and does not change the sustainability score calculation. Risk axes are explicitly labeled as risk strength and should not be read as higher-is-better.")}</p>
+        <div class="axis-list">{axis_items}</div>
+      </div>
+    </div>
+  </section>
+"""
+
+
+def _radar_svg(scores: list[float]) -> str:
+    center = 170.0
+    radius = 108.0
+    max_score = 100.0
+    grid_polygons = []
+    for fraction in [0.25, 0.5, 0.75, 1.0]:
+        points = _radar_points([max_score * fraction] * len(scores), center, radius)
+        grid_polygons.append(
+            f'<polygon class="radar-grid" points="{_points_attr(points)}" />'
+        )
+    axes = []
+    labels = []
+    for index, item in enumerate(RADAR_DIMENSIONS):
+        angle = _radar_angle(index, len(RADAR_DIMENSIONS))
+        end_x = center + radius * math.cos(angle)
+        end_y = center + radius * math.sin(angle)
+        label_x = center + (radius + 38) * math.cos(angle)
+        label_y = center + (radius + 38) * math.sin(angle)
+        anchor = _text_anchor(label_x, center)
+        axes.append(
+            f'<line class="radar-axis" x1="{center:.1f}" y1="{center:.1f}" x2="{end_x:.1f}" y2="{end_y:.1f}" />'
+        )
+        labels.append(
+            _svg_label(
+                x=label_x,
+                y=label_y,
+                anchor=anchor,
+                zh=str(item["zh"]),
+                en=str(item["en"]),
+                score=scores[index],
+            )
+        )
+    value_points = _radar_points(scores, center, radius)
+    point_marks = "".join(
+        f'<circle class="radar-point" cx="{x:.1f}" cy="{y:.1f}" r="3.5" />'
+        for x, y in value_points
+    )
+    return (
+        '<svg viewBox="0 0 340 340" role="img">'
+        f'<title>{_h("五维雷达图 / Five-Dimension Radar")}</title>'
+        f"{''.join(grid_polygons)}"
+        f"{''.join(axes)}"
+        f'<polygon class="radar-area" points="{_points_attr(value_points)}" />'
+        f"{point_marks}"
+        f"{''.join(labels)}"
+        "</svg>"
+    )
+
+
+def _radar_points(
+    scores: list[float],
+    center: float,
+    radius: float,
+) -> list[tuple[float, float]]:
+    return [
+        (
+            center + radius * (score / 100.0) * math.cos(
+                _radar_angle(index, len(scores))
+            ),
+            center + radius * (score / 100.0) * math.sin(
+                _radar_angle(index, len(scores))
+            ),
+        )
+        for index, score in enumerate(scores)
+    ]
+
+
+def _radar_angle(index: int, total: int) -> float:
+    return -math.pi / 2 + (2 * math.pi * index / total)
+
+
+def _points_attr(points: list[tuple[float, float]]) -> str:
+    return " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+
+
+def _svg_label(
+    x: float,
+    y: float,
+    anchor: str,
+    zh: str,
+    en: str,
+    score: float,
+) -> str:
+    return (
+        f'<text class="radar-label" x="{x:.1f}" y="{y:.1f}" text-anchor="{anchor}">'
+        f'<tspan class="lang-zh">{_h(zh)}</tspan>'
+        f'<tspan class="lang-en">{_h(en)}</tspan>'
+        f'<tspan class="radar-score" x="{x:.1f}" dy="15">{score:.0f}</tspan>'
+        "</text>"
+    )
+
+
+def _text_anchor(x: float, center: float) -> str:
+    if x > center + 8:
+        return "start"
+    if x < center - 8:
+        return "end"
+    return "middle"
+
+
+def _radar_axis_item(item: dict[str, str], score: float) -> str:
+    return (
+        '<div class="axis-item">'
+        f'{_term(item["zh"], item["en"], item["help_zh"], item["help_en"])}'
+        f'<span class="axis-value">{score:.0f}</span>'
+        "</div>"
+    )
+
+
+def _dimension_score(dimensions: Any, key: str) -> float:
+    if not isinstance(dimensions, dict):
+        return 0.0
+    value = dimensions.get(key)
+    if not isinstance(value, dict):
+        return 0.0
+    score = value.get("score")
+    if not isinstance(score, int | float):
+        return 0.0
+    return max(0.0, min(100.0, float(score)))
 
 
 def _source_row(layer: dict[str, Any]) -> str:

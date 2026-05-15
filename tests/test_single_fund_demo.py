@@ -62,6 +62,11 @@ def test_render_single_fund_demo_html_defaults_to_chinese_with_english_toggle():
     assert "0-100 的综合评分" in html
     assert "Fresh: fetched successfully from a real provider" in html
     assert "已审核映射表示来自本地人工审核映射库" in html
+    assert "五维雷达图" in html
+    assert "Five-Dimension Radar" in html
+    assert "估值风险强度" in html
+    assert "Higher means stronger risk here" in html
+    assert '<polygon class="radar-area"' in html
 
 
 def test_run_single_fund_demo_script_writes_demo_artifacts(tmp_path, monkeypatch):
