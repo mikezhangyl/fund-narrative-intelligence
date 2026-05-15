@@ -58,6 +58,10 @@ def test_render_single_fund_demo_html_defaults_to_chinese_with_english_toggle():
     assert "走弱" in html
     assert "weakening" in html
     assert "本次使用真实数据源" in html
+    assert 'class="help"' in html
+    assert "0-100 的综合评分" in html
+    assert "Fresh: fetched successfully from a real provider" in html
+    assert "已审核映射表示来自本地人工审核映射库" in html
 
 
 def test_run_single_fund_demo_script_writes_demo_artifacts(tmp_path, monkeypatch):

@@ -261,7 +261,7 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
       border-bottom: 1px solid var(--line);
       padding: 8px 0 22px;
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, auto);
       gap: 20px;
       align-items: end;
     }}
@@ -269,6 +269,7 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     h2 {{ font-size: 18px; margin: 0 0 12px; }}
     h3 {{ font-size: 14px; margin: 0 0 10px; color: var(--muted); }}
     p {{ margin: 0; }}
+    .header-term {{ margin: 0; }}
     section {{ padding: 24px 0; border-bottom: 1px solid var(--line); }}
     table {{ width: 100%; border-collapse: collapse; background: var(--panel); }}
     th, td {{ padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
@@ -291,7 +292,49 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     .muted {{ color: var(--muted); }}
     .two-col {{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }}
     .tag {{ display: inline-block; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; }}
-    .right {{ text-align: right; }}
+    .right {{ min-width: 260px; text-align: right; }}
+    .right .term {{ justify-content: flex-end; }}
+    .term {{ display: inline-flex; align-items: center; gap: 5px; white-space: normal; }}
+    .help {{ position: relative; display: inline-block; vertical-align: middle; }}
+    .help summary {{
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--blue);
+      cursor: pointer;
+      display: inline-flex;
+      font-size: 11px;
+      font-weight: 750;
+      height: 17px;
+      justify-content: center;
+      line-height: 1;
+      list-style: none;
+      width: 17px;
+    }}
+    .help summary::-webkit-details-marker {{ display: none; }}
+    .help-card {{
+      background: var(--ink);
+      border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(21, 25, 30, 0.22);
+      color: #fff;
+      display: none;
+      font-size: 12px;
+      font-weight: 450;
+      left: 0;
+      line-height: 1.5;
+      max-width: 320px;
+      min-width: 250px;
+      padding: 10px 12px;
+      position: absolute;
+      text-align: left;
+      top: 23px;
+      white-space: normal;
+      z-index: 20;
+    }}
+    .right .help-card {{ left: auto; right: 0; }}
+    .help[open] .help-card,
+    .help:hover .help-card,
+    .help:focus-within .help-card {{ display: block; }}
     .language-switch {{ display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }}
     .language-switch button {{
       border: 1px solid var(--line);
@@ -315,6 +358,7 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
       header, .summary-grid, .two-col {{ grid-template-columns: 1fr; }}
       table {{ display: block; overflow-x: auto; white-space: nowrap; }}
       .language-switch {{ justify-content: flex-start; }}
+      .help-card {{ max-width: min(320px, calc(100vw - 48px)); }}
     }}
   </style>
 </head>
@@ -331,18 +375,18 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
       <p>{_bi("单基金叙事报告，聚焦十大重仓股。", "Single-fund narrative demo focused on the top ten holdings.")}</p>
     </div>
     <div class="right">
-      <p class="muted">{_bi("主叙事", "Primary narrative")}</p>
+      <div class="muted header-term">{_term("主叙事", "Primary narrative", "基金十大重仓聚合后暴露最高的叙事主题。这里的叙事来自本地已审核叙事库，不是本次实时自动发现。", "The dominant theme after aggregating the fund's top holdings. This narrative comes from the reviewed local registry, not live auto-discovery in this run.")}</div>
       <h2>{narrative_label}</h2>
-      <p class="stage">{stage_label}</p>
+      <div class="stage header-term">{_term("阶段", "Stage", "系统根据支持信号、风险信号、估值压力、动量和反向证据把叙事归入当前阶段。", "The system assigns the current stage from support signals, risk signals, valuation pressure, momentum, and counter-evidence.")}: {stage_label}</div>
     </div>
   </header>
 
   <section>
     <div class="summary-grid">
-      <div class="metric"><div class="metric-label">{_bi("持续性评分", "Sustainability score")}</div><div class="metric-value">{_fmt(primary.get("sustainability_score"))}</div></div>
-      <div class="metric"><div class="metric-label">{_bi("置信度", "Confidence")}</div><div class="metric-value">{_pct(primary.get("confidence"))}</div></div>
-      <div class="metric"><div class="metric-label">{_bi("叙事暴露", "Narrative exposure")}</div><div class="metric-value">{_pct(primary.get("normalized_exposure"))}</div></div>
-      <div class="metric"><div class="metric-label">{_bi("十大重仓映射权重", "Top-10 mapped weight")}</div><div class="metric-value">{_pct(payload["mapping_coverage"].get("covered_weight"))}</div></div>
+      <div class="metric"><div class="metric-label">{_term("持续性评分", "Sustainability score", "0-100 的综合评分，来自盈利验证、资金强化、估值压力、叙事动量、反向证据风险五个维度。分数越高，当前证据对叙事越友好；它不是买卖建议。", "A 0-100 composite score from earnings validation, capital reinforcement, valuation pressure, momentum, and counter-evidence risk. Higher means the current evidence is more supportive; it is not investment advice.")}</div><div class="metric-value">{_fmt(primary.get("sustainability_score"))}</div></div>
+      <div class="metric"><div class="metric-label">{_term("置信度", "Confidence", "表示系统对当前叙事判断的把握程度，受数据质量、证据密度、映射置信度影响。它不是收益概率。", "How much confidence the system has in this narrative read, driven by data quality, evidence density, and mapping confidence. It is not a return probability.")}</div><div class="metric-value">{_pct(primary.get("confidence"))}</div></div>
+      <div class="metric"><div class="metric-label">{_term("叙事暴露", "Narrative exposure", "十大重仓中映射到该主叙事的归一化暴露。100% 表示已映射的重仓主要集中在同一叙事上。", "Normalized exposure of the top holdings mapped to the primary narrative. 100% means the mapped top holdings are concentrated in this narrative.")}</div><div class="metric-value">{_pct(primary.get("normalized_exposure"))}</div></div>
+      <div class="metric"><div class="metric-label">{_term("十大重仓映射权重", "Top-10 mapped weight", "十大重仓中已经找到叙事映射的实际持仓权重合计。这个数低时，说明还有较多重仓没有被叙事库覆盖。", "The actual portfolio weight in the top holdings that has a narrative mapping. A low value means many top holdings are not covered by the narrative registry yet.")}</div><div class="metric-value">{_pct(payload["mapping_coverage"].get("covered_weight"))}</div></div>
     </div>
     <div class="notice ok">
       {stage_explanation}
@@ -353,7 +397,7 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
   <section>
     <h2>{_bi("十大重仓叙事映射", "Top Holdings Narrative Map")}</h2>
     <table>
-      <thead><tr><th>{_bi("股票", "Stock")}</th><th>{_bi("权重", "Weight")}</th><th>{_bi("叙事", "Narrative")}</th><th>{_bi("映射", "Mapping")}</th><th>{_bi("价格变动", "Price move")}</th><th>{_bi("市盈率 TTM", "PE TTM")}</th><th>{_bi("营收同比", "Revenue YoY")}</th><th>{_bi("归母净利同比", "Net profit YoY")}</th></tr></thead>
+      <thead><tr><th>{_bi("股票", "Stock")}</th><th>{_bi("权重", "Weight")}</th><th>{_term("叙事", "Narrative", "股票被归入的已审核叙事主题。V1 使用 reviewed mapping，不代表叙事是实时自动生成。", "The reviewed narrative theme assigned to the stock. V1 uses reviewed mappings; this does not mean the narrative was generated live.")}</th><th>{_term("映射", "Mapping", "显示映射来源和置信度。已审核映射表示来自本地人工审核映射库。", "Shows the mapping source and confidence. Reviewed mapping means it comes from the local human-reviewed mapping store.")}</th><th>{_term("价格变动", "Price move", "本次行情 provider 返回的最新价格相对前收盘价变化。若发生 fallback，页面会单独披露。", "Latest provider price change versus previous close. If a provider fallback occurred, the page discloses it separately.")}</th><th>{_term("市盈率 TTM", "PE TTM", "Eastmoney 估值接口返回的滚动市盈率，用作估值压力参考。", "Trailing PE returned by the Eastmoney valuation endpoint, used as valuation-pressure context.")}</th><th>{_term("营收同比", "Revenue YoY", "最近一期财务指标中的营业收入同比增速。", "Revenue year-over-year growth from the latest available financial metrics.")}</th><th>{_term("归母净利同比", "Net profit YoY", "最近一期财务指标中的归母净利润同比增速。", "Parent net profit year-over-year growth from the latest available financial metrics.")}</th></tr></thead>
       <tbody>{holding_rows}</tbody>
     </table>
   </section>
@@ -362,11 +406,11 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     <div class="two-col">
       <div>
         <h2>{_bi("阶段驱动因素", "Stage Drivers")}</h2>
-        <table><thead><tr><th>{_bi("维度", "Dimension")}</th><th>{_bi("分数", "Score")}</th><th>{_bi("支持信号", "Support")}</th><th>{_bi("风险信号", "Risk")}</th><th>{_bi("置信度", "Confidence")}</th></tr></thead><tbody>{dimension_rows}</tbody></table>
+        <table><thead><tr><th>{_term("维度", "Dimension", "评分模型拆分出的叙事判断维度。每个维度会统计对应的支持信号和风险信号。", "Narrative scoring dimensions. Each dimension counts supporting and risk signals relevant to that dimension.")}</th><th>{_term("分数", "Score", "该维度的 0-100 分。分数越高，表示该维度越支持叙事持续。", "0-100 score for this dimension. Higher means this dimension is more supportive of narrative sustainability.")}</th><th>{_term("支持信号", "Support", "推动该维度评分上升的信号数量。", "Number of signals pushing this dimension upward.")}</th><th>{_term("风险信号", "Risk", "拖累该维度评分或增加风险的信号数量。", "Number of signals weighing on this dimension or increasing risk.")}</th><th>{_term("置信度", "Confidence", "该维度判断的把握程度，受信号强度、来源和数据质量影响。", "Confidence in this dimension's read, affected by signal strength, source, and data quality.")}</th></tr></thead><tbody>{dimension_rows}</tbody></table>
       </div>
       <div>
         <h2>{_bi("数据来源", "Data Sources")}</h2>
-        <table><thead><tr><th>{_bi("数据层", "Layer")}</th><th>{_bi("Provider", "Provider")}</th><th>{_bi("质量", "Quality")}</th><th>{_bi("披露", "Disclosure")}</th></tr></thead><tbody>{source_rows}</tbody></table>
+        <table><thead><tr><th>{_term("数据层", "Layer", "报告使用的数据类别，例如持仓、估值、财务、公告、新闻和映射库。", "The data category used by the report, such as holdings, valuation, financials, announcements, news, and mapping stores.")}</th><th>{_term("Provider", "Provider", "提供该数据层的来源或适配器。URL 可点击时指向对应 provider 查询地址或来源。", "The source or adapter for this data layer. Clickable URLs point to the provider query or source when available.")}</th><th>{_term("质量", "Quality", "新鲜：本次运行从真实 provider 成功获取；部分：数据可用但覆盖、来源或完整性有限；Mock：fixture 或模拟数据；陈旧：不是本次最新获取；不可用：该层未拿到可用数据。", "Fresh: fetched successfully from a real provider in this run. Partial: usable but limited by coverage, source, or completeness. Mock: fixture or simulated data. Stale: not freshly fetched in this run. Unavailable: no usable data was returned.")}</th><th>{_term("披露", "Disclosure", "标记该层是真实 provider 数据还是 Mock 数据。只要出现 Mock 或不可用，页面必须提示用户。", "Marks whether this layer is real provider data or mock data. Any mock or unavailable layer must be disclosed to the user.")}</th></tr></thead><tbody>{source_rows}</tbody></table>
       </div>
     </div>
   </section>
@@ -678,6 +722,24 @@ def _bi(zh: Any, en: Any) -> str:
     return (
         f'<span class="lang-zh">{_h(zh)}</span>'
         f'<span class="lang-en">{_h(en)}</span>'
+    )
+
+
+def _term(label_zh: Any, label_en: Any, help_zh: Any, help_en: Any) -> str:
+    return (
+        '<span class="term">'
+        f"{_bi(label_zh, label_en)}"
+        f"{_help(help_zh, help_en)}"
+        "</span>"
+    )
+
+
+def _help(help_zh: Any, help_en: Any) -> str:
+    return (
+        '<details class="help">'
+        f'<summary aria-label="{_h("说明 / Help")}" title="{_h("说明 / Help")}">?</summary>'
+        f'<span class="help-card">{_bi(help_zh, help_en)}</span>'
+        "</details>"
     )
 
 
