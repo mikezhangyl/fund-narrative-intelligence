@@ -184,6 +184,8 @@ Expected artifacts:
 - Latest reviewed-registry enriched acceptance for `161725` passed with no mock provider-foundation layers; effective data quality remains `partial` because registry-rule stock mappings are derived rather than a fully reviewed mapping provider.
 - Latest reviewed-mapping enriched acceptance for `161725` passed with all selected mappings using `reviewed_mapping`; `603198` 迎驾贡酒 and `600702` 舍得酒业 were added to the reviewed mapping store to avoid registry-rule fallback.
 - Reviewed-store audit metadata is seeded with `review_schema_version=review-metadata-v1` and reviewer `seed-curation` until future web approvals replace it with user-level approval metadata.
+- Single-fund demo now also covers fund `513010` as a degraded real-data demo: Eastmoney holdings are fresh, reviewed mappings cover all ten Hong Kong technology top holdings, primary narrative is `Hong Kong Tech Platforms` / `diverging`, and no mock layers are used. Current HK optional provider coverage is incomplete: CNINFO announcements, Eastmoney market quotes, Eastmoney valuation, and Eastmoney financial metrics are marked `unavailable`, so the demo must be run and validated with `--allow-degraded` and must disclose those unavailable layers in the HTML data-source section.
+- The reviewed registry includes `N_HK_TECH_PLATFORMS`, and the reviewed mapping store includes `01211`, `03690`, `01810`, `00700`, `09988`, `09999`, `00981`, `09618`, `01024`, and `09888` mapped to that narrative for `513010` demo coverage.
 
 ## Deferred Scope
 

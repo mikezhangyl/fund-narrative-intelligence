@@ -70,6 +70,29 @@ def test_render_single_fund_demo_html_defaults_to_chinese_with_english_toggle():
     assert "Higher means stronger risk here" in html
     assert '<polygon class="radar-area"' in html
     assert 'viewBox="0 0 520 390"' in html
+    assert 'class="table-scroll"' in html
+
+
+def test_render_single_fund_demo_html_localizes_hong_kong_tech_narrative():
+    payload = build_single_fund_demo_payload(
+        raw=_raw_payload(
+            narrative_id="N_HK_TECH_PLATFORMS",
+            narrative_name="Hong Kong Tech Platforms",
+        ),
+        scoring=_scoring_payload(
+            narrative_id="N_HK_TECH_PLATFORMS",
+            narrative_name="Hong Kong Tech Platforms",
+            stage="diverging",
+        ),
+        workspace_snapshot=_workspace_snapshot(),
+    )
+
+    html = render_single_fund_demo_html(payload)
+
+    assert "港股科技平台" in html
+    assert "Hong Kong Tech Platforms" in html
+    assert "分化" in html
+    assert "diverging" in html
 
 
 def test_radar_svg_labels_have_viewbox_padding():
@@ -127,6 +150,55 @@ def test_run_single_fund_demo_script_writes_demo_artifacts(tmp_path, monkeypatch
     assert "Top Holdings Narrative Map" in html
 
 
+def test_run_single_fund_demo_requires_mapped_primary_narrative():
+    from scripts.run_single_fund_demo import _require_mapped_narrative
+
+    try:
+        _require_mapped_narrative(
+            {
+                "primary_narrative": None,
+                "mapping_coverage": {
+                    "covered_holding_count": 0,
+                    "total_holding_count": 10,
+                },
+                "unmapped_holdings": [
+                    {"stock_code": "01211", "stock_name": "比亚迪股份"},
+                    {"stock_code": "03690", "stock_name": "美团-W"},
+                ],
+            }
+        )
+    except SingleFundDemoError as exc:
+        message = str(exc)
+        assert "reviewed stock mappings cover 0 of 10 holdings" in message
+        assert "01211 比亚迪股份" in message
+    else:
+        raise AssertionError("expected missing primary narrative validation failure")
+
+
+def test_single_fund_demo_scripts_parse_degraded_demo_options():
+    from scripts import run_single_fund_demo, validate_single_fund_demo
+
+    run_args = run_single_fund_demo.build_parser().parse_args(
+        ["--fund-code", "513010", "--allow-degraded"]
+    )
+    validate_args = validate_single_fund_demo.build_parser().parse_args(
+        [
+            "--fund-code",
+            "513010",
+            "--output-dir",
+            "outputs/demo_513010",
+            "--allow-degraded",
+            "--expected-narrative",
+            "Hong Kong Tech Platforms",
+        ]
+    )
+
+    assert run_args.fund_code == "513010"
+    assert run_args.allow_degraded is True
+    assert validate_args.allow_degraded is True
+    assert validate_args.expected_narrative == "Hong Kong Tech Platforms"
+
+
 def _approx_svg_text_width(text: str) -> float:
     width = 0.0
     for character in text:
@@ -134,7 +206,10 @@ def _approx_svg_text_width(text: str) -> float:
     return width
 
 
-def _raw_payload():
+def _raw_payload(
+    narrative_id="N_BAIJIU_CONSUMPTION",
+    narrative_name="Premium Baijiu Consumption",
+):
     holdings = [
         {
             "stock_code": code,
@@ -158,7 +233,7 @@ def _raw_payload():
     mappings = [
         {
             "stock_code": item["stock_code"],
-            "narrative_id": "N_BAIJIU_CONSUMPTION",
+            "narrative_id": narrative_id,
             "confidence": 0.84,
             "mapping_weight": 0.9,
             "method": "reviewed_mapping",
@@ -176,8 +251,8 @@ def _raw_payload():
         "holdings": holdings,
         "narrative_registry": [
             {
-                "narrative_id": "N_BAIJIU_CONSUMPTION",
-                "name": "Premium Baijiu Consumption",
+                "narrative_id": narrative_id,
+                "name": narrative_name,
             }
         ],
         "stock_narrative_mappings": mappings,
@@ -241,17 +316,22 @@ def _raw_payload():
     }
 
 
-def _scoring_payload(mock_layer=False):
+def _scoring_payload(
+    mock_layer=False,
+    narrative_id="N_BAIJIU_CONSUMPTION",
+    narrative_name="Premium Baijiu Consumption",
+    stage="weakening",
+):
     return {
         "primary_narrative": {
-            "narrative_id": "N_BAIJIU_CONSUMPTION",
-            "name": "Premium Baijiu Consumption",
+            "narrative_id": narrative_id,
+            "name": narrative_name,
             "confidence": 0.8166,
             "normalized_exposure": 1.0,
             "raw_exposure": 0.761837,
             "interpretation": {"stage_explanation": "This narrative is weakening."},
             "state": {
-                "stage": "weakening",
+                "stage": stage,
                 "sustainability_score": 44.5,
                 "dimensions": {
                     "earnings_score": {

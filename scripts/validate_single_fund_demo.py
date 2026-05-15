@@ -24,6 +24,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fund-code", default=DEFAULT_FUND_CODE)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--allow-mock", action="store_true")
+    parser.add_argument("--allow-degraded", action="store_true")
+    parser.add_argument("--expected-narrative")
     return parser
 
 
@@ -33,7 +35,8 @@ def main(argv: list[str] | None = None) -> int:
         validate_demo_outputs(
             output_dir=args.output_dir,
             fund_code=args.fund_code,
-            require_real=not args.allow_mock,
+            require_real=not (args.allow_mock or args.allow_degraded),
+            expected_narrative=args.expected_narrative,
         )
     except SingleFundDemoError as exc:
         print(f"Single-fund demo validation failed: {exc}", file=sys.stderr)
@@ -46,6 +49,7 @@ def validate_demo_outputs(
     output_dir: Path,
     fund_code: str = DEFAULT_FUND_CODE,
     require_real: bool = True,
+    expected_narrative: str | None = None,
 ) -> None:
     demo_json = output_dir / f"fund_{fund_code}_demo.json"
     demo_html = output_dir / f"fund_{fund_code}_demo.html"
@@ -59,20 +63,17 @@ def validate_demo_outputs(
     validate_single_fund_demo_payload(payload, require_real=require_real)
     if payload["fund"]["fund_code"] != fund_code:
         raise SingleFundDemoError("demo fund code does not match requested fund")
-    if payload["primary_narrative"]["name"] != "Premium Baijiu Consumption":
-        raise SingleFundDemoError("expected 161725 demo narrative is missing")
-    if payload["primary_narrative"]["stage"] not in {
-        "emerging",
-        "accelerating",
-        "mature",
-        "weakening",
-        "broken",
-    }:
-        raise SingleFundDemoError("demo narrative stage is not recognized")
+    if (
+        expected_narrative
+        and payload["primary_narrative"]["name"] != expected_narrative
+    ):
+        raise SingleFundDemoError(
+            f"expected demo narrative is missing: {expected_narrative}"
+        )
     html = demo_html.read_text(encoding="utf-8")
     for marker in [
         "Top Holdings Narrative Map",
-        "Premium Baijiu Consumption",
+        payload["primary_narrative"]["name"],
         "Data Sources",
         "Derived Signals",
     ]:

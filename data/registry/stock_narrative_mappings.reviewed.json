@@ -468,6 +468,136 @@
         "reviewed_at": "2026-05-15",
         "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
       }
+    },
+    {
+      "stock_code": "01211",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.7,
+      "confidence": 0.7,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "03690",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.92,
+      "confidence": 0.84,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "01810",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.86,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "00700",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.95,
+      "confidence": 0.88,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "09988",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.95,
+      "confidence": 0.88,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "09999",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.82,
+      "confidence": 0.8,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "00981",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.76,
+      "confidence": 0.76,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "09618",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.9,
+      "confidence": 0.84,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "01024",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.88,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "09888",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.86,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
     }
   ],
   "review_metadata": {

@@ -26,9 +26,10 @@
     "ruff": "passed",
     "compileall": "passed",
     "real_single_fund_demo": "passed for 161725",
+    "degraded_single_fund_demo_513010": "passed with fresh holdings, reviewed mappings, no mock layers, and unavailable optional HK provider layers disclosed",
     "single_fund_demo_validation": "passed",
-    "browser_smoke": "passed at http://127.0.0.1:8765/fund_161725_demo.html",
-    "pytest": "275 passed",
+    "browser_smoke": "passed at http://127.0.0.1:8765/fund_161725_demo.html and http://127.0.0.1:8765/fund_513010_demo.html",
+    "pytest": "280 passed",
     "coverage": "81%",
     "v1_acceptance": "passed",
     "reviewed_mapping_enriched_acceptance": "passed"
@@ -51,6 +52,12 @@
       "date": "2026-05-15",
       "decision": "Make real-data validation fail by default when mock or unavailable provider layers are present.",
       "rationale": "Mock fallback is allowed by architecture, but product demos must visibly disclose it and should not masquerade as real output."
+    },
+    {
+      "id": "SFD-004",
+      "date": "2026-05-15",
+      "decision": "Add 513010 as an explicit degraded demo for Hong Kong technology platform exposure.",
+      "rationale": "513010 has fresh real holdings and reviewed narrative mapping coverage, but current optional provider adapters do not yet cover all HK quote, valuation, financial, and announcement layers. The demo is still useful if unavailable layers are disclosed instead of hidden."
     }
   ]
 }

@@ -52,7 +52,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--allow-mock",
         action="store_true",
-        help="Generate the demo even if provider layers are mock or unavailable.",
+        help=(
+            "Deprecated alias for --allow-degraded. Generate the demo even if "
+            "provider layers are mock or unavailable."
+        ),
+    )
+    parser.add_argument(
+        "--allow-degraded",
+        action="store_true",
+        help=(
+            "Generate the demo when non-core provider layers are mock or unavailable; "
+            "the HTML data-source notice must disclose those layers."
+        ),
     )
     return parser
 
@@ -66,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
             announcement_start_date=args.announcement_start_date,
             narrative_registry_path=args.narrative_registry_path,
             stock_mappings_path=args.stock_mappings_path,
-            require_real=not args.allow_mock,
+            require_real=not (args.allow_mock or args.allow_degraded),
         )
     except SingleFundDemoError as exc:
         print(f"Single-fund demo failed: {exc}", file=sys.stderr)
@@ -107,9 +118,10 @@ def run_demo(
         stock_mappings_path=stock_mappings_path,
         base_intelligence_mode="provider-derived",
     )
-    workspace_snapshot_path = build_workspace_snapshot(output_dir)
     raw = _read_json(artifacts["raw"])
     scoring = _read_json(artifacts["scoring"])
+    _require_mapped_narrative(scoring)
+    workspace_snapshot_path = build_workspace_snapshot(output_dir)
     workspace_snapshot = _read_json(workspace_snapshot_path)
     demo_paths = write_single_fund_demo_artifacts(
         raw=raw,
@@ -131,6 +143,24 @@ def _read_json(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise SingleFundDemoError(f"{path} must contain a JSON object")
     return payload
+
+
+def _require_mapped_narrative(scoring: dict[str, Any]) -> None:
+    if scoring.get("primary_narrative"):
+        return
+    coverage = scoring.get("mapping_coverage") or {}
+    unmapped = scoring.get("unmapped_holdings") or []
+    sample = ", ".join(
+        f"{item.get('stock_code')} {item.get('stock_name')}"
+        for item in unmapped[:5]
+        if isinstance(item, dict)
+    )
+    raise SingleFundDemoError(
+        "no primary narrative was produced; reviewed stock mappings cover "
+        f"{coverage.get('covered_holding_count', 0)} of "
+        f"{coverage.get('total_holding_count', 0)} holdings"
+        + (f". unmapped sample: {sample}" if sample else "")
+    )
 
 
 if __name__ == "__main__":

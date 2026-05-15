@@ -10,12 +10,18 @@ from src.modules.snapshot_writer.writer import write_json_artifact
 DEMO_VERSION = "single-fund-demo-v1"
 
 NARRATIVE_ZH = {
+    "Hong Kong Tech Platforms": "港股科技平台",
     "Premium Baijiu Consumption": "高端白酒消费",
 }
 STAGE_ZH = {
+    "crowded": "拥挤",
+    "dead": "失效",
+    "diverging": "分化",
     "emerging": "萌芽",
+    "expanding": "扩张",
     "accelerating": "加速",
     "mature": "成熟",
+    "strengthening": "增强",
     "weakening": "走弱",
     "broken": "破裂",
 }
@@ -321,6 +327,8 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     .header-term {{ margin: 0; }}
     section {{ padding: 24px 0; border-bottom: 1px solid var(--line); }}
     table {{ width: 100%; border-collapse: collapse; background: var(--panel); }}
+    .table-scroll {{ max-width: 100%; overflow-x: auto; }}
+    .table-scroll table {{ min-width: 100%; }}
     th, td {{ padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
     th {{ font-size: 12px; color: var(--muted); font-weight: 650; }}
     a {{ color: var(--blue); text-decoration: none; }}
@@ -340,6 +348,7 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     .ok {{ border-left-color: var(--green); }}
     .muted {{ color: var(--muted); }}
     .two-col {{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }}
+    header > *, .two-col > *, .radar-layout > * {{ min-width: 0; }}
     .radar-layout {{ align-items: center; display: grid; grid-template-columns: minmax(320px, 430px) 1fr; gap: 24px; }}
     .radar-chart svg {{ display: block; height: auto; max-width: 100%; }}
     .radar-grid {{ fill: none; stroke: var(--line); stroke-width: 1; }}
@@ -417,7 +426,9 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     @media (max-width: 860px) {{
       main {{ padding: 18px 14px 40px; }}
       header, .summary-grid, .two-col, .radar-layout {{ grid-template-columns: 1fr; }}
-      table {{ display: block; overflow-x: auto; white-space: nowrap; }}
+      table {{ white-space: nowrap; }}
+      .right {{ text-align: left; }}
+      .right .term {{ justify-content: flex-start; }}
       .language-switch {{ justify-content: flex-start; }}
       .help-card {{ max-width: min(320px, calc(100vw - 48px)); }}
     }}
@@ -457,10 +468,12 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
 
   <section>
     <h2>{_bi("十大重仓叙事映射", "Top Holdings Narrative Map")}</h2>
+    <div class="table-scroll">
     <table>
       <thead><tr><th>{_bi("股票", "Stock")}</th><th>{_bi("权重", "Weight")}</th><th>{_term("叙事", "Narrative", "股票被归入的已审核叙事主题。V1 使用 reviewed mapping，不代表叙事是实时自动生成。", "The reviewed narrative theme assigned to the stock. V1 uses reviewed mappings; this does not mean the narrative was generated live.")}</th><th>{_term("映射", "Mapping", "显示映射来源和置信度。已审核映射表示来自本地人工审核映射库。", "Shows the mapping source and confidence. Reviewed mapping means it comes from the local human-reviewed mapping store.")}</th><th>{_term("价格变动", "Price move", "本次行情 provider 返回的最新价格相对前收盘价变化。若发生 fallback，页面会单独披露。", "Latest provider price change versus previous close. If a provider fallback occurred, the page discloses it separately.")}</th><th>{_term("市盈率 TTM", "PE TTM", "Eastmoney 估值接口返回的滚动市盈率，用作估值压力参考。", "Trailing PE returned by the Eastmoney valuation endpoint, used as valuation-pressure context.")}</th><th>{_term("营收同比", "Revenue YoY", "最近一期财务指标中的营业收入同比增速。", "Revenue year-over-year growth from the latest available financial metrics.")}</th><th>{_term("归母净利同比", "Net profit YoY", "最近一期财务指标中的归母净利润同比增速。", "Parent net profit year-over-year growth from the latest available financial metrics.")}</th></tr></thead>
       <tbody>{holding_rows}</tbody>
     </table>
+    </div>
   </section>
 
   {radar_chart}
@@ -469,11 +482,15 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     <div class="two-col">
       <div>
         <h2>{_bi("阶段驱动因素", "Stage Drivers")}</h2>
+        <div class="table-scroll">
         <table><thead><tr><th>{_term("维度", "Dimension", "评分模型拆分出的叙事判断维度。每个维度会统计对应的支持信号和风险信号。", "Narrative scoring dimensions. Each dimension counts supporting and risk signals relevant to that dimension.")}</th><th>{_term("分数", "Score", "该维度的 0-100 分。分数越高，表示该维度越支持叙事持续。", "0-100 score for this dimension. Higher means this dimension is more supportive of narrative sustainability.")}</th><th>{_term("支持信号", "Support", "推动该维度评分上升的信号数量。", "Number of signals pushing this dimension upward.")}</th><th>{_term("风险信号", "Risk", "拖累该维度评分或增加风险的信号数量。", "Number of signals weighing on this dimension or increasing risk.")}</th><th>{_term("置信度", "Confidence", "该维度判断的把握程度，受信号强度、来源和数据质量影响。", "Confidence in this dimension's read, affected by signal strength, source, and data quality.")}</th></tr></thead><tbody>{dimension_rows}</tbody></table>
+        </div>
       </div>
       <div>
         <h2>{_bi("数据来源", "Data Sources")}</h2>
+        <div class="table-scroll">
         <table><thead><tr><th>{_term("数据层", "Layer", "报告使用的数据类别，例如持仓、估值、财务、公告、新闻和映射库。", "The data category used by the report, such as holdings, valuation, financials, announcements, news, and mapping stores.")}</th><th>{_term("Provider", "Provider", "提供该数据层的来源或适配器。URL 可点击时指向对应 provider 查询地址或来源。", "The source or adapter for this data layer. Clickable URLs point to the provider query or source when available.")}</th><th>{_term("质量", "Quality", "新鲜：本次运行从真实 provider 成功获取；部分：数据可用但覆盖、来源或完整性有限；Mock：fixture 或模拟数据；陈旧：不是本次最新获取；不可用：该层未拿到可用数据。", "Fresh: fetched successfully from a real provider in this run. Partial: usable but limited by coverage, source, or completeness. Mock: fixture or simulated data. Stale: not freshly fetched in this run. Unavailable: no usable data was returned.")}</th><th>{_term("披露", "Disclosure", "标记该层是真实 provider 数据还是 Mock 数据。只要出现 Mock 或不可用，页面必须提示用户。", "Marks whether this layer is real provider data or mock data. Any mock or unavailable layer must be disclosed to the user.")}</th></tr></thead><tbody>{source_rows}</tbody></table>
+        </div>
       </div>
     </div>
   </section>
@@ -483,18 +500,24 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     <div class="two-col">
       <div>
         <h3>{_bi("公告", "Announcements")}</h3>
+        <div class="table-scroll">
         <table><thead><tr><th>{_bi("日期", "Date")}</th><th>{_bi("股票", "Stock")}</th><th>{_bi("信号", "Signal")}</th><th>{_bi("来源", "Source")}</th></tr></thead><tbody>{announcement_rows}</tbody></table>
+        </div>
       </div>
       <div>
         <h3>{_bi("新闻", "News")}</h3>
+        <div class="table-scroll">
         <table><thead><tr><th>{_bi("日期", "Date")}</th><th>{_bi("情绪", "Sentiment")}</th><th>{_bi("标题", "Title")}</th><th>{_bi("来源", "Source")}</th></tr></thead><tbody>{news_rows}</tbody></table>
+        </div>
       </div>
     </div>
   </section>
 
   <section>
     <h2>{_bi("衍生信号", "Derived Signals")}</h2>
+    <div class="table-scroll">
     <table><thead><tr><th>{_bi("日期", "Date")}</th><th>{_bi("股票", "Stock")}</th><th>{_bi("类型", "Type")}</th><th>{_bi("强度", "Strength")}</th><th>{_bi("置信度", "Confidence")}</th><th>{_bi("Provider", "Provider")}</th></tr></thead><tbody>{signal_rows}</tbody></table>
+    </div>
   </section>
 </main>
 <script>
@@ -980,10 +1003,15 @@ def _stage_explanation(primary: dict[str, Any]) -> str:
     en = (primary.get("interpretation") or {}).get("stage_explanation") or ""
     zh_by_stage = {
         "emerging": "该叙事处于萌芽阶段：已有早期证据，但支持信号仍需继续验证。",
+        "diverging": "该叙事处于分化阶段：部分信号仍有支撑，但盈利、资金、估值或反向证据之间出现明显分歧。",
+        "crowded": "该叙事处于拥挤阶段：资金或动量仍强，但估值压力已经明显上升。",
+        "strengthening": "该叙事处于增强阶段：支持信号正在改善，反向证据尚未成为主导压力。",
+        "expanding": "该叙事处于扩张阶段：盈利、资金和动量证据形成较强合力。",
         "accelerating": "该叙事处于加速阶段：支持信号正在增强，资金、盈利或动量证据开始形成合力。",
         "mature": "该叙事处于成熟阶段：核心逻辑仍有支撑，但边际变化需要继续观察。",
         "weakening": "该叙事正在走弱：支持信号减弱，或反向证据的重要性上升。",
         "broken": "该叙事已经破裂：反向证据明显压过支持信号，需要重新审视原假设。",
+        "dead": "该叙事暂时失效：支持信号不足，且近期缺少能维持叙事的有效证据。",
     }
     return _bi(zh_by_stage.get(stage, en), en)
 
