@@ -625,7 +625,11 @@ python -m src.main --fund-code 161725 --provider-mode eastmoney --include-financ
 
 The `financial_metrics` payload is optional and provider-derived. It preserves
 latest report date, revenue/profit YoY metrics, source URL, and provider
-metadata, and can derive deterministic earnings signals for scoring.
+metadata, and can derive deterministic earnings signals for scoring. When
+present, Markdown and HTML reports must render a `Financial Metrics` section
+with stock, report period, revenue YoY, parent-net-profit YoY, provider, and
+source URL so users can inspect the metric inputs behind financial-derived
+signals.
 
 V1 can also derive lightweight valuation context from market quotes:
 

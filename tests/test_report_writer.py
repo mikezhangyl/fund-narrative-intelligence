@@ -1,4 +1,4 @@
-from src.modules.report_writer.writer import render_html_report
+from src.modules.report_writer.writer import render_html_report, render_markdown_report
 
 
 def test_html_report_renders_structured_sections_without_raw_markdown():
@@ -127,6 +127,21 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
             }
         ],
         "risk_evidence": [],
+        "financial_metrics": {
+            "provider_name": "eastmoney-financial-metrics",
+            "metrics": [
+                {
+                    "stock_code": "NVDA",
+                    "stock_name": "NVIDIA",
+                    "report_date": "2026-03-31",
+                    "report_type": "一季报",
+                    "revenue_yoy": 18.0,
+                    "parent_net_profit_yoy": 22.0,
+                    "source_provider": "eastmoney-financial-metrics",
+                    "source_url": "https://datacenter.eastmoney.com/securities/api/data/get",
+                }
+            ],
+        },
         "provider_foundation": {
             "effective_data_quality": "mock",
             "disclosure_required": True,
@@ -146,6 +161,7 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
         },
     }
 
+    markdown = render_markdown_report(scoring_payload)
     html = render_html_report(scoring_payload)
 
     assert "<h1>Mock Fund (000001)</h1>" in html
@@ -158,6 +174,7 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert '<section class="mapping-rationales">' in html
     assert '<section class="excluded-mapping-candidates">' in html
     assert '<section class="candidate-narratives">' in html
+    assert '<section class="financial-metrics">' in html
     assert '<section class="data-source-notice">' in html
     assert "Mapping Coverage" in html
     assert "Mapping Precision Flags" in html
@@ -171,6 +188,9 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "needs review" in html
     assert "curation review" in html
     assert "Mock 数据" in html
+    assert "Financial Metrics" in markdown
+    assert "eastmoney-financial-metrics" in markdown
+    assert "https://datacenter.eastmoney.com/securities/api/data/get" in html
     assert "<h3>AI Infrastructure</h3>" in html
     assert "Lifecycle stage" in html
     assert "### AI Infrastructure" not in html

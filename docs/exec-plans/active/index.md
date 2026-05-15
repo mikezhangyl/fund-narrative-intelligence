@@ -77,3 +77,4 @@
 - [validate-signal-trace-cli.md](./validate-signal-trace-cli.md)
 - [eastmoney-financial-metrics.md](./eastmoney-financial-metrics.md)
 - [workspace-data-layers.md](./workspace-data-layers.md)
+- [financial-metrics-report.md](./financial-metrics-report.md)

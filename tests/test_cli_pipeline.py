@@ -1227,6 +1227,14 @@ def test_optional_financial_metrics_produce_earnings_signals(tmp_path):
     assert scoring["primary_narrative"]["state"]["dimensions"]["earnings_score"][
         "score"
     ] > 50
+    markdown = artifacts["markdown"].read_text()
+    html = artifacts["html"].read_text()
+    assert "Financial Metrics" in markdown
+    assert "NVIDIA" in markdown
+    assert "eastmoney-financial-metrics" in markdown
+    assert '<section class="financial-metrics">' in html
+    assert "2026-03-31" in html
+    assert "https://datacenter.eastmoney.com/securities/api/data/get" in html
 
 
 def test_optional_news_evidence_is_disclosed_and_added_to_outputs(tmp_path):

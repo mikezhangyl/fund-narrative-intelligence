@@ -1369,3 +1369,29 @@ Consequences:
 - The validator rejects identity drift, duplicate layer names, invalid
   data-quality values, invalid artifact names, and missing mock/source
   disclosure fields.
+
+## ADR-0054: Render Financial Metrics In Reports
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Render optional `financial_metrics` payloads in Markdown and HTML reports.
+
+Rationale:
+
+- Eastmoney financial metrics now feed deterministic earnings signals, so users
+  should be able to inspect the underlying revenue/profit growth rows without
+  opening raw JSON.
+- Provider/source disclosure remains necessary because the metrics can come
+  from optional live providers and may degrade independently from other layers.
+- Keeping this as a presentation-only section avoids changing scoring behavior.
+
+Consequences:
+
+- Reports include a `Financial Metrics` table when the payload exists.
+- Rows include stock, report period, revenue YoY, parent-net-profit YoY,
+  provider, and source URL.
+- Reviewed-mapping enriched acceptance now requires `Financial Metrics` in both
+  Markdown and HTML reports.

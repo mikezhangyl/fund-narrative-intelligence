@@ -60,6 +60,8 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
             "",
             *_render_candidate_narrative_lines(scoring_payload),
             "",
+            *_render_financial_metrics_lines(scoring_payload),
+            "",
             "## Primary Narrative",
             "",
             _render_narrative_markdown(primary)
@@ -161,6 +163,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
   {_render_excluded_mapping_candidates_html(scoring_payload)}
 
   {_render_candidate_narratives_html(scoring_payload)}
+
+  {_render_financial_metrics_html(scoring_payload)}
 
   <section class="primary-narrative">
     <h2>Primary Narrative</h2>
@@ -463,6 +467,30 @@ def _render_candidate_narrative_lines(
     return lines
 
 
+def _render_financial_metrics_lines(scoring_payload: dict[str, Any]) -> list[str]:
+    metrics = _financial_metric_rows(scoring_payload)
+    if not metrics:
+        return []
+
+    lines = [
+        "## Financial Metrics",
+        "",
+        "| Stock | Report | Revenue YoY | Parent Net Profit YoY | Provider | Source |",
+        "| --- | --- | ---: | ---: | --- | --- |",
+    ]
+    for metric in metrics:
+        lines.append(
+            "| "
+            f"{metric.get('stock_code') or '-'} {metric.get('stock_name') or ''} | "
+            f"{_format_report_period(metric)} | "
+            f"{_format_percent_metric(metric.get('revenue_yoy'))} | "
+            f"{_format_percent_metric(metric.get('parent_net_profit_yoy'))} | "
+            f"{metric.get('source_provider') or metric.get('provider_name') or '-'} | "
+            f"{metric.get('source_url') or '-'} |"
+        )
+    return lines
+
+
 def _render_narrative_html(narrative: dict[str, Any]) -> str:
     state = narrative["state"]
     interpretation = narrative.get("interpretation", {})
@@ -639,6 +667,61 @@ def _render_candidate_narratives_html(scoring_payload: dict[str, Any]) -> str:
     </table>
   </section>
 """
+
+
+def _render_financial_metrics_html(scoring_payload: dict[str, Any]) -> str:
+    metrics = _financial_metric_rows(scoring_payload)
+    if not metrics:
+        return ""
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(_stock_label(metric))}</td>"
+        f"<td>{escape(_format_report_period(metric))}</td>"
+        f"<td>{escape(_format_percent_metric(metric.get('revenue_yoy')))}</td>"
+        f"<td>{escape(_format_percent_metric(metric.get('parent_net_profit_yoy')))}</td>"
+        f"<td>{escape(str(metric.get('source_provider') or metric.get('provider_name') or '-'))}</td>"
+        f"<td>{escape(str(metric.get('source_url') or '-'))}</td>"
+        "</tr>"
+        for metric in metrics
+    )
+    return f"""
+  <section class="financial-metrics">
+    <h2>Financial Metrics</h2>
+    <p>Provider financial metrics used by financial-derived signals when available.</p>
+    <table>
+      <thead><tr><th>Stock</th><th>Report</th><th>Revenue YoY</th><th>Parent Net Profit YoY</th><th>Provider</th><th>Source</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+"""
+
+
+def _financial_metric_rows(scoring_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    payload = scoring_payload.get("financial_metrics")
+    if not isinstance(payload, dict):
+        return []
+    metrics = payload.get("metrics")
+    if not isinstance(metrics, list):
+        return []
+    return [metric for metric in metrics if isinstance(metric, dict)]
+
+
+def _stock_label(metric: dict[str, Any]) -> str:
+    stock_code = str(metric.get("stock_code") or "-")
+    stock_name = str(metric.get("stock_name") or "")
+    return f"{stock_code} {stock_name}".strip()
+
+
+def _format_report_period(metric: dict[str, Any]) -> str:
+    report_date = metric.get("report_date") or "-"
+    report_type = metric.get("report_type") or ""
+    return f"{report_date} {report_type}".strip()
+
+
+def _format_percent_metric(value: Any) -> str:
+    if isinstance(value, int | float):
+        return f"{value:.2f}%"
+    return "-"
 
 
 def _format_precision_action(action: Any) -> str:

@@ -1,0 +1,40 @@
+{
+  "task_run_id": "20260515-financial-metrics-report",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/financial-metrics-report",
+  "worktree": "main",
+  "base_commit": "e7bcdd9",
+  "head_commit": "pending-commit",
+  "merge_base": "e7bcdd9",
+  "quality_reviewed_commit": "parent-review",
+  "reviewed_snapshot_type": "parent-review",
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "commit_and_merge",
+  "review_outcome": "passed",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "not_required",
+  "verification": {
+    "ruff": "passed",
+    "compileall": "passed",
+    "pytest": "257 passed",
+    "coverage": "80%",
+    "v1_acceptance": "passed",
+    "reviewed_mapping_enriched_acceptance": "passed"
+  },
+  "decisions": [
+    {
+      "id": "FMR-001",
+      "date": "2026-05-15",
+      "decision": "Render financial metrics as an optional report section instead of changing scoring.",
+      "rationale": "Financial-derived signals already affect scores; this slice makes the source metrics visible to users while keeping scoring stable."
+    }
+  ]
+}
