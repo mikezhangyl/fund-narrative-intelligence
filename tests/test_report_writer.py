@@ -142,6 +142,23 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
                 }
             ],
         },
+        "valuation_snapshots": {
+            "provider_name": "eastmoney-valuation",
+            "valuation_basis": "provider_valuation_metrics",
+            "valuations": [
+                {
+                    "stock_code": "NVDA",
+                    "stock_name": "NVIDIA",
+                    "latest_price": 106.0,
+                    "price_change_percent": 6.0,
+                    "pe_ttm": 54.2,
+                    "pb": 18.0,
+                    "valuation_pressure": "elevated",
+                    "source_provider": "eastmoney-valuation",
+                    "source_url": "https://push2.eastmoney.com/api/qt/stock/get",
+                }
+            ],
+        },
         "provider_foundation": {
             "effective_data_quality": "mock",
             "disclosure_required": True,
@@ -175,6 +192,7 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert '<section class="excluded-mapping-candidates">' in html
     assert '<section class="candidate-narratives">' in html
     assert '<section class="financial-metrics">' in html
+    assert '<section class="valuation-snapshots">' in html
     assert '<section class="data-source-notice">' in html
     assert "Mapping Coverage" in html
     assert "Mapping Precision Flags" in html
@@ -189,8 +207,11 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "curation review" in html
     assert "Mock 数据" in html
     assert "Financial Metrics" in markdown
+    assert "Valuation Snapshots" in markdown
     assert "eastmoney-financial-metrics" in markdown
+    assert "eastmoney-valuation" in markdown
     assert "https://datacenter.eastmoney.com/securities/api/data/get" in html
+    assert "https://push2.eastmoney.com/api/qt/stock/get" in html
     assert "<h3>AI Infrastructure</h3>" in html
     assert "Lifecycle stage" in html
     assert "### AI Infrastructure" not in html

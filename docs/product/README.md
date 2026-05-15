@@ -55,8 +55,8 @@ provenance, and review-action state without rebuilding them from lower-level
 artifacts.
 
 The strict reviewed-mapping enriched acceptance path now uses explicit
-Eastmoney valuation and financial metrics, and requires financial metrics to be
-visible in reports:
+Eastmoney valuation and financial metrics, and requires both valuation snapshots
+and financial metrics to be visible in reports:
 
 ```bash
 python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725

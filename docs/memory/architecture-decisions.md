@@ -1395,3 +1395,28 @@ Consequences:
   provider, and source URL.
 - Reviewed-mapping enriched acceptance now requires `Financial Metrics` in both
   Markdown and HTML reports.
+
+## ADR-0055: Render Valuation Snapshots In Reports
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Render optional `valuation_snapshots` payloads in Markdown and HTML reports.
+
+Rationale:
+
+- Eastmoney valuation snapshots now feed deterministic valuation-risk signals,
+  so users need the PE/PB/pressure rows visible in the report.
+- The valuation layer is still a snapshot context, not a full historical
+  valuation model, so provider basis and source URL must remain visible.
+- This is a presentation-only change and does not alter scoring.
+
+Consequences:
+
+- Reports include a `Valuation Snapshots` table when the payload exists.
+- Rows include stock, valuation basis, latest price, price change, PE TTM, PB,
+  valuation pressure, provider, and source URL.
+- Reviewed-mapping enriched acceptance now requires `Valuation Snapshots` in
+  both Markdown and HTML reports.

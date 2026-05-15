@@ -655,7 +655,9 @@ This keeps the same `valuation-snapshot-v1` artifact contract but uses
 `valuation_basis = provider_valuation_metrics`. The payload can include PE, PB,
 market-cap, float-market-cap, and turnover-style metrics when Eastmoney returns
 them. It is still not a full financial-statement valuation model or historical
-valuation percentile.
+valuation percentile. When valuation snapshots are present, reports must render
+a `Valuation Snapshots` section with stock, valuation basis, latest price, price
+change, PE TTM, PB, valuation pressure, provider, and source URL.
 
 V1 can also fetch RSS-derived news evidence for mapped narratives:
 

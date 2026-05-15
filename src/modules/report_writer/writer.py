@@ -60,6 +60,8 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
             "",
             *_render_candidate_narrative_lines(scoring_payload),
             "",
+            *_render_valuation_snapshot_lines(scoring_payload),
+            "",
             *_render_financial_metrics_lines(scoring_payload),
             "",
             "## Primary Narrative",
@@ -163,6 +165,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
   {_render_excluded_mapping_candidates_html(scoring_payload)}
 
   {_render_candidate_narratives_html(scoring_payload)}
+
+  {_render_valuation_snapshots_html(scoring_payload)}
 
   {_render_financial_metrics_html(scoring_payload)}
 
@@ -491,6 +495,33 @@ def _render_financial_metrics_lines(scoring_payload: dict[str, Any]) -> list[str
     return lines
 
 
+def _render_valuation_snapshot_lines(scoring_payload: dict[str, Any]) -> list[str]:
+    valuations = _valuation_snapshot_rows(scoring_payload)
+    if not valuations:
+        return []
+
+    lines = [
+        "## Valuation Snapshots",
+        "",
+        "| Stock | Basis | Price | Change | PE TTM | PB | Pressure | Provider | Source |",
+        "| --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- |",
+    ]
+    for valuation in valuations:
+        lines.append(
+            "| "
+            f"{_stock_label(valuation)} | "
+            f"{valuation.get('valuation_basis') or '-'} | "
+            f"{_format_number_metric(valuation.get('latest_price'))} | "
+            f"{_format_percent_metric(valuation.get('price_change_percent'))} | "
+            f"{_format_number_metric(valuation.get('pe_ttm'))} | "
+            f"{_format_number_metric(valuation.get('pb'))} | "
+            f"{valuation.get('valuation_pressure') or '-'} | "
+            f"{valuation.get('source_provider') or valuation.get('provider_name') or '-'} | "
+            f"{valuation.get('source_url') or '-'} |"
+        )
+    return lines
+
+
 def _render_narrative_html(narrative: dict[str, Any]) -> str:
     state = narrative["state"]
     interpretation = narrative.get("interpretation", {})
@@ -696,6 +727,51 @@ def _render_financial_metrics_html(scoring_payload: dict[str, Any]) -> str:
 """
 
 
+def _render_valuation_snapshots_html(scoring_payload: dict[str, Any]) -> str:
+    valuations = _valuation_snapshot_rows(scoring_payload)
+    if not valuations:
+        return ""
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(_stock_label(valuation))}</td>"
+        f"<td>{escape(str(valuation.get('valuation_basis') or '-'))}</td>"
+        f"<td>{escape(_format_number_metric(valuation.get('latest_price')))}</td>"
+        f"<td>{escape(_format_percent_metric(valuation.get('price_change_percent')))}</td>"
+        f"<td>{escape(_format_number_metric(valuation.get('pe_ttm')))}</td>"
+        f"<td>{escape(_format_number_metric(valuation.get('pb')))}</td>"
+        f"<td>{escape(str(valuation.get('valuation_pressure') or '-'))}</td>"
+        f"<td>{escape(str(valuation.get('source_provider') or valuation.get('provider_name') or '-'))}</td>"
+        f"<td>{escape(str(valuation.get('source_url') or '-'))}</td>"
+        "</tr>"
+        for valuation in valuations
+    )
+    return f"""
+  <section class="valuation-snapshots">
+    <h2>Valuation Snapshots</h2>
+    <p>Provider valuation context used by valuation-derived signals when available.</p>
+    <table>
+      <thead><tr><th>Stock</th><th>Basis</th><th>Price</th><th>Change</th><th>PE TTM</th><th>PB</th><th>Pressure</th><th>Provider</th><th>Source</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+"""
+
+
+def _valuation_snapshot_rows(scoring_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    payload = scoring_payload.get("valuation_snapshots")
+    if not isinstance(payload, dict):
+        return []
+    valuations = payload.get("valuations")
+    if not isinstance(valuations, list):
+        return []
+    basis = payload.get("valuation_basis")
+    return [
+        {**valuation, "valuation_basis": valuation.get("valuation_basis") or basis}
+        for valuation in valuations
+        if isinstance(valuation, dict)
+    ]
+
+
 def _financial_metric_rows(scoring_payload: dict[str, Any]) -> list[dict[str, Any]]:
     payload = scoring_payload.get("financial_metrics")
     if not isinstance(payload, dict):
@@ -721,6 +797,12 @@ def _format_report_period(metric: dict[str, Any]) -> str:
 def _format_percent_metric(value: Any) -> str:
     if isinstance(value, int | float):
         return f"{value:.2f}%"
+    return "-"
+
+
+def _format_number_metric(value: Any) -> str:
+    if isinstance(value, int | float):
+        return f"{value:.2f}"
     return "-"
 
 

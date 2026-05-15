@@ -1149,7 +1149,15 @@ def test_optional_valuation_snapshots_can_use_eastmoney_metrics(tmp_path):
     assert valuation_layer["provider_name"] == "eastmoney-valuation"
     assert valuation_layer["is_mock"] is False
     assert {layer["layer"] for layer in source_table["layers"]} >= {"valuation"}
-    assert "Eastmoney valuation metrics" in artifacts["markdown"].read_text()
+    markdown = artifacts["markdown"].read_text()
+    html = artifacts["html"].read_text()
+    assert "Eastmoney valuation metrics" in markdown
+    assert "Valuation Snapshots" in markdown
+    assert "NVIDIA" in markdown
+    assert "54.20" in markdown
+    assert '<section class="valuation-snapshots">' in html
+    assert "provider_valuation_metrics" in html
+    assert "https://push2.eastmoney.com/api/qt/stock/get" in html
 
 
 def test_optional_financial_metrics_produce_earnings_signals(tmp_path):

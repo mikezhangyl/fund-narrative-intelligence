@@ -431,6 +431,7 @@ def _write_outputs(
         "eastmoney-valuation\n"
         "eastmoney-financial-metrics\n"
         "Financial Metrics\n"
+        "Valuation Snapshots\n"
     )
     (output_dir / "fund_161725_report.md").write_text(notice, encoding="utf-8")
     (output_dir / "fund_161725_report.html").write_text(notice, encoding="utf-8")
