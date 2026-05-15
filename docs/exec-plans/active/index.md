@@ -91,3 +91,4 @@
 - [valuation-financial-boundary-tests.md](./valuation-financial-boundary-tests.md)
 - [artifact-optional-payload-validation.md](./artifact-optional-payload-validation.md)
 - [artifact-optional-payload-consistency.md](./artifact-optional-payload-consistency.md)
+- [single-fund-demo.md](./single-fund-demo.md)

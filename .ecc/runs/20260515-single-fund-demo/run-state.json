@@ -1,0 +1,56 @@
+{
+  "task_run_id": "20260515-single-fund-demo",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/single-fund-demo",
+  "worktree": "main",
+  "base_commit": "e9862bb",
+  "head_commit": "pending-commit",
+  "merge_base": "e9862bb",
+  "quality_reviewed_commit": null,
+  "reviewed_snapshot_type": null,
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "commit_and_merge",
+  "review_outcome": "passed",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "not_required",
+  "verification": {
+    "target_pytest": "3 passed",
+    "ruff": "passed",
+    "compileall": "passed",
+    "real_single_fund_demo": "passed for 161725",
+    "single_fund_demo_validation": "passed",
+    "browser_smoke": "passed at http://127.0.0.1:8765/fund_161725_demo.html",
+    "pytest": "275 passed",
+    "coverage": "81%",
+    "v1_acceptance": "passed",
+    "reviewed_mapping_enriched_acceptance": "passed"
+  },
+  "decisions": [
+    {
+      "id": "SFD-001",
+      "date": "2026-05-15",
+      "decision": "Focus the next value proof on fund 161725 instead of continuing broad provider expansion.",
+      "rationale": "The user needs to see one real fund's top holdings, narrative mapping, stage, and evidence before judging the project's value."
+    },
+    {
+      "id": "SFD-002",
+      "date": "2026-05-15",
+      "decision": "Keep the demo as server-generated JSON and HTML artifacts for now.",
+      "rationale": "The future web approval workflow needs structured objects, but the user explicitly does not need browser interaction yet."
+    },
+    {
+      "id": "SFD-003",
+      "date": "2026-05-15",
+      "decision": "Make real-data validation fail by default when mock or unavailable provider layers are present.",
+      "rationale": "Mock fallback is allowed by architecture, but product demos must visibly disclose it and should not masquerade as real output."
+    }
+  ]
+}

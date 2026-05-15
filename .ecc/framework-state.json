@@ -8,9 +8,9 @@
     "ecc-task-subagent-workflow",
     "memory-governance"
   ],
-  "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-artifact-optional-payload-consistency",
+  "current_phase": "single_fund_real_demo",
+  "latest_run": "20260515-single-fund-demo",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "finish artifact optional payload consistency, then continue the next end-to-end provider slice"
+  "next_step": "review the 161725 demo output, then decide the next real-fund/product display slice"
 }
