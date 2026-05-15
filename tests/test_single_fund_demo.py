@@ -4,6 +4,7 @@ from scripts.run_single_fund_demo import main as run_demo_main
 from src.modules.single_fund_demo import (
     SingleFundDemoError,
     build_single_fund_demo_payload,
+    render_single_fund_demo_html,
     validate_single_fund_demo_payload,
 )
 
@@ -39,6 +40,26 @@ def test_validate_single_fund_demo_rejects_real_demo_with_mock_layer():
         raise AssertionError("expected mock layer validation failure")
 
 
+def test_render_single_fund_demo_html_defaults_to_chinese_with_english_toggle():
+    payload = build_single_fund_demo_payload(
+        raw=_raw_payload(),
+        scoring=_scoring_payload(),
+        workspace_snapshot=_workspace_snapshot(),
+    )
+
+    html = render_single_fund_demo_html(payload)
+
+    assert '<html lang="zh-CN">' in html
+    assert 'data-lang="en"' in html
+    assert "十大重仓叙事映射" in html
+    assert "Top Holdings Narrative Map" in html
+    assert "高端白酒消费" in html
+    assert "Premium Baijiu Consumption" in html
+    assert "走弱" in html
+    assert "weakening" in html
+    assert "本次使用真实数据源" in html
+
+
 def test_run_single_fund_demo_script_writes_demo_artifacts(tmp_path, monkeypatch):
     from scripts import run_single_fund_demo
 
@@ -66,9 +87,9 @@ def test_run_single_fund_demo_script_writes_demo_artifacts(tmp_path, monkeypatch
 
     assert result == 0
     assert (tmp_path / "fund_161725_demo.json").exists()
-    assert "Top Holdings Narrative Map" in (
-        tmp_path / "fund_161725_demo.html"
-    ).read_text(encoding="utf-8")
+    html = (tmp_path / "fund_161725_demo.html").read_text(encoding="utf-8")
+    assert "十大重仓叙事映射" in html
+    assert "Top Holdings Narrative Map" in html
 
 
 def _raw_payload():
@@ -186,9 +207,7 @@ def _scoring_payload(mock_layer=False):
             "confidence": 0.8166,
             "normalized_exposure": 1.0,
             "raw_exposure": 0.761837,
-            "interpretation": {
-                "stage_explanation": "This narrative is weakening."
-            },
+            "interpretation": {"stage_explanation": "This narrative is weakening."},
             "state": {
                 "stage": "weakening",
                 "sustainability_score": 44.5,
@@ -222,7 +241,13 @@ def _provider_foundation(mock_layer=False):
         "effective_data_quality": "mock" if mock_layer else "fresh",
         "disclosure_required": mock_layer,
         "disclosure_message": "Mock data is present" if mock_layer else "",
-        "degradation_events": [],
+        "degradation_events": [
+            {
+                "type": "provider_fallback",
+                "provider": "eastmoney-market-quote",
+                "fallback_provider": "yahoo-chart",
+            }
+        ],
         "layers": {
             "holdings": {
                 "layer": "holdings",

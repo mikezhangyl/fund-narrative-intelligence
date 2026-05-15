@@ -8,6 +8,63 @@ from src.modules.snapshot_writer.writer import write_json_artifact
 
 DEMO_VERSION = "single-fund-demo-v1"
 
+NARRATIVE_ZH = {
+    "Premium Baijiu Consumption": "高端白酒消费",
+}
+STAGE_ZH = {
+    "emerging": "萌芽",
+    "accelerating": "加速",
+    "mature": "成熟",
+    "weakening": "走弱",
+    "broken": "破裂",
+}
+DIMENSION_ZH = {
+    "earnings_score": "盈利验证",
+    "capital_score": "资金强化",
+    "valuation_risk_score": "估值压力",
+    "momentum_score": "叙事动量",
+    "counter_evidence_risk_score": "反向证据风险",
+}
+QUALITY_ZH = {
+    "fresh": "新鲜",
+    "partial": "部分",
+    "mock": "Mock",
+    "stale": "陈旧",
+    "unavailable": "不可用",
+}
+DISCLOSURE_ZH = {
+    "real": "真实",
+    "mock": "Mock",
+}
+MAPPING_METHOD_ZH = {
+    "reviewed_mapping": "已审核映射",
+    "fixture_mapping": "Fixture 映射",
+    "registry_rule": "规则映射",
+}
+SIGNAL_TYPE_ZH = {
+    "relative_strength_down": "相对强度走弱",
+    "relative_strength_up": "相对强度走强",
+    "valuation_extreme": "估值偏高",
+    "valuation_reset": "估值修复",
+    "earnings_validation": "盈利验证",
+    "earnings_risk": "盈利风险",
+    "capital_reinforcement": "资金强化",
+    "counter_evidence": "反向证据",
+}
+SOURCE_LAYER_ZH = {
+    "Fund holdings": "基金持仓",
+    "Narrative registry": "叙事库",
+    "Stock mappings": "股票叙事映射",
+    "Evidence": "证据",
+    "Signals": "信号",
+    "Announcements": "公告",
+    "Market quotes": "行情",
+    "Valuation": "估值",
+    "Financial metrics": "财务指标",
+    "News evidence": "新闻证据",
+    "Derived signals": "衍生信号",
+}
+
 
 class SingleFundDemoError(ValueError):
     pass
@@ -169,13 +226,16 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     news_rows = "".join(_evidence_row(row) for row in payload["evidence"]["news"])
     signal_rows = "".join(_signal_row(row) for row in payload["evidence"]["signals"])
     fallback_notice = _fallback_notice(status)
+    narrative_label = _narrative_label(primary.get("name"))
+    stage_label = _stage_label(primary.get("stage"))
+    stage_explanation = _stage_explanation(primary)
     return f"""<!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
-  <title>{_h(fund["fund_code"])} Narrative Demo</title>
+  <title>{_h(fund["fund_code"])} 基金叙事报告</title>
   <style>
     :root {{
       color-scheme: light;
@@ -232,45 +292,68 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
     .two-col {{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }}
     .tag {{ display: inline-block; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; }}
     .right {{ text-align: right; }}
+    .language-switch {{ display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }}
+    .language-switch button {{
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 999px;
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      padding: 5px 12px;
+    }}
+    html[lang="zh-CN"] button[data-lang="zh-CN"],
+    html[lang="en"] button[data-lang="en"] {{
+      border-color: var(--blue);
+      color: var(--blue);
+      font-weight: 650;
+    }}
+    html[lang="zh-CN"] .lang-en {{ display: none; }}
+    html[lang="en"] .lang-zh {{ display: none; }}
     @media (max-width: 860px) {{
       main {{ padding: 18px 14px 40px; }}
       header, .summary-grid, .two-col {{ grid-template-columns: 1fr; }}
       table {{ display: block; overflow-x: auto; white-space: nowrap; }}
+      .language-switch {{ justify-content: flex-start; }}
     }}
   </style>
 </head>
 <body>
 <main>
+  <div class="language-switch" aria-label="Language switch">
+    <button type="button" data-lang="zh-CN">中文</button>
+    <button type="button" data-lang="en">English</button>
+  </div>
   <header>
     <div>
-      <p class="muted">{_h(fund.get("fund_code"))} / as of {_h(fund.get("as_of_date"))}</p>
+      <p class="muted">{_h(fund.get("fund_code"))} / {_bi("截至", "as of")} {_h(fund.get("as_of_date"))}</p>
       <h1>{_h(fund.get("fund_name"))}</h1>
-      <p>Single-fund narrative demo focused on the top ten holdings.</p>
+      <p>{_bi("单基金叙事报告，聚焦十大重仓股。", "Single-fund narrative demo focused on the top ten holdings.")}</p>
     </div>
     <div class="right">
-      <p class="muted">Primary narrative</p>
-      <h2>{_h(primary.get("name"))}</h2>
-      <p class="stage">{_h(primary.get("stage"))}</p>
+      <p class="muted">{_bi("主叙事", "Primary narrative")}</p>
+      <h2>{narrative_label}</h2>
+      <p class="stage">{stage_label}</p>
     </div>
   </header>
 
   <section>
     <div class="summary-grid">
-      <div class="metric"><div class="metric-label">Sustainability score</div><div class="metric-value">{_fmt(primary.get("sustainability_score"))}</div></div>
-      <div class="metric"><div class="metric-label">Confidence</div><div class="metric-value">{_pct(primary.get("confidence"))}</div></div>
-      <div class="metric"><div class="metric-label">Narrative exposure</div><div class="metric-value">{_pct(primary.get("normalized_exposure"))}</div></div>
-      <div class="metric"><div class="metric-label">Top-10 mapped weight</div><div class="metric-value">{_pct(payload["mapping_coverage"].get("covered_weight"))}</div></div>
+      <div class="metric"><div class="metric-label">{_bi("持续性评分", "Sustainability score")}</div><div class="metric-value">{_fmt(primary.get("sustainability_score"))}</div></div>
+      <div class="metric"><div class="metric-label">{_bi("置信度", "Confidence")}</div><div class="metric-value">{_pct(primary.get("confidence"))}</div></div>
+      <div class="metric"><div class="metric-label">{_bi("叙事暴露", "Narrative exposure")}</div><div class="metric-value">{_pct(primary.get("normalized_exposure"))}</div></div>
+      <div class="metric"><div class="metric-label">{_bi("十大重仓映射权重", "Top-10 mapped weight")}</div><div class="metric-value">{_pct(payload["mapping_coverage"].get("covered_weight"))}</div></div>
     </div>
     <div class="notice ok">
-      {_h((primary.get("interpretation") or {}).get("stage_explanation") or "")}
+      {stage_explanation}
     </div>
     {fallback_notice}
   </section>
 
   <section>
-    <h2>Top Holdings Narrative Map</h2>
+    <h2>{_bi("十大重仓叙事映射", "Top Holdings Narrative Map")}</h2>
     <table>
-      <thead><tr><th>Stock</th><th>Weight</th><th>Narrative</th><th>Mapping</th><th>Price move</th><th>PE TTM</th><th>Revenue YoY</th><th>Net profit YoY</th></tr></thead>
+      <thead><tr><th>{_bi("股票", "Stock")}</th><th>{_bi("权重", "Weight")}</th><th>{_bi("叙事", "Narrative")}</th><th>{_bi("映射", "Mapping")}</th><th>{_bi("价格变动", "Price move")}</th><th>{_bi("市盈率 TTM", "PE TTM")}</th><th>{_bi("营收同比", "Revenue YoY")}</th><th>{_bi("归母净利同比", "Net profit YoY")}</th></tr></thead>
       <tbody>{holding_rows}</tbody>
     </table>
   </section>
@@ -278,35 +361,42 @@ def render_single_fund_demo_html(payload: dict[str, Any]) -> str:
   <section>
     <div class="two-col">
       <div>
-        <h2>Stage Drivers</h2>
-        <table><thead><tr><th>Dimension</th><th>Score</th><th>Support</th><th>Risk</th><th>Confidence</th></tr></thead><tbody>{dimension_rows}</tbody></table>
+        <h2>{_bi("阶段驱动因素", "Stage Drivers")}</h2>
+        <table><thead><tr><th>{_bi("维度", "Dimension")}</th><th>{_bi("分数", "Score")}</th><th>{_bi("支持信号", "Support")}</th><th>{_bi("风险信号", "Risk")}</th><th>{_bi("置信度", "Confidence")}</th></tr></thead><tbody>{dimension_rows}</tbody></table>
       </div>
       <div>
-        <h2>Data Sources</h2>
-        <table><thead><tr><th>Layer</th><th>Provider</th><th>Quality</th><th>Disclosure</th></tr></thead><tbody>{source_rows}</tbody></table>
+        <h2>{_bi("数据来源", "Data Sources")}</h2>
+        <table><thead><tr><th>{_bi("数据层", "Layer")}</th><th>{_bi("Provider", "Provider")}</th><th>{_bi("质量", "Quality")}</th><th>{_bi("披露", "Disclosure")}</th></tr></thead><tbody>{source_rows}</tbody></table>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>Evidence Samples</h2>
+    <h2>{_bi("证据样本", "Evidence Samples")}</h2>
     <div class="two-col">
       <div>
-        <h3>Announcements</h3>
-        <table><thead><tr><th>Date</th><th>Stock</th><th>Signal</th><th>Source</th></tr></thead><tbody>{announcement_rows}</tbody></table>
+        <h3>{_bi("公告", "Announcements")}</h3>
+        <table><thead><tr><th>{_bi("日期", "Date")}</th><th>{_bi("股票", "Stock")}</th><th>{_bi("信号", "Signal")}</th><th>{_bi("来源", "Source")}</th></tr></thead><tbody>{announcement_rows}</tbody></table>
       </div>
       <div>
-        <h3>News</h3>
-        <table><thead><tr><th>Date</th><th>Sentiment</th><th>Title</th><th>Source</th></tr></thead><tbody>{news_rows}</tbody></table>
+        <h3>{_bi("新闻", "News")}</h3>
+        <table><thead><tr><th>{_bi("日期", "Date")}</th><th>{_bi("情绪", "Sentiment")}</th><th>{_bi("标题", "Title")}</th><th>{_bi("来源", "Source")}</th></tr></thead><tbody>{news_rows}</tbody></table>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>Derived Signals</h2>
-    <table><thead><tr><th>Date</th><th>Stock</th><th>Type</th><th>Strength</th><th>Confidence</th><th>Provider</th></tr></thead><tbody>{signal_rows}</tbody></table>
+    <h2>{_bi("衍生信号", "Derived Signals")}</h2>
+    <table><thead><tr><th>{_bi("日期", "Date")}</th><th>{_bi("股票", "Stock")}</th><th>{_bi("类型", "Type")}</th><th>{_bi("强度", "Strength")}</th><th>{_bi("置信度", "Confidence")}</th><th>{_bi("Provider", "Provider")}</th></tr></thead><tbody>{signal_rows}</tbody></table>
   </section>
 </main>
+<script>
+  document.querySelectorAll("[data-lang]").forEach((button) => {{
+    button.addEventListener("click", () => {{
+      document.documentElement.lang = button.dataset.lang;
+    }});
+  }});
+</script>
 </body>
 </html>
 """
@@ -461,26 +551,34 @@ def _signal_rows(items: list[Any], limit: int) -> list[dict[str, Any]]:
 def _fallback_notice(status: dict[str, Any]) -> str:
     if status.get("mock_layer_count"):
         return (
-            '<div class="notice danger">Mock data is present in this run. '
-            "The future web UI must show this disclosure at the URL level.</div>"
+            '<div class="notice danger">'
+            f"{_bi('本次运行包含 Mock 数据。未来网页必须在页面入口明确展示该提示。', 'Mock data is present in this run. The future web UI must show this disclosure at the URL level.')}"
+            "</div>"
         )
     if status.get("degradation_event_count"):
         return (
-            '<div class="notice">Real providers were used, with provider fallback '
-            f'events recorded: {_h(status.get("degradation_event_count"))}. '
-            "This run remains non-mock, but the fallback is visible for review.</div>"
+            '<div class="notice">'
+            f"{_bi('本次使用真实数据源，但记录到 provider fallback 事件：', 'Real providers were used, with provider fallback events recorded: ')}"
+            f'{_h(status.get("degradation_event_count"))}. '
+            f"{_bi('本次仍然是非 Mock 运行，fallback 已在页面中显式披露。', 'This run remains non-mock, but the fallback is visible for review.')}"
+            "</div>"
         )
-    return '<div class="notice ok">All required layers are real provider layers.</div>'
+    return (
+        '<div class="notice ok">'
+        f"{_bi('所有必需数据层均为真实 provider 数据。', 'All required layers are real provider layers.')}"
+        "</div>"
+    )
 
 
 def _holding_row(row: dict[str, Any]) -> str:
     stock = f'{row.get("stock_code")} {row.get("stock_name")}'
+    mapping_method = str(row.get("mapping_method") or "")
     return (
         "<tr>"
         f"<td>{_h(stock)}</td>"
         f"<td>{_pct(row.get('weight'))}</td>"
-        f"<td>{_h(row.get('narrative_name'))}</td>"
-        f"<td>{_h(row.get('mapping_method'))} / {_pct(row.get('mapping_confidence'))}</td>"
+        f"<td>{_narrative_label(row.get('narrative_name'))}</td>"
+        f"<td>{_label(mapping_method, MAPPING_METHOD_ZH)} / {_pct(row.get('mapping_confidence'))}</td>"
         f"<td>{_pct(row.get('price_change_percent'), already_percent=True)}</td>"
         f"<td>{_fmt(row.get('pe_ttm'))}</td>"
         f"<td>{_pct(row.get('revenue_yoy'), already_percent=True)}</td>"
@@ -494,7 +592,7 @@ def _dimension_row(name: str, value: Any) -> str:
         return ""
     return (
         "<tr>"
-        f"<td>{_h(name)}</td>"
+        f"<td>{_label(name, DIMENSION_ZH)}</td>"
         f"<td>{_fmt(value.get('score'))}</td>"
         f"<td>{_h(value.get('supporting_signal_count'))}</td>"
         f"<td>{_h(value.get('risk_signal_count'))}</td>"
@@ -509,12 +607,14 @@ def _source_row(layer: dict[str, Any]) -> str:
     provider = _h(layer.get("provider_name"))
     if source_url.startswith("http"):
         provider = f'<a href="{_h(source_url)}">{provider}</a>'
+    display_name = str(layer.get("display_name") or layer.get("layer") or "")
+    data_quality = str(layer.get("data_quality") or "")
     return (
         "<tr>"
-        f"<td>{_h(layer.get('display_name') or layer.get('layer'))}</td>"
+        f"<td>{_label(display_name, SOURCE_LAYER_ZH)}</td>"
         f"<td>{provider}</td>"
-        f"<td><span class=\"tag\">{_h(layer.get('data_quality'))}</span></td>"
-        f"<td>{_h(disclosure)}</td>"
+        f"<td><span class=\"tag\">{_label(data_quality, QUALITY_ZH)}</span></td>"
+        f"<td>{_label(disclosure, DISCLOSURE_ZH)}</td>"
         "</tr>"
     )
 
@@ -524,15 +624,24 @@ def _evidence_row(row: dict[str, Any]) -> str:
     source_url = str(row.get("source_url") or "")
     if source_url.startswith("http"):
         source = f'<a href="{_h(source_url)}">{source}</a>'
-    label = row.get("title") or row.get("type") or row.get("sentiment")
+    label = (
+        _h(row["title"])
+        if row.get("title")
+        else _label(row.get("type") or row.get("sentiment"), SIGNAL_TYPE_ZH)
+    )
     stock = " ".join(
-        part for part in [str(row.get("stock_code") or ""), str(row.get("stock_name") or "")] if part
+        part
+        for part in [
+            str(row.get("stock_code") or ""),
+            str(row.get("stock_name") or ""),
+        ]
+        if part
     )
     return (
         "<tr>"
         f"<td>{_h(row.get('event_date'))}</td>"
         f"<td>{_h(stock)}</td>"
-        f"<td>{_h(label)}</td>"
+        f"<td>{label}</td>"
         f"<td>{source}</td>"
         "</tr>"
     )
@@ -547,7 +656,7 @@ def _signal_row(row: dict[str, Any]) -> str:
         "<tr>"
         f"<td>{_h(row.get('event_date'))}</td>"
         f"<td>{_h(row.get('stock_code'))}</td>"
-        f"<td>{_h(row.get('signal_type'))}</td>"
+        f"<td>{_label(row.get('signal_type'), SIGNAL_TYPE_ZH)}</td>"
         f"<td>{_fmt(row.get('strength'))}</td>"
         f"<td>{_pct(row.get('confidence'))}</td>"
         f"<td>{source}</td>"
@@ -563,6 +672,41 @@ def _dict_value(value: Any, context: str) -> dict[str, Any]:
 
 def _h(value: Any) -> str:
     return html.escape("" if value is None else str(value), quote=True)
+
+
+def _bi(zh: Any, en: Any) -> str:
+    return (
+        f'<span class="lang-zh">{_h(zh)}</span>'
+        f'<span class="lang-en">{_h(en)}</span>'
+    )
+
+
+def _label(value: Any, zh_labels: dict[str, str]) -> str:
+    value_text = "" if value is None else str(value)
+    return _bi(zh_labels.get(value_text, value_text), value_text)
+
+
+def _narrative_label(name: Any) -> str:
+    name_text = "" if name is None else str(name)
+    return _bi(NARRATIVE_ZH.get(name_text, name_text), name_text)
+
+
+def _stage_label(stage: Any) -> str:
+    stage_text = "" if stage is None else str(stage)
+    return _bi(STAGE_ZH.get(stage_text, stage_text), stage_text)
+
+
+def _stage_explanation(primary: dict[str, Any]) -> str:
+    stage = str(primary.get("stage") or "")
+    en = (primary.get("interpretation") or {}).get("stage_explanation") or ""
+    zh_by_stage = {
+        "emerging": "该叙事处于萌芽阶段：已有早期证据，但支持信号仍需继续验证。",
+        "accelerating": "该叙事处于加速阶段：支持信号正在增强，资金、盈利或动量证据开始形成合力。",
+        "mature": "该叙事处于成熟阶段：核心逻辑仍有支撑，但边际变化需要继续观察。",
+        "weakening": "该叙事正在走弱：支持信号减弱，或反向证据的重要性上升。",
+        "broken": "该叙事已经破裂：反向证据明显压过支持信号，需要重新审视原假设。",
+    }
+    return _bi(zh_by_stage.get(stage, en), en)
 
 
 def _fmt(value: Any) -> str:
