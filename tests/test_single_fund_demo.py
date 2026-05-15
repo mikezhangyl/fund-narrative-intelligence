@@ -1,6 +1,8 @@
 import json
+import unicodedata
 
 from scripts.run_single_fund_demo import main as run_demo_main
+from src.modules import single_fund_demo as demo
 from src.modules.single_fund_demo import (
     SingleFundDemoError,
     build_single_fund_demo_payload,
@@ -67,6 +69,30 @@ def test_render_single_fund_demo_html_defaults_to_chinese_with_english_toggle():
     assert "估值风险强度" in html
     assert "Higher means stronger risk here" in html
     assert '<polygon class="radar-area"' in html
+    assert 'viewBox="0 0 520 390"' in html
+
+
+def test_radar_svg_labels_have_viewbox_padding():
+    viewbox_width = 520
+    min_padding = 8
+
+    for index, item in enumerate(demo.RADAR_DIMENSIONS):
+        layout = demo._radar_label_layout(index)
+        x = float(layout["x"])
+        anchor = str(layout["anchor"])
+        for key in ["svg_zh", "svg_en"]:
+            text_width = _approx_svg_text_width(str(item[key]))
+            if anchor == "middle":
+                left = x - text_width / 2
+                right = x + text_width / 2
+            elif anchor == "end":
+                left = x - text_width
+                right = x
+            else:
+                left = x
+                right = x + text_width
+            assert left >= min_padding
+            assert right <= viewbox_width - min_padding
 
 
 def test_run_single_fund_demo_script_writes_demo_artifacts(tmp_path, monkeypatch):
@@ -99,6 +125,13 @@ def test_run_single_fund_demo_script_writes_demo_artifacts(tmp_path, monkeypatch
     html = (tmp_path / "fund_161725_demo.html").read_text(encoding="utf-8")
     assert "十大重仓叙事映射" in html
     assert "Top Holdings Narrative Map" in html
+
+
+def _approx_svg_text_width(text: str) -> float:
+    width = 0.0
+    for character in text:
+        width += 12.0 if unicodedata.east_asian_width(character) in {"F", "W"} else 7.0
+    return width
 
 
 def _raw_payload():

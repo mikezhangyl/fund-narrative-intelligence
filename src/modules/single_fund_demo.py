@@ -31,6 +31,8 @@ RADAR_DIMENSIONS = [
         "key": "earnings_score",
         "zh": "盈利验证",
         "en": "Earnings validation",
+        "svg_zh": "盈利验证",
+        "svg_en": "Earnings",
         "help_zh": "盈利和财务数据是否支持该叙事。分数越高，盈利证据越支持叙事。",
         "help_en": "Whether earnings and financial data support the narrative. Higher means stronger earnings support.",
     },
@@ -38,6 +40,8 @@ RADAR_DIMENSIONS = [
         "key": "capital_score",
         "zh": "资金强化",
         "en": "Capital reinforcement",
+        "svg_zh": "资金强化",
+        "svg_en": "Capital",
         "help_zh": "资金流、行情和资本市场信号是否强化该叙事。分数越高，资金支持越强。",
         "help_en": "Whether market and capital signals reinforce the narrative. Higher means stronger capital support.",
     },
@@ -45,6 +49,8 @@ RADAR_DIMENSIONS = [
         "key": "valuation_risk_score",
         "zh": "估值风险强度",
         "en": "Valuation risk strength",
+        "svg_zh": "估值风险强度",
+        "svg_en": "Valuation risk",
         "help_zh": "估值压力或拥挤程度。这里分数越高代表风险越强，不代表越好。",
         "help_en": "Valuation pressure or crowding. Higher means stronger risk here, not a better condition.",
     },
@@ -52,6 +58,8 @@ RADAR_DIMENSIONS = [
         "key": "momentum_score",
         "zh": "叙事动量",
         "en": "Narrative momentum",
+        "svg_zh": "叙事动量",
+        "svg_en": "Momentum",
         "help_zh": "新闻、公告、行情等信号是否显示叙事仍有热度。分数越高，动量越强。",
         "help_en": "Whether news, announcements, and market signals show the narrative still has momentum. Higher means stronger momentum.",
     },
@@ -59,6 +67,8 @@ RADAR_DIMENSIONS = [
         "key": "counter_evidence_risk_score",
         "zh": "反向证据强度",
         "en": "Counter-evidence strength",
+        "svg_zh": "反向证据强度",
+        "svg_en": "Counter evidence",
         "help_zh": "和叙事相反的风险证据强度。这里分数越高代表反向证据越强，不代表越好。",
         "help_en": "Strength of evidence against the narrative. Higher means stronger counter-evidence here, not a better condition.",
     },
@@ -724,12 +734,18 @@ def _radar_chart(primary: dict[str, Any]) -> str:
 
 
 def _radar_svg(scores: list[float]) -> str:
-    center = 170.0
-    radius = 108.0
+    center = 260.0
+    center_y = 195.0
+    radius = 94.0
     max_score = 100.0
     grid_polygons = []
     for fraction in [0.25, 0.5, 0.75, 1.0]:
-        points = _radar_points([max_score * fraction] * len(scores), center, radius)
+        points = _radar_points(
+            [max_score * fraction] * len(scores),
+            center,
+            center_y,
+            radius,
+        )
         grid_polygons.append(
             f'<polygon class="radar-grid" points="{_points_attr(points)}" />'
         )
@@ -738,30 +754,28 @@ def _radar_svg(scores: list[float]) -> str:
     for index, item in enumerate(RADAR_DIMENSIONS):
         angle = _radar_angle(index, len(RADAR_DIMENSIONS))
         end_x = center + radius * math.cos(angle)
-        end_y = center + radius * math.sin(angle)
-        label_x = center + (radius + 38) * math.cos(angle)
-        label_y = center + (radius + 38) * math.sin(angle)
-        anchor = _text_anchor(label_x, center)
+        end_y = center_y + radius * math.sin(angle)
+        label = _radar_label_layout(index)
         axes.append(
-            f'<line class="radar-axis" x1="{center:.1f}" y1="{center:.1f}" x2="{end_x:.1f}" y2="{end_y:.1f}" />'
+            f'<line class="radar-axis" x1="{center:.1f}" y1="{center_y:.1f}" x2="{end_x:.1f}" y2="{end_y:.1f}" />'
         )
         labels.append(
             _svg_label(
-                x=label_x,
-                y=label_y,
-                anchor=anchor,
-                zh=str(item["zh"]),
-                en=str(item["en"]),
+                x=label["x"],
+                y=label["y"],
+                anchor=label["anchor"],
+                zh=str(item["svg_zh"]),
+                en=str(item["svg_en"]),
                 score=scores[index],
             )
         )
-    value_points = _radar_points(scores, center, radius)
+    value_points = _radar_points(scores, center, center_y, radius)
     point_marks = "".join(
         f'<circle class="radar-point" cx="{x:.1f}" cy="{y:.1f}" r="3.5" />'
         for x, y in value_points
     )
     return (
-        '<svg viewBox="0 0 340 340" role="img">'
+        '<svg viewBox="0 0 520 390" role="img">'
         f'<title>{_h("五维雷达图 / Five-Dimension Radar")}</title>'
         f"{''.join(grid_polygons)}"
         f"{''.join(axes)}"
@@ -774,15 +788,16 @@ def _radar_svg(scores: list[float]) -> str:
 
 def _radar_points(
     scores: list[float],
-    center: float,
+    center_x: float,
+    center_y: float,
     radius: float,
 ) -> list[tuple[float, float]]:
     return [
         (
-            center + radius * (score / 100.0) * math.cos(
+            center_x + radius * (score / 100.0) * math.cos(
                 _radar_angle(index, len(scores))
             ),
-            center + radius * (score / 100.0) * math.sin(
+            center_y + radius * (score / 100.0) * math.sin(
                 _radar_angle(index, len(scores))
             ),
         )
@@ -796,6 +811,17 @@ def _radar_angle(index: int, total: int) -> float:
 
 def _points_attr(points: list[tuple[float, float]]) -> str:
     return " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+
+
+def _radar_label_layout(index: int) -> dict[str, float | str]:
+    layouts: list[dict[str, float | str]] = [
+        {"x": 260.0, "y": 40.0, "anchor": "middle"},
+        {"x": 392.0, "y": 148.0, "anchor": "start"},
+        {"x": 384.0, "y": 308.0, "anchor": "start"},
+        {"x": 136.0, "y": 308.0, "anchor": "end"},
+        {"x": 128.0, "y": 148.0, "anchor": "end"},
+    ]
+    return layouts[index]
 
 
 def _svg_label(
@@ -813,14 +839,6 @@ def _svg_label(
         f'<tspan class="radar-score" x="{x:.1f}" dy="15">{score:.0f}</tspan>'
         "</text>"
     )
-
-
-def _text_anchor(x: float, center: float) -> str:
-    if x > center + 8:
-        return "start"
-    if x < center - 8:
-        return "end"
-    return "middle"
 
 
 def _radar_axis_item(item: dict[str, str], score: float) -> str:
