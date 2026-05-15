@@ -526,6 +526,7 @@ outputs/fund_000001_raw.json
 outputs/fund_000001_scoring.json
 outputs/fund_000001_review_queue.json
 outputs/fund_000001_source_table.json
+outputs/fund_000001_signal_trace.json
 outputs/fund_000001_manifest.json
 outputs/fund_000001_report.md
 outputs/fund_000001_report.html
@@ -538,6 +539,7 @@ The generated artifacts must satisfy:
 - `scoring.json` includes narrative exposures, five dimension scores, sustainability score, lifecycle stage, confidence, data quality, and version metadata.
 - `review_queue.json` includes the workspace-ready candidate review queue and the candidate/exclusion context needed to render it.
 - `source_table.json` includes provider-foundation layers, source URLs, data quality, mock flags, review metadata when present, and degradation events for future web source/provenance tables.
+- `signal_trace.json` includes per-narrative score traces tying each scoring dimension to signal events, source provider, source URL, source layer, and mock/provider-derived status for future web score explanation screens.
 - `manifest.json` includes artifact paths, provider foundation, data quality, and web-readiness metadata so a future web workspace can discover outputs without reconstructing file names.
 - `report.md` and `report.html` include fund basics, top holdings, one primary narrative, two to three secondary narratives, evidence summaries, risk evidence, confidence/data-quality notes, and a non-investment-advice disclaimer.
 - `report.html` renders semantic HTML sections and tables rather than displaying raw Markdown syntax.
@@ -561,11 +563,11 @@ python -m src.main --validate-artifact-contracts outputs/
 ```
 
 When given a directory, this command validates all known contract artifacts in
-that directory: fund manifests, source-table artifacts, review queue artifacts,
-workspace snapshots, review-action previews, and review-action persistence
-results. When given a manifest file, it validates the manifest and every file
-referenced by it, including source-table identity and provider-foundation
-consistency.
+that directory: fund manifests, source-table artifacts, signal-trace artifacts,
+review queue artifacts, workspace snapshots, review-action previews, and
+review-action persistence results. When given a manifest file, it validates the
+manifest and every file referenced by it, including source-table and
+signal-trace identity plus provider-foundation consistency.
 
 V1 should also be able to assemble a future-web workspace snapshot from an
 existing manifest or output directory:
@@ -582,6 +584,7 @@ include:
 - fund identity, provider mode, data quality, and `web_ready`
 - the original artifact manifest and provider foundation
 - the full source-table artifact
+- the full signal-trace artifact
 - the full review-queue artifact
 - primary/secondary narrative summaries and mapping context
 - report artifact references

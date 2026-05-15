@@ -9,6 +9,7 @@ from src.validation import (
     validate_news_evidence_payload,
     validate_pipeline_artifact_manifest_payload,
     validate_review_queue_artifact_payload,
+    validate_signal_trace_artifact_payload,
     validate_source_table_artifact_payload,
     validate_valuation_snapshot_payload,
     validate_workspace_snapshot_payload,
@@ -28,16 +29,19 @@ def build_workspace_snapshot(
     scoring = _read_manifest_json_artifact(artifact_root, artifacts, "scoring")
     review_queue = _read_manifest_json_artifact(artifact_root, artifacts, "review_queue")
     source_table = _read_manifest_json_artifact(artifact_root, artifacts, "source_table")
+    signal_trace = _read_manifest_json_artifact(artifact_root, artifacts, "signal_trace")
     _validate_manifest_text_artifact(artifact_root, artifacts, "markdown", "markdown")
     _validate_manifest_text_artifact(artifact_root, artifacts, "html", "html")
     validate_review_queue_artifact_payload(review_queue)
     validate_source_table_artifact_payload(source_table)
+    validate_signal_trace_artifact_payload(signal_trace)
     _require_bundle_identity(
         manifest=manifest,
         raw=raw,
         scoring=scoring,
         review_queue=review_queue,
         source_table=source_table,
+        signal_trace=signal_trace,
     )
     snapshot = _workspace_snapshot_payload(
         manifest=manifest,
@@ -45,6 +49,7 @@ def build_workspace_snapshot(
         scoring=scoring,
         review_queue=review_queue,
         source_table=source_table,
+        signal_trace=signal_trace,
         manifest_path=manifest_path,
     )
     validate_workspace_snapshot_payload(snapshot)
@@ -61,6 +66,7 @@ def _workspace_snapshot_payload(
     scoring: dict[str, Any],
     review_queue: dict[str, Any],
     source_table: dict[str, Any],
+    signal_trace: dict[str, Any],
     manifest_path: Path,
 ) -> dict[str, Any]:
     return {
@@ -75,6 +81,7 @@ def _workspace_snapshot_payload(
         "provider_foundation": manifest["provider_foundation"],
         "data_source_notice": _data_source_notice(manifest["provider_foundation"]),
         "source_table": source_table,
+        "signal_trace": signal_trace,
         "review_queue": review_queue,
         "narratives": {
             "primary": scoring.get("primary_narrative"),
@@ -243,6 +250,7 @@ def _require_bundle_identity(
     scoring: dict[str, Any],
     review_queue: dict[str, Any],
     source_table: dict[str, Any],
+    signal_trace: dict[str, Any],
 ) -> None:
     if raw.get("metadata", {}).get("fund_code") != manifest["fund_code"]:
         raise ValueError("workspace snapshot raw fund_code mismatch")
@@ -252,6 +260,10 @@ def _require_bundle_identity(
         raise ValueError("workspace snapshot source table fund_code mismatch")
     if source_table.get("as_of_date") != manifest["as_of_date"]:
         raise ValueError("workspace snapshot source table as_of_date mismatch")
+    if signal_trace.get("fund_code") != manifest["fund_code"]:
+        raise ValueError("workspace snapshot signal trace fund_code mismatch")
+    if signal_trace.get("as_of_date") != manifest["as_of_date"]:
+        raise ValueError("workspace snapshot signal trace as_of_date mismatch")
     if review_queue.get("metadata", {}).get("fund_code") != manifest["fund_code"]:
         raise ValueError("workspace snapshot review queue fund_code mismatch")
     if review_queue.get("metadata", {}).get("as_of_date") != manifest["as_of_date"]:

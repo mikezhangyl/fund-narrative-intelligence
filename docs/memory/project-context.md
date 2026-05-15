@@ -38,6 +38,7 @@ Experienced individual investors or researchers who want to understand what mark
 - Emit raw JSON, scoring JSON, Markdown report, and HTML report artifacts under `outputs/`.
 - Emit a dedicated review queue JSON artifact for future web approval workspace loading.
 - Emit a dedicated source table JSON artifact for future web source/provenance table rendering.
+- Emit a dedicated signal trace JSON artifact for future web score-provenance rendering.
 
 ## V1 Acceptance Command
 
@@ -55,6 +56,7 @@ Expected artifacts:
 - `outputs/fund_000001_scoring.json`
 - `outputs/fund_000001_review_queue.json`
 - `outputs/fund_000001_source_table.json`
+- `outputs/fund_000001_signal_trace.json`
 - `outputs/fund_000001_manifest.json`
 - `outputs/fund_000001_report.md`
 - `outputs/fund_000001_report.html`
@@ -121,10 +123,11 @@ Expected artifacts:
 - Raw/scoring JSON includes `candidate_review_queue`, a read-ready queue for future web approval screens with available actions, related exclusions, and promotion action templates.
 - Pipeline outputs include `fund_<code>_review_queue.json`, a dedicated future-workspace artifact containing the queue plus candidate/exclusion context.
 - Pipeline outputs include `fund_<code>_source_table.json`, a dedicated future-workspace artifact containing provider-foundation source rows, mock flags, data quality, degradation events, and reviewed-store metadata when present.
+- Pipeline outputs include `fund_<code>_signal_trace.json`, a dedicated future-workspace artifact containing per-narrative score traces from signal events to scoring dimensions, with source provider, source URL, source layer, and mock/provider-derived status.
 - Pipeline outputs include `fund_<code>_manifest.json`, a web-ready discovery artifact with relative artifact paths, provider foundation, data quality, and degradation events.
 - `python -m src.main --validate-artifact-manifest path/to/fund_000001_manifest.json` validates a manifest artifact without requiring `--fund-code`.
-- `python -m src.main --validate-artifact-contracts path/to/outputs_or_manifest` validates known generated artifact contracts in one command before future web workspace loading, including manifest-referenced source-table artifacts and generated workspace snapshots.
-- `python -m src.main --build-workspace-snapshot path/to/outputs_or_manifest` writes `fund_<code>_workspace_snapshot.json`, a future-web loader artifact that bundles the manifest, provider foundation, source table, review queue, narrative summaries, report paths, and approval workflow readiness metadata.
+- `python -m src.main --validate-artifact-contracts path/to/outputs_or_manifest` validates known generated artifact contracts in one command before future web workspace loading, including manifest-referenced source-table and signal-trace artifacts plus generated workspace snapshots.
+- `python -m src.main --build-workspace-snapshot path/to/outputs_or_manifest` writes `fund_<code>_workspace_snapshot.json`, a future-web loader artifact that bundles the manifest, provider foundation, source table, signal trace, review queue, narrative summaries, report paths, and approval workflow readiness metadata.
 - `python -m src.main --validate-workspace-snapshot path/to/fund_000001_workspace_snapshot.json` validates that loader artifact without building UI.
 - Workspace snapshots include a top-level `data_source_notice` object so future web screens can immediately display mock/partial/unavailable/degraded source warnings instead of inferring them from provider layers. They also include `approval_workflow.review_queue_summary`, `available_actions`, and item counts for future web approval routing. The V1 acceptance script explicitly validates this for the mock baseline so mock-backed web loader data cannot be mistaken for a real environment.
 - `python -m src.main --validate-review-queue path/to/fund_000001_review_queue.json` validates a review queue artifact without requiring `--fund-code`.

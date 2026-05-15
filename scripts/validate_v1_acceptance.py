@@ -19,6 +19,7 @@ EXPECTED_ARTIFACTS = {
     "scoring": f"fund_{FUND_CODE}_scoring.json",
     "review_queue": f"fund_{FUND_CODE}_review_queue.json",
     "source_table": f"fund_{FUND_CODE}_source_table.json",
+    "signal_trace": f"fund_{FUND_CODE}_signal_trace.json",
     "manifest": f"fund_{FUND_CODE}_manifest.json",
     "markdown": f"fund_{FUND_CODE}_report.md",
     "html": f"fund_{FUND_CODE}_report.html",
@@ -91,6 +92,7 @@ def validate_acceptance_outputs(output_dir: Path) -> None:
     manifest = _read_json(artifacts["manifest"])
     review_queue = _read_json(artifacts["review_queue"])
     source_table = _read_json(artifacts["source_table"])
+    signal_trace = _read_json(artifacts["signal_trace"])
     markdown = artifacts["markdown"].read_text(encoding="utf-8")
     html = artifacts["html"].read_text(encoding="utf-8")
 
@@ -155,6 +157,27 @@ def validate_acceptance_outputs(output_dir: Path) -> None:
     _require(
         source_table.get("provider_foundation") == foundation,
         "source table provider foundation mismatch",
+    )
+    _require(
+        signal_trace.get("version") == "signal-trace-v1",
+        "signal trace version mismatch",
+    )
+    _require(signal_trace.get("fund_code") == FUND_CODE, "signal trace fund_code mismatch")
+    _require(
+        signal_trace.get("provider_foundation") == foundation,
+        "signal trace provider foundation mismatch",
+    )
+    _require(
+        any(
+            _mock_source_url(signal.get("source_url"))
+            for narrative in signal_trace.get("narratives", [])
+            if isinstance(narrative, dict)
+            for dimension in narrative.get("dimensions", [])
+            if isinstance(dimension, dict)
+            for signal in dimension.get("signals", [])
+            if isinstance(signal, dict)
+        ),
+        "signal trace must expose mock source URLs for mock baseline",
     )
     _require(
         "Data Source Notice" in markdown and "Mock 数据" in markdown,
@@ -236,6 +259,7 @@ def _print_success(output_dir: Path) -> None:
         "scoring",
         "review_queue",
         "source_table",
+        "signal_trace",
         "manifest",
         "markdown",
         "html",

@@ -175,6 +175,7 @@ def validate_acceptance_outputs(
     )
     raw = _read_json(output_dir / f"fund_{fund_code}_raw.json")
     scoring = _read_json(output_dir / f"fund_{fund_code}_scoring.json")
+    signal_trace = _read_json(output_dir / f"fund_{fund_code}_signal_trace.json")
     markdown = (output_dir / f"fund_{fund_code}_report.md").read_text(encoding="utf-8")
     html = (output_dir / f"fund_{fund_code}_report.html").read_text(encoding="utf-8")
     foundation = scoring.get("provider_foundation", {})
@@ -280,6 +281,18 @@ def validate_acceptance_outputs(
         ),
         "valuation-derived signal events must disclose eastmoney-valuation",
     )
+    _require(
+        signal_trace.get("provider_foundation") == foundation,
+        "signal trace provider foundation mismatch",
+    )
+    _require(
+        _signal_trace_contains_source(
+            signal_trace,
+            source="valuation_snapshot",
+            source_provider="eastmoney-valuation",
+        ),
+        "signal trace must include eastmoney valuation-derived signals",
+    )
     expected = (
         "reviewed-registry-store",
         "reviewed-mapping-store",
@@ -358,6 +371,24 @@ def _require_layer_review_metadata(layer: dict[str, Any], layer_name: str) -> No
 
 def _contains_all(value: str, expected_fragments: tuple[str, ...]) -> bool:
     return all(fragment in value for fragment in expected_fragments)
+
+
+def _signal_trace_contains_source(
+    signal_trace: dict[str, Any],
+    *,
+    source: str,
+    source_provider: str,
+) -> bool:
+    return any(
+        signal.get("source") == source
+        and signal.get("source_provider") == source_provider
+        for narrative in signal_trace.get("narratives", [])
+        if isinstance(narrative, dict)
+        for dimension in narrative.get("dimensions", [])
+        if isinstance(dimension, dict)
+        for signal in dimension.get("signals", [])
+        if isinstance(signal, dict)
+    )
 
 
 def _require(condition: bool, message: str) -> None:

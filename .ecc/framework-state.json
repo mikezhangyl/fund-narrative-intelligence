@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-valuation-derived-signals",
+  "latest_run": "20260515-signal-trace-artifact",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "commit and merge valuation-derived signals, then continue the next end-to-end provider slice"
+  "next_step": "commit and merge signal trace artifact, then continue the next end-to-end provider slice"
 }

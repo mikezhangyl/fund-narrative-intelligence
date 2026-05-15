@@ -1,0 +1,40 @@
+{
+  "task_run_id": "20260515-signal-trace-artifact",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/signal-trace-artifact",
+  "worktree": "main",
+  "base_commit": "b0035f4",
+  "head_commit": "pending-commit",
+  "merge_base": "b0035f4",
+  "quality_reviewed_commit": "parent-review",
+  "reviewed_snapshot_type": "parent-review",
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "commit_and_merge",
+  "review_outcome": "passed",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "not_required",
+  "decisions": [
+    {
+      "id": "STA-001",
+      "date": "2026-05-15",
+      "decision": "Use a separate signal trace artifact instead of expanding reports or source tables only.",
+      "rationale": "The future web workspace needs a structured score-provenance object; reports and source tables are presentation and provider-layer artifacts, not score trace contracts."
+    }
+  ],
+  "verification": {
+    "ruff": "passed",
+    "compileall": "passed",
+    "pytest": "247 passed",
+    "coverage": "80%",
+    "v1_acceptance": "passed",
+    "reviewed_mapping_enriched_acceptance": "passed"
+  }
+}

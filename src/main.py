@@ -33,6 +33,7 @@ from src.validation import (
     validate_review_action_persistence_result_payload,
     validate_review_action_preview_payload,
     validate_review_queue_artifact_payload,
+    validate_signal_trace_artifact_payload,
     validate_source_table_artifact_payload,
     validate_workspace_snapshot_payload,
 )
@@ -450,6 +451,7 @@ def main(argv: list[str] | None = None) -> int:
                 [
                     f"manifests={summary['manifests']}",
                     f"source_tables={summary['source_tables']}",
+                    f"signal_traces={summary['signal_traces']}",
                     f"review_queues={summary['review_queues']}",
                     f"workspace_snapshots={summary['workspace_snapshots']}",
                     f"review_previews={summary['review_previews']}",
@@ -827,6 +829,9 @@ def _validate_artifact_contract_directory(path: Path) -> dict[str, int]:
     for source_table_path in sorted(path.glob("fund_*_source_table.json")):
         validate_source_table_artifact_payload(_read_json_object(source_table_path))
         summary["source_tables"] += 1
+    for signal_trace_path in sorted(path.glob("fund_*_signal_trace.json")):
+        validate_signal_trace_artifact_payload(_read_json_object(signal_trace_path))
+        summary["signal_traces"] += 1
     for snapshot_path in sorted(path.glob("fund_*_workspace_snapshot.json")):
         validate_workspace_snapshot_payload(_read_json_object(snapshot_path))
         summary["workspace_snapshots"] += 1
@@ -885,6 +890,18 @@ def _validate_manifest_referenced_artifact(
                 "manifest artifact source_table provider_foundation mismatch"
             )
         return
+    if artifact_key == "signal_trace":
+        payload = _read_json_object(artifact_path)
+        validate_signal_trace_artifact_payload(payload)
+        if payload.get("fund_code") != manifest["fund_code"]:
+            raise ValueError("manifest artifact signal_trace fund_code mismatch")
+        if payload.get("as_of_date") != manifest["as_of_date"]:
+            raise ValueError("manifest artifact signal_trace as_of_date mismatch")
+        if payload.get("provider_foundation") != manifest["provider_foundation"]:
+            raise ValueError(
+                "manifest artifact signal_trace provider_foundation mismatch"
+            )
+        return
     if artifact_key in {"raw", "scoring"}:
         payload = _read_json_object(artifact_path)
         _validate_manifest_json_metadata(
@@ -921,6 +938,7 @@ def _empty_contract_summary() -> dict[str, int]:
     return {
         "manifests": 0,
         "source_tables": 0,
+        "signal_traces": 0,
         "review_queues": 0,
         "workspace_snapshots": 0,
         "review_previews": 0,

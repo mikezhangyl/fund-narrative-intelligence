@@ -609,6 +609,36 @@ def validate_source_table_artifact_payload(payload: dict[str, Any]) -> None:
         )
 
 
+def validate_signal_trace_artifact_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "signal trace artifact")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "fund_code",
+            "as_of_date",
+            "provider_foundation",
+            "signal_count",
+            "narratives",
+        },
+        "signal trace artifact",
+    )
+    if payload["version"] != "signal-trace-v1":
+        raise ProviderContractError("signal trace artifact version is unsupported")
+    for field in {"fund_code", "as_of_date"}:
+        if not isinstance(payload[field], str) or not payload[field]:
+            raise ProviderContractError(
+                f"signal trace artifact {field} must be a non-empty string"
+            )
+    _require_mapping(payload["provider_foundation"], "signal trace provider_foundation")
+    if not isinstance(payload["signal_count"], int) or payload["signal_count"] < 0:
+        raise ProviderContractError("signal trace signal_count must be non-negative")
+    if not isinstance(payload["narratives"], list) or not payload["narratives"]:
+        raise ProviderContractError("signal trace narratives must be a non-empty list")
+    for index, narrative in enumerate(payload["narratives"]):
+        _validate_signal_trace_narrative(narrative, f"signal trace narratives[{index}]")
+
+
 def validate_workspace_snapshot_payload(payload: dict[str, Any]) -> None:
     _require_mapping(payload, "workspace snapshot")
     _require_keys(
@@ -624,6 +654,7 @@ def validate_workspace_snapshot_payload(payload: dict[str, Any]) -> None:
             "provider_foundation",
             "data_source_notice",
             "source_table",
+            "signal_trace",
             "review_queue",
             "narratives",
             "reports",
@@ -642,6 +673,7 @@ def validate_workspace_snapshot_payload(payload: dict[str, Any]) -> None:
         raise ProviderContractError("workspace snapshot web_ready must be true")
     validate_pipeline_artifact_manifest_payload(payload["artifact_manifest"])
     validate_source_table_artifact_payload(payload["source_table"])
+    validate_signal_trace_artifact_payload(payload["signal_trace"])
     validate_review_queue_artifact_payload(payload["review_queue"])
     _require_mapping(payload["provider_foundation"], "workspace snapshot provider_foundation")
     _validate_workspace_snapshot_identity(payload)
@@ -675,6 +707,14 @@ def _validate_workspace_snapshot_identity(payload: dict[str, Any]) -> None:
     if payload["source_table"]["provider_foundation"] != payload["provider_foundation"]:
         raise ProviderContractError(
             "workspace snapshot source table provider_foundation mismatch"
+        )
+    if payload["signal_trace"]["fund_code"] != payload["fund_code"]:
+        raise ProviderContractError("workspace snapshot signal trace fund_code mismatch")
+    if payload["signal_trace"]["as_of_date"] != payload["as_of_date"]:
+        raise ProviderContractError("workspace snapshot signal trace as_of_date mismatch")
+    if payload["signal_trace"]["provider_foundation"] != payload["provider_foundation"]:
+        raise ProviderContractError(
+            "workspace snapshot signal trace provider_foundation mismatch"
         )
     if payload["review_queue"]["provider_foundation"] != payload["provider_foundation"]:
         raise ProviderContractError(
@@ -916,6 +956,92 @@ def _validate_workspace_snapshot_approval_workflow(
         raise ProviderContractError("approval_workflow available_actions mismatch")
 
 
+def _validate_signal_trace_narrative(narrative: Any, context: str) -> None:
+    _require_mapping(narrative, context)
+    _require_keys(
+        narrative,
+        {
+            "narrative_id",
+            "name",
+            "stage",
+            "sustainability_score",
+            "confidence",
+            "dimensions",
+        },
+        context,
+    )
+    for field in {"narrative_id", "name", "stage"}:
+        if not isinstance(narrative[field], str) or not narrative[field]:
+            raise ProviderContractError(f"{context}.{field} must be a non-empty string")
+    if not isinstance(narrative["dimensions"], list) or not narrative["dimensions"]:
+        raise ProviderContractError(f"{context}.dimensions must be a non-empty list")
+    for index, dimension in enumerate(narrative["dimensions"]):
+        _validate_signal_trace_dimension(dimension, f"{context}.dimensions[{index}]")
+
+
+def _validate_signal_trace_dimension(dimension: Any, context: str) -> None:
+    _require_mapping(dimension, context)
+    _require_keys(
+        dimension,
+        {
+            "dimension",
+            "score",
+            "confidence",
+            "data_quality",
+            "supporting_signal_count",
+            "risk_signal_count",
+            "signals",
+        },
+        context,
+    )
+    if not isinstance(dimension["dimension"], str) or not dimension["dimension"]:
+        raise ProviderContractError(f"{context}.dimension must be a non-empty string")
+    if not isinstance(dimension["signals"], list):
+        raise ProviderContractError(f"{context}.signals must be a list")
+    for index, signal in enumerate(dimension["signals"]):
+        _validate_signal_trace_signal(signal, f"{context}.signals[{index}]")
+
+
+def _validate_signal_trace_signal(signal: Any, context: str) -> None:
+    _require_mapping(signal, context)
+    _require_keys(
+        signal,
+        {
+            "signal_id",
+            "signal_type",
+            "role",
+            "strength",
+            "confidence",
+            "confidence_multiplier",
+            "event_date",
+            "half_life_days",
+            "source",
+            "source_provider",
+            "source_url",
+            "source_stock_code",
+            "source_layer",
+            "source_layer_is_mock",
+        },
+        context,
+    )
+    for field in {
+        "signal_id",
+        "signal_type",
+        "role",
+        "event_date",
+        "source",
+        "source_provider",
+        "source_url",
+        "source_layer",
+    }:
+        if not isinstance(signal[field], str) or not signal[field]:
+            raise ProviderContractError(f"{context}.{field} must be a non-empty string")
+    if signal["role"] not in {"support", "negative"}:
+        raise ProviderContractError(f"{context}.role must be support or negative")
+    if not isinstance(signal["source_layer_is_mock"], bool):
+        raise ProviderContractError(f"{context}.source_layer_is_mock must be boolean")
+
+
 def _require_mapping(value: Any, context: str) -> None:
     if not isinstance(value, dict):
         raise ProviderContractError(f"{context} must be an object")
@@ -1043,6 +1169,30 @@ def _validate_pipeline_manifest_artifacts(artifacts: Any) -> None:
             raise ProviderContractError(f"{context}.path must be a relative file path")
         if artifact["format"] != expected_format:
             raise ProviderContractError(f"{context}.format must be {expected_format}")
+    signal_trace = artifacts.get("signal_trace")
+    if signal_trace is not None:
+        _validate_manifest_artifact_descriptor(
+            artifact=signal_trace,
+            artifact_key="signal_trace",
+            expected_format="json",
+        )
+
+
+def _validate_manifest_artifact_descriptor(
+    artifact: Any,
+    artifact_key: str,
+    expected_format: str,
+) -> None:
+    context = f"pipeline artifact manifest artifacts.{artifact_key}"
+    _require_mapping(artifact, context)
+    _require_keys(artifact, {"path", "format"}, context)
+    path = artifact["path"]
+    if not isinstance(path, str) or not path:
+        raise ProviderContractError(f"{context}.path must be a non-empty string")
+    if path.startswith("/") or ".." in path.split("/"):
+        raise ProviderContractError(f"{context}.path must be a relative file path")
+    if artifact["format"] != expected_format:
+        raise ProviderContractError(f"{context}.format must be {expected_format}")
 
 
 def _validate_review_queue_exclusion(exclusion: Any, context: str) -> None:

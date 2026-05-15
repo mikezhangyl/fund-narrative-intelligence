@@ -1260,3 +1260,33 @@ Consequences:
   `derived_signal_events` and scoring `signal_events`.
 - Reviewed-mapping enriched acceptance now requires Eastmoney valuation
   snapshots to produce valuation-derived signals.
+
+## ADR-0050: Emit Signal Trace Artifact For Score Provenance
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Emit a dedicated `fund_<code>_signal_trace.json` artifact and include it in the
+artifact manifest and workspace snapshot.
+
+Rationale:
+
+- Future web screens need to explain score provenance without recomputing joins
+  from raw/scoring JSON.
+- Source tables explain provider layers, but they do not show which signal
+  events affected which scoring dimensions.
+- A separate contract keeps reports presentational while preserving a
+  machine-readable trace for UI inspection and approval workflows.
+
+Consequences:
+
+- Signal trace artifacts include per-narrative dimension traces with signal ID,
+  signal type, role, source provider, source URL, source layer, and mock status.
+- `--validate-artifact-contracts` validates signal trace artifacts when present
+  and manifest-referenced signal traces for identity/provider-foundation drift.
+- Workspace snapshots embed the full signal trace so future web loaders can show
+  score explanations directly.
+- Mock baseline traces fall back to `mock://fixtures/signal_events.json` when
+  fixture signal events have no event-level source URL.

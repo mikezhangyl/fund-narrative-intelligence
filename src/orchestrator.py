@@ -28,6 +28,7 @@ from src.modules.signal_service.derived import (
     derive_valuation_signal_events,
 )
 from src.modules.signal_service.scoring import score_narrative_state
+from src.modules.signal_service.trace import build_signal_trace_payload
 from src.modules.snapshot_writer.writer import write_json_artifact
 from src.modules.valuation.snapshots import (
     build_quote_derived_valuation_snapshots,
@@ -499,15 +500,24 @@ def run_pipeline(
             "excluded_mapping_candidates"
         ],
     }
+    signal_trace_payload = build_signal_trace_payload(
+        fund_code=fund_code,
+        as_of_date=as_of_date,
+        provider_foundation=provider_foundation,
+        narratives=narrative_results,
+        signal_events=signal_events,
+    )
 
     raw_path = output_path / f"fund_{fund_code}_raw.json"
     scoring_path = output_path / f"fund_{fund_code}_scoring.json"
     review_queue_path = output_path / f"fund_{fund_code}_review_queue.json"
     source_table_path = output_path / f"fund_{fund_code}_source_table.json"
+    signal_trace_path = output_path / f"fund_{fund_code}_signal_trace.json"
     manifest_path = output_path / f"fund_{fund_code}_manifest.json"
     write_json_artifact(raw_payload, raw_path)
     write_json_artifact(scoring_payload, scoring_path)
     write_json_artifact(review_queue_payload, review_queue_path)
+    write_json_artifact(signal_trace_payload, signal_trace_path)
     write_json_artifact(
         _source_table_payload(
             fund_code=fund_code,
@@ -529,6 +539,7 @@ def run_pipeline(
             "scoring": scoring_path,
             "review_queue": review_queue_path,
             "source_table": source_table_path,
+            "signal_trace": signal_trace_path,
             "markdown": report_paths["markdown"],
             "html": report_paths["html"],
         },
@@ -540,6 +551,7 @@ def run_pipeline(
         "scoring": scoring_path,
         "review_queue": review_queue_path,
         "source_table": source_table_path,
+        "signal_trace": signal_trace_path,
         "manifest": manifest_path,
         "markdown": report_paths["markdown"],
         "html": report_paths["html"],

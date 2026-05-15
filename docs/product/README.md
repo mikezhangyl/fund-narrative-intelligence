@@ -26,7 +26,7 @@ python scripts/validate_v1_acceptance.py
 It must generate fund `000001`, validate generated artifact contracts, build and
 validate a workspace snapshot, confirm mock data is visibly disclosed, and
 produce raw JSON, scoring JSON, review queue, source table, manifest, Markdown
-report, HTML report, and workspace snapshot artifacts.
+report, HTML report, signal trace, and workspace snapshot artifacts.
 
 V1 can also list available mock fixtures:
 
@@ -47,10 +47,10 @@ python -m src.main --build-workspace-snapshot outputs/
 python -m src.main --validate-workspace-snapshot outputs/fund_000001_workspace_snapshot.json
 ```
 
-The workspace snapshot includes top-level `data_source_notice` and
-`approval_workflow` fields so a future web UI can display mock/partial source
-warnings and review-action state without rebuilding them from lower-level
-artifacts.
+The workspace snapshot includes top-level `data_source_notice`,
+`signal_trace`, and `approval_workflow` fields so a future web UI can display
+mock/partial source warnings, score provenance, and review-action state without
+rebuilding them from lower-level artifacts.
 
 The strict reviewed-mapping enriched acceptance path now uses explicit
 Eastmoney valuation metrics:

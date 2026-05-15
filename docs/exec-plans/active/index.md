@@ -73,3 +73,4 @@
 - [docs-workspace-acceptance-sync.md](./docs-workspace-acceptance-sync.md)
 - [eastmoney-valuation-provider.md](./eastmoney-valuation-provider.md)
 - [valuation-derived-signals.md](./valuation-derived-signals.md)
+- [signal-trace-artifact.md](./signal-trace-artifact.md)

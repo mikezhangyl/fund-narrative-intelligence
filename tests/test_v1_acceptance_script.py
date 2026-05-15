@@ -48,6 +48,7 @@ def test_validate_acceptance_outputs_rejects_missing_mock_source_url(tmp_path):
     manifest_path = output_dir / "fund_000001_manifest.json"
     review_queue_path = output_dir / "fund_000001_review_queue.json"
     source_table_path = output_dir / "fund_000001_source_table.json"
+    signal_trace_path = output_dir / "fund_000001_signal_trace.json"
     markdown_path = output_dir / "fund_000001_report.md"
     html_path = output_dir / "fund_000001_report.html"
 
@@ -106,6 +107,7 @@ def test_validate_acceptance_outputs_rejects_missing_mock_source_url(tmp_path):
         ),
         encoding="utf-8",
     )
+    signal_trace_path.write_text("{}", encoding="utf-8")
     markdown_path.write_text("Data Source Notice\nMock 数据\n", encoding="utf-8")
     html_path.write_text("Data Source Notice\nMock 数据\n", encoding="utf-8")
 

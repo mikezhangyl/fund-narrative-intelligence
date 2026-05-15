@@ -298,9 +298,60 @@ def _write_outputs(
         "layers": list(provider_foundation["layers"].values()),
         "degradation_events": provider_foundation["degradation_events"],
     }
+    signal_trace = {
+        "version": "signal-trace-v1",
+        "fund_code": "161725",
+        "as_of_date": "2026-03-31",
+        "provider_foundation": provider_foundation,
+        "signal_count": len(derived_signal_events),
+        "narratives": [
+            {
+                "narrative_id": "premium_baijiu_consumption",
+                "name": "Premium Baijiu Consumption",
+                "stage": "diverging",
+                "sustainability_score": 50,
+                "confidence": 0.5,
+                "dimensions": [
+                    {
+                        "dimension": "valuation_risk_score",
+                        "score": 65,
+                        "confidence": 0.4,
+                        "data_quality": "partial",
+                        "supporting_signal_count": 1,
+                        "risk_signal_count": 0,
+                        "signals": [
+                            {
+                                "signal_id": (
+                                    "SIG_VAL_600519_premium_baijiu_consumption_"
+                                    "VALUATION_EXTREME"
+                                ),
+                                "signal_type": "valuation_extreme",
+                                "role": "support",
+                                "strength": 0.75,
+                                "confidence": 0.6,
+                                "confidence_multiplier": 0.75,
+                                "event_date": "2026-05-14",
+                                "half_life_days": 30,
+                                "source": "valuation_snapshot",
+                                "source_provider": "eastmoney-valuation",
+                                "source_url": (
+                                    "https://push2.eastmoney.com/api/qt/stock/get"
+                                    "?secid=1.600519"
+                                ),
+                                "source_stock_code": "600519",
+                                "source_layer": "valuation",
+                                "source_layer_is_mock": False,
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
     _write_json(output_dir / "fund_161725_raw.json", raw)
     _write_json(output_dir / "fund_161725_scoring.json", scoring)
     _write_json(output_dir / "fund_161725_source_table.json", source_table)
+    _write_json(output_dir / "fund_161725_signal_trace.json", signal_trace)
     _write_json(output_dir / "fund_161725_manifest.json", manifest)
     notice = (
         "reviewed-registry-store\nreviewed-mapping-store\n"

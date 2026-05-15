@@ -20,6 +20,14 @@ def test_build_workspace_snapshot_from_output_directory(tmp_path):
     assert snapshot["artifact_manifest"]["artifacts"]["source_table"]["path"] == (
         "fund_000001_source_table.json"
     )
+    assert snapshot["artifact_manifest"]["artifacts"]["signal_trace"]["path"] == (
+        "fund_000001_signal_trace.json"
+    )
+    assert snapshot["signal_trace"]["version"] == "signal-trace-v1"
+    assert snapshot["signal_trace"]["fund_code"] == "000001"
+    assert snapshot["signal_trace"]["provider_foundation"] == snapshot[
+        "provider_foundation"
+    ]
     assert snapshot["source_table"]["layers"][0]["source_url"].startswith(
         "mock://fixtures/"
     )
@@ -214,6 +222,18 @@ def test_workspace_snapshot_validation_rejects_identity_drift(tmp_path):
         validate_workspace_snapshot_payload(snapshot)
 
     assert "source table fund_code mismatch" in str(exc.value)
+
+
+def test_workspace_snapshot_validation_rejects_signal_trace_identity_drift(tmp_path):
+    run_pipeline(fund_code="000001", provider_mode="mock", output_dir=tmp_path)
+    snapshot_path = build_workspace_snapshot(tmp_path)
+    snapshot = json.loads(snapshot_path.read_text())
+    snapshot["signal_trace"]["fund_code"] = "999999"
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_workspace_snapshot_payload(snapshot)
+
+    assert "signal trace fund_code mismatch" in str(exc.value)
 
 
 def test_workspace_snapshot_validation_rejects_source_notice_drift(tmp_path):

@@ -29,6 +29,7 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
     review_queue_path = tmp_path / "fund_000001_review_queue.json"
     manifest_path = tmp_path / "fund_000001_manifest.json"
     source_table_path = tmp_path / "fund_000001_source_table.json"
+    signal_trace_path = tmp_path / "fund_000001_signal_trace.json"
     markdown_path = tmp_path / "fund_000001_report.md"
     html_path = tmp_path / "fund_000001_report.html"
 
@@ -38,6 +39,7 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
         review_queue_path,
         manifest_path,
         source_table_path,
+        signal_trace_path,
         markdown_path,
         html_path,
     ]:
@@ -47,6 +49,7 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
     scoring = json.loads(scoring_path.read_text())
     manifest = json.loads(manifest_path.read_text())
     source_table = json.loads(source_table_path.read_text())
+    signal_trace = json.loads(signal_trace_path.read_text())
     markdown = markdown_path.read_text()
     html = html_path.read_text()
 
@@ -78,6 +81,10 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
         "fund_000001_source_table.json"
     )
     assert manifest["artifacts"]["source_table"]["format"] == "json"
+    assert manifest["artifacts"]["signal_trace"]["path"] == (
+        "fund_000001_signal_trace.json"
+    )
+    assert manifest["artifacts"]["signal_trace"]["format"] == "json"
     assert manifest["artifacts"]["markdown"]["path"] == "fund_000001_report.md"
     assert manifest["artifacts"]["html"]["path"] == "fund_000001_report.html"
     assert manifest["provider_foundation"] == scoring["provider_foundation"]
@@ -88,6 +95,21 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
     assert source_table["layers"][0]["display_name"] == "Holdings"
     assert source_table["layers"][0]["source_url"] == "mock://fixtures/fund_000001.json"
     assert source_table["degradation_events"] == scoring["degradation_events"]
+    assert signal_trace["version"] == "signal-trace-v1"
+    assert signal_trace["fund_code"] == "000001"
+    assert signal_trace["provider_foundation"] == scoring["provider_foundation"]
+    assert signal_trace["signal_count"] == len(raw["signal_events"])
+    primary_trace = signal_trace["narratives"][0]
+    assert primary_trace["narrative_id"] == scoring["primary_narrative"]["narrative_id"]
+    assert primary_trace["dimensions"][0]["dimension"] == "earnings_score"
+    assert primary_trace["dimensions"][0]["score"] == scoring["primary_narrative"][
+        "state"
+    ]["dimensions"]["earnings_score"]["score"]
+    assert any(
+        item["source_url"] == "mock://fixtures/signal_events.json"
+        for dimension in primary_trace["dimensions"]
+        for item in dimension["signals"]
+    )
     assert scoring["primary_narrative"]["narrative_id"]
     assert "interpretation" in scoring["primary_narrative"]
     assert len(scoring["secondary_narratives"]) >= 2
@@ -155,6 +177,25 @@ def test_artifact_contracts_reject_source_table_as_of_date_mismatch(tmp_path):
         assert "source_table as_of_date mismatch" in str(exc)
     else:
         raise AssertionError("expected source_table as_of_date mismatch")
+
+
+def test_artifact_contracts_reject_signal_trace_identity_mismatch(tmp_path):
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+    )
+    signal_trace = json.loads(artifacts["signal_trace"].read_text())
+    signal_trace["fund_code"] = "999999"
+    artifacts["signal_trace"].write_text(
+        json.dumps(signal_trace, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError) as exc:
+        main_module._validate_artifact_contracts(tmp_path)
+
+    assert "signal_trace fund_code mismatch" in str(exc.value)
 
 
 def test_real_provider_mode_degrades_to_mock_without_crashing(tmp_path):
