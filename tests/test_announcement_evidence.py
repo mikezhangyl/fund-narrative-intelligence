@@ -1,5 +1,8 @@
 from src.modules.evidence.announcements import convert_announcements_to_evidence
-from src.validation import validate_evidence_payload
+from src.validation import (
+    validate_announcement_evidence_payload,
+    validate_evidence_payload,
+)
 
 
 def test_converts_supporting_cninfo_announcement_to_mapped_evidence():
@@ -53,6 +56,7 @@ def test_converts_supporting_cninfo_announcement_to_mapped_evidence():
     assert evidence["stock_code"] == "000001"
     assert evidence["provider_data_quality"] == "fresh"
     validate_evidence_payload({"version": result["version"], "evidence": result["evidence"]})
+    validate_announcement_evidence_payload(result)
 
 
 def test_converts_risk_announcement_to_negative_evidence_and_cleans_title():

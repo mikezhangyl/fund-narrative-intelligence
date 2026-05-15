@@ -168,6 +168,123 @@ def validate_evidence_payload(payload: dict[str, Any]) -> None:
         _require_probability(item["confidence"], f"{context}.confidence")
 
 
+def validate_announcement_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "announcement payload")
+    _require_keys(
+        payload,
+        {"version", "data_quality", "announcements", "missing_stock_codes"},
+        "announcement payload",
+    )
+    if not isinstance(payload["version"], str) or not payload["version"]:
+        raise ProviderContractError("announcement payload version must be non-empty")
+    if payload["data_quality"] not in SOURCE_TABLE_LAYER_DATA_QUALITIES:
+        raise ProviderContractError("announcement payload data_quality is unsupported")
+    if not isinstance(payload["announcements"], list):
+        raise ProviderContractError("announcement payload announcements must be a list")
+    _require_string_list(
+        payload["missing_stock_codes"],
+        "announcement payload missing_stock_codes",
+    )
+    for index, announcement in enumerate(payload["announcements"]):
+        _validate_announcement_item(
+            announcement,
+            f"announcement payload announcements[{index}]",
+        )
+
+
+def _validate_announcement_item(item: Any, context: str) -> None:
+    _require_mapping(item, context)
+    _require_keys(
+        item,
+        {
+            "stock_code",
+            "stock_name",
+            "title",
+            "category",
+            "announcement_date",
+            "source",
+            "source_url",
+        },
+        context,
+    )
+    for field in {"stock_code", "stock_name", "title", "category", "source"}:
+        if not isinstance(item[field], str):
+            raise ProviderContractError(f"{context}.{field} must be a string")
+    if item["announcement_date"] is not None and not isinstance(
+        item["announcement_date"],
+        str,
+    ):
+        raise ProviderContractError(f"{context}.announcement_date must be a string")
+    if item["source_url"] is not None and not isinstance(item["source_url"], str):
+        raise ProviderContractError(f"{context}.source_url must be a string")
+
+
+def validate_announcement_evidence_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "announcement evidence")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "data_quality",
+            "evidence",
+            "missing_stock_codes",
+            "unmapped_stock_codes",
+            "skipped_announcement_count",
+        },
+        "announcement evidence",
+    )
+    if payload["version"] != "announcement-evidence-v1":
+        raise ProviderContractError("announcement evidence version is unsupported")
+    if payload["data_quality"] not in SOURCE_TABLE_LAYER_DATA_QUALITIES:
+        raise ProviderContractError("announcement evidence data_quality is unsupported")
+    validate_evidence_payload(
+        {"version": payload["version"], "evidence": payload["evidence"]}
+    )
+    _require_string_list(
+        payload["missing_stock_codes"],
+        "announcement evidence missing_stock_codes",
+    )
+    _require_string_list(
+        payload["unmapped_stock_codes"],
+        "announcement evidence unmapped_stock_codes",
+    )
+    if not isinstance(payload["skipped_announcement_count"], int):
+        raise ProviderContractError(
+            "announcement evidence skipped_announcement_count must be an integer"
+        )
+    for index, item in enumerate(payload["evidence"]):
+        _validate_announcement_evidence_item(
+            item,
+            f"announcement evidence evidence[{index}]",
+        )
+
+
+def _validate_announcement_evidence_item(item: Any, context: str) -> None:
+    _require_mapping(item, context)
+    _require_keys(
+        item,
+        {
+            "stock_code",
+            "stock_name",
+            "announcement_category",
+            "provider_data_quality",
+            "mapping_confidence",
+            "classification_reason",
+        },
+        context,
+    )
+    for field in {
+        "stock_code",
+        "stock_name",
+        "announcement_category",
+        "provider_data_quality",
+        "classification_reason",
+    }:
+        if not isinstance(item[field], str):
+            raise ProviderContractError(f"{context}.{field} must be a string")
+    _require_probability(item["mapping_confidence"], f"{context}.mapping_confidence")
+
+
 def validate_signal_payload(payload: dict[str, Any]) -> None:
     _require_mapping(payload, "signal events")
     _require_keys(payload, {"version", "signal_events"}, "signal events")

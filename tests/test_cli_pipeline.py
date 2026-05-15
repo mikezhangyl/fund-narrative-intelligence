@@ -5,6 +5,7 @@ import sys
 import pytest
 from src import main as main_module
 from src.config import FIXTURE_DIR
+from src.errors import ProviderContractError
 from src.orchestrator import run_pipeline
 from src.providers import eastmoney as eastmoney_module
 
@@ -376,6 +377,41 @@ def test_optional_announcement_evidence_is_disclosed_and_added_to_outputs(tmp_pa
     assert '<section class="announcement-evidence">' in html
     assert "https://static.cninfo.com.cn/finalpage/1.PDF" in html
     assert "cninfo-announcement" in html
+
+
+def test_optional_announcement_evidence_rejects_malformed_provider_payload(tmp_path):
+    class BadAnnouncementProvider:
+        provider_name = "cninfo-announcement"
+        provider_version = "cninfo-announcement-v1"
+        source_url = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_announcements(
+            self,
+            stock_codes: list[str],
+            as_of_date: str,
+            start_date: str | None = None,
+        ) -> dict:
+            del stock_codes
+            del as_of_date
+            del start_date
+            return {
+                "version": self.provider_version,
+                "data_quality": "fresh",
+                "announcements": "not-a-list",
+                "missing_stock_codes": [],
+            }
+
+    with pytest.raises(ProviderContractError) as exc:
+        run_pipeline(
+            fund_code="000001",
+            provider_mode="mock",
+            output_dir=tmp_path,
+            include_announcement_evidence=True,
+            announcement_provider=BadAnnouncementProvider(),
+        )
+
+    assert "announcement payload announcements must be a list" in str(exc.value)
 
 
 def test_cli_include_cninfo_announcements_passes_options_to_pipeline(

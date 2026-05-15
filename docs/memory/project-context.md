@@ -97,6 +97,7 @@ Expected artifacts:
 - Optional `CNInfoAnnouncementProvider` exists as the first real intelligence-source adapter foundation; it is not wired into the default report pipeline.
 - Optional announcement-to-evidence conversion and orchestration exist for CNINFO-style announcement metadata; default reports do not call CNINFO unless `--include-cninfo-announcements` is set.
 - CNINFO announcement search for Shanghai and Shenzhen A-shares must send `stock` as `code,orgId`, for example `600519,gssh0600519` or `000001,gssz0000001`; using only the 6-digit code can return empty results.
+- Announcement provider payloads and generated announcement evidence payloads have reusable contract validators. Optional CNINFO orchestration validates the provider payload before conversion and the generated evidence payload before returning it.
 - Markdown and HTML reports include a `Data Source Notice` whenever a run uses mock data, fallback/degradation, or mixed real/mock layers.
 - Mock-backed holdings and fixture-backed intelligence layers use `mock://fixtures/...` source identifiers so raw/scoring JSON and future web source tables visibly mark non-real data at the source field.
 - HTML reports render semantic sections/tables directly from structured scoring data.

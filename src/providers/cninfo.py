@@ -8,6 +8,8 @@ from typing import Any, Callable
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from src.validation import validate_announcement_payload
+
 CNINFO_ANNOUNCEMENT_QUERY_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
 CNINFO_STATIC_BASE_URL = "https://static.cninfo.com.cn/"
 
@@ -74,7 +76,7 @@ class CNInfoAnnouncementProvider:
             )
             announcements.extend(normalized)
 
-        return {
+        payload = {
             "version": self.provider_version,
             "data_quality": _data_quality(
                 requested_count=len(requested_stock_codes),
@@ -83,6 +85,8 @@ class CNInfoAnnouncementProvider:
             "announcements": announcements,
             "missing_stock_codes": missing_stock_codes,
         }
+        validate_announcement_payload(payload)
+        return payload
 
 
 def build_cninfo_announcement_payload(

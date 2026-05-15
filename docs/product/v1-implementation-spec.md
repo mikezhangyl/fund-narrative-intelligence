@@ -82,6 +82,8 @@ Optional announcement-to-evidence conversion:
 - Evidence confidence is `classification_base_confidence * mapping_confidence * data_quality_confidence`.
 - The converter must not download or parse PDFs in V1. Generated summaries must state that only announcement metadata was classified.
 - Unmapped or malformed announcements must be tracked and skipped without crashing the caller.
+- Announcement provider payloads and generated announcement evidence payloads
+  must pass reusable provider-contract validators before orchestration proceeds.
 
 ## Degradation Strategy
 

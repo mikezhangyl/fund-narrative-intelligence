@@ -8,6 +8,7 @@ from html import unescape
 from typing import Any
 
 from src.config import DATA_QUALITY_CONFIDENCE
+from src.validation import validate_announcement_evidence_payload
 
 ANNOUNCEMENT_EVIDENCE_VERSION = "announcement-evidence-v1"
 
@@ -104,7 +105,7 @@ def convert_announcements_to_evidence(
                 )
             )
 
-    return {
+    payload = {
         "version": ANNOUNCEMENT_EVIDENCE_VERSION,
         "data_quality": data_quality,
         "evidence": sorted(
@@ -122,6 +123,8 @@ def convert_announcements_to_evidence(
         "unmapped_stock_codes": sorted(unmapped_stock_codes),
         "skipped_announcement_count": skipped_count,
     }
+    validate_announcement_evidence_payload(payload)
+    return payload
 
 
 def classify_announcement(announcement: dict[str, Any]) -> AnnouncementEvidenceProfile:

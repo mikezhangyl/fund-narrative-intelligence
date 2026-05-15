@@ -56,6 +56,7 @@ from src.providers.news import (
     GoogleNewsRssEvidenceProvider,
 )
 from src.providers.provenance import build_provider_foundation
+from src.validation import validate_announcement_payload
 
 NARRATIVE_REGISTRY_MODE_FIXTURE = "fixture"
 NARRATIVE_REGISTRY_MODE_REVIEWED = "reviewed"
@@ -756,6 +757,7 @@ def _run_announcement_evidence(
         *degradation_events,
         *getattr(provider, "degradation_events", []),
     ]
+    validate_announcement_payload(announcements_payload)
     announcement_evidence_payload = convert_announcements_to_evidence(
         announcements_payload=announcements_payload,
         stock_mappings=stock_mappings,

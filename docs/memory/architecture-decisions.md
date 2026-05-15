@@ -1608,3 +1608,30 @@ Consequences:
 - Reviewed-mapping enriched acceptance fails if `announcements`,
   `announcement_evidence`, or `market_quotes` data-layer rows are missing.
 - These layers must be non-mock, have rows, and disclose source URLs.
+
+## ADR-0063: Validate Announcement Provider Contracts
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add reusable validators for announcement provider payloads and generated
+announcement evidence payloads, and call them from CNINFO orchestration.
+
+Rationale:
+
+- Malformed real-provider payloads should fail fast instead of being silently
+  converted into empty evidence.
+- Announcement evidence is now used by scoring, reports, and future workspace
+  loading, so it needs the same contract discipline as news, valuation, and
+  financial provider payloads.
+- The converter should still track malformed individual announcement rows, but
+  top-level payload shape errors are provider contract failures.
+
+Consequences:
+
+- CNINFO provider output is validated before it is returned.
+- Optional announcement orchestration validates the provider payload before
+  conversion.
+- Generated announcement evidence is validated before leaving the converter.
