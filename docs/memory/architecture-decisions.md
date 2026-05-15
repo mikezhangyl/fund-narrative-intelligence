@@ -1496,3 +1496,30 @@ Consequences:
 - Reports include a `Market Quotes` table when the payload exists.
 - Rows include stock, latest price, change percent, change amount, previous
   close, volume, provider, and source URL.
+
+## ADR-0059: Render News Evidence In Reports
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Render optional `news_evidence` payloads in Markdown and HTML reports.
+
+Rationale:
+
+- News-derived signals are based on RSS title/snippet evidence, so users need
+  to inspect the evidence rows and query coverage without opening raw JSON.
+- The title/snippet limitation is material and should be visible beside the
+  evidence table.
+- This is presentation-only and does not change classification or scoring.
+
+Consequences:
+
+- Reports include a `News Evidence` table when the payload exists.
+- Rows include title, narrative ID, sentiment, confidence, event date, provider,
+  source URL, and classification reason.
+- Reports show query coverage and explicitly state that article bodies are not
+  parsed in V1.
+- Reviewed-mapping enriched acceptance now requires `News Evidence` in both
+  Markdown and HTML reports.

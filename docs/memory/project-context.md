@@ -156,6 +156,7 @@ Expected artifacts:
 - Optional Eastmoney financial metric runs fetch latest F10 main financial indicators into `financial_metrics` and derive `financial-metrics-derived-signals`: positive revenue/profit YoY becomes `revenue_growth_up`, while negative growth can become `demand_slowdown`.
 - Reports render an optional `Financial Metrics` section when `financial_metrics` is present, including stock, report period, revenue YoY, parent-net-profit YoY, provider, and source URL. This keeps Eastmoney financial-derived signal inputs visible to users instead of only storing them in JSON.
 - Optional news evidence runs derive `news_evidence` from Google News RSS titles/snippets and add a non-mock `News Evidence` provider layer named `google-news-rss`. The shared artifact contract is provider-agnostic and includes `query_scope` with requested/queried/omitted narrative IDs. V1 does not parse article bodies and must disclose the title/snippet limitation plus query coverage in reports/source tables.
+- Reports render an optional `News Evidence` section when `news_evidence` is present, including query coverage, title, narrative ID, sentiment, confidence, event date, provider, source URL, and classification reason.
 - Optional news evidence runs also derive `news-derived-signals`: positive snippets become `news_frequency_up`, mixed snippets become `research_mentions_up`, and negative snippets become `language_decay`.
 
 ## Mock Scenario Fixtures

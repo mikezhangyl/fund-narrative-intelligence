@@ -337,6 +337,7 @@ def validate_acceptance_outputs(
         "eastmoney-financial-metrics",
         "Financial Metrics",
         "Valuation Snapshots",
+        "News Evidence",
     )
     _require(_contains_all(markdown, expected), "Markdown reviewed mapping mismatch")
     _require(_contains_all(html, expected), "HTML reviewed mapping mismatch")

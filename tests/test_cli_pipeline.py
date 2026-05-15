@@ -1335,6 +1335,10 @@ def test_optional_news_evidence_is_disclosed_and_added_to_outputs(tmp_path):
     assert "queried 4/4 mapped narratives" in news_layer["note"]
     assert {layer["layer"] for layer in source_table["layers"]} >= {"news_evidence"}
     assert "News Evidence" in markdown
+    assert "AI infrastructure growth accelerates" in markdown
+    assert "keyword heuristic over RSS title/snippet" in markdown
+    assert '<section class="news-evidence">' in html
+    assert "https://example.com/news/ai" in html
     assert "titles/snippets only" in html
 
 

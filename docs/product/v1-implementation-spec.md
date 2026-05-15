@@ -674,6 +674,11 @@ python -m src.main --fund-code 000001 --include-news-evidence
 
 This produces `news_evidence` in raw/scoring JSON and a `News Evidence`
 provider-foundation layer. The first provider is `google-news-rss`, but the
+report contract is provider-agnostic. When present, reports must render a
+`News Evidence` section with query coverage, title, narrative ID, sentiment,
+confidence, event date, provider, source URL, and classification reason. The
+section must state that V1 classifies RSS titles/snippets only and does not
+parse article bodies.
 artifact contract is provider-agnostic so future search/news APIs can reuse the
 same shape. The payload must include `query_scope` with requested, queried, and
 omitted narrative IDs so reports can disclose top-N coverage. V1 classifies RSS

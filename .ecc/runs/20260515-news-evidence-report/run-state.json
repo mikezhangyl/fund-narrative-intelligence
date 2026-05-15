@@ -1,0 +1,40 @@
+{
+  "task_run_id": "20260515-news-evidence-report",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/news-evidence-report",
+  "worktree": "main",
+  "base_commit": "d03c540",
+  "head_commit": "pending-commit",
+  "merge_base": "d03c540",
+  "quality_reviewed_commit": "parent-review",
+  "reviewed_snapshot_type": "parent-review",
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "commit_and_merge",
+  "review_outcome": "passed",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "not_required",
+  "verification": {
+    "ruff": "passed",
+    "compileall": "passed",
+    "pytest": "259 passed",
+    "coverage": "80%",
+    "v1_acceptance": "passed",
+    "reviewed_mapping_enriched_acceptance": "passed"
+  },
+  "decisions": [
+    {
+      "id": "NER-001",
+      "date": "2026-05-15",
+      "decision": "Render news evidence as an optional report section.",
+      "rationale": "News-derived signals use RSS title/snippet evidence, so reports should show the evidence rows and query coverage directly."
+    }
+  ]
+}

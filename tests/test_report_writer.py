@@ -175,6 +175,29 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
                 }
             ],
         },
+        "news_evidence": {
+            "provider_name": "google-news-rss",
+            "query_scope": {
+                "requested_narrative_ids": ["N_AI_INFRA"],
+                "queried_narrative_ids": ["N_AI_INFRA"],
+                "omitted_narrative_ids": [],
+                "query_limit": 4,
+            },
+            "evidence": [
+                {
+                    "evidence_id": "EV_NEWS_N_AI_INFRA_TEST",
+                    "narrative_id": "N_AI_INFRA",
+                    "title": "AI infrastructure growth accelerates",
+                    "summary": "RSS title/snippet matched the narrative.",
+                    "sentiment": "positive",
+                    "confidence": 0.52,
+                    "event_date": "2026-05-14",
+                    "source_provider": "google-news-rss",
+                    "source_url": "https://example.com/news/ai",
+                    "classification_reason": "keyword heuristic over RSS title/snippet",
+                }
+            ],
+        },
         "provider_foundation": {
             "effective_data_quality": "mock",
             "disclosure_required": True,
@@ -210,6 +233,7 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert '<section class="financial-metrics">' in html
     assert '<section class="valuation-snapshots">' in html
     assert '<section class="market-quotes">' in html
+    assert '<section class="news-evidence">' in html
     assert '<section class="data-source-notice">' in html
     assert "Mapping Coverage" in html
     assert "Mapping Precision Flags" in html
@@ -226,12 +250,15 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "Financial Metrics" in markdown
     assert "Valuation Snapshots" in markdown
     assert "Market Quotes" in markdown
+    assert "News Evidence" in markdown
     assert "eastmoney-financial-metrics" in markdown
     assert "eastmoney-valuation" in markdown
     assert "eastmoney-market-quote" in markdown
+    assert "google-news-rss" in markdown
     assert "https://datacenter.eastmoney.com/securities/api/data/get" in html
     assert "https://push2.eastmoney.com/api/qt/stock/get" in html
     assert "https://push2.eastmoney.com/api/qt/ulist.np/get" in html
+    assert "https://example.com/news/ai" in html
     assert "<h3>AI Infrastructure</h3>" in html
     assert "Lifecycle stage" in html
     assert "### AI Infrastructure" not in html

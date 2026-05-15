@@ -60,6 +60,8 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
             "",
             *_render_candidate_narrative_lines(scoring_payload),
             "",
+            *_render_news_evidence_lines(scoring_payload),
+            "",
             *_render_market_quote_lines(scoring_payload),
             "",
             *_render_valuation_snapshot_lines(scoring_payload),
@@ -167,6 +169,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
   {_render_excluded_mapping_candidates_html(scoring_payload)}
 
   {_render_candidate_narratives_html(scoring_payload)}
+
+  {_render_news_evidence_html(scoring_payload)}
 
   {_render_market_quotes_html(scoring_payload)}
 
@@ -552,6 +556,35 @@ def _render_market_quote_lines(scoring_payload: dict[str, Any]) -> list[str]:
     return lines
 
 
+def _render_news_evidence_lines(scoring_payload: dict[str, Any]) -> list[str]:
+    rows = _news_evidence_rows(scoring_payload)
+    if not rows:
+        return []
+
+    lines = [
+        "## News Evidence",
+        "",
+        f"- Query coverage: {_format_news_query_coverage(scoring_payload)}",
+        "- Limitation: V1 classifies RSS titles/snippets only; article bodies are not parsed.",
+        "",
+        "| Title | Narrative | Sentiment | Confidence | Date | Provider | Source | Reason |",
+        "| --- | --- | --- | ---: | --- | --- | --- | --- |",
+    ]
+    for row in rows:
+        lines.append(
+            "| "
+            f"{row.get('title') or '-'} | "
+            f"{row.get('narrative_id') or '-'} | "
+            f"{row.get('sentiment') or '-'} | "
+            f"{_format_number_metric(row.get('confidence'))} | "
+            f"{row.get('event_date') or '-'} | "
+            f"{row.get('source_provider') or row.get('provider_name') or '-'} | "
+            f"{row.get('source_url') or '-'} | "
+            f"{row.get('classification_reason') or '-'} |"
+        )
+    return lines
+
+
 def _render_narrative_html(narrative: dict[str, Any]) -> str:
     state = narrative["state"]
     interpretation = narrative.get("interpretation", {})
@@ -814,6 +847,67 @@ def _render_market_quotes_html(scoring_payload: dict[str, Any]) -> str:
     </table>
   </section>
 """
+
+
+def _render_news_evidence_html(scoring_payload: dict[str, Any]) -> str:
+    rows_data = _news_evidence_rows(scoring_payload)
+    if not rows_data:
+        return ""
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(str(row.get('title') or '-'))}</td>"
+        f"<td>{escape(str(row.get('narrative_id') or '-'))}</td>"
+        f"<td>{escape(str(row.get('sentiment') or '-'))}</td>"
+        f"<td>{escape(_format_number_metric(row.get('confidence')))}</td>"
+        f"<td>{escape(str(row.get('event_date') or '-'))}</td>"
+        f"<td>{escape(str(row.get('source_provider') or row.get('provider_name') or '-'))}</td>"
+        f"<td>{escape(str(row.get('source_url') or '-'))}</td>"
+        f"<td>{escape(str(row.get('classification_reason') or '-'))}</td>"
+        "</tr>"
+        for row in rows_data
+    )
+    return f"""
+  <section class="news-evidence">
+    <h2>News Evidence</h2>
+    <p>Query coverage: {escape(_format_news_query_coverage(scoring_payload))}</p>
+    <p>Limitation: V1 classifies RSS titles/snippets only; article bodies are not parsed.</p>
+    <table>
+      <thead><tr><th>Title</th><th>Narrative</th><th>Sentiment</th><th>Confidence</th><th>Date</th><th>Provider</th><th>Source</th><th>Reason</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+"""
+
+
+def _news_evidence_rows(scoring_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    payload = scoring_payload.get("news_evidence")
+    if not isinstance(payload, dict):
+        return []
+    evidence = payload.get("evidence")
+    if not isinstance(evidence, list):
+        return []
+    provider_name = payload.get("provider_name")
+    return [
+        {**item, "provider_name": item.get("provider_name") or provider_name}
+        for item in evidence
+        if isinstance(item, dict)
+    ]
+
+
+def _format_news_query_coverage(scoring_payload: dict[str, Any]) -> str:
+    payload = scoring_payload.get("news_evidence")
+    if not isinstance(payload, dict):
+        return "unavailable"
+    query_scope = payload.get("query_scope")
+    if not isinstance(query_scope, dict):
+        return "unavailable"
+    requested = query_scope.get("requested_narrative_ids") or []
+    queried = query_scope.get("queried_narrative_ids") or []
+    omitted = query_scope.get("omitted_narrative_ids") or []
+    return (
+        f"queried {len(queried)}/{len(requested)} requested narratives; "
+        f"omitted {len(omitted)}; query_limit={query_scope.get('query_limit', '-')}"
+    )
 
 
 def _valuation_snapshot_rows(scoring_payload: dict[str, Any]) -> list[dict[str, Any]]:
