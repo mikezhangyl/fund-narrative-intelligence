@@ -1473,3 +1473,26 @@ Consequences:
   `financial_metrics`, `news_evidence`, and `derived_signal_events`.
 - Required rows must be non-mock, have positive item counts, and disclose source
   URLs.
+
+## ADR-0058: Render Market Quotes In Reports
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Render optional `market_quotes` payloads in Markdown and HTML reports.
+
+Rationale:
+
+- Market quotes can derive momentum and capital-flow signals, so users should
+  see the quote rows behind those signals without opening raw JSON.
+- Provider/source disclosure remains required because quote data can be live,
+  fallback, or unavailable independently from other layers.
+- This remains a presentation-only change.
+
+Consequences:
+
+- Reports include a `Market Quotes` table when the payload exists.
+- Rows include stock, latest price, change percent, change amount, previous
+  close, volume, provider, and source URL.

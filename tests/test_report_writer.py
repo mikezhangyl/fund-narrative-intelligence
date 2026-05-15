@@ -159,6 +159,22 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
                 }
             ],
         },
+        "market_quotes": {
+            "provider_name": "eastmoney-market-quote",
+            "quotes": [
+                {
+                    "stock_code": "NVDA",
+                    "stock_name": "NVIDIA",
+                    "latest_price": 1000.0,
+                    "change_percent": 1.5,
+                    "change_amount": 14.7,
+                    "previous_close": 985.3,
+                    "volume": 100,
+                    "source_provider": "eastmoney-market-quote",
+                    "source_url": "https://push2.eastmoney.com/api/qt/ulist.np/get",
+                }
+            ],
+        },
         "provider_foundation": {
             "effective_data_quality": "mock",
             "disclosure_required": True,
@@ -193,6 +209,7 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert '<section class="candidate-narratives">' in html
     assert '<section class="financial-metrics">' in html
     assert '<section class="valuation-snapshots">' in html
+    assert '<section class="market-quotes">' in html
     assert '<section class="data-source-notice">' in html
     assert "Mapping Coverage" in html
     assert "Mapping Precision Flags" in html
@@ -208,10 +225,13 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "Mock 数据" in html
     assert "Financial Metrics" in markdown
     assert "Valuation Snapshots" in markdown
+    assert "Market Quotes" in markdown
     assert "eastmoney-financial-metrics" in markdown
     assert "eastmoney-valuation" in markdown
+    assert "eastmoney-market-quote" in markdown
     assert "https://datacenter.eastmoney.com/securities/api/data/get" in html
     assert "https://push2.eastmoney.com/api/qt/stock/get" in html
+    assert "https://push2.eastmoney.com/api/qt/ulist.np/get" in html
     assert "<h3>AI Infrastructure</h3>" in html
     assert "Lifecycle stage" in html
     assert "### AI Infrastructure" not in html

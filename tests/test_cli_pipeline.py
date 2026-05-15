@@ -987,8 +987,12 @@ def test_optional_eastmoney_quotes_are_disclosed_and_added_to_outputs(tmp_path):
     assert quote_layer["is_mock"] is False
     assert "Market Quotes" in markdown
     assert "eastmoney-market-quote" in markdown
+    assert "1000.00" in markdown
+    assert "1.50%" in markdown
     assert "Market Quotes" in html
+    assert '<section class="market-quotes">' in html
     assert "eastmoney-market-quote" in html
+    assert "https://push2.eastmoney.com/api/qt/ulist.np/get" in html
 
 
 def test_optional_valuation_snapshots_are_quote_derived_and_disclosed(tmp_path):

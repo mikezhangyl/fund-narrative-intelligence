@@ -620,6 +620,10 @@ evidence, and derived signal events:
 python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725
 ```
 
+When market quotes are present, Markdown and HTML reports must render a
+`Market Quotes` section with stock, latest price, price change, previous close,
+volume, provider, and source URL.
+
 The same path also includes Eastmoney F10 financial metrics through:
 
 ```bash

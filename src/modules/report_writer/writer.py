@@ -60,6 +60,8 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
             "",
             *_render_candidate_narrative_lines(scoring_payload),
             "",
+            *_render_market_quote_lines(scoring_payload),
+            "",
             *_render_valuation_snapshot_lines(scoring_payload),
             "",
             *_render_financial_metrics_lines(scoring_payload),
@@ -165,6 +167,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
   {_render_excluded_mapping_candidates_html(scoring_payload)}
 
   {_render_candidate_narratives_html(scoring_payload)}
+
+  {_render_market_quotes_html(scoring_payload)}
 
   {_render_valuation_snapshots_html(scoring_payload)}
 
@@ -522,6 +526,32 @@ def _render_valuation_snapshot_lines(scoring_payload: dict[str, Any]) -> list[st
     return lines
 
 
+def _render_market_quote_lines(scoring_payload: dict[str, Any]) -> list[str]:
+    quotes = _market_quote_rows(scoring_payload)
+    if not quotes:
+        return []
+
+    lines = [
+        "## Market Quotes",
+        "",
+        "| Stock | Latest Price | Change | Change Amount | Previous Close | Volume | Provider | Source |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |",
+    ]
+    for quote in quotes:
+        lines.append(
+            "| "
+            f"{_stock_label(quote)} | "
+            f"{_format_number_metric(quote.get('latest_price'))} | "
+            f"{_format_percent_metric(quote.get('change_percent'))} | "
+            f"{_format_number_metric(quote.get('change_amount'))} | "
+            f"{_format_number_metric(quote.get('previous_close'))} | "
+            f"{_format_number_metric(quote.get('volume'))} | "
+            f"{quote.get('source_provider') or quote.get('provider_name') or '-'} | "
+            f"{quote.get('source_url') or '-'} |"
+        )
+    return lines
+
+
 def _render_narrative_html(narrative: dict[str, Any]) -> str:
     state = narrative["state"]
     interpretation = narrative.get("interpretation", {})
@@ -757,6 +787,35 @@ def _render_valuation_snapshots_html(scoring_payload: dict[str, Any]) -> str:
 """
 
 
+def _render_market_quotes_html(scoring_payload: dict[str, Any]) -> str:
+    quotes = _market_quote_rows(scoring_payload)
+    if not quotes:
+        return ""
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(_stock_label(quote))}</td>"
+        f"<td>{escape(_format_number_metric(quote.get('latest_price')))}</td>"
+        f"<td>{escape(_format_percent_metric(quote.get('change_percent')))}</td>"
+        f"<td>{escape(_format_number_metric(quote.get('change_amount')))}</td>"
+        f"<td>{escape(_format_number_metric(quote.get('previous_close')))}</td>"
+        f"<td>{escape(_format_number_metric(quote.get('volume')))}</td>"
+        f"<td>{escape(str(quote.get('source_provider') or quote.get('provider_name') or '-'))}</td>"
+        f"<td>{escape(str(quote.get('source_url') or '-'))}</td>"
+        "</tr>"
+        for quote in quotes
+    )
+    return f"""
+  <section class="market-quotes">
+    <h2>Market Quotes</h2>
+    <p>Provider quote snapshots used by market-quote-derived signals when available.</p>
+    <table>
+      <thead><tr><th>Stock</th><th>Latest Price</th><th>Change</th><th>Change Amount</th><th>Previous Close</th><th>Volume</th><th>Provider</th><th>Source</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+"""
+
+
 def _valuation_snapshot_rows(scoring_payload: dict[str, Any]) -> list[dict[str, Any]]:
     payload = scoring_payload.get("valuation_snapshots")
     if not isinstance(payload, dict):
@@ -769,6 +828,26 @@ def _valuation_snapshot_rows(scoring_payload: dict[str, Any]) -> list[dict[str, 
         {**valuation, "valuation_basis": valuation.get("valuation_basis") or basis}
         for valuation in valuations
         if isinstance(valuation, dict)
+    ]
+
+
+def _market_quote_rows(scoring_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    payload = scoring_payload.get("market_quotes")
+    if not isinstance(payload, dict):
+        return []
+    quotes = payload.get("quotes")
+    if not isinstance(quotes, list):
+        return []
+    provider_name = payload.get("provider_name")
+    source_url = payload.get("source_url")
+    return [
+        {
+            **quote,
+            "provider_name": quote.get("provider_name") or provider_name,
+            "source_url": quote.get("source_url") or source_url,
+        }
+        for quote in quotes
+        if isinstance(quote, dict)
     ]
 
 

@@ -81,3 +81,4 @@
 - [valuation-snapshot-report.md](./valuation-snapshot-report.md)
 - [v1-data-layers-acceptance.md](./v1-data-layers-acceptance.md)
 - [reviewed-data-layers-acceptance.md](./reviewed-data-layers-acceptance.md)
+- [market-quotes-report.md](./market-quotes-report.md)
