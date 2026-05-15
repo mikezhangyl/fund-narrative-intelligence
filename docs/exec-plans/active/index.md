@@ -88,3 +88,4 @@
 - [reviewed-optional-data-layers.md](./reviewed-optional-data-layers.md)
 - [announcement-payload-validation.md](./announcement-payload-validation.md)
 - [provider-boundary-validation.md](./provider-boundary-validation.md)
+- [valuation-financial-boundary-tests.md](./valuation-financial-boundary-tests.md)
