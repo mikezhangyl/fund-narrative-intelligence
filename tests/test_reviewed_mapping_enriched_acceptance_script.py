@@ -26,7 +26,7 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
             assert not snapshot_path.exists()
         if args == ["--build-workspace-snapshot", str(tmp_path)]:
             assert not snapshot_path.exists()
-            snapshot_path.write_text('{"version": "workspace-snapshot-v1"}', encoding="utf-8")
+            _write_json(snapshot_path, _workspace_snapshot_data_layers())
         if args == ["--validate-workspace-snapshot", str(snapshot_path)]:
             assert snapshot_path.exists()
         return 0
@@ -99,11 +99,30 @@ def test_reviewed_mapping_enriched_acceptance_rejects_registry_rule_mapping(tmp_
 
 def test_reviewed_mapping_enriched_acceptance_rejects_missing_valuation(tmp_path):
     _write_outputs(tmp_path, include_valuation=False)
+    _write_json(
+        tmp_path / "fund_161725_workspace_snapshot.json",
+        _workspace_snapshot_data_layers(include_valuation=False),
+    )
 
     with pytest.raises(validate_reviewed_mapping_enriched_acceptance.AcceptanceError) as exc:
         validate_reviewed_mapping_enriched_acceptance.validate_acceptance_outputs(tmp_path)
 
     assert "valuation_snapshots is required" in str(exc.value)
+
+
+def test_reviewed_mapping_enriched_acceptance_rejects_missing_financial_data_layer(
+    tmp_path,
+):
+    _write_outputs(tmp_path)
+    _write_json(
+        tmp_path / "fund_161725_workspace_snapshot.json",
+        _workspace_snapshot_data_layers(include_financial_metrics=False),
+    )
+
+    with pytest.raises(validate_reviewed_mapping_enriched_acceptance.AcceptanceError) as exc:
+        validate_reviewed_mapping_enriched_acceptance.validate_acceptance_outputs(tmp_path)
+
+    assert "workspace data_layers must include financial_metrics" in str(exc.value)
 
 
 def _write_outputs(
@@ -468,6 +487,68 @@ def _source_url(layer: str) -> str:
         "financial_metrics": "https://datacenter.eastmoney.com/securities/api/data/get",
         "news_evidence": "https://news.google.com/rss/search",
     }[layer]
+
+
+def _workspace_snapshot_data_layers(
+    *,
+    include_valuation: bool = True,
+    include_financial_metrics: bool = True,
+) -> dict:
+    layer_names = [
+        "holdings",
+        "evidence",
+        "signal_events",
+        "announcements",
+        "announcement_evidence",
+        "market_quotes",
+        "news_evidence",
+        "derived_signal_events",
+    ]
+    if include_valuation:
+        layer_names.append("valuation_snapshots")
+    if include_financial_metrics:
+        layer_names.append("financial_metrics")
+    return {
+        "version": "workspace-snapshot-v1",
+        "data_layers": {
+            "version": "workspace-data-layers-v1",
+            "fund_code": "161725",
+            "as_of_date": "2026-05-15",
+            "layers": [
+                {
+                    "layer": layer,
+                    "provider_name": _data_layer_provider_name(layer),
+                    "data_quality": "fresh",
+                    "is_mock": False,
+                    "source_url": _data_layer_source_url(layer),
+                    "artifact": "raw",
+                    "item_count": 1,
+                    "available": True,
+                }
+                for layer in layer_names
+            ],
+        },
+    }
+
+
+def _data_layer_provider_name(layer: str) -> str:
+    return {
+        "valuation_snapshots": "eastmoney-valuation",
+        "financial_metrics": "eastmoney-financial-metrics",
+        "news_evidence": "google-news-rss",
+        "derived_signal_events": "mixed-derived-signals",
+        "signal_events": "provider-derived-signals",
+    }.get(layer, "provider-derived")
+
+
+def _data_layer_source_url(layer: str) -> str:
+    return {
+        "valuation_snapshots": "https://push2.eastmoney.com/api/qt/stock/get",
+        "financial_metrics": "https://datacenter.eastmoney.com/securities/api/data/get",
+        "news_evidence": "https://news.google.com/rss/search",
+        "derived_signal_events": "derived://mixed-derived-signals",
+        "signal_events": "derived://provider-signals",
+    }.get(layer, "https://example.test/provider")
 
 
 def _write_json(path: Path, payload: dict) -> None:

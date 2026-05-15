@@ -177,6 +177,9 @@ def validate_acceptance_outputs(
     raw = _read_json(output_dir / f"fund_{fund_code}_raw.json")
     scoring = _read_json(output_dir / f"fund_{fund_code}_scoring.json")
     signal_trace = _read_json(output_dir / f"fund_{fund_code}_signal_trace.json")
+    workspace_snapshot = _read_json(
+        output_dir / f"fund_{fund_code}_workspace_snapshot.json"
+    )
     markdown = (output_dir / f"fund_{fund_code}_report.md").read_text(encoding="utf-8")
     html = (output_dir / f"fund_{fund_code}_report.html").read_text(encoding="utf-8")
     foundation = scoring.get("provider_foundation", {})
@@ -324,6 +327,7 @@ def validate_acceptance_outputs(
         ),
         "signal trace must include eastmoney financial-derived signals",
     )
+    _validate_workspace_data_layers(workspace_snapshot)
     expected = (
         "reviewed-registry-store",
         "reviewed-mapping-store",
@@ -423,6 +427,45 @@ def _signal_trace_contains_source(
         for signal in dimension.get("signals", [])
         if isinstance(signal, dict)
     )
+
+
+def _validate_workspace_data_layers(workspace_snapshot: dict[str, Any]) -> None:
+    data_layers = workspace_snapshot.get("data_layers")
+    _require(isinstance(data_layers, dict), "workspace snapshot must include data_layers")
+    _require(
+        data_layers.get("version") == "workspace-data-layers-v1",
+        "workspace data_layers version mismatch",
+    )
+    rows = data_layers.get("layers")
+    _require(isinstance(rows, list) and rows, "workspace data_layers must include rows")
+    layers_by_name = {
+        row.get("layer"): row for row in rows if isinstance(row, dict)
+    }
+    for layer_name in (
+        "holdings",
+        "valuation_snapshots",
+        "financial_metrics",
+        "news_evidence",
+        "derived_signal_events",
+    ):
+        layer = layers_by_name.get(layer_name)
+        _require(layer is not None, f"workspace data_layers must include {layer_name}")
+        _require(
+            layer.get("is_mock") is False,
+            f"workspace data_layers {layer_name} must not be mock",
+        )
+        _require(
+            layer.get("item_count", 0) > 0,
+            f"workspace data_layers {layer_name} must have rows",
+        )
+        _require(
+            isinstance(layer.get("source_url"), str) and layer.get("source_url"),
+            f"workspace data_layers {layer_name} must disclose source URL",
+        )
+    mock_layers = [
+        row.get("layer") for row in rows if isinstance(row, dict) and row.get("is_mock")
+    ]
+    _require(not mock_layers, f"workspace data_layers must not include mock layers: {mock_layers}")
 
 
 def _require(condition: bool, message: str) -> None:

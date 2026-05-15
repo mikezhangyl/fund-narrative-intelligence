@@ -1446,3 +1446,30 @@ Consequences:
   `mock://fixtures/` source URL.
 - A mutated workspace snapshot that rewrites mock data-layer URLs to real-looking
   URLs fails acceptance.
+
+## ADR-0057: Require Reviewed Data Layers In Enriched Acceptance
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Make reviewed-mapping enriched acceptance validate workspace snapshot
+`data_layers`.
+
+Rationale:
+
+- The enriched path is the current strongest no-mock-core server flow, so it
+  should also cover the future web loader summary, not only raw/scoring/report
+  artifacts.
+- Future web screens need layer availability before drill-down; missing
+  `financial_metrics` or `valuation_snapshots` data-layer rows would hide live
+  payloads even when raw JSON contains them.
+
+Consequences:
+
+- Reviewed-mapping enriched acceptance requires `workspace-data-layers-v1`.
+- Required data layers are `holdings`, `valuation_snapshots`,
+  `financial_metrics`, `news_evidence`, and `derived_signal_events`.
+- Required rows must be non-mock, have positive item counts, and disclose source
+  URLs.

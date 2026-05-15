@@ -612,7 +612,9 @@ The strict reviewed-mapping enriched acceptance command exercises the current
 no-mock-core server path with Eastmoney holdings, reviewed registry, reviewed
 stock mappings, provider-derived evidence/signals, CNINFO announcements, market
 quotes, Eastmoney valuation metrics, news evidence, and workspace snapshot
-validation:
+validation. Its workspace snapshot validation must include no-mock
+`data_layers` rows for holdings, valuation snapshots, financial metrics, news
+evidence, and derived signal events:
 
 ```bash
 python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725
