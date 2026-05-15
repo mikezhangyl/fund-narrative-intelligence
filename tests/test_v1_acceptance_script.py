@@ -40,6 +40,27 @@ def test_validate_v1_acceptance_script_runs_as_file(tmp_path):
     assert "fund_000001_workspace_snapshot.json" in result.stdout
 
 
+def test_validate_acceptance_outputs_rejects_missing_data_layer_mock_source_url(
+    tmp_path,
+):
+    exit_code = validate_v1_acceptance.main(["--output-dir", str(tmp_path)])
+    assert exit_code == 0
+
+    snapshot_path = tmp_path / "fund_000001_workspace_snapshot.json"
+    snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
+    for layer in snapshot["data_layers"]["layers"]:
+        if layer["is_mock"]:
+            layer["source_url"] = "https://example.test/not-a-mock-fixture"
+    snapshot_path.write_text(json.dumps(snapshot), encoding="utf-8")
+
+    with pytest.raises(validate_v1_acceptance.AcceptanceError) as exc:
+        validate_v1_acceptance.validate_acceptance_outputs(tmp_path)
+
+    assert "workspace snapshot data_layers must expose mock source URLs" in str(
+        exc.value
+    )
+
+
 def test_validate_acceptance_outputs_rejects_missing_mock_source_url(tmp_path):
     output_dir = tmp_path
     output_dir.mkdir(exist_ok=True)

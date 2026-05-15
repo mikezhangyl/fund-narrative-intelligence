@@ -48,8 +48,8 @@ Experienced individual investors or researchers who want to understand what mark
 The script generates fund `000001` into a temporary directory, runs
 `--validate-artifact-contracts`, builds and validates a workspace snapshot, and
 checks mock source URL disclosure, manifest web-readiness, review queue/source
-table presence, workspace mock `data_source_notice`, workspace `data_layers`,
-and report data-source notices.
+table presence, workspace mock `data_source_notice`, workspace `data_layers`
+mock source disclosure, and report data-source notices.
 
 Expected artifacts:
 

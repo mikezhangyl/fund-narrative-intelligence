@@ -225,6 +225,24 @@ def validate_acceptance_outputs(output_dir: Path) -> None:
         ),
         "workspace snapshot data source notice must expose mock source URLs",
     )
+    data_layers = workspace_snapshot.get("data_layers", {})
+    _require(
+        data_layers.get("version") == "workspace-data-layers-v1",
+        "workspace snapshot data_layers version mismatch",
+    )
+    data_layer_rows = data_layers.get("layers", [])
+    _require(
+        isinstance(data_layer_rows, list) and data_layer_rows,
+        "workspace snapshot data_layers must include layer rows",
+    )
+    _require(
+        any(
+            layer.get("is_mock") is True and _mock_source_url(layer.get("source_url"))
+            for layer in data_layer_rows
+            if isinstance(layer, dict)
+        ),
+        "workspace snapshot data_layers must expose mock source URLs",
+    )
 
 
 def _run_cli(args: list[str]) -> None:

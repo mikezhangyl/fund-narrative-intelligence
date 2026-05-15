@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-valuation-snapshot-report",
+  "latest_run": "20260515-v1-data-layers-acceptance",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "commit and merge valuation snapshot report, then continue the next end-to-end provider slice"
+  "next_step": "commit and merge V1 data_layers acceptance, then continue the next end-to-end provider slice"
 }

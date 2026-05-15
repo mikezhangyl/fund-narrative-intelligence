@@ -1420,3 +1420,29 @@ Consequences:
   valuation pressure, provider, and source URL.
 - Reviewed-mapping enriched acceptance now requires `Valuation Snapshots` in
   both Markdown and HTML reports.
+
+## ADR-0056: Require Data Layer Mock Disclosure In V1 Acceptance
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Make `scripts/validate_v1_acceptance.py` explicitly validate workspace snapshot
+`data_layers` mock disclosure.
+
+Rationale:
+
+- Generic workspace snapshot validation checks schema, but V1 acceptance should
+  also prove that mock baseline web-loader data cannot be mistaken for live data.
+- Future web data tabs will likely read `data_layers` before opening raw
+  artifacts, so the summary layer needs the same mock-source guarantee as source
+  tables and reports.
+
+Consequences:
+
+- V1 acceptance requires `data_layers.version = workspace-data-layers-v1`.
+- V1 acceptance requires at least one mock data-layer row with a
+  `mock://fixtures/` source URL.
+- A mutated workspace snapshot that rewrites mock data-layer URLs to real-looking
+  URLs fails acceptance.

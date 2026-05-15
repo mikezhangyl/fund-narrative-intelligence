@@ -445,7 +445,8 @@ python scripts/validate_v1_acceptance.py
 The script generates fund `000001`, validates generated artifact contracts,
 builds and validates a workspace snapshot, and checks that mock-backed outputs
 are visibly disclosed through data quality, `mock://fixtures/...` source
-identifiers, report notices, and workspace `data_source_notice`.
+identifiers, report notices, workspace `data_source_notice`, and workspace
+`data_layers` source URLs.
 
 The CLI should also expose available local fixtures:
 

@@ -79,3 +79,4 @@
 - [workspace-data-layers.md](./workspace-data-layers.md)
 - [financial-metrics-report.md](./financial-metrics-report.md)
 - [valuation-snapshot-report.md](./valuation-snapshot-report.md)
+- [v1-data-layers-acceptance.md](./v1-data-layers-acceptance.md)
