@@ -6,6 +6,7 @@ ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER = "cninfo-derived-signals"
 MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER = "market-quote-derived-signals"
 NEWS_DERIVED_SIGNAL_PROVIDER = "news-derived-signals"
 VALUATION_DERIVED_SIGNAL_PROVIDER = "valuation-derived-signals"
+FINANCIAL_METRICS_DERIVED_SIGNAL_PROVIDER = "financial-metrics-derived-signals"
 
 _ANNOUNCEMENT_SIGNAL_MAP = {
     ("earnings", "positive"): (
@@ -140,6 +141,37 @@ def derive_valuation_signal_events(
             data_quality=str(valuation_snapshots_payload.get("data_quality") or "unavailable"),
             fallback_provider=str(valuation_snapshots_payload.get("provider_name") or ""),
             fallback_url=valuation_snapshots_payload.get("source_url"),
+            as_of_date=as_of_date,
+        )
+    ]
+    return sorted(
+        signals,
+        key=lambda item: (
+            item["narrative_id"],
+            item["event_date"],
+            item["signal_id"],
+        ),
+    )
+
+
+def derive_financial_metrics_signal_events(
+    financial_metrics_payload: dict[str, Any],
+    stock_mappings: list[dict[str, Any]],
+    as_of_date: str,
+) -> list[dict[str, Any]]:
+    metrics = financial_metrics_payload.get("metrics")
+    if not isinstance(metrics, list):
+        return []
+    mappings_by_stock = _mappings_by_stock(stock_mappings)
+    signals = [
+        signal
+        for metric in metrics
+        for signal in _financial_metric_signals(
+            metric=metric,
+            stock_mappings=mappings_by_stock.get(str(metric.get("stock_code") or ""), []),
+            data_quality=str(financial_metrics_payload.get("data_quality") or "unavailable"),
+            fallback_provider=str(financial_metrics_payload.get("provider_name") or ""),
+            fallback_url=financial_metrics_payload.get("source_url"),
             as_of_date=as_of_date,
         )
     ]
@@ -310,6 +342,71 @@ def _valuation_signals(
         for mapping in stock_mappings
         if mapping.get("narrative_id")
     ]
+
+
+def _financial_metric_signals(
+    metric: dict[str, Any],
+    stock_mappings: list[dict[str, Any]],
+    data_quality: str,
+    fallback_provider: str,
+    fallback_url: Any,
+    as_of_date: str,
+) -> list[dict[str, Any]]:
+    profile = _financial_signal_profile(metric)
+    if profile is None:
+        return []
+    signal_type, suffix, strength, reason = profile
+    stock_code = str(metric.get("stock_code") or "")
+    source_provider = str(metric.get("source_provider") or fallback_provider)
+    source_url = metric.get("source_url") or fallback_url
+    event_date = str(metric.get("report_date") or as_of_date)
+    data_quality_confidence = _data_quality_confidence(data_quality)
+    return [
+        {
+            "signal_id": f"SIG_FIN_{stock_code}_{mapping['narrative_id']}_{suffix}",
+            "narrative_id": str(mapping["narrative_id"]),
+            "signal_type": signal_type,
+            "strength": strength,
+            "confidence": round(float(mapping.get("confidence", 0)) * data_quality_confidence, 4),
+            "confidence_multiplier": 0.8,
+            "event_date": event_date,
+            "half_life_days": 90,
+            "source": "financial_metrics",
+            "source_provider": source_provider,
+            "source_stock_code": stock_code,
+            "source_url": source_url,
+            "derivation_reason": reason,
+        }
+        for mapping in stock_mappings
+        if mapping.get("narrative_id")
+    ]
+
+
+def _financial_signal_profile(
+    metric: dict[str, Any],
+) -> tuple[str, str, float, str] | None:
+    revenue_yoy = _optional_float(metric.get("revenue_yoy"))
+    profit_yoy = _optional_float(metric.get("parent_net_profit_yoy"))
+    growth_values = [value for value in (revenue_yoy, profit_yoy) if value is not None]
+    if not growth_values:
+        return None
+    strongest_growth = max(growth_values)
+    weakest_growth = min(growth_values)
+    if strongest_growth > 0:
+        return (
+            "revenue_growth_up",
+            "REVENUE_GROWTH_UP",
+            round(min(strongest_growth / 20, 1), 3),
+            "positive provider financial growth metrics",
+        )
+    if weakest_growth < 0:
+        return (
+            "demand_slowdown",
+            "DEMAND_SLOWDOWN",
+            round(min(abs(weakest_growth) / 20, 1), 3),
+            "negative provider financial growth metrics",
+        )
+    return None
 
 
 def _valuation_signal_profile(

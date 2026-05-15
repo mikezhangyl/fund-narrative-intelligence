@@ -614,6 +614,16 @@ validation:
 python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725
 ```
 
+The same path also includes Eastmoney F10 financial metrics through:
+
+```bash
+python -m src.main --fund-code 161725 --provider-mode eastmoney --include-financial-metrics
+```
+
+The `financial_metrics` payload is optional and provider-derived. It preserves
+latest report date, revenue/profit YoY metrics, source URL, and provider
+metadata, and can derive deterministic earnings signals for scoring.
+
 V1 can also derive lightweight valuation context from market quotes:
 
 ```bash

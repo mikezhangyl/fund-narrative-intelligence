@@ -1313,3 +1313,31 @@ Consequences:
 - The CLI reuses the shared signal trace validator.
 - Valid artifacts print `Signal trace valid:` with the path.
 - Malformed artifacts fail through the standard parser error path.
+
+## ADR-0052: Add Optional Eastmoney Financial Metrics Layer
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add an optional `--include-financial-metrics` path backed by Eastmoney F10 main
+financial indicators.
+
+Rationale:
+
+- Earnings validation should gradually move from fixture and announcement-only
+  signals toward real reported financial metrics.
+- The Eastmoney F10 endpoint returns no-key revenue and parent-net-profit YoY
+  fields that can be normalized without adding pandas, AKShare, or Tushare yet.
+- Keeping the layer optional protects default V1 runs from provider instability.
+
+Consequences:
+
+- Raw/scoring artifacts may include `financial_metrics`.
+- Provider foundation may include a non-mock `financial_metrics` layer named
+  `eastmoney-financial-metrics`.
+- Positive revenue/profit YoY metrics derive `revenue_growth_up`; negative
+  growth can derive `demand_slowdown`.
+- Reviewed-mapping enriched acceptance now exercises this layer and requires
+  the resulting financial-derived signal trace.

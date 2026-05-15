@@ -334,6 +334,75 @@ def _validate_valuation_snapshot_item(item: Any, context: str) -> None:
             raise ProviderContractError(f"{context}.{field} must be a non-empty string")
 
 
+def validate_financial_metrics_payload(payload: dict[str, Any]) -> None:
+    _require_mapping(payload, "financial metrics")
+    _require_keys(
+        payload,
+        {
+            "version",
+            "provider_name",
+            "provider_version",
+            "data_quality",
+            "source_url",
+            "retrieved_at",
+            "metrics",
+            "missing_stock_codes",
+        },
+        "financial metrics",
+    )
+    if payload["version"] != "financial-metrics-v1":
+        raise ProviderContractError("financial metrics version is unsupported")
+    if payload["data_quality"] not in SOURCE_TABLE_LAYER_DATA_QUALITIES:
+        raise ProviderContractError("financial metrics data_quality is unsupported")
+    for field in {"provider_name", "provider_version", "source_url", "retrieved_at"}:
+        if not isinstance(payload[field], str) or not payload[field]:
+            raise ProviderContractError(
+                f"financial metrics {field} must be a non-empty string"
+            )
+    if not isinstance(payload["metrics"], list):
+        raise ProviderContractError("financial metrics metrics must be a list")
+    for index, metric in enumerate(payload["metrics"]):
+        _validate_financial_metric(metric, f"financial metrics metrics[{index}]")
+    _require_string_list(
+        payload["missing_stock_codes"],
+        "financial metrics missing_stock_codes",
+    )
+
+
+def _validate_financial_metric(metric: Any, context: str) -> None:
+    _require_mapping(metric, context)
+    _require_keys(
+        metric,
+        {
+            "stock_code",
+            "stock_name",
+            "report_date",
+            "report_type",
+            "source",
+            "source_provider",
+            "source_url",
+            "retrieved_at",
+        },
+        context,
+    )
+    if not metric["stock_code"]:
+        raise ProviderContractError(f"{context}.stock_code must be non-empty")
+    if metric["source"] != "provider_financial_metrics":
+        raise ProviderContractError(
+            f"{context}.source must be provider_financial_metrics"
+        )
+    for field in {
+        "stock_name",
+        "report_date",
+        "report_type",
+        "source_provider",
+        "source_url",
+        "retrieved_at",
+    }:
+        if not isinstance(metric[field], str) or not metric[field]:
+            raise ProviderContractError(f"{context}.{field} must be a non-empty string")
+
+
 def validate_news_evidence_payload(payload: dict[str, Any]) -> None:
     _require_mapping(payload, "news evidence")
     _require_keys(

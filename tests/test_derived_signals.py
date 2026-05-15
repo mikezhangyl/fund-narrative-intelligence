@@ -1,5 +1,6 @@
 from src.modules.signal_service.derived import (
     derive_announcement_signal_events,
+    derive_financial_metrics_signal_events,
     derive_market_quote_signal_events,
     derive_news_signal_events,
     derive_valuation_signal_events,
@@ -411,3 +412,61 @@ def test_derives_valuation_reset_signal_from_discounted_provider_metrics():
     )
     assert valuation_score["score"] < 50
     assert signals[0]["confidence"] == 0.525
+
+
+def test_derives_earnings_signal_from_positive_financial_metrics():
+    financial_metrics = {
+        "version": "financial-metrics-v1",
+        "provider_name": "eastmoney-financial-metrics",
+        "data_quality": "fresh",
+        "metrics": [
+            {
+                "stock_code": "600519",
+                "stock_name": "贵州茅台",
+                "source_provider": "eastmoney-financial-metrics",
+                "source_url": "https://datacenter.eastmoney.com/securities/api/data/get",
+                "retrieved_at": "2026-05-15T00:00:00+00:00",
+                "report_date": "2026-03-31",
+                "revenue_yoy": 6.3,
+                "parent_net_profit_yoy": 1.4,
+            }
+        ],
+    }
+    stock_mappings = [
+        {
+            "stock_code": "600519",
+            "narrative_id": "N_BAIJIU",
+            "confidence": 0.8,
+        }
+    ]
+
+    signals = derive_financial_metrics_signal_events(
+        financial_metrics_payload=financial_metrics,
+        stock_mappings=stock_mappings,
+        as_of_date="2026-05-15",
+    )
+
+    assert signals == [
+        {
+            "signal_id": "SIG_FIN_600519_N_BAIJIU_REVENUE_GROWTH_UP",
+            "narrative_id": "N_BAIJIU",
+            "signal_type": "revenue_growth_up",
+            "strength": 0.315,
+            "confidence": 0.6,
+            "confidence_multiplier": 0.8,
+            "event_date": "2026-03-31",
+            "half_life_days": 90,
+            "source": "financial_metrics",
+            "source_provider": "eastmoney-financial-metrics",
+            "source_stock_code": "600519",
+            "source_url": "https://datacenter.eastmoney.com/securities/api/data/get",
+            "derivation_reason": "positive provider financial growth metrics",
+        }
+    ]
+    earnings_score = calculate_dimension_score(
+        "earnings_score",
+        signals,
+        as_of_date="2026-05-15",
+        data_quality="fresh",
+    )
+    assert earnings_score["score"] > 50

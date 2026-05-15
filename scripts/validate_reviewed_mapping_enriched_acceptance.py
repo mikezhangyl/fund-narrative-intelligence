@@ -134,6 +134,7 @@ def _run_acceptance(
             "--include-valuation-snapshots",
             "--valuation-source",
             "eastmoney",
+            "--include-financial-metrics",
             "--include-news-evidence",
             "--output-dir",
             str(output_dir),
@@ -183,9 +184,11 @@ def validate_acceptance_outputs(
     registry_layer = layers.get("narrative_registry", {})
     mapping_layer = layers.get("stock_mappings", {})
     valuation_layer = layers.get("valuation", {})
+    financial_layer = layers.get("financial_metrics", {})
     mappings = raw.get("stock_narrative_mappings") or []
     coverage = raw.get("mapping_coverage", {})
     valuation_snapshots = raw.get("valuation_snapshots")
+    financial_metrics = raw.get("financial_metrics")
     derived_signal_events = raw.get("derived_signal_events") or []
     valuation_signal_events = [
         item
@@ -264,6 +267,26 @@ def validate_acceptance_outputs(
         "valuation layer source_url must disclose Eastmoney valuation source",
     )
     _require(
+        isinstance(financial_metrics, dict) and financial_metrics,
+        "financial_metrics is required",
+    )
+    _require(
+        financial_metrics == scoring.get("financial_metrics"),
+        "raw/scoring financial_metrics mismatch",
+    )
+    _require(
+        financial_metrics.get("provider_name") == "eastmoney-financial-metrics",
+        "financial_metrics provider must be eastmoney-financial-metrics",
+    )
+    _require(
+        financial_layer.get("provider_name") == "eastmoney-financial-metrics",
+        "financial metrics layer must use eastmoney-financial-metrics",
+    )
+    _require(
+        financial_layer.get("is_mock") is False,
+        "financial metrics layer must not be mock",
+    )
+    _require(
         derived_signal_events == scoring.get("derived_signal_events"),
         "raw/scoring derived_signal_events mismatch",
     )
@@ -293,12 +316,21 @@ def validate_acceptance_outputs(
         ),
         "signal trace must include eastmoney valuation-derived signals",
     )
+    _require(
+        _signal_trace_contains_source(
+            signal_trace,
+            source="financial_metrics",
+            source_provider="eastmoney-financial-metrics",
+        ),
+        "signal trace must include eastmoney financial-derived signals",
+    )
     expected = (
         "reviewed-registry-store",
         "reviewed-mapping-store",
         "provider-derived-evidence",
         "provider-derived-signals",
         "eastmoney-valuation",
+        "eastmoney-financial-metrics",
     )
     _require(_contains_all(markdown, expected), "Markdown reviewed mapping mismatch")
     _require(_contains_all(html, expected), "HTML reviewed mapping mismatch")
@@ -425,6 +457,7 @@ def _print_success(
     print("announcements=fresh")
     print("market_quotes=fresh")
     print("valuation=eastmoney")
+    print("financial_metrics=eastmoney")
     print("mock_layers=none")
     print("effective_data_quality=partial")
     print(f"workspace_snapshot=fund_{fund_code}_workspace_snapshot.json")

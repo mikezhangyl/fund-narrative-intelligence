@@ -28,6 +28,7 @@ from src.orchestrator import (
 from src.providers.mock import MockDataProvider
 from src.real_fund_smoke import run_real_fund_smoke
 from src.validation import (
+    validate_financial_metrics_payload,
     validate_news_evidence_payload,
     validate_pipeline_artifact_manifest_payload,
     validate_review_action_persistence_result_payload,
@@ -243,6 +244,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--include-news-evidence",
         action="store_true",
         help="Optionally fetch RSS-derived news evidence for mapped narratives.",
+    )
+    parser.add_argument(
+        "--include-financial-metrics",
+        action="store_true",
+        help="Optionally fetch provider financial metrics and derive earnings signals.",
     )
     parser.add_argument(
         "--announcement-start-date",
@@ -568,6 +574,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-valuation-snapshots is not supported with --preview-review-action")
         if args.include_news_evidence:
             parser.error("--include-news-evidence is not supported with --preview-review-action")
+        if args.include_financial_metrics:
+            parser.error("--include-financial-metrics is not supported with --preview-review-action")
         try:
             output_path = write_review_action_preview(
                 registry_path=Path(args.registry_path),
@@ -600,6 +608,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-valuation-snapshots is not supported with --persist-review-action")
         if args.include_news_evidence:
             parser.error("--include-news-evidence is not supported with --persist-review-action")
+        if args.include_financial_metrics:
+            parser.error("--include-financial-metrics is not supported with --persist-review-action")
         if not args.registry_output:
             parser.error("--registry-output is required with --persist-review-action")
         try:
@@ -643,6 +653,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-valuation-snapshots requires --fund-code")
         if args.include_news_evidence:
             parser.error("--include-news-evidence requires --fund-code")
+        if args.include_financial_metrics:
+            parser.error("--include-financial-metrics requires --fund-code")
         for fund_code in MockDataProvider().list_fund_codes():
             print(fund_code)
         return 0
@@ -656,6 +668,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-valuation-snapshots is not supported with --run-all-fixtures")
         if args.include_news_evidence:
             parser.error("--include-news-evidence is not supported with --run-all-fixtures")
+        if args.include_financial_metrics:
+            parser.error("--include-financial-metrics is not supported with --run-all-fixtures")
         try:
             results = run_all_fixture_pipelines(
                 provider_mode=args.provider_mode,
@@ -684,6 +698,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-valuation-snapshots is not supported with --run-real-smoke")
         if args.include_news_evidence:
             parser.error("--include-news-evidence is not supported with --run-real-smoke")
+        if args.include_financial_metrics:
+            parser.error("--include-financial-metrics is not supported with --run-real-smoke")
         try:
             summary = run_real_fund_smoke(output_dir=args.output_dir)
         except PipelineError as exc:
@@ -716,6 +732,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-valuation-snapshots is not supported with --run-announcement-smoke")
         if args.include_news_evidence:
             parser.error("--include-news-evidence is not supported with --run-announcement-smoke")
+        if args.include_financial_metrics:
+            parser.error("--include-financial-metrics is not supported with --run-announcement-smoke")
         try:
             summary = run_announcement_evidence_smoke(output_dir=args.output_dir)
         except PipelineError as exc:
@@ -746,6 +764,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--include-valuation-snapshots is not supported with --provider-diagnostics")
         if args.include_news_evidence:
             parser.error("--include-news-evidence is not supported with --provider-diagnostics")
+        if args.include_financial_metrics:
+            parser.error("--include-financial-metrics is not supported with --provider-diagnostics")
         if not args.fund_code:
             parser.error("--fund-code is required with --provider-diagnostics")
             return 2
@@ -783,6 +803,7 @@ def main(argv: list[str] | None = None) -> int:
             include_market_quotes=args.include_market_quotes,
             include_valuation_snapshots=args.include_valuation_snapshots,
             valuation_snapshot_source=args.valuation_source,
+            include_financial_metrics=args.include_financial_metrics,
             include_news_evidence=args.include_news_evidence,
             narrative_registry_mode=args.narrative_registry_mode,
             narrative_registry_path=args.narrative_registry_path,
@@ -964,6 +985,9 @@ def _validate_manifest_json_metadata(
     news_evidence = payload.get("news_evidence")
     if news_evidence is not None:
         validate_news_evidence_payload(news_evidence)
+    financial_metrics = payload.get("financial_metrics")
+    if financial_metrics is not None:
+        validate_financial_metrics_payload(financial_metrics)
 
 
 def _empty_contract_summary() -> dict[str, int]:

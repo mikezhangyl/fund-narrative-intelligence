@@ -75,6 +75,7 @@ def test_reviewed_mapping_enriched_acceptance_passes_with_mocked_cli(
         "--include-valuation-snapshots",
         "--valuation-source",
         "eastmoney",
+        "--include-financial-metrics",
         "--include-news-evidence",
         "--output-dir",
         str(tmp_path),
@@ -152,6 +153,10 @@ def _write_outputs(
                 {"valuation": _real_layer("valuation", "eastmoney-valuation")}
                 if include_valuation
                 else {}
+            ),
+            "financial_metrics": _real_layer(
+                "financial_metrics",
+                "eastmoney-financial-metrics",
             ),
             "news_evidence": _real_layer("news_evidence", "google-news-rss"),
             "derived_signals": _real_layer(
@@ -237,6 +242,33 @@ def _write_outputs(
         "skipped_item_count": 0,
         "degradation_events": [],
     }
+    financial_metrics = {
+        "version": "financial-metrics-v1",
+        "provider_name": "eastmoney-financial-metrics",
+        "provider_version": "eastmoney-financial-metrics-v1",
+        "data_quality": "fresh",
+        "source_url": "https://datacenter.eastmoney.com/securities/api/data/get",
+        "retrieved_at": "2026-05-14T00:00:00+00:00",
+        "metrics": [
+            {
+                "stock_code": "600519",
+                "stock_name": "贵州茅台",
+                "report_date": "2026-03-31",
+                "report_type": "一季报",
+                "notice_date": "2026-04-25",
+                "currency": "CNY",
+                "revenue": 54702912385.23,
+                "revenue_yoy": 6.336,
+                "parent_net_profit": 27242512886.45,
+                "parent_net_profit_yoy": 1.4714,
+                "source": "provider_financial_metrics",
+                "source_provider": "eastmoney-financial-metrics",
+                "source_url": "https://datacenter.eastmoney.com/securities/api/data/get",
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+            }
+        ],
+        "missing_stock_codes": [],
+    }
     derived_signal_events = [
         {"signal_id": "SIG_ANN_cninfo-600519-0", "source": "cninfo_announcement"},
         {"signal_id": "SIG_NEWS_news-premium-baijiu-0", "source": "news_evidence"},
@@ -249,6 +281,12 @@ def _write_outputs(
             "source": "valuation_snapshot",
             "source_provider": "eastmoney-valuation",
             "signal_type": "valuation_extreme",
+        },
+        {
+            "signal_id": "SIG_FIN_600519_premium_baijiu_consumption_REVENUE_GROWTH_UP",
+            "source": "financial_metrics",
+            "source_provider": "eastmoney-financial-metrics",
+            "signal_type": "revenue_growth_up",
         },
     ]
     raw = {
@@ -270,6 +308,7 @@ def _write_outputs(
         "news_evidence": news_evidence,
         "market_quotes": market_quotes,
         **({"valuation_snapshots": valuation_snapshots} if include_valuation else {}),
+        "financial_metrics": financial_metrics,
         "evidence": [*announcement_evidence["evidence"], *news_evidence["evidence"]],
         "derived_signal_events": derived_signal_events,
         "signal_events": derived_signal_events,
@@ -283,6 +322,7 @@ def _write_outputs(
         "stock_mapping_mode": "reviewed",
         "news_evidence": news_evidence,
         **({"valuation_snapshots": valuation_snapshots} if include_valuation else {}),
+        "financial_metrics": financial_metrics,
         "derived_signal_events": derived_signal_events,
     }
     manifest = {
@@ -343,7 +383,39 @@ def _write_outputs(
                                 "source_layer_is_mock": False,
                             }
                         ],
-                    }
+                    },
+                    {
+                        "dimension": "earnings_score",
+                        "score": 58,
+                        "confidence": 0.4,
+                        "data_quality": "partial",
+                        "supporting_signal_count": 1,
+                        "risk_signal_count": 0,
+                        "signals": [
+                            {
+                                "signal_id": (
+                                    "SIG_FIN_600519_premium_baijiu_consumption_"
+                                    "REVENUE_GROWTH_UP"
+                                ),
+                                "signal_type": "revenue_growth_up",
+                                "role": "support",
+                                "strength": 0.315,
+                                "confidence": 0.6,
+                                "confidence_multiplier": 0.8,
+                                "event_date": "2026-03-31",
+                                "half_life_days": 90,
+                                "source": "financial_metrics",
+                                "source_provider": "eastmoney-financial-metrics",
+                                "source_url": (
+                                    "https://datacenter.eastmoney.com/securities/"
+                                    "api/data/get"
+                                ),
+                                "source_stock_code": "600519",
+                                "source_layer": "financial_metrics",
+                                "source_layer_is_mock": False,
+                            }
+                        ],
+                    },
                 ],
             }
         ],
@@ -357,6 +429,7 @@ def _write_outputs(
         "reviewed-registry-store\nreviewed-mapping-store\n"
         "provider-derived-evidence\nprovider-derived-signals\n"
         "eastmoney-valuation\n"
+        "eastmoney-financial-metrics\n"
     )
     (output_dir / "fund_161725_report.md").write_text(notice, encoding="utf-8")
     (output_dir / "fund_161725_report.html").write_text(notice, encoding="utf-8")
@@ -390,6 +463,7 @@ def _source_url(layer: str) -> str:
         "announcements": "https://www.cninfo.com.cn/new/hisAnnouncement/query",
         "market_quotes": "https://query1.finance.yahoo.com/v8/finance/chart/600519.SS",
         "valuation": "https://push2.eastmoney.com/api/qt/stock/get?secid=1.600519",
+        "financial_metrics": "https://datacenter.eastmoney.com/securities/api/data/get",
         "news_evidence": "https://news.google.com/rss/search",
     }[layer]
 

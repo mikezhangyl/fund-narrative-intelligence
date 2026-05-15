@@ -560,6 +560,43 @@ def test_cli_include_news_evidence_passes_option_to_pipeline(
     assert captured["include_news_evidence"] is True
 
 
+def test_cli_include_financial_metrics_passes_option_to_pipeline(
+    tmp_path,
+    monkeypatch,
+):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "source_table": tmp_path / "source_table.json",
+            "signal_trace": tmp_path / "signal_trace.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--provider-mode",
+            "eastmoney",
+            "--include-financial-metrics",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["include_financial_metrics"] is True
+
+
 def test_cli_base_intelligence_mode_passes_option_to_pipeline(tmp_path, monkeypatch):
     captured = {}
 
@@ -1113,6 +1150,83 @@ def test_optional_valuation_snapshots_can_use_eastmoney_metrics(tmp_path):
     assert valuation_layer["is_mock"] is False
     assert {layer["layer"] for layer in source_table["layers"]} >= {"valuation"}
     assert "Eastmoney valuation metrics" in artifacts["markdown"].read_text()
+
+
+def test_optional_financial_metrics_produce_earnings_signals(tmp_path):
+    class FakeFinancialMetricsProvider:
+        provider_name = "eastmoney-financial-metrics"
+        provider_version = "eastmoney-financial-metrics-v1"
+        source_url = "https://datacenter.eastmoney.com/securities/api/data/get"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_financial_metrics(self, stock_codes: list[str]) -> dict:
+            assert "NVDA" in stock_codes
+            return {
+                "version": "financial-metrics-v1",
+                "provider_name": self.provider_name,
+                "provider_version": self.provider_version,
+                "data_quality": "fresh",
+                "source_url": self.source_url,
+                "retrieved_at": "2026-05-15T00:00:00+00:00",
+                "metrics": [
+                    {
+                        "stock_code": "NVDA",
+                        "stock_name": "NVIDIA",
+                        "report_date": "2026-03-31",
+                        "report_type": "一季报",
+                        "notice_date": "2026-04-25",
+                        "currency": "USD",
+                        "revenue": 26_000_000_000.0,
+                        "revenue_yoy": 18.0,
+                        "parent_net_profit": 14_000_000_000.0,
+                        "parent_net_profit_yoy": 22.0,
+                        "deduct_parent_net_profit_yoy": 21.0,
+                        "roe": 32.0,
+                        "gross_margin": 72.0,
+                        "net_margin": 54.0,
+                        "debt_asset_ratio": 18.0,
+                        "source": "provider_financial_metrics",
+                        "source_provider": self.provider_name,
+                        "source_url": self.source_url,
+                        "retrieved_at": "2026-05-15T00:00:00+00:00",
+                    }
+                ],
+                "missing_stock_codes": [],
+            }
+
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_financial_metrics=True,
+        financial_metrics_provider=FakeFinancialMetricsProvider(),
+    )
+
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    signal_trace = json.loads(artifacts["signal_trace"].read_text())
+    financial_layer = scoring["provider_foundation"]["layers"]["financial_metrics"]
+    financial_signals = [
+        item
+        for item in raw["derived_signal_events"]
+        if item["source"] == "financial_metrics"
+        and item["narrative_id"] == "N_AI_INFRA"
+    ]
+
+    assert raw["financial_metrics"] == scoring["financial_metrics"]
+    assert raw["financial_metrics"]["provider_name"] == "eastmoney-financial-metrics"
+    assert financial_layer["provider_name"] == "eastmoney-financial-metrics"
+    assert financial_layer["is_mock"] is False
+    assert financial_signals[0]["signal_type"] == "revenue_growth_up"
+    assert any(
+        signal["source_layer"] == "financial_metrics"
+        for narrative in signal_trace["narratives"]
+        for dimension in narrative["dimensions"]
+        for signal in dimension["signals"]
+    )
+    assert scoring["primary_narrative"]["state"]["dimensions"]["earnings_score"][
+        "score"
+    ] > 50
 
 
 def test_optional_news_evidence_is_disclosed_and_added_to_outputs(tmp_path):

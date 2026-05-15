@@ -11,6 +11,7 @@ _SOURCE_LAYER_BY_SIGNAL_SOURCE = {
     "market_quote": "market_quotes",
     "news_evidence": "news_evidence",
     "valuation_snapshot": "valuation",
+    "financial_metrics": "financial_metrics",
 }
 
 

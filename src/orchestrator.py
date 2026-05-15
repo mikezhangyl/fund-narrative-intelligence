@@ -19,10 +19,12 @@ from src.modules.report_writer.interpretation import interpret_narrative
 from src.modules.report_writer.writer import write_reports
 from src.modules.signal_service.derived import (
     ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER,
+    FINANCIAL_METRICS_DERIVED_SIGNAL_PROVIDER,
     MARKET_QUOTE_DERIVED_SIGNAL_PROVIDER,
     NEWS_DERIVED_SIGNAL_PROVIDER,
     VALUATION_DERIVED_SIGNAL_PROVIDER,
     derive_announcement_signal_events,
+    derive_financial_metrics_signal_events,
     derive_market_quote_signal_events,
     derive_news_signal_events,
     derive_valuation_signal_events,
@@ -38,6 +40,7 @@ from src.providers.cninfo import (
     CNINFO_ANNOUNCEMENT_QUERY_URL,
     CNInfoAnnouncementProvider,
 )
+from src.providers.eastmoney_financials import EastmoneyFinancialMetricsProvider
 from src.providers.eastmoney_market import EastmoneyMarketDataProvider
 from src.providers.eastmoney_valuation import EastmoneyValuationProvider
 from src.providers.factory import select_data_provider
@@ -94,6 +97,8 @@ def run_pipeline(
     include_valuation_snapshots: bool = False,
     valuation_snapshot_source: str = VALUATION_SOURCE_QUOTE_DERIVED,
     valuation_provider: Any | None = None,
+    include_financial_metrics: bool = False,
+    financial_metrics_provider: Any | None = None,
     include_news_evidence: bool = False,
     news_evidence_provider: Any | None = None,
     narrative_registry_mode: str = NARRATIVE_REGISTRY_MODE_FIXTURE,
@@ -213,6 +218,8 @@ def run_pipeline(
     market_quotes_layer: dict[str, Any] | None = None
     valuation_snapshots_payload: dict[str, Any] | None = None
     valuation_layer: dict[str, Any] | None = None
+    financial_metrics_payload: dict[str, Any] | None = None
+    financial_metrics_layer: dict[str, Any] | None = None
     if include_market_quotes:
         market_result = _run_market_quotes(
             stock_codes=[holding["stock_code"] for holding in holdings],
@@ -287,6 +294,35 @@ def run_pipeline(
             signal_events = [
                 *signal_events,
                 *valuation_signal_events,
+            ]
+    if include_financial_metrics:
+        financial_metrics_result = _run_financial_metrics(
+            stock_codes=[holding["stock_code"] for holding in holdings],
+            financial_metrics_provider=financial_metrics_provider,
+        )
+        financial_metrics_payload = financial_metrics_result["financial_metrics"]
+        financial_metrics_layer = financial_metrics_result["provider_layer"]
+        degradation_events = [
+            *degradation_events,
+            *financial_metrics_result["degradation_events"],
+        ]
+        financial_metric_signal_events = derive_financial_metrics_signal_events(
+            financial_metrics_payload=financial_metrics_payload,
+            stock_mappings=selected_mappings,
+            as_of_date=as_of_date,
+        )
+        if financial_metric_signal_events:
+            derived_signal_provider_names.append(FINANCIAL_METRICS_DERIVED_SIGNAL_PROVIDER)
+            derived_signal_data_qualities.append(
+                str(financial_metrics_payload.get("data_quality") or "unavailable")
+            )
+            derived_signal_events = [
+                *derived_signal_events,
+                *financial_metric_signal_events,
+            ]
+            signal_events = [
+                *signal_events,
+                *financial_metric_signal_events,
             ]
     if include_announcement_evidence:
         announcement_result = _run_announcement_evidence(
@@ -389,6 +425,7 @@ def run_pipeline(
         derived_signals_layer=derived_signals_layer,
         market_quotes_layer=market_quotes_layer,
         valuation_layer=valuation_layer,
+        financial_metrics_layer=financial_metrics_layer,
         news_evidence_layer=news_evidence_layer,
         narrative_registry_layer=narrative_registry_layer,
         stock_mapping_layer=stock_mapping_layer,
@@ -450,6 +487,8 @@ def run_pipeline(
         raw_payload["market_quotes"] = market_quotes_payload
     if valuation_snapshots_payload is not None:
         raw_payload["valuation_snapshots"] = valuation_snapshots_payload
+    if financial_metrics_payload is not None:
+        raw_payload["financial_metrics"] = financial_metrics_payload
     if derived_signal_provider_names:
         raw_payload["derived_signal_events"] = derived_signal_events
 
@@ -487,6 +526,8 @@ def run_pipeline(
         scoring_payload["market_quotes"] = market_quotes_payload
     if valuation_snapshots_payload is not None:
         scoring_payload["valuation_snapshots"] = valuation_snapshots_payload
+    if financial_metrics_payload is not None:
+        scoring_payload["financial_metrics"] = financial_metrics_payload
     if derived_signal_provider_names:
         scoring_payload["derived_signal_events"] = derived_signal_events
 
@@ -758,6 +799,21 @@ def _run_valuation_snapshots(
     }
 
 
+def _run_financial_metrics(
+    stock_codes: list[str],
+    financial_metrics_provider: Any | None,
+) -> dict[str, Any]:
+    provider = financial_metrics_provider or EastmoneyFinancialMetricsProvider()
+    financial_metrics_payload = provider.get_financial_metrics(stock_codes=stock_codes)
+    return {
+        "financial_metrics": financial_metrics_payload,
+        "provider_layer": _financial_metrics_provider_layer(
+            financial_metrics_payload
+        ),
+        "degradation_events": getattr(provider, "degradation_events", []),
+    }
+
+
 def _run_news_evidence(
     narratives: list[dict[str, Any]],
     all_narrative_ids: list[str],
@@ -839,6 +895,7 @@ def _provider_foundation_with_optional_announcement_layer(
     derived_signals_layer: dict[str, Any] | None,
     market_quotes_layer: dict[str, Any] | None,
     valuation_layer: dict[str, Any] | None,
+    financial_metrics_layer: dict[str, Any] | None,
     news_evidence_layer: dict[str, Any] | None,
     narrative_registry_layer: dict[str, Any] | None,
     stock_mapping_layer: dict[str, Any] | None,
@@ -854,6 +911,7 @@ def _provider_foundation_with_optional_announcement_layer(
         and derived_signals_layer is None
         and market_quotes_layer is None
         and valuation_layer is None
+        and financial_metrics_layer is None
         and news_evidence_layer is None
         and narrative_registry_layer is None
         and stock_mapping_layer is None
@@ -874,6 +932,8 @@ def _provider_foundation_with_optional_announcement_layer(
         layers = {**layers, "market_quotes": market_quotes_layer}
     if valuation_layer is not None:
         layers = {**layers, "valuation": valuation_layer}
+    if financial_metrics_layer is not None:
+        layers = {**layers, "financial_metrics": financial_metrics_layer}
     if news_evidence_layer is not None:
         layers = {**layers, "news_evidence": news_evidence_layer}
     if announcement_layer is not None:
@@ -1110,6 +1170,31 @@ def _market_quotes_provider_layer(
         or getattr(provider, "source_url", None),
         "is_mock": provider_name.startswith("mock") or data_quality == "mock",
         "note": "Optional market quote snapshot for current holdings; V1 does not use quotes for scoring yet.",
+    }
+
+
+def _financial_metrics_provider_layer(
+    financial_metrics_payload: dict[str, Any],
+) -> dict[str, Any]:
+    provider_name = str(
+        financial_metrics_payload.get("provider_name")
+        or "financial-metrics-provider"
+    )
+    data_quality = str(financial_metrics_payload.get("data_quality") or "unavailable")
+    return {
+        "layer": "financial_metrics",
+        "provider_name": provider_name,
+        "provider_version": str(
+            financial_metrics_payload.get("provider_version")
+            or financial_metrics_payload["version"]
+        ),
+        "data_quality": data_quality,
+        "source_url": financial_metrics_payload.get("source_url"),
+        "is_mock": provider_name.startswith("mock") or data_quality == "mock",
+        "note": (
+            "Optional financial metrics provider; V1 uses latest reported "
+            "revenue/profit growth metrics as deterministic earnings signals."
+        ),
     }
 
 

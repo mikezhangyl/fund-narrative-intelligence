@@ -54,7 +54,7 @@ mock/partial source warnings, score provenance, and review-action state without
 rebuilding them from lower-level artifacts.
 
 The strict reviewed-mapping enriched acceptance path now uses explicit
-Eastmoney valuation metrics:
+Eastmoney valuation and financial metrics:
 
 ```bash
 python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725

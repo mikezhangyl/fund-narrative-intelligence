@@ -6,6 +6,7 @@ from typing import Any
 
 from src.modules.snapshot_writer.writer import write_json_artifact
 from src.validation import (
+    validate_financial_metrics_payload,
     validate_news_evidence_payload,
     validate_pipeline_artifact_manifest_payload,
     validate_review_queue_artifact_payload,
@@ -293,8 +294,14 @@ def _validate_optional_bundle_payloads(raw: dict[str, Any], scoring: dict[str, A
 
     raw_news = raw.get("news_evidence")
     scoring_news = scoring.get("news_evidence")
-    if raw_news is None and scoring_news is None:
-        return
-    if raw_news != scoring_news:
-        raise ValueError("workspace snapshot news_evidence mismatch")
-    validate_news_evidence_payload(raw_news)
+    if raw_news is not None or scoring_news is not None:
+        if raw_news != scoring_news:
+            raise ValueError("workspace snapshot news_evidence mismatch")
+        validate_news_evidence_payload(raw_news)
+
+    raw_financial_metrics = raw.get("financial_metrics")
+    scoring_financial_metrics = scoring.get("financial_metrics")
+    if raw_financial_metrics is not None or scoring_financial_metrics is not None:
+        if raw_financial_metrics != scoring_financial_metrics:
+            raise ValueError("workspace snapshot financial_metrics mismatch")
+        validate_financial_metrics_payload(raw_financial_metrics)

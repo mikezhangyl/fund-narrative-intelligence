@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-validate-signal-trace-cli",
+  "latest_run": "20260515-eastmoney-financial-metrics",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "commit and merge signal trace CLI validation, then continue the next end-to-end provider slice"
+  "next_step": "commit and merge Eastmoney financial metrics, then continue the next end-to-end provider slice"
 }
