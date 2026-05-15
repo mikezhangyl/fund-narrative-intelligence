@@ -1290,3 +1290,26 @@ Consequences:
   score explanations directly.
 - Mock baseline traces fall back to `mock://fixtures/signal_events.json` when
   fixture signal events have no event-level source URL.
+
+## ADR-0051: Add Direct Signal Trace Artifact Validation CLI
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add `python -m src.main --validate-signal-trace path/to/fund_000001_signal_trace.json`.
+
+Rationale:
+
+- Future web loaders and debugging scripts should be able to validate the
+  score-provenance artifact without validating or rebuilding a full output
+  directory.
+- The project already exposes direct validation for other workspace-facing
+  artifacts, so signal trace should follow the same operational pattern.
+
+Consequences:
+
+- The CLI reuses the shared signal trace validator.
+- Valid artifacts print `Signal trace valid:` with the path.
+- Malformed artifacts fail through the standard parser error path.

@@ -569,6 +569,15 @@ review-action persistence results. When given a manifest file, it validates the
 manifest and every file referenced by it, including source-table and
 signal-trace identity plus provider-foundation consistency.
 
+Signal trace artifacts should also support direct validation:
+
+```bash
+python -m src.main --validate-signal-trace path/to/fund_000001_signal_trace.json
+```
+
+This command validates the score-provenance artifact without requiring
+`--fund-code` or a full output directory.
+
 V1 should also be able to assemble a future-web workspace snapshot from an
 existing manifest or output directory:
 

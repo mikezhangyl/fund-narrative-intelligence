@@ -184,6 +184,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate a fund review-queue artifact and exit.",
     )
     parser.add_argument(
+        "--validate-signal-trace",
+        help="Validate a fund signal-trace artifact and exit.",
+    )
+    parser.add_argument(
         "--validate-artifact-manifest",
         help="Validate a pipeline artifact manifest and exit.",
     )
@@ -309,6 +313,12 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(
             "--validate-review-queue cannot be combined with review action execution"
         )
+    if args.validate_signal_trace and (
+        args.preview_review_action or args.persist_review_action
+    ):
+        parser.error(
+            "--validate-signal-trace cannot be combined with review action execution"
+        )
     if args.validate_artifact_manifest and (
         args.preview_review_action or args.persist_review_action
     ):
@@ -403,6 +413,27 @@ def main(argv: list[str] | None = None) -> int:
 
         print("Review queue valid:")
         print(Path(args.validate_review_queue))
+        return 0
+
+    if args.validate_signal_trace:
+        try:
+            payload = _read_json_object(Path(args.validate_signal_trace))
+            validate_signal_trace_artifact_payload(payload)
+        except PipelineError as exc:
+            parser.error(str(exc))
+            return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        except Exception as exc:
+            print(
+                f"Unrecoverable signal trace validation error: {exc}",
+                file=sys.stderr,
+            )
+            return 1
+
+        print("Signal trace valid:")
+        print(Path(args.validate_signal_trace))
         return 0
 
     if args.validate_artifact_manifest:
@@ -798,6 +829,7 @@ def _uses_non_pipeline_action(args: argparse.Namespace) -> bool:
             args.validate_persistence_result,
             args.validate_review_preview,
             args.validate_review_queue,
+            args.validate_signal_trace,
             args.validate_artifact_manifest,
             args.validate_artifact_contracts,
             args.build_workspace_snapshot,

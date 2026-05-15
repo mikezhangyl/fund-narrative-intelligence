@@ -155,6 +155,30 @@ def test_main_validate_review_queue_rejects_malformed_file(tmp_path, capsys):
     assert "review queue artifact missing required fields" in captured.err
 
 
+def test_main_validates_signal_trace_artifact(tmp_path, capsys):
+    main_module.main(["--fund-code", "000001", "--output-dir", str(tmp_path)])
+    signal_trace_path = tmp_path / "fund_000001_signal_trace.json"
+
+    exit_code = main_module.main(["--validate-signal-trace", str(signal_trace_path)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Signal trace valid:" in captured.out
+    assert str(signal_trace_path) in captured.out
+
+
+def test_main_validate_signal_trace_rejects_malformed_file(tmp_path, capsys):
+    signal_trace_path = tmp_path / "bad-signal-trace.json"
+    signal_trace_path.write_text("{}", encoding="utf-8")
+
+    with pytest.raises(SystemExit) as exc:
+        main_module.main(["--validate-signal-trace", str(signal_trace_path)])
+
+    captured = capsys.readouterr()
+    assert exc.value.code == 2
+    assert "signal trace artifact missing required fields" in captured.err
+
+
 def test_main_validates_artifact_manifest(tmp_path, capsys):
     main_module.main(["--fund-code", "000001", "--output-dir", str(tmp_path)])
     manifest_path = tmp_path / "fund_000001_manifest.json"

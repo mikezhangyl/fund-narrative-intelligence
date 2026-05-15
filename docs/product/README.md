@@ -45,6 +45,7 @@ Future web loading is prepared through:
 ```bash
 python -m src.main --build-workspace-snapshot outputs/
 python -m src.main --validate-workspace-snapshot outputs/fund_000001_workspace_snapshot.json
+python -m src.main --validate-signal-trace outputs/fund_000001_signal_trace.json
 ```
 
 The workspace snapshot includes top-level `data_source_notice`,
