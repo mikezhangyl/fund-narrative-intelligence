@@ -1661,3 +1661,30 @@ Consequences:
   payloads.
 - Optional news evidence runs fail with `ProviderContractError` before derived
   signal generation sees malformed evidence rows.
+
+## ADR-0065: Validate Optional Payloads In Artifact Contract Checks
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+When `_validate_artifact_contracts` reads manifest-referenced raw and scoring
+JSON, validate all optional provider payloads present in those artifacts.
+
+Rationale:
+
+- Future web loaders and audits may validate existing outputs without rerunning
+  the pipeline.
+- Runtime provider-boundary validation is not enough for edited, archived, or
+  externally generated artifact directories.
+- Optional payload contracts should be enforced consistently across runtime and
+  offline validation.
+
+Consequences:
+
+- Offline artifact validation now checks `announcements`,
+  `announcement_evidence`, `market_quotes`, `valuation_snapshots`,
+  `financial_metrics`, and `news_evidence` when present.
+- Malformed optional payloads in either raw or scoring artifacts fail before
+  workspace snapshots are built.

@@ -28,7 +28,10 @@ from src.orchestrator import (
 from src.providers.mock import MockDataProvider
 from src.real_fund_smoke import run_real_fund_smoke
 from src.validation import (
+    validate_announcement_evidence_payload,
+    validate_announcement_payload,
     validate_financial_metrics_payload,
+    validate_market_quote_payload,
     validate_news_evidence_payload,
     validate_pipeline_artifact_manifest_payload,
     validate_review_action_persistence_result_payload,
@@ -36,6 +39,7 @@ from src.validation import (
     validate_review_queue_artifact_payload,
     validate_signal_trace_artifact_payload,
     validate_source_table_artifact_payload,
+    validate_valuation_snapshot_payload,
     validate_workspace_snapshot_payload,
 )
 
@@ -982,6 +986,18 @@ def _validate_manifest_json_metadata(
         raise ValueError(
             f"manifest artifact {artifact_key} provider_foundation mismatch"
         )
+    announcements = payload.get("announcements")
+    if announcements is not None:
+        validate_announcement_payload(announcements)
+    announcement_evidence = payload.get("announcement_evidence")
+    if announcement_evidence is not None:
+        validate_announcement_evidence_payload(announcement_evidence)
+    market_quotes = payload.get("market_quotes")
+    if market_quotes is not None:
+        validate_market_quote_payload(market_quotes)
+    valuation_snapshots = payload.get("valuation_snapshots")
+    if valuation_snapshots is not None:
+        validate_valuation_snapshot_payload(valuation_snapshots)
     news_evidence = payload.get("news_evidence")
     if news_evidence is not None:
         validate_news_evidence_payload(news_evidence)

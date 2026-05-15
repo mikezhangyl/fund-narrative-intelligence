@@ -1,0 +1,43 @@
+{
+  "task_run_id": "20260515-artifact-optional-payload-validation",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/artifact-optional-payload-validation",
+  "worktree": "main",
+  "base_commit": "7fa0e47",
+  "head_commit": "recorded-by-git-history",
+  "merge_base": "7fa0e47",
+  "quality_reviewed_commit": null,
+  "reviewed_snapshot_type": null,
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "commit_and_merge",
+  "review_outcome": "passed",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "not_required",
+  "verification": {
+    "red_target_pytest": "2 expected failures for missing artifact optional payload validation",
+    "green_target_pytest": "2 passed",
+    "related_pytest": "56 passed",
+    "ruff": "passed",
+    "compileall": "passed",
+    "v1_acceptance": "passed",
+    "pytest": "271 passed",
+    "coverage": "80%",
+    "reviewed_mapping_enriched_acceptance": "passed"
+  },
+  "decisions": [
+    {
+      "id": "AOPV-001",
+      "date": "2026-05-15",
+      "decision": "Offline artifact validation should validate every optional provider payload present in raw/scoring JSON.",
+      "rationale": "Future web loading and audits may validate existing outputs without rerunning the pipeline."
+    }
+  ]
+}

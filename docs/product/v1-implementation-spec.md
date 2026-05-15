@@ -88,6 +88,9 @@ Optional announcement-to-evidence conversion:
   evidence payloads must also be validated at the orchestration boundary so
   injected providers and future adapters follow the same contracts as built-in
   providers.
+- Offline artifact contract validation must re-run those optional payload
+  validators for raw/scoring JSON so existing output directories can be audited
+  before future web workspace loading.
 
 ## Degradation Strategy
 

@@ -199,6 +199,54 @@ def test_artifact_contracts_reject_signal_trace_identity_mismatch(tmp_path):
     assert "signal_trace fund_code mismatch" in str(exc.value)
 
 
+def test_artifact_contracts_reject_invalid_market_quotes_payload(tmp_path):
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+    )
+    raw = json.loads(artifacts["raw"].read_text())
+    raw["market_quotes"] = {
+        "version": "eastmoney-market-quote-v1",
+        "provider_name": "eastmoney-market-quote",
+        "provider_version": "eastmoney-market-quote-v1",
+        "data_quality": "fresh",
+        "source_url": "https://push2.eastmoney.com/api/qt/ulist.np/get",
+        "retrieved_at": "2026-05-14T00:00:00+00:00",
+        "quotes": "not-a-list",
+        "missing_stock_codes": [],
+    }
+    artifacts["raw"].write_text(json.dumps(raw), encoding="utf-8")
+
+    with pytest.raises(ProviderContractError) as exc:
+        main_module._validate_artifact_contracts(tmp_path)
+
+    assert "market quotes quotes must be a list" in str(exc.value)
+
+
+def test_artifact_contracts_reject_invalid_announcement_evidence_payload(tmp_path):
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+    )
+    scoring = json.loads(artifacts["scoring"].read_text())
+    scoring["announcement_evidence"] = {
+        "version": "announcement-evidence-v1",
+        "data_quality": "fresh",
+        "evidence": "not-a-list",
+        "missing_stock_codes": [],
+        "unmapped_stock_codes": [],
+        "skipped_announcement_count": 0,
+    }
+    artifacts["scoring"].write_text(json.dumps(scoring), encoding="utf-8")
+
+    with pytest.raises(ProviderContractError) as exc:
+        main_module._validate_artifact_contracts(tmp_path)
+
+    assert "evidence must be a list" in str(exc.value)
+
+
 def test_real_provider_mode_degrades_to_mock_without_crashing(tmp_path):
     command = [
         sys.executable,

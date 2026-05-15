@@ -132,6 +132,7 @@ Expected artifacts:
 - Pipeline outputs include `fund_<code>_manifest.json`, a web-ready discovery artifact with relative artifact paths, provider foundation, data quality, and degradation events.
 - `python -m src.main --validate-artifact-manifest path/to/fund_000001_manifest.json` validates a manifest artifact without requiring `--fund-code`.
 - `python -m src.main --validate-artifact-contracts path/to/outputs_or_manifest` validates known generated artifact contracts in one command before future web workspace loading, including manifest-referenced source-table and signal-trace artifacts plus generated workspace snapshots.
+- Artifact contract validation checks optional raw/scoring provider payloads when present: announcements, announcement evidence, market quotes, valuation snapshots, financial metrics, and news evidence.
 - `python -m src.main --validate-signal-trace path/to/fund_000001_signal_trace.json` validates a signal trace artifact without requiring `--fund-code`.
 - `python -m src.main --build-workspace-snapshot path/to/outputs_or_manifest` writes `fund_<code>_workspace_snapshot.json`, a future-web loader artifact that bundles the manifest, provider foundation, source table, signal trace, review queue, narrative summaries, report paths, data-layer summaries, and approval workflow readiness metadata.
 - `python -m src.main --validate-workspace-snapshot path/to/fund_000001_workspace_snapshot.json` validates that loader artifact without building UI.
