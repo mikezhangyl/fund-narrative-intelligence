@@ -1553,3 +1553,30 @@ Consequences:
   announcement evidence is enabled.
 - Reviewed-mapping enriched acceptance now requires `Announcement Evidence` in
   both Markdown and HTML reports.
+
+## ADR-0061: Validate Announcement Payloads In Workspace Snapshots
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Reject workspace snapshot builds when raw and scoring artifacts disagree on
+`announcements` or `announcement_evidence` payloads.
+
+Rationale:
+
+- Future web workspaces should load one coherent server-produced bundle rather
+  than choosing between conflicting raw and scoring copies.
+- Announcement payloads are duplicated for report rendering and workspace
+  loading, so drift can otherwise hide until UI approval screens consume them.
+- This keeps the current implementation server-side while preparing for later
+  visual approval flows.
+
+Consequences:
+
+- Workspace snapshot building now fails fast on mismatched `announcements`.
+- Workspace snapshot building now fails fast on mismatched
+  `announcement_evidence`.
+- Basic collection shape is checked for both payloads before the snapshot is
+  written.

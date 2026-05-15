@@ -388,6 +388,28 @@ def _require_bundle_identity(
 
 
 def _validate_optional_bundle_payloads(raw: dict[str, Any], scoring: dict[str, Any]) -> None:
+    raw_announcements = raw.get("announcements")
+    scoring_announcements = scoring.get("announcements")
+    if raw_announcements is not None or scoring_announcements is not None:
+        if raw_announcements != scoring_announcements:
+            raise ValueError("workspace snapshot announcements mismatch")
+        _validate_optional_collection_payload(
+            raw_announcements,
+            payload_name="announcements",
+            collection_key="announcements",
+        )
+
+    raw_announcement_evidence = raw.get("announcement_evidence")
+    scoring_announcement_evidence = scoring.get("announcement_evidence")
+    if raw_announcement_evidence is not None or scoring_announcement_evidence is not None:
+        if raw_announcement_evidence != scoring_announcement_evidence:
+            raise ValueError("workspace snapshot announcement_evidence mismatch")
+        _validate_optional_collection_payload(
+            raw_announcement_evidence,
+            payload_name="announcement_evidence",
+            collection_key="evidence",
+        )
+
     raw_valuation = raw.get("valuation_snapshots")
     scoring_valuation = scoring.get("valuation_snapshots")
     if raw_valuation is not None or scoring_valuation is not None:
@@ -408,3 +430,17 @@ def _validate_optional_bundle_payloads(raw: dict[str, Any], scoring: dict[str, A
         if raw_financial_metrics != scoring_financial_metrics:
             raise ValueError("workspace snapshot financial_metrics mismatch")
         validate_financial_metrics_payload(raw_financial_metrics)
+
+
+def _validate_optional_collection_payload(
+    payload: Any,
+    *,
+    payload_name: str,
+    collection_key: str,
+) -> None:
+    if not isinstance(payload, dict):
+        raise ValueError(f"workspace snapshot {payload_name} must be an object")
+    if not isinstance(payload.get(collection_key), list):
+        raise ValueError(
+            f"workspace snapshot {payload_name}.{collection_key} must be a list"
+        )

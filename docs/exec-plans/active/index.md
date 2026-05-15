@@ -84,3 +84,4 @@
 - [market-quotes-report.md](./market-quotes-report.md)
 - [news-evidence-report.md](./news-evidence-report.md)
 - [announcement-report.md](./announcement-report.md)
+- [workspace-announcement-validation.md](./workspace-announcement-validation.md)

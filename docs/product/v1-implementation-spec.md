@@ -608,6 +608,12 @@ include:
 - `approval_workflow.review_queue_summary`, `available_actions`, and item counts
   so future web approval routing can load without re-deriving queue state
 
+When optional duplicated provider payloads are present in both raw and scoring
+artifacts, the workspace snapshot builder must reject raw/scoring drift before
+writing the loader artifact. V1 currently enforces this for
+`announcements`, `announcement_evidence`, `valuation_snapshots`,
+`financial_metrics`, and `news_evidence`.
+
 The strict reviewed-mapping enriched acceptance command exercises the current
 no-mock-core server path with Eastmoney holdings, reviewed registry, reviewed
 stock mappings, provider-derived evidence/signals, CNINFO announcements, market

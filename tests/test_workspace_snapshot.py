@@ -278,6 +278,32 @@ def test_workspace_snapshot_preserves_financial_metrics_layer_for_future_web(tmp
     }
 
 
+def test_build_workspace_snapshot_rejects_announcement_payload_drift(tmp_path):
+    _run_pipeline_with_announcement_payload(tmp_path)
+    scoring_path = tmp_path / "fund_000001_scoring.json"
+    scoring = json.loads(scoring_path.read_text())
+    scoring["announcements"]["announcements"][0]["title"] = "mutated announcement title"
+    scoring_path.write_text(json.dumps(scoring), encoding="utf-8")
+
+    with pytest.raises(ValueError) as exc:
+        build_workspace_snapshot(tmp_path)
+
+    assert "workspace snapshot announcements mismatch" in str(exc.value)
+
+
+def test_build_workspace_snapshot_rejects_announcement_evidence_payload_drift(tmp_path):
+    _run_pipeline_with_announcement_payload(tmp_path)
+    scoring_path = tmp_path / "fund_000001_scoring.json"
+    scoring = json.loads(scoring_path.read_text())
+    scoring["announcement_evidence"]["evidence"][0]["summary"] = "mutated summary"
+    scoring_path.write_text(json.dumps(scoring), encoding="utf-8")
+
+    with pytest.raises(ValueError) as exc:
+        build_workspace_snapshot(tmp_path)
+
+    assert "workspace snapshot announcement_evidence mismatch" in str(exc.value)
+
+
 def test_build_workspace_snapshot_rejects_invalid_news_payload(tmp_path):
     run_pipeline(fund_code="000001", provider_mode="mock", output_dir=tmp_path)
     raw_path = tmp_path / "fund_000001_raw.json"
@@ -396,3 +422,46 @@ def test_workspace_snapshot_validation_rejects_incomplete_narrative_payload(tmp_
         validate_workspace_snapshot_payload(snapshot)
 
     assert "narratives.primary missing required fields" in str(exc.value)
+
+
+def _run_pipeline_with_announcement_payload(tmp_path):
+    class FakeAnnouncementProvider:
+        provider_name = "cninfo-announcement"
+        provider_version = "cninfo-announcement-v1"
+        source_url = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_announcements(
+            self,
+            stock_codes: list[str],
+            as_of_date: str,
+            start_date: str | None = None,
+        ) -> dict:
+            assert "NVDA" in stock_codes
+            assert as_of_date == "2026-05-13"
+            assert start_date == "2026-05-01"
+            return {
+                "version": self.provider_version,
+                "data_quality": "fresh",
+                "announcements": [
+                    {
+                        "stock_code": "NVDA",
+                        "stock_name": "NVIDIA",
+                        "title": "2026年度业绩预增公告",
+                        "category": "业绩预告",
+                        "announcement_date": "2026-05-12",
+                        "source": "cninfo",
+                        "source_url": "https://static.cninfo.com.cn/finalpage/1.PDF",
+                    }
+                ],
+                "missing_stock_codes": [],
+            }
+
+    run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_announcement_evidence=True,
+        announcement_start_date="2026-05-01",
+        announcement_provider=FakeAnnouncementProvider(),
+    )
