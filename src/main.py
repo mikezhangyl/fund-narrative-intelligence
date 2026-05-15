@@ -925,6 +925,7 @@ def _validate_manifest_bundle(manifest_path: Path) -> None:
             artifact_path=artifact_path,
             manifest=manifest,
         )
+    _validate_manifest_optional_payload_consistency(manifest, artifact_root)
 
 
 def _validate_manifest_referenced_artifact(
@@ -1004,6 +1005,32 @@ def _validate_manifest_json_metadata(
     financial_metrics = payload.get("financial_metrics")
     if financial_metrics is not None:
         validate_financial_metrics_payload(financial_metrics)
+
+
+def _validate_manifest_optional_payload_consistency(
+    manifest: dict,
+    artifact_root: Path,
+) -> None:
+    artifacts = manifest["artifacts"]
+    raw_artifact = artifacts.get("raw")
+    scoring_artifact = artifacts.get("scoring")
+    if not isinstance(raw_artifact, dict) or not isinstance(scoring_artifact, dict):
+        return
+    raw = _read_json_object(artifact_root / raw_artifact["path"])
+    scoring = _read_json_object(artifact_root / scoring_artifact["path"])
+    for payload_key in (
+        "announcements",
+        "announcement_evidence",
+        "market_quotes",
+        "valuation_snapshots",
+        "financial_metrics",
+        "news_evidence",
+    ):
+        raw_payload = raw.get(payload_key)
+        scoring_payload = scoring.get(payload_key)
+        if raw_payload is not None or scoring_payload is not None:
+            if raw_payload != scoring_payload:
+                raise ValueError(f"manifest artifact {payload_key} mismatch")
 
 
 def _empty_contract_summary() -> dict[str, int]:

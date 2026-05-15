@@ -90,3 +90,4 @@
 - [provider-boundary-validation.md](./provider-boundary-validation.md)
 - [valuation-financial-boundary-tests.md](./valuation-financial-boundary-tests.md)
 - [artifact-optional-payload-validation.md](./artifact-optional-payload-validation.md)
+- [artifact-optional-payload-consistency.md](./artifact-optional-payload-consistency.md)

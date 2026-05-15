@@ -1688,3 +1688,31 @@ Consequences:
   `financial_metrics`, and `news_evidence` when present.
 - Malformed optional payloads in either raw or scoring artifacts fail before
   workspace snapshots are built.
+
+## ADR-0066: Reject Optional Payload Drift In Artifact Contracts
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+When a manifest bundle contains both raw and scoring artifacts, offline
+artifact-contract validation must compare duplicated optional provider payloads
+and reject drift.
+
+Rationale:
+
+- Workspace snapshot building already rejects some raw/scoring drift, but
+  artifact-contract validation should fail earlier for archived or edited
+  output directories.
+- Future web loaders should not have to choose between conflicting raw and
+  scoring payload copies.
+- This makes offline validation consistent with workspace snapshot expectations.
+
+Consequences:
+
+- `_validate_artifact_contracts` now compares `announcements`,
+  `announcement_evidence`, `market_quotes`, `valuation_snapshots`,
+  `financial_metrics`, and `news_evidence` across raw and scoring JSON.
+- Drift in any of those payloads fails before text reports or workspace
+  snapshots are consumed.

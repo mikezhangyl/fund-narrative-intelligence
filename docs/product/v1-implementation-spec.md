@@ -91,6 +91,8 @@ Optional announcement-to-evidence conversion:
 - Offline artifact contract validation must re-run those optional payload
   validators for raw/scoring JSON so existing output directories can be audited
   before future web workspace loading.
+- It must also reject raw/scoring drift for duplicated optional provider
+  payloads.
 
 ## Degradation Strategy
 

@@ -247,6 +247,53 @@ def test_artifact_contracts_reject_invalid_announcement_evidence_payload(tmp_pat
     assert "evidence must be a list" in str(exc.value)
 
 
+def test_artifact_contracts_reject_optional_payload_drift(tmp_path):
+    artifacts = run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+    )
+    market_quotes = {
+        "version": "eastmoney-market-quote-v1",
+        "provider_name": "eastmoney-market-quote",
+        "provider_version": "eastmoney-market-quote-v1",
+        "data_quality": "fresh",
+        "source_url": "https://push2.eastmoney.com/api/qt/ulist.np/get",
+        "retrieved_at": "2026-05-14T00:00:00+00:00",
+        "quotes": [
+            {
+                "stock_code": "NVDA",
+                "stock_name": "NVIDIA",
+                "latest_price": 1000.0,
+                "change_percent": 1.5,
+                "change_amount": 14.7,
+                "volume": 100,
+                "amount": 100000.0,
+                "high": 1005.0,
+                "low": 990.0,
+                "open": 995.0,
+                "previous_close": 985.3,
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+            }
+        ],
+        "missing_stock_codes": [],
+    }
+    raw = json.loads(artifacts["raw"].read_text())
+    scoring = json.loads(artifacts["scoring"].read_text())
+    raw["market_quotes"] = market_quotes
+    scoring["market_quotes"] = {
+        **market_quotes,
+        "quotes": [{**market_quotes["quotes"][0], "latest_price": 999.0}],
+    }
+    artifacts["raw"].write_text(json.dumps(raw), encoding="utf-8")
+    artifacts["scoring"].write_text(json.dumps(scoring), encoding="utf-8")
+
+    with pytest.raises(ValueError) as exc:
+        main_module._validate_artifact_contracts(tmp_path)
+
+    assert "manifest artifact market_quotes mismatch" in str(exc.value)
+
+
 def test_real_provider_mode_degrades_to_mock_without_crashing(tmp_path):
     command = [
         sys.executable,
