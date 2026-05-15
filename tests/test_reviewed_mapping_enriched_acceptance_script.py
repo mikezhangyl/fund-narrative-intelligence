@@ -125,6 +125,36 @@ def test_reviewed_mapping_enriched_acceptance_rejects_missing_financial_data_lay
     assert "workspace data_layers must include financial_metrics" in str(exc.value)
 
 
+def test_reviewed_mapping_enriched_acceptance_rejects_missing_announcement_data_layer(
+    tmp_path,
+):
+    _write_outputs(tmp_path)
+    _write_json(
+        tmp_path / "fund_161725_workspace_snapshot.json",
+        _workspace_snapshot_data_layers(omitted_layers={"announcement_evidence"}),
+    )
+
+    with pytest.raises(validate_reviewed_mapping_enriched_acceptance.AcceptanceError) as exc:
+        validate_reviewed_mapping_enriched_acceptance.validate_acceptance_outputs(tmp_path)
+
+    assert "workspace data_layers must include announcement_evidence" in str(exc.value)
+
+
+def test_reviewed_mapping_enriched_acceptance_rejects_missing_market_quote_data_layer(
+    tmp_path,
+):
+    _write_outputs(tmp_path)
+    _write_json(
+        tmp_path / "fund_161725_workspace_snapshot.json",
+        _workspace_snapshot_data_layers(omitted_layers={"market_quotes"}),
+    )
+
+    with pytest.raises(validate_reviewed_mapping_enriched_acceptance.AcceptanceError) as exc:
+        validate_reviewed_mapping_enriched_acceptance.validate_acceptance_outputs(tmp_path)
+
+    assert "workspace data_layers must include market_quotes" in str(exc.value)
+
+
 def _write_outputs(
     output_dir: Path,
     mapping_method: str = "reviewed_mapping",
@@ -495,7 +525,9 @@ def _workspace_snapshot_data_layers(
     *,
     include_valuation: bool = True,
     include_financial_metrics: bool = True,
+    omitted_layers: set[str] | None = None,
 ) -> dict:
+    omitted_layers = omitted_layers or set()
     layer_names = [
         "holdings",
         "evidence",
@@ -510,6 +542,7 @@ def _workspace_snapshot_data_layers(
         layer_names.append("valuation_snapshots")
     if include_financial_metrics:
         layer_names.append("financial_metrics")
+    layer_names = [layer for layer in layer_names if layer not in omitted_layers]
     return {
         "version": "workspace-snapshot-v1",
         "data_layers": {

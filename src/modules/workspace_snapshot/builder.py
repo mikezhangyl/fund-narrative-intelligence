@@ -179,7 +179,7 @@ def _optional_data_layers(
 ) -> list[dict[str, Any]]:
     candidates = [
         ("announcements", "announcements", "announcements"),
-        ("announcement_evidence", "announcement_evidence", "announcements"),
+        ("announcement_evidence", "evidence", "announcements"),
         ("market_quotes", "quotes", "market_quotes"),
         ("valuation_snapshots", "valuations", "valuation"),
         ("financial_metrics", "metrics", "financial_metrics"),

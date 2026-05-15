@@ -1580,3 +1580,31 @@ Consequences:
   `announcement_evidence`.
 - Basic collection shape is checked for both payloads before the snapshot is
   written.
+
+## ADR-0062: Require Optional Provider Layers In Reviewed Workspace Acceptance
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Reviewed-mapping enriched acceptance must require workspace `data_layers` for
+`announcements`, `announcement_evidence`, and `market_quotes` in addition to
+the previously required holdings, valuation, financial, news, and derived
+signal layers.
+
+Rationale:
+
+- The reviewed enriched scenario intentionally enables CNINFO announcements and
+  market quotes, so future web data tabs should be able to discover those rows
+  from the snapshot without opening raw JSON first.
+- Reports now show these optional payloads; workspace acceptance should enforce
+  the same source visibility for the later UI.
+- Missing optional data-layer rows are contract gaps even when the raw/scoring
+  payloads exist.
+
+Consequences:
+
+- Reviewed-mapping enriched acceptance fails if `announcements`,
+  `announcement_evidence`, or `market_quotes` data-layer rows are missing.
+- These layers must be non-mock, have rows, and disclose source URLs.

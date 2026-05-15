@@ -445,6 +445,9 @@ def _validate_workspace_data_layers(workspace_snapshot: dict[str, Any]) -> None:
     }
     for layer_name in (
         "holdings",
+        "announcements",
+        "announcement_evidence",
+        "market_quotes",
         "valuation_snapshots",
         "financial_metrics",
         "news_evidence",

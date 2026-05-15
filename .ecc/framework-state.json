@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-workspace-announcement-validation",
+  "latest_run": "20260515-reviewed-optional-data-layers",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "finish workspace announcement validation, then continue the next end-to-end provider slice"
+  "next_step": "finish reviewed optional data_layers acceptance, then continue the next end-to-end provider slice"
 }

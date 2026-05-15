@@ -1,0 +1,43 @@
+{
+  "task_run_id": "20260515-reviewed-optional-data-layers",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/reviewed-optional-data-layers",
+  "worktree": "main",
+  "base_commit": "9a1842b",
+  "head_commit": "recorded-by-git-history",
+  "merge_base": "9a1842b",
+  "quality_reviewed_commit": null,
+  "reviewed_snapshot_type": null,
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "commit_and_merge",
+  "review_outcome": "passed",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "not_required",
+  "verification": {
+    "red_target_pytest": "2 expected failures for missing optional data-layer acceptance checks",
+    "red_bug_regression_pytest": "1 expected failure for announcement_evidence item_count",
+    "green_target_pytest": "23 passed",
+    "ruff": "passed",
+    "compileall": "passed",
+    "v1_acceptance": "passed",
+    "pytest": "264 passed",
+    "coverage": "80%",
+    "reviewed_mapping_enriched_acceptance": "passed"
+  },
+  "decisions": [
+    {
+      "id": "RODL-001",
+      "date": "2026-05-15",
+      "decision": "Reviewed enriched acceptance should require every optional provider data layer enabled by the scenario.",
+      "rationale": "Future web data tabs need the same visible source-layer coverage that reports now show."
+    }
+  ]
+}

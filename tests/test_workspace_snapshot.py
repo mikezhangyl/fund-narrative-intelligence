@@ -304,6 +304,17 @@ def test_build_workspace_snapshot_rejects_announcement_evidence_payload_drift(tm
     assert "workspace snapshot announcement_evidence mismatch" in str(exc.value)
 
 
+def test_workspace_snapshot_counts_announcement_evidence_for_future_web(tmp_path):
+    _run_pipeline_with_announcement_payload(tmp_path)
+
+    snapshot_path = build_workspace_snapshot(tmp_path)
+    snapshot = json.loads(snapshot_path.read_text())
+
+    data_layers = {layer["layer"]: layer for layer in snapshot["data_layers"]["layers"]}
+    assert data_layers["announcements"]["item_count"] == 1
+    assert data_layers["announcement_evidence"]["item_count"] == 2
+
+
 def test_build_workspace_snapshot_rejects_invalid_news_payload(tmp_path):
     run_pipeline(fund_code="000001", provider_mode="mock", output_dir=tmp_path)
     raw_path = tmp_path / "fund_000001_raw.json"
