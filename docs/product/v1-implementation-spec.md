@@ -478,7 +478,7 @@ V1 can optionally include CNINFO announcement metadata as evidence:
 python -m src.main --fund-code 000001 --include-cninfo-announcements --announcement-start-date 2026-05-01
 ```
 
-This option is off by default. When enabled, raw/scoring JSON must include `announcements` and `announcement_evidence`, provider foundation must include an `announcements` layer, and reports must disclose that announcement evidence is metadata-only.
+This option is off by default. When enabled, raw/scoring JSON must include `announcements` and `announcement_evidence`, provider foundation must include an `announcements` layer, and reports must disclose that announcement evidence is metadata-only. Reports must render `Announcements` and `Announcement Evidence` sections with stock, title, category, date, narrative ID, confidence, generated summary, provider, source URL, and the limitation that source PDF contents are not parsed in V1.
 
 V1 should also support a live announcement-evidence smoke command:
 

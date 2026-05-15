@@ -83,3 +83,4 @@
 - [reviewed-data-layers-acceptance.md](./reviewed-data-layers-acceptance.md)
 - [market-quotes-report.md](./market-quotes-report.md)
 - [news-evidence-report.md](./news-evidence-report.md)
+- [announcement-report.md](./announcement-report.md)

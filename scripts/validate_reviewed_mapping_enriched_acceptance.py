@@ -338,6 +338,7 @@ def validate_acceptance_outputs(
         "Financial Metrics",
         "Valuation Snapshots",
         "News Evidence",
+        "Announcement Evidence",
     )
     _require(_contains_all(markdown, expected), "Markdown reviewed mapping mismatch")
     _require(_contains_all(html, expected), "HTML reviewed mapping mismatch")

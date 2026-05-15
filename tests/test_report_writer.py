@@ -198,6 +198,36 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
                 }
             ],
         },
+        "announcements": {
+            "provider_name": "cninfo-announcement",
+            "announcements": [
+                {
+                    "stock_code": "NVDA",
+                    "stock_name": "NVIDIA",
+                    "title": "2026年度业绩预增公告",
+                    "category": "业绩预告",
+                    "announcement_date": "2026-05-12",
+                    "source_provider": "cninfo-announcement",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/1.PDF",
+                }
+            ],
+        },
+        "announcement_evidence": {
+            "provider_name": "cninfo-announcement",
+            "evidence": [
+                {
+                    "evidence_id": "EV_ANN_NVDA_N_AI_INFRA",
+                    "narrative_id": "N_AI_INFRA",
+                    "type": "earnings",
+                    "title": "2026年度业绩预增公告",
+                    "summary": "Classified CNINFO metadata only. PDF content has not been parsed.",
+                    "confidence": 0.64,
+                    "event_date": "2026-05-12",
+                    "source_provider": "cninfo-announcement",
+                    "source_url": "https://static.cninfo.com.cn/finalpage/1.PDF",
+                }
+            ],
+        },
         "provider_foundation": {
             "effective_data_quality": "mock",
             "disclosure_required": True,
@@ -234,6 +264,8 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert '<section class="valuation-snapshots">' in html
     assert '<section class="market-quotes">' in html
     assert '<section class="news-evidence">' in html
+    assert '<section class="announcements">' in html
+    assert '<section class="announcement-evidence">' in html
     assert '<section class="data-source-notice">' in html
     assert "Mapping Coverage" in html
     assert "Mapping Precision Flags" in html
@@ -251,14 +283,17 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "Valuation Snapshots" in markdown
     assert "Market Quotes" in markdown
     assert "News Evidence" in markdown
+    assert "Announcement Evidence" in markdown
     assert "eastmoney-financial-metrics" in markdown
     assert "eastmoney-valuation" in markdown
     assert "eastmoney-market-quote" in markdown
     assert "google-news-rss" in markdown
+    assert "cninfo-announcement" in markdown
     assert "https://datacenter.eastmoney.com/securities/api/data/get" in html
     assert "https://push2.eastmoney.com/api/qt/stock/get" in html
     assert "https://push2.eastmoney.com/api/qt/ulist.np/get" in html
     assert "https://example.com/news/ai" in html
+    assert "https://static.cninfo.com.cn/finalpage/1.PDF" in html
     assert "<h3>AI Infrastructure</h3>" in html
     assert "Lifecycle stage" in html
     assert "### AI Infrastructure" not in html

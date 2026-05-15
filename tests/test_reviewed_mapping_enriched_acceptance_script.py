@@ -452,6 +452,7 @@ def _write_outputs(
         "Financial Metrics\n"
         "Valuation Snapshots\n"
         "News Evidence\n"
+        "Announcement Evidence\n"
     )
     (output_dir / "fund_161725_report.md").write_text(notice, encoding="utf-8")
     (output_dir / "fund_161725_report.html").write_text(notice, encoding="utf-8")

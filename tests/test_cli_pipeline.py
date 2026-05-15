@@ -368,7 +368,13 @@ def test_optional_announcement_evidence_is_disclosed_and_added_to_outputs(tmp_pa
     assert "PDF content has not been parsed" in generated_evidence[0]["summary"]
     assert "Announcements" in markdown
     assert "cninfo-announcement" in markdown
+    assert "2026年度业绩预增公告" in markdown
+    assert "Announcement Evidence" in markdown
+    assert "PDF content has not been parsed" in markdown
     assert "Announcements" in html
+    assert '<section class="announcements">' in html
+    assert '<section class="announcement-evidence">' in html
+    assert "https://static.cninfo.com.cn/finalpage/1.PDF" in html
     assert "cninfo-announcement" in html
 
 

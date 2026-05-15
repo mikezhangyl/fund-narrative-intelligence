@@ -1523,3 +1523,33 @@ Consequences:
   parsed in V1.
 - Reviewed-mapping enriched acceptance now requires `News Evidence` in both
   Markdown and HTML reports.
+
+## ADR-0060: Render Announcements And Announcement Evidence In Reports
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Render optional `announcements` and `announcement_evidence` payloads in Markdown
+and HTML reports.
+
+Rationale:
+
+- Announcement-derived signals should be explainable from the report without
+  opening raw JSON.
+- V1 classifies announcement metadata only, so the PDF-not-parsed limitation
+  must be visible beside the generated evidence.
+- The scoring payload should carry `announcements` alongside
+  `announcement_evidence` for report rendering and future web loading.
+
+Consequences:
+
+- Reports include `Announcements` and `Announcement Evidence` tables when the
+  payloads exist.
+- Rows include stock/title/category/date metadata, narrative IDs, confidence,
+  generated summaries, provider names, and source URLs.
+- Scoring JSON now preserves the original `announcements` payload when
+  announcement evidence is enabled.
+- Reviewed-mapping enriched acceptance now requires `Announcement Evidence` in
+  both Markdown and HTML reports.

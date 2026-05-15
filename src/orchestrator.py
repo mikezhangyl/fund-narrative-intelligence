@@ -518,6 +518,8 @@ def run_pipeline(
         "risk_evidence": _top_evidence(evidence, narrative_results, sentiments={"negative"}),
         "degradation_events": degradation_events,
     }
+    if announcements_payload is not None:
+        scoring_payload["announcements"] = announcements_payload
     if announcement_evidence_payload is not None:
         scoring_payload["announcement_evidence"] = announcement_evidence_payload
     if news_evidence_payload is not None:
