@@ -81,6 +81,12 @@ def _workspace_snapshot_payload(
         "artifact_manifest": manifest,
         "provider_foundation": manifest["provider_foundation"],
         "data_source_notice": _data_source_notice(manifest["provider_foundation"]),
+        "data_layers": _data_layers(
+            fund_code=manifest["fund_code"],
+            as_of_date=manifest["as_of_date"],
+            raw=raw,
+            provider_foundation=manifest["provider_foundation"],
+        ),
         "source_table": source_table,
         "signal_trace": signal_trace,
         "review_queue": review_queue,
@@ -126,6 +132,103 @@ def _data_source_notice(provider_foundation: dict[str, Any]) -> dict[str, Any]:
             for layer in layers
             if layer["is_mock"] or layer["data_quality"] != "fresh"
         ],
+    }
+
+
+def _data_layers(
+    fund_code: str,
+    as_of_date: str,
+    raw: dict[str, Any],
+    provider_foundation: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "version": "workspace-data-layers-v1",
+        "fund_code": fund_code,
+        "as_of_date": as_of_date,
+        "layers": [
+            _data_layer(
+                layer="holdings",
+                provider_foundation=provider_foundation,
+                artifact="raw",
+                item_count=len(raw.get("holdings") or []),
+                available=bool(raw.get("holdings")),
+            ),
+            _data_layer(
+                layer="evidence",
+                provider_foundation=provider_foundation,
+                artifact="raw",
+                item_count=len(raw.get("evidence") or []),
+                available="evidence" in raw,
+            ),
+            _data_layer(
+                layer="signal_events",
+                provider_foundation=provider_foundation,
+                artifact="raw",
+                item_count=len(raw.get("signal_events") or []),
+                available="signal_events" in raw,
+                source_layer="signals",
+            ),
+            *_optional_data_layers(raw=raw, provider_foundation=provider_foundation),
+        ],
+    }
+
+
+def _optional_data_layers(
+    raw: dict[str, Any],
+    provider_foundation: dict[str, Any],
+) -> list[dict[str, Any]]:
+    candidates = [
+        ("announcements", "announcements", "announcements"),
+        ("announcement_evidence", "announcement_evidence", "announcements"),
+        ("market_quotes", "quotes", "market_quotes"),
+        ("valuation_snapshots", "valuations", "valuation"),
+        ("financial_metrics", "metrics", "financial_metrics"),
+        ("news_evidence", "evidence", "news_evidence"),
+        ("derived_signal_events", None, "derived_signals"),
+    ]
+    layers = []
+    for artifact_key, collection_key, source_layer in candidates:
+        if artifact_key not in raw:
+            continue
+        payload = raw.get(artifact_key)
+        if collection_key is None:
+            item_count = len(payload) if isinstance(payload, list) else 0
+        elif isinstance(payload, dict):
+            item_count = len(payload.get(collection_key) or [])
+        else:
+            item_count = 0
+        layers.append(
+            _data_layer(
+                layer=artifact_key,
+                provider_foundation=provider_foundation,
+                artifact="raw",
+                item_count=item_count,
+                available=True,
+                source_layer=source_layer,
+            )
+        )
+    return layers
+
+
+def _data_layer(
+    *,
+    layer: str,
+    provider_foundation: dict[str, Any],
+    artifact: str,
+    item_count: int,
+    available: bool,
+    source_layer: str | None = None,
+) -> dict[str, Any]:
+    provider_layer = provider_foundation["layers"][source_layer or layer]
+    return {
+        "layer": layer,
+        "provider_name": provider_layer["provider_name"],
+        "data_quality": provider_layer["data_quality"],
+        "is_mock": provider_layer["is_mock"],
+        "source_url": provider_layer["source_url"],
+        "artifact": artifact,
+        "item_count": item_count,
+        "available": available,
     }
 
 

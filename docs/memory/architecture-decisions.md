@@ -1341,3 +1341,31 @@ Consequences:
   growth can derive `demand_slowdown`.
 - Reviewed-mapping enriched acceptance now exercises this layer and requires
   the resulting financial-derived signal trace.
+
+## ADR-0053: Add Workspace Snapshot Data Layers
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Add a `data_layers` object to `workspace-snapshot-v1`.
+
+Rationale:
+
+- Future web screens need to know which provider payloads are available before
+  opening raw/scoring artifacts.
+- Source tables describe provider provenance, but they do not summarize payload
+  availability or row counts for UI tabs.
+- Keeping full payloads in existing artifacts avoids duplicating large raw data
+  inside the workspace snapshot.
+
+Consequences:
+
+- Workspace snapshots include `data_layers.version =
+  workspace-data-layers-v1`, fund/date identity, and per-layer summaries.
+- Each layer records provider name, data quality, mock flag, source URL,
+  artifact owner, item count, and availability.
+- The validator rejects identity drift, duplicate layer names, invalid
+  data-quality values, invalid artifact names, and missing mock/source
+  disclosure fields.

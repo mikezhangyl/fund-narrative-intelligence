@@ -39,6 +39,7 @@ Experienced individual investors or researchers who want to understand what mark
 - Emit a dedicated review queue JSON artifact for future web approval workspace loading.
 - Emit a dedicated source table JSON artifact for future web source/provenance table rendering.
 - Emit a dedicated signal trace JSON artifact for future web score-provenance rendering.
+- Emit workspace snapshot `data_layers` summaries for future web data-tab loading.
 
 ## V1 Acceptance Command
 
@@ -47,8 +48,8 @@ Experienced individual investors or researchers who want to understand what mark
 The script generates fund `000001` into a temporary directory, runs
 `--validate-artifact-contracts`, builds and validates a workspace snapshot, and
 checks mock source URL disclosure, manifest web-readiness, review queue/source
-table presence, workspace mock `data_source_notice`, and report data-source
-notices.
+table presence, workspace mock `data_source_notice`, workspace `data_layers`,
+and report data-source notices.
 
 Expected artifacts:
 
@@ -129,9 +130,9 @@ Expected artifacts:
 - `python -m src.main --validate-artifact-manifest path/to/fund_000001_manifest.json` validates a manifest artifact without requiring `--fund-code`.
 - `python -m src.main --validate-artifact-contracts path/to/outputs_or_manifest` validates known generated artifact contracts in one command before future web workspace loading, including manifest-referenced source-table and signal-trace artifacts plus generated workspace snapshots.
 - `python -m src.main --validate-signal-trace path/to/fund_000001_signal_trace.json` validates a signal trace artifact without requiring `--fund-code`.
-- `python -m src.main --build-workspace-snapshot path/to/outputs_or_manifest` writes `fund_<code>_workspace_snapshot.json`, a future-web loader artifact that bundles the manifest, provider foundation, source table, signal trace, review queue, narrative summaries, report paths, and approval workflow readiness metadata.
+- `python -m src.main --build-workspace-snapshot path/to/outputs_or_manifest` writes `fund_<code>_workspace_snapshot.json`, a future-web loader artifact that bundles the manifest, provider foundation, source table, signal trace, review queue, narrative summaries, report paths, data-layer summaries, and approval workflow readiness metadata.
 - `python -m src.main --validate-workspace-snapshot path/to/fund_000001_workspace_snapshot.json` validates that loader artifact without building UI.
-- Workspace snapshots include a top-level `data_source_notice` object so future web screens can immediately display mock/partial/unavailable/degraded source warnings instead of inferring them from provider layers. They also include `approval_workflow.review_queue_summary`, `available_actions`, and item counts for future web approval routing. The V1 acceptance script explicitly validates this for the mock baseline so mock-backed web loader data cannot be mistaken for a real environment.
+- Workspace snapshots include a top-level `data_source_notice` object so future web screens can immediately display mock/partial/unavailable/degraded source warnings instead of inferring them from provider layers. They also include `data_layers.version = workspace-data-layers-v1` with layer availability, provider name, data quality, mock flag, source URL, artifact reference, and item count for web data tabs. They also include `approval_workflow.review_queue_summary`, `available_actions`, and item counts for future web approval routing. The V1 acceptance script explicitly validates this for the mock baseline so mock-backed web loader data cannot be mistaken for a real environment.
 - `python -m src.main --validate-review-queue path/to/fund_000001_review_queue.json` validates a review queue artifact without requiring `--fund-code`.
 - `python -m src.main --preview-review-action path/to/action.json` writes a review-action preview artifact without requiring `--fund-code` and without mutating `data/fixtures/narrative_registry.json`.
 - Review-action preview artifacts include `registry_delta` so future web approval screens can show added active narratives and candidate state transitions without diffing the full registry.
@@ -211,6 +212,7 @@ Expected artifacts:
 - Reviewed stock mapping workflow data is also separate from `data/fixtures/`. The reviewed mapping store uses `reviewed_mapping` so future web approval screens can distinguish persisted mapping records from runtime registry-term fallback.
 - Reviewed stores should fail fast when audit metadata is missing rather than silently presenting fixture-derived data as reviewed.
 - Future web source tables should read provider layer `source_url`, `data_quality`, `is_mock`, and optional `review_metadata` directly from generated artifacts.
+- Future web data panels should read workspace snapshot `data_layers` for payload availability/count summaries first, then open raw/scoring artifacts only for drill-down payloads.
 
 ## Open Questions
 

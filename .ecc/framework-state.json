@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-eastmoney-financial-metrics",
+  "latest_run": "20260515-workspace-data-layers",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "commit and merge Eastmoney financial metrics, then continue the next end-to-end provider slice"
+  "next_step": "commit and merge workspace data layers, then continue the next end-to-end provider slice"
 }

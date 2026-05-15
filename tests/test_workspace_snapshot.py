@@ -28,6 +28,25 @@ def test_build_workspace_snapshot_from_output_directory(tmp_path):
     assert snapshot["signal_trace"]["provider_foundation"] == snapshot[
         "provider_foundation"
     ]
+    assert snapshot["data_layers"]["version"] == "workspace-data-layers-v1"
+    assert snapshot["data_layers"]["fund_code"] == "000001"
+    layers_by_name = {
+        layer["layer"]: layer for layer in snapshot["data_layers"]["layers"]
+    }
+    assert layers_by_name["holdings"] == {
+        "layer": "holdings",
+        "provider_name": "mock-fixture-provider",
+        "data_quality": "mock",
+        "is_mock": True,
+        "source_url": "mock://fixtures/fund_000001.json",
+        "artifact": "raw",
+        "item_count": 10,
+        "available": True,
+    }
+    assert layers_by_name["signal_events"]["source_url"] == (
+        "mock://fixtures/signal_events.json"
+    )
+    assert layers_by_name["signal_events"]["item_count"] > 0
     assert snapshot["source_table"]["layers"][0]["source_url"].startswith(
         "mock://fixtures/"
     )
@@ -193,6 +212,70 @@ def test_workspace_snapshot_preserves_news_layer_for_future_web(tmp_path):
     assert {layer["layer"] for layer in snapshot["source_table"]["layers"]} >= {
         "news_evidence"
     }
+    data_layers = {layer["layer"]: layer for layer in snapshot["data_layers"]["layers"]}
+    assert data_layers["news_evidence"]["item_count"] == 1
+    assert data_layers["news_evidence"]["provider_name"] == "google-news-rss"
+    assert data_layers["news_evidence"]["is_mock"] is False
+
+
+def test_workspace_snapshot_preserves_financial_metrics_layer_for_future_web(tmp_path):
+    class FakeFinancialMetricsProvider:
+        provider_name = "eastmoney-financial-metrics"
+        provider_version = "eastmoney-financial-metrics-v1"
+        source_url = "https://datacenter.eastmoney.com/securities/api/data/get"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_financial_metrics(self, stock_codes: list[str]) -> dict:
+            assert "NVDA" in stock_codes
+            return {
+                "version": "financial-metrics-v1",
+                "provider_name": self.provider_name,
+                "provider_version": self.provider_version,
+                "data_quality": "fresh",
+                "source_url": self.source_url,
+                "retrieved_at": "2026-05-15T00:00:00+00:00",
+                "metrics": [
+                    {
+                        "stock_code": "NVDA",
+                        "stock_name": "NVIDIA",
+                        "report_date": "2026-03-31",
+                        "report_type": "一季报",
+                        "notice_date": "2026-04-25",
+                        "currency": "USD",
+                        "revenue_yoy": 18.0,
+                        "parent_net_profit_yoy": 22.0,
+                        "source": "provider_financial_metrics",
+                        "source_provider": self.provider_name,
+                        "source_url": self.source_url,
+                        "retrieved_at": "2026-05-15T00:00:00+00:00",
+                    }
+                ],
+                "missing_stock_codes": [],
+            }
+
+    run_pipeline(
+        fund_code="000001",
+        provider_mode="mock",
+        output_dir=tmp_path,
+        include_financial_metrics=True,
+        financial_metrics_provider=FakeFinancialMetricsProvider(),
+    )
+
+    snapshot_path = build_workspace_snapshot(tmp_path)
+    snapshot = json.loads(snapshot_path.read_text())
+
+    validate_workspace_snapshot_payload(snapshot)
+    data_layers = {layer["layer"]: layer for layer in snapshot["data_layers"]["layers"]}
+    assert data_layers["financial_metrics"] == {
+        "layer": "financial_metrics",
+        "provider_name": "eastmoney-financial-metrics",
+        "data_quality": "fresh",
+        "is_mock": False,
+        "source_url": "https://datacenter.eastmoney.com/securities/api/data/get",
+        "artifact": "raw",
+        "item_count": 1,
+        "available": True,
+    }
 
 
 def test_build_workspace_snapshot_rejects_invalid_news_payload(tmp_path):
@@ -246,6 +329,18 @@ def test_workspace_snapshot_validation_rejects_source_notice_drift(tmp_path):
         validate_workspace_snapshot_payload(snapshot)
 
     assert "data_source_notice display_required mismatch" in str(exc.value)
+
+
+def test_workspace_snapshot_validation_rejects_data_layers_drift(tmp_path):
+    run_pipeline(fund_code="000001", provider_mode="mock", output_dir=tmp_path)
+    snapshot_path = build_workspace_snapshot(tmp_path)
+    snapshot = json.loads(snapshot_path.read_text())
+    snapshot["data_layers"]["fund_code"] = "999999"
+
+    with pytest.raises(ProviderContractError) as exc:
+        validate_workspace_snapshot_payload(snapshot)
+
+    assert "workspace snapshot data_layers fund_code mismatch" in str(exc.value)
 
 
 def test_workspace_snapshot_validation_rejects_approval_summary_drift(tmp_path):

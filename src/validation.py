@@ -722,6 +722,7 @@ def validate_workspace_snapshot_payload(payload: dict[str, Any]) -> None:
             "artifact_manifest",
             "provider_foundation",
             "data_source_notice",
+            "data_layers",
             "source_table",
             "signal_trace",
             "review_queue",
@@ -747,6 +748,7 @@ def validate_workspace_snapshot_payload(payload: dict[str, Any]) -> None:
     _require_mapping(payload["provider_foundation"], "workspace snapshot provider_foundation")
     _validate_workspace_snapshot_identity(payload)
     _validate_workspace_snapshot_data_source_notice(payload)
+    _validate_workspace_snapshot_data_layers(payload)
     _validate_workspace_snapshot_narratives(payload["narratives"])
     _validate_workspace_snapshot_reports(payload["reports"])
     _validate_workspace_snapshot_approval_workflow(
@@ -798,6 +800,72 @@ def _validate_workspace_snapshot_identity(payload: dict[str, Any]) -> None:
         raise ProviderContractError("workspace snapshot review queue data_quality mismatch")
     if payload["review_queue"].get("fund", {}).get("fund_code") != payload["fund_code"]:
         raise ProviderContractError("workspace snapshot review queue fund_code mismatch")
+
+
+def _validate_workspace_snapshot_data_layers(payload: dict[str, Any]) -> None:
+    data_layers = payload["data_layers"]
+    _require_mapping(data_layers, "workspace snapshot data_layers")
+    _require_keys(
+        data_layers,
+        {"version", "fund_code", "as_of_date", "layers"},
+        "workspace snapshot data_layers",
+    )
+    if data_layers["version"] != "workspace-data-layers-v1":
+        raise ProviderContractError("workspace snapshot data_layers version mismatch")
+    if data_layers["fund_code"] != payload["fund_code"]:
+        raise ProviderContractError("workspace snapshot data_layers fund_code mismatch")
+    if data_layers["as_of_date"] != payload["as_of_date"]:
+        raise ProviderContractError("workspace snapshot data_layers as_of_date mismatch")
+    if not isinstance(data_layers["layers"], list) or not data_layers["layers"]:
+        raise ProviderContractError(
+            "workspace snapshot data_layers.layers must be a non-empty list"
+        )
+    seen_layers = set()
+    for index, layer in enumerate(data_layers["layers"]):
+        layer_name = _validate_workspace_snapshot_data_layer(
+            layer,
+            f"workspace snapshot data_layers.layers[{index}]",
+        )
+        if layer_name in seen_layers:
+            raise ProviderContractError(
+                f"workspace snapshot data_layers layer duplicated: {layer_name}"
+            )
+        seen_layers.add(layer_name)
+
+
+def _validate_workspace_snapshot_data_layer(layer: Any, context: str) -> str:
+    _require_mapping(layer, context)
+    _require_keys(
+        layer,
+        {
+            "layer",
+            "provider_name",
+            "data_quality",
+            "is_mock",
+            "source_url",
+            "artifact",
+            "item_count",
+            "available",
+        },
+        context,
+    )
+    layer_name = layer["layer"]
+    if not isinstance(layer_name, str) or not layer_name:
+        raise ProviderContractError(f"{context}.layer must be a non-empty string")
+    for field in {"provider_name", "data_quality", "source_url", "artifact"}:
+        if not isinstance(layer[field], str) or not layer[field]:
+            raise ProviderContractError(f"{context}.{field} must be a non-empty string")
+    if layer["data_quality"] not in SOURCE_TABLE_LAYER_DATA_QUALITIES:
+        raise ProviderContractError(f"{context}.data_quality is unsupported")
+    if layer["artifact"] not in {"raw", "scoring"}:
+        raise ProviderContractError(f"{context}.artifact is unsupported")
+    if not isinstance(layer["is_mock"], bool):
+        raise ProviderContractError(f"{context}.is_mock must be boolean")
+    if not isinstance(layer["available"], bool):
+        raise ProviderContractError(f"{context}.available must be boolean")
+    if not isinstance(layer["item_count"], int) or layer["item_count"] < 0:
+        raise ProviderContractError(f"{context}.item_count must be non-negative")
+    return layer_name
 
 
 def _validate_workspace_snapshot_narratives(narratives: Any) -> None:

@@ -48,10 +48,11 @@ python -m src.main --validate-workspace-snapshot outputs/fund_000001_workspace_s
 python -m src.main --validate-signal-trace outputs/fund_000001_signal_trace.json
 ```
 
-The workspace snapshot includes top-level `data_source_notice`,
+The workspace snapshot includes top-level `data_source_notice`, `data_layers`,
 `signal_trace`, and `approval_workflow` fields so a future web UI can display
-mock/partial source warnings, score provenance, and review-action state without
-rebuilding them from lower-level artifacts.
+mock/partial source warnings, provider payload availability/counts, score
+provenance, and review-action state without rebuilding them from lower-level
+artifacts.
 
 The strict reviewed-mapping enriched acceptance path now uses explicit
 Eastmoney valuation and financial metrics:

@@ -601,6 +601,9 @@ include:
 - top-level `data_source_notice` with display requirement, severity, message,
   mock/unavailable/degradation counts, and source-layer rows requiring
   disclosure
+- top-level `data_layers.version = workspace-data-layers-v1` with per-layer
+  availability, provider name, data quality, mock flag, source URL, artifact
+  reference, and item count for future web data panels
 - `approval_workflow.review_queue_summary`, `available_actions`, and item counts
   so future web approval routing can load without re-deriving queue state
 
