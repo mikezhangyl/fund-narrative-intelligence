@@ -1037,6 +1037,38 @@ def test_optional_eastmoney_quotes_are_disclosed_and_added_to_outputs(tmp_path):
     assert "https://push2.eastmoney.com/api/qt/ulist.np/get" in html
 
 
+def test_optional_market_quotes_rejects_malformed_provider_payload(tmp_path):
+    class BadMarketDataProvider:
+        provider_name = "eastmoney-market-quote"
+        provider_version = "eastmoney-market-quote-v1"
+        source_url = "https://push2.eastmoney.com/api/qt/ulist.np/get"
+        degradation_events: list[dict[str, str]] = []
+
+        def get_stock_quotes(self, stock_codes: list[str]) -> dict:
+            del stock_codes
+            return {
+                "version": self.provider_version,
+                "provider_name": self.provider_name,
+                "provider_version": self.provider_version,
+                "data_quality": "fresh",
+                "source_url": self.source_url,
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+                "quotes": "not-a-list",
+                "missing_stock_codes": [],
+            }
+
+    with pytest.raises(ProviderContractError) as exc:
+        run_pipeline(
+            fund_code="000001",
+            provider_mode="mock",
+            output_dir=tmp_path,
+            include_market_quotes=True,
+            market_data_provider=BadMarketDataProvider(),
+        )
+
+    assert "market quotes quotes must be a list" in str(exc.value)
+
+
 def test_optional_valuation_snapshots_are_quote_derived_and_disclosed(tmp_path):
     class FakeMarketDataProvider:
         provider_name = "eastmoney-market-quote"
@@ -1382,6 +1414,46 @@ def test_optional_news_evidence_is_disclosed_and_added_to_outputs(tmp_path):
     assert '<section class="news-evidence">' in html
     assert "https://example.com/news/ai" in html
     assert "titles/snippets only" in html
+
+
+def test_optional_news_evidence_rejects_malformed_provider_payload(tmp_path):
+    class BadNewsEvidenceProvider:
+        provider_name = "google-news-rss"
+        provider_version = "google-news-rss-v1"
+        source_url = "https://news.google.com/rss/search"
+
+        def get_news_evidence(self, narratives: list[dict], as_of_date: str) -> dict:
+            del narratives
+            del as_of_date
+            return {
+                "version": "news-evidence-v1",
+                "provider_name": self.provider_name,
+                "provider_version": self.provider_version,
+                "data_quality": "fresh",
+                "source_url": self.source_url,
+                "retrieved_at": "2026-05-14T00:00:00+00:00",
+                "query_scope": {
+                    "requested_narrative_ids": [],
+                    "queried_narrative_ids": [],
+                    "omitted_narrative_ids": [],
+                    "query_limit": 4,
+                },
+                "evidence": "not-a-list",
+                "missing_narrative_ids": [],
+                "skipped_item_count": 0,
+                "degradation_events": [],
+            }
+
+    with pytest.raises(ProviderContractError) as exc:
+        run_pipeline(
+            fund_code="000001",
+            provider_mode="mock",
+            output_dir=tmp_path,
+            include_news_evidence=True,
+            news_evidence_provider=BadNewsEvidenceProvider(),
+        )
+
+    assert "evidence must be a list" in str(exc.value)
 
 
 def test_provider_derived_mode_uses_news_evidence_and_signals(tmp_path):

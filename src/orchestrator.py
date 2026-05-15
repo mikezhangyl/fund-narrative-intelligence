@@ -56,7 +56,13 @@ from src.providers.news import (
     GoogleNewsRssEvidenceProvider,
 )
 from src.providers.provenance import build_provider_foundation
-from src.validation import validate_announcement_payload
+from src.validation import (
+    validate_announcement_payload,
+    validate_financial_metrics_payload,
+    validate_market_quote_payload,
+    validate_news_evidence_payload,
+    validate_valuation_snapshot_payload,
+)
 
 NARRATIVE_REGISTRY_MODE_FIXTURE = "fixture"
 NARRATIVE_REGISTRY_MODE_REVIEWED = "reviewed"
@@ -780,6 +786,7 @@ def _run_market_quotes(
 ) -> dict[str, Any]:
     provider = market_data_provider or EastmoneyMarketDataProvider()
     market_quotes_payload = provider.get_stock_quotes(stock_codes=stock_codes)
+    validate_market_quote_payload(market_quotes_payload)
     return {
         "market_quotes": market_quotes_payload,
         "provider_layer": _market_quotes_provider_layer(
@@ -796,6 +803,7 @@ def _run_valuation_snapshots(
 ) -> dict[str, Any]:
     provider = valuation_provider or EastmoneyValuationProvider()
     valuation_snapshots_payload = provider.get_valuation_snapshots(stock_codes=stock_codes)
+    validate_valuation_snapshot_payload(valuation_snapshots_payload)
     return {
         "valuation_snapshots": valuation_snapshots_payload,
         "provider_layer": valuation_provider_layer(valuation_snapshots_payload),
@@ -809,6 +817,7 @@ def _run_financial_metrics(
 ) -> dict[str, Any]:
     provider = financial_metrics_provider or EastmoneyFinancialMetricsProvider()
     financial_metrics_payload = provider.get_financial_metrics(stock_codes=stock_codes)
+    validate_financial_metrics_payload(financial_metrics_payload)
     return {
         "financial_metrics": financial_metrics_payload,
         "provider_layer": _financial_metrics_provider_layer(
@@ -881,6 +890,7 @@ def _run_news_evidence(
             *news_evidence_payload.get("degradation_events", []),
         ]
     degradation_events = [*degradation_events, *getattr(provider, "degradation_events", [])]
+    validate_news_evidence_payload(news_evidence_payload)
     return {
         "news_evidence": news_evidence_payload,
         "provider_layer": _news_evidence_provider_layer(

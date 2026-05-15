@@ -9,8 +9,8 @@
     "memory-governance"
   ],
   "current_phase": "v1_mock_pipeline",
-  "latest_run": "20260515-announcement-payload-validation",
+  "latest_run": "20260515-provider-boundary-validation",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "finish announcement payload validation, then continue the next end-to-end provider slice"
+  "next_step": "finish provider boundary validation, then continue the next end-to-end provider slice"
 }

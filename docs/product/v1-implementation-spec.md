@@ -84,6 +84,10 @@ Optional announcement-to-evidence conversion:
 - Unmapped or malformed announcements must be tracked and skipped without crashing the caller.
 - Announcement provider payloads and generated announcement evidence payloads
   must pass reusable provider-contract validators before orchestration proceeds.
+- Optional market quote, valuation snapshot, financial metrics, and news
+  evidence payloads must also be validated at the orchestration boundary so
+  injected providers and future adapters follow the same contracts as built-in
+  providers.
 
 ## Degradation Strategy
 

@@ -1635,3 +1635,29 @@ Consequences:
 - Optional announcement orchestration validates the provider payload before
   conversion.
 - Generated announcement evidence is validated before leaving the converter.
+
+## ADR-0064: Validate Optional Provider Payloads At Orchestration Boundaries
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Validate market quote, valuation snapshot, financial metrics, and news evidence
+payloads inside orchestration immediately after optional providers return.
+
+Rationale:
+
+- Built-in providers validate their own payloads, but injected test providers
+  and future adapters should not be able to bypass provider contracts.
+- Malformed optional payloads can otherwise fail later as generic type errors
+  or silently produce empty derived signals.
+- Boundary validation keeps failure messages tied to the provider contract.
+
+Consequences:
+
+- Optional market quote runs fail fast on malformed market payloads.
+- Optional valuation and financial metric runs fail fast on malformed provider
+  payloads.
+- Optional news evidence runs fail with `ProviderContractError` before derived
+  signal generation sees malformed evidence rows.
