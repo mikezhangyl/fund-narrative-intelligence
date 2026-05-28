@@ -9,6 +9,7 @@ This directory contains product and architecture source documents for Fund Narra
 - [Narrative Mapping Methodology v0](./narrative-mapping-methodology-v0.md)
 - [Narrative Service Boundary](./narrative-service-boundary.md)
 - [Narrative Service Implementation Request](./narrative-service-implementation-request-2026-05-28.md)
+- [Narrative Store Migration Checklist](./narrative-store-migration-checklist.md)
 
 ## Current Product Definition
 
@@ -70,6 +71,12 @@ python scripts/run_narrative_service_provider_smoke.py
 Set `NARRATIVE_SERVICE_URL` or pass `--base-url` to verify service-first HTTP
 consumption. If the service is unavailable, the smoke should show an explicit
 local fallback warning rather than a silent success.
+
+Migration preparation is tracked in
+`docs/product/narrative-store-migration-checklist.md`. Until the independent
+service passes conformance, provider smoke, and at least one service-backed FNI
+report, FNI local narrative files remain fallback/test fixtures rather than
+authoritative service-owned truth.
 
 The first engineering acceptance command is:
 

@@ -72,6 +72,8 @@ Narrative source disclosure is now present in fund holding exposure, fund exposu
 
 FNI now has a narrative service provider smoke script at `scripts/run_narrative_service_provider_smoke.py`. It can run against `NARRATIVE_SERVICE_URL` or `--base-url`, writes JSON/Markdown output, and reports whether data came from `narrative_service` or `local_prototype`. Tests include a local fake HTTP narrative service and an unreachable-service fallback case. The next narrative-service step should be migration preparation: make it explicit that FNI local narrative stores are fallback/test fixtures until the independent service becomes authoritative.
 
+Narrative store migration preparation is documented at `docs/product/narrative-store-migration-checklist.md`. The current FNI local narrative registry, stock mappings, evidence packs, and candidate event sample are fallback/test fixtures until an independent Narrative Service passes conformance, provider smoke, and at least one service-backed FNI report. Actual migration/deletion should wait for the service project.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

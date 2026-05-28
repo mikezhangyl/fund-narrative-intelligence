@@ -157,6 +157,9 @@ Implemented surface:
 
 Move governance-owned stores out of FNI.
 
+Status: migration preparation checklist documented on 2026-05-28; actual store
+migration remains blocked until the independent service exists.
+
 Candidate migrated stores:
 
 - narrative registry;
@@ -172,6 +175,10 @@ Acceptance:
   data;
 - FNI fixture files remain only for tests and offline examples;
 - service-side review and audit artifacts can regenerate FNI report inputs.
+
+Preparation artifact:
+
+- `docs/product/narrative-store-migration-checklist.md`
 
 ## Non-Goals
 
