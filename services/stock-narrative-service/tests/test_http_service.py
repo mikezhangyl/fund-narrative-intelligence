@@ -1,0 +1,207 @@
+from __future__ import annotations
+
+import json
+import sys
+import threading
+from pathlib import Path
+from urllib.request import Request, urlopen
+
+SERVICE_ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = SERVICE_ROOT / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
+from stock_narrative_service.app import create_server  # noqa: E402
+from stock_narrative_service.config import ServiceConfig  # noqa: E402
+
+
+def test_required_get_endpoints_return_normalized_envelopes(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+
+        registry = _get_json(f"{base_url}/api/v1/narratives/registry")
+        mappings = _get_json(f"{base_url}/api/v1/narratives/mappings")
+        evidence = _get_json(f"{base_url}/api/v1/narratives/evidence-packs")
+        candidates = _get_json(f"{base_url}/api/v1/narratives/candidates")
+        audit = _get_json(f"{base_url}/api/v1/narratives/trust-audits/latest")
+        queue = _get_json(f"{base_url}/api/v1/narratives/review-queue")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    for envelope in (registry, mappings, evidence, candidates, audit, queue):
+        assert set(envelope) >= {
+            "status",
+            "source",
+            "provider",
+            "provider_version",
+            "data",
+            "warnings",
+            "trust_metadata",
+        }
+        assert envelope["source"] == "narrative_service"
+        assert envelope["provider"] == "stock-narrative-service"
+
+    assert registry["data"]["version"] == "registry-v1"
+    assert registry["trust_metadata"]["trust_status"] == "untrusted_experimental"
+    assert mappings["data"]["mappings"][0]["stock_code"] == "600519"
+    assert evidence["data"]["trust_status"] == "candidate_untrusted"
+    assert candidates["data"]["candidate_narratives"][0]["candidate_narrative_id"] == "C_SEED"
+    assert audit["data"]["result"] == "blocked"
+    assert queue["data"]["items"][0]["item_type"] == "candidate_narrative"
+
+
+def test_intake_events_create_only_candidate_review_items(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _post_json(
+            f"{base_url}/api/v1/narratives/intake/events",
+            {
+                "events": [
+                    {
+                        "event_id": "EVT_ROBOT",
+                        "source_type": "manual",
+                        "event_time": "2026-05-28T10:00:00+08:00",
+                        "title": "机器人执行器",
+                        "source_url": "manual://robot-actuator",
+                        "candidate_narratives": [
+                            {
+                                "name": "机器人执行器",
+                                "canonical_taxonomy": "机器人",
+                                "confidence": 0.63,
+                            }
+                        ],
+                    }
+                ]
+            },
+        )
+        queue = _get_json(f"{base_url}/api/v1/narratives/review-queue")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "available"
+    assert response["trust_metadata"]["trust_status"] == "candidate_untrusted"
+    created = response["data"]["candidate_narratives"]
+    assert created
+    assert {item["trust_status"] for item in created} == {"candidate_untrusted"}
+    assert {item["human_review_status"] for item in created} == {"candidate"}
+    assert "trusted_validated" not in json.dumps(response, ensure_ascii=False)
+    assert any(
+        item["payload_ref"] == created[0]["candidate_narrative_id"]
+        for item in queue["data"]["items"]
+    )
+
+
+def test_unknown_route_returns_error_envelope(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        try:
+            _get_json(f"{base_url}/api/v1/narratives/missing")
+        except Exception as exc:
+            assert "HTTP Error 404" in str(exc)
+        else:
+            raise AssertionError("expected 404 for unknown route")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+
+def _write_seed_files(tmp_path: Path) -> ServiceConfig:
+    registry_path = tmp_path / "registry.json"
+    mappings_path = tmp_path / "mappings.json"
+    evidence_path = tmp_path / "evidence.json"
+    events_path = tmp_path / "events.json"
+    intake_ledger_path = tmp_path / "runtime" / "intake_events.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "version": "registry-v1",
+                "trust_metadata": {
+                    "trust_status": "untrusted_experimental",
+                    "trust_note": "seed data",
+                },
+                "narratives": [{"narrative_id": "N_BAIJIU", "name": "白酒"}],
+                "candidate_narratives": [
+                    {
+                        "candidate_narrative_id": "C_SEED",
+                        "name": "机器人执行器",
+                        "human_review_status": "candidate",
+                        "trust_status": "candidate_untrusted",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    mappings_path.write_text(
+        json.dumps(
+            {
+                "trust_metadata": {
+                    "trust_status": "untrusted_experimental",
+                    "trust_note": "seed mappings",
+                },
+                "mappings": [
+                    {
+                        "stock_code": "600519",
+                        "narrative_id": "N_BAIJIU",
+                        "confidence": 0.86,
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    evidence_path.write_text(
+        json.dumps(
+            {
+                "version": "mapping-evidence-pack-v0",
+                "trust_status": "candidate_untrusted",
+                "packs": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    events_path.write_text(
+        json.dumps({"version": "candidate-narrative-events-v1", "events": []}),
+        encoding="utf-8",
+    )
+    return ServiceConfig(
+        registry_path=registry_path,
+        mappings_path=mappings_path,
+        evidence_packs_path=evidence_path,
+        candidate_events_path=events_path,
+        intake_ledger_path=intake_ledger_path,
+    )
+
+
+def _start(server):
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    return thread
+
+
+def _get_json(url: str):
+    with urlopen(url, timeout=2) as response:  # noqa: S310
+        return json.loads(response.read().decode("utf-8"))
+
+
+def _post_json(url: str, payload: dict):
+    request = Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        method="POST",
+        headers={"Content-Type": "application/json"},
+    )
+    with urlopen(request, timeout=2) as response:  # noqa: S310
+        return json.loads(response.read().decode("utf-8"))
+

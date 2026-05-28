@@ -1,0 +1,2 @@
+"""Stock Narrative Service package."""
+

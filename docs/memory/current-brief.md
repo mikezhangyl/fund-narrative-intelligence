@@ -74,6 +74,8 @@ FNI now has a narrative service provider smoke script at `scripts/run_narrative_
 
 Narrative store migration preparation is documented at `docs/product/narrative-store-migration-checklist.md`. The current FNI local narrative registry, stock mappings, evidence packs, and candidate event sample are fallback/test fixtures until an independent Narrative Service passes conformance, provider smoke, and at least one service-backed FNI report. Actual migration/deletion should wait for the service project.
 
+The Narrative Service now exists as an in-repo subservice under `services/stock-narrative-service/` and can be started with `uv run python scripts/run_stock_narrative_service.py --port 8800`. It remains an HTTP boundary: FNI should use `NARRATIVE_SERVICE_URL`, not Python imports, for production/report consumption.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

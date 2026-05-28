@@ -73,6 +73,12 @@ Set `NARRATIVE_SERVICE_URL` or pass `--base-url` to verify service-first HTTP
 consumption. If the service is unavailable, the smoke should show an explicit
 local fallback warning rather than a silent success.
 
+The in-repo Narrative Service can be started with:
+
+```bash
+uv run python scripts/run_stock_narrative_service.py --port 8800
+```
+
 Migration preparation is tracked in
 `docs/product/narrative-store-migration-checklist.md`. Until the independent
 service passes conformance, provider smoke, and at least one service-backed FNI

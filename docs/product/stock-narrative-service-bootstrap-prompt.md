@@ -11,6 +11,11 @@ Last updated: 2026-05-28
 This project should be an independent Narrative Service, not part of FNI and
 not part of the market-data gateway.
 
+Implementation update: this service is now implemented as an in-repo monorepo
+subservice at `services/stock-narrative-service/`. It still keeps the HTTP
+service boundary; FNI should consume it through `NARRATIVE_SERVICE_URL`, not by
+importing service internals.
+
 Target service split:
 
 - `stock-data-gateway`: market data and external data-source access.
@@ -18,6 +23,12 @@ Target service split:
   candidate intake, review queue, trust audit, and promotion governance.
 - `fund-narrative-intelligence`: report consumer that calls the narrative
   service and generates fund-facing analysis.
+
+Current in-repo start command:
+
+```bash
+uv run python scripts/run_stock_narrative_service.py --port 8800
+```
 
 ## First Version Goal
 
@@ -213,4 +224,3 @@ The definition of done is: FNI conformance probe passes, FNI provider smoke
 returns source=narrative_service, and at least one FNI report can disclose
 narrative_source=narrative_service.
 ```
-

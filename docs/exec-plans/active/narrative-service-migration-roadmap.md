@@ -160,6 +160,11 @@ Move governance-owned stores out of FNI.
 Status: migration preparation checklist documented on 2026-05-28; actual store
 migration remains blocked until the independent service exists.
 
+Update: a first in-repo HTTP subservice now exists at
+`services/stock-narrative-service/`. It is a monorepo subservice, not an FNI
+internal module. FNI should continue to consume it through
+`NARRATIVE_SERVICE_URL`.
+
 Candidate migrated stores:
 
 - narrative registry;
@@ -179,6 +184,13 @@ Acceptance:
 Preparation artifact:
 
 - `docs/product/narrative-store-migration-checklist.md`
+
+Implemented subservice surface:
+
+- `services/stock-narrative-service/src/stock_narrative_service/app.py`
+- `services/stock-narrative-service/src/stock_narrative_service/storage.py`
+- `scripts/run_stock_narrative_service.py`
+- `services/stock-narrative-service/tests/test_http_service.py`
 
 ## Non-Goals
 
