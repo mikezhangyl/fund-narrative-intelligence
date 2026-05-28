@@ -1,0 +1,12 @@
+config/narrative_service_contract.yaml
+docs/memory/current-brief.md
+docs/product/stock-narrative-service-runbook.md
+scripts/run_narrative_service_conformance_probe.py
+tests/test_narrative_service_conformance_probe.py
+.ecc/runs/20260529-mik-42-narrative-service-contract/task-brief.md
+.ecc/runs/20260529-mik-42-narrative-service-contract/task-handoff.md
+.ecc/runs/20260529-mik-42-narrative-service-contract/changed-files.txt
+.ecc/runs/20260529-mik-42-narrative-service-contract/artifacts/generated-files-manifest.json
+.ecc/runs/20260529-mik-42-narrative-service-contract/quality-agent/findings.json
+.ecc/runs/20260529-mik-42-narrative-service-contract/quality-agent/review-state.json
+.ecc/runs/20260529-mik-42-narrative-service-contract/run-state.json

@@ -212,6 +212,9 @@ def _request_payload(*, endpoint: dict[str, Any], method: str) -> dict[str, Any]
 
 
 def _required_envelope_fields(contract: dict[str, Any]) -> list[str]:
+    policy_fields = contract.get("api_policy", {}).get("required_envelope_fields", [])
+    if isinstance(policy_fields, list) and policy_fields:
+        return [str(field) for field in policy_fields if str(field)]
     envelope = contract.get("runtime", {}).get("response_envelope", {})
     fields = envelope.get("required_fields", [])
     return [str(field) for field in fields if str(field)]

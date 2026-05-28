@@ -1,0 +1,84 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "acceptance_summary",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T170900+0000/acceptance_summary.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Narrative Service end-to-end acceptance summary.",
+      "checksum_sha256": "ef5fdc1dd3aae6a9991c4578bf44ca60cbae70b61c297164eed67585e2c2986c",
+      "mtime_epoch": 1779988140,
+      "size_bytes": 1227
+    },
+    {
+      "type": "conformance_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T170900+0000/conformance/narrative_service_conformance_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Narrative Service contract conformance JSON.",
+      "checksum_sha256": "f5836bb91f88ed07418b4c05e4c57883637a92bd8d94fa6c00658ac46c398945",
+      "mtime_epoch": 1779988140,
+      "size_bytes": 2773
+    },
+    {
+      "type": "conformance_markdown",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T170900+0000/conformance/narrative_service_conformance_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Narrative Service contract conformance Markdown.",
+      "checksum_sha256": "3f4f846a730935d645f094f20fd631c3db63e42d3304a15f84e431a49d4dbbec",
+      "mtime_epoch": 1779988140,
+      "size_bytes": 760
+    },
+    {
+      "type": "provider_smoke_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T170900+0000/provider_smoke/narrative_service_provider_smoke.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "FNI provider smoke JSON against Narrative Service.",
+      "checksum_sha256": "9cd4544f2030d7e06e60d3730644eaaefe83ec62a043ee44f6f8d1c2369f8c17",
+      "mtime_epoch": 1779988140,
+      "size_bytes": 641
+    },
+    {
+      "type": "provider_smoke_markdown",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T170900+0000/provider_smoke/narrative_service_provider_smoke.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "FNI provider smoke Markdown against Narrative Service.",
+      "checksum_sha256": "6427e5a82a3be4fcae01644986f407cbb20ceb3dfb3c829932fde53c825bc87c",
+      "mtime_epoch": 1779988140,
+      "size_bytes": 192
+    },
+    {
+      "type": "report_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T170900+0000/fund_holding_exposure_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Service-backed FNI fund holding exposure report JSON.",
+      "checksum_sha256": "9127a3d7f7533e5d0fdac8440c187294398ed448ca1bc3cbcb7a90be0648414a",
+      "mtime_epoch": 1779988140,
+      "size_bytes": 4820
+    },
+    {
+      "type": "report_html",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T170900+0000/fund_holding_exposure_report.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Service-backed FNI fund holding exposure report HTML.",
+      "checksum_sha256": "df9923e61d87964cb28e65be287bc1888be04a8076fe7ac6059e5bdca8acca4d",
+      "mtime_epoch": 1779988140,
+      "size_bytes": 4348
+    },
+    {
+      "type": "runtime_ledger",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T170900+0000/runtime/review_actions.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Runtime review-action ledger generated during acceptance.",
+      "checksum_sha256": "817da3f7d9436ff1f723ade9d61a0a2c8b5c5d185dde07f46984b99410dbcc86",
+      "mtime_epoch": 1779988140,
+      "size_bytes": 596
+    }
+  ]
+}

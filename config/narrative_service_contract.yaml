@@ -17,6 +17,39 @@ runtime:
       - warnings
       - trust_metadata
 
+api_policy:
+  base_path: /api/v1/narratives
+  current_version: v1
+  versioning_rule: additive_non_breaking
+  compatibility_rule: new endpoints and optional fields may be added without breaking existing probes
+  required_envelope_fields:
+    - status
+    - source
+    - provider
+    - provider_version
+    - data
+    - warnings
+    - trust_metadata
+  error_semantics:
+    missing_id:
+      http_status: 200
+      status: missing
+      data_shape: object_with_error
+      warning_required: true
+      meaning: Requested id is syntactically valid but no record exists.
+    invalid_request:
+      http_status: 400
+      status: failed
+      data_shape: object_with_error
+      warning_required: true
+      meaning: Request payload or query parameters are invalid.
+    service_degraded:
+      http_status: 200
+      status: degraded
+      data_shape: partial_data_with_warnings
+      warning_required: true
+      meaning: Service is reachable but one or more backing stores or checks are incomplete.
+
 endpoints:
   - method: GET
     path: /api/v1/narratives/registry

@@ -119,6 +119,19 @@ warnings
 trust_metadata
 ```
 
+Versioning is additive under `/api/v1/narratives`: new endpoints and optional
+fields may be added without breaking existing conformance probes. Existing
+required envelope fields must not be removed or renamed inside v1.
+
+Error semantics:
+
+- syntactically valid missing ids return a normalized envelope with
+  `status=missing`, an error object in `data`, and a warning;
+- invalid requests return HTTP 400 with `status=failed`, an error object in
+  `data`, and a warning;
+- degraded service state returns HTTP 200 with `status=degraded`, partial data
+  where available, and warnings.
+
 `GET /api/v1/narratives/ops/summary` returns service-level counts, current
 trust statuses, review queue summary, and latest trust-audit result. It is an
 operational snapshot, not a promotion or mutation endpoint.

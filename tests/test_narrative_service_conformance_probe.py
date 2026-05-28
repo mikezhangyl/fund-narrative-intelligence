@@ -1,6 +1,10 @@
 import json
+from pathlib import Path
 
+import yaml
 from scripts import run_narrative_service_conformance_probe
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_narrative_service_conformance_probe_reports_not_configured(
@@ -88,3 +92,54 @@ def test_narrative_service_conformance_probe_checks_contract_endpoints(
     assert all(result["status"] == "passed" for result in endpoint_results)
     assert requested
     assert requested[0][1].startswith("http://127.0.0.1:9999/api/v1/narratives/")
+
+
+def test_narrative_service_contract_declares_versioning_and_error_semantics():
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    policy = contract["api_policy"]
+
+    assert policy["base_path"] == "/api/v1/narratives"
+    assert policy["current_version"] == "v1"
+    assert policy["versioning_rule"] == "additive_non_breaking"
+    assert policy["compatibility_rule"] == (
+        "new endpoints and optional fields may be added without breaking existing probes"
+    )
+    assert policy["required_envelope_fields"] == [
+        "status",
+        "source",
+        "provider",
+        "provider_version",
+        "data",
+        "warnings",
+        "trust_metadata",
+    ]
+    assert policy["error_semantics"]["missing_id"]["status"] == "missing"
+    assert policy["error_semantics"]["invalid_request"]["http_status"] == 400
+    assert all(
+        endpoint["path"].startswith(policy["base_path"])
+        for endpoint in contract["endpoints"]
+    )
+
+
+def test_fni_report_entrypoints_do_not_import_narrative_service_internals():
+    report_paths = [
+        PROJECT_ROOT / "src" / "scanners" / "fund_holding_exposure_report.py",
+        PROJECT_ROOT / "src" / "scanners" / "fund_exposure_comparison_report.py",
+        PROJECT_ROOT / "src" / "scanners" / "fund_narrative_exposure_matrix_report.py",
+        PROJECT_ROOT / "scripts" / "run_fund_holding_exposure_report.py",
+        PROJECT_ROOT / "scripts" / "run_fund_exposure_comparison_report.py",
+        PROJECT_ROOT / "scripts" / "run_fund_narrative_exposure_matrix_report.py",
+    ]
+
+    offenders = [
+        path
+        for path in report_paths
+        if "stock_narrative_service" in path.read_text(encoding="utf-8")
+    ]
+
+    assert offenders == []
