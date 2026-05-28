@@ -105,7 +105,7 @@ class ReviewedNarrativeRegistryProvider:
 
     provider_name = "reviewed-registry-store"
     provider_version = "reviewed-registry-v1"
-    data_quality = "fresh"
+    data_quality = "partial"
 
     def get_narrative_registry(self) -> dict[str, Any]:
         raw_payload = _load_json_object(self.registry_path)
@@ -126,6 +126,7 @@ class ReviewedNarrativeRegistryProvider:
             "is_mock": False,
             "note": "Loaded from file-backed Narrative Registry store for reviewed workflows.",
             "review_metadata": deepcopy(payload["review_metadata"]),
+            "trust_metadata": deepcopy(payload["trust_metadata"]),
         }
 
 
@@ -141,9 +142,14 @@ class ReviewedStockNarrativeMappingProvider:
         payload = _load_json_object(self.mappings_path, label="reviewed mappings")
         validate_mapping_payload(payload)
         _require_reviewed_store_metadata(payload, context="reviewed mappings")
+        _require_trust_metadata(payload, context="reviewed mappings")
         _require_reviewed_mapping_entry_metadata(payload["mappings"])
         _require_reviewed_mapping_methods(payload["mappings"])
-        return deepcopy(payload["mappings"])
+        mappings = deepcopy(payload["mappings"])
+        for mapping in mappings:
+            mapping["source_trust_status"] = payload["trust_metadata"]["trust_status"]
+            mapping["source_trust_note"] = payload["trust_metadata"]["trust_note"]
+        return mappings
 
     def get_provider_layer(self) -> dict[str, Any]:
         payload = _load_json_object(self.mappings_path, label="reviewed mappings")
@@ -160,6 +166,7 @@ class ReviewedStockNarrativeMappingProvider:
             "is_mock": False,
             "note": "Loaded from file-backed stock-to-narrative mapping store for reviewed workflows.",
             "review_metadata": deepcopy(payload["review_metadata"]),
+            "trust_metadata": deepcopy(payload["trust_metadata"]),
         }
 
 
@@ -369,6 +376,7 @@ def _reviewed_registry_source_url(path: Path) -> str:
 
 def _require_reviewed_registry_metadata(payload: dict[str, Any]) -> None:
     _require_reviewed_store_metadata(payload, context="reviewed registry")
+    _require_trust_metadata(payload, context="reviewed registry")
     for index, narrative in enumerate(payload["narratives"]):
         _require_localized_narrative_fields(
             narrative,
@@ -402,6 +410,39 @@ def _require_reviewed_store_metadata(payload: dict[str, Any], context: str) -> N
     review_note = metadata.get("review_note")
     if not isinstance(review_note, str) or not review_note.strip():
         raise ValueError(f"{context}.review_metadata.review_note must be a non-empty string")
+
+
+def _require_trust_metadata(payload: dict[str, Any], context: str) -> None:
+    metadata = payload.get("trust_metadata")
+    if not isinstance(metadata, dict):
+        raise ValueError(f"{context} must include trust_metadata")
+    required = {
+        "trust_schema_version",
+        "trust_status",
+        "trust_note",
+        "limitations",
+        "required_for_trusted_status",
+    }
+    missing = sorted(required - set(metadata))
+    if missing:
+        raise ValueError(f"{context}.trust_metadata missing fields: {', '.join(missing)}")
+    if metadata.get("trust_schema_version") != "trust-metadata-v1":
+        raise ValueError(
+            f"{context}.trust_metadata.trust_schema_version must be trust-metadata-v1"
+        )
+    if metadata.get("trust_status") not in {
+        "untrusted_experimental",
+        "trusted_validated",
+    }:
+        raise ValueError(
+            f"{context}.trust_metadata.trust_status must be untrusted_experimental "
+            "or trusted_validated"
+        )
+    if not isinstance(metadata.get("trust_note"), str) or not metadata["trust_note"].strip():
+        raise ValueError(f"{context}.trust_metadata.trust_note must be a non-empty string")
+    for field in ("limitations", "required_for_trusted_status"):
+        if not isinstance(metadata.get(field), list) or not metadata[field]:
+            raise ValueError(f"{context}.trust_metadata.{field} must be a non-empty list")
 
 
 def _require_reviewed_mapping_entry_metadata(mappings: list[dict[str, Any]]) -> None:

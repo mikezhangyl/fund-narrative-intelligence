@@ -2066,11 +2066,12 @@ def test_reviewed_narrative_registry_mode_uses_store_layer(tmp_path):
     assert raw["narrative_registry_mode"] == "reviewed"
     assert scoring["narrative_registry_mode"] == "reviewed"
     assert registry_layer["provider_name"] == "reviewed-registry-store"
-    assert registry_layer["data_quality"] == "fresh"
+    assert registry_layer["data_quality"] == "partial"
     assert registry_layer["source_url"].startswith("reviewed-registry://external/")
     assert "/narrative_registry.reviewed.json#sha256=" in registry_layer["source_url"]
     assert registry_layer["is_mock"] is False
     assert registry_layer["review_metadata"]["reviewed_by"] == "seed-curation"
+    assert registry_layer["trust_metadata"]["trust_status"] == "untrusted_experimental"
     assert scoring["provider_foundation"]["effective_data_quality"] == "partial"
     assert "Narrative Registry 来自 reviewed-registry-store" in markdown
     assert "reviewed-registry://external/" in markdown
@@ -2108,6 +2109,7 @@ def test_reviewed_stock_mapping_mode_uses_store_layer(tmp_path):
     assert mapping_layer["is_mock"] is False
     assert mapping_layer["source_url"].startswith("reviewed-mapping://external/")
     assert mapping_layer["review_metadata"]["reviewed_by"] == "seed-curation"
+    assert mapping_layer["trust_metadata"]["trust_status"] == "untrusted_experimental"
     assert raw["provider_foundation"] == scoring["provider_foundation"]
     assert review_queue["provider_foundation"] == scoring["provider_foundation"]
     assert source_table["provider_foundation"] == scoring["provider_foundation"]
@@ -2131,6 +2133,7 @@ def test_reviewed_stock_mapping_mode_does_not_fallback_to_registry_rule(tmp_path
             {
                 "version": "mapping-v1",
                 "review_metadata": _review_metadata(),
+                "trust_metadata": _trust_metadata(),
                 "mappings": [
                     {
                         "stock_code": "NVDA",
@@ -2698,6 +2701,16 @@ def _review_metadata() -> dict:
     }
 
 
+def _trust_metadata() -> dict:
+    return {
+        "trust_schema_version": "trust-metadata-v1",
+        "trust_status": "untrusted_experimental",
+        "trust_note": "Local seed data only; not validated as trusted production knowledge.",
+        "limitations": ["Limited review coverage."],
+        "required_for_trusted_status": ["Run a documented source and logic audit."],
+    }
+
+
 def _review_entry() -> dict:
     return {
         "status": "approved",
@@ -2710,6 +2723,7 @@ def _review_entry() -> dict:
 def _reviewed_registry_text() -> str:
     payload = json.loads((FIXTURE_DIR / "narrative_registry.json").read_text())
     payload["review_metadata"] = _review_metadata()
+    payload["trust_metadata"] = _trust_metadata()
     for narrative in payload["narratives"]:
         narrative["reviewed_by"] = "seed-curation"
         narrative["reviewed_at"] = "2026-05-15"
@@ -2719,6 +2733,7 @@ def _reviewed_registry_text() -> str:
 def _reviewed_mapping_text() -> str:
     payload = json.loads((FIXTURE_DIR / "stock_narrative_mappings.json").read_text())
     payload["review_metadata"] = _review_metadata()
+    payload["trust_metadata"] = _trust_metadata()
     for mapping in payload["mappings"]:
         mapping["method"] = "reviewed_mapping"
         mapping["review"] = _review_entry()

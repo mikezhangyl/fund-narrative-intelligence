@@ -97,12 +97,13 @@ def test_reviewed_narrative_registry_provider_loads_validated_store(tmp_path):
     assert layer["layer"] == "narrative_registry"
     assert layer["provider_name"] == "reviewed-registry-store"
     assert layer["provider_version"] == "reviewed-registry-v1"
-    assert layer["data_quality"] == "fresh"
+    assert layer["data_quality"] == "partial"
     assert layer["source_url"].startswith("reviewed-registry://external/")
     assert "/narrative_registry.reviewed.json#sha256=" in layer["source_url"]
     assert layer["is_mock"] is False
     assert layer["review_metadata"]["reviewed_by"] == "seed-curation"
     assert layer["review_metadata"]["review_schema_version"] == "review-metadata-v1"
+    assert layer["trust_metadata"]["trust_status"] == "untrusted_experimental"
 
 
 def test_reviewed_narrative_registry_provider_rejects_missing_audit_metadata(
@@ -191,6 +192,9 @@ def test_reviewed_stock_mapping_provider_loads_validated_store(tmp_path):
 
     assert fresh_mappings[0]["confidence"] != 0.0
     assert {mapping["method"] for mapping in fresh_mappings} == {"reviewed_mapping"}
+    assert {mapping["source_trust_status"] for mapping in fresh_mappings} == {
+        "untrusted_experimental"
+    }
     assert layer["layer"] == "stock_mappings"
     assert layer["provider_name"] == "reviewed-mapping-store"
     assert layer["provider_version"] == "reviewed-mapping-v1"
@@ -200,6 +204,7 @@ def test_reviewed_stock_mapping_provider_loads_validated_store(tmp_path):
     assert layer["is_mock"] is False
     assert layer["review_metadata"]["reviewed_by"] == "seed-curation"
     assert layer["review_metadata"]["review_schema_version"] == "review-metadata-v1"
+    assert layer["trust_metadata"]["trust_status"] == "untrusted_experimental"
 
 
 def test_reviewed_stock_mapping_provider_rejects_missing_audit_metadata(tmp_path):
@@ -323,6 +328,7 @@ def _reviewed_registry_text() -> str:
         "reviewed_at": "2026-05-15",
         "review_note": "Seeded reviewed registry for V1 provider validation.",
     }
+    payload["trust_metadata"] = _trust_metadata()
     for narrative in payload["narratives"]:
         narrative["reviewed_by"] = "seed-curation"
         narrative["reviewed_at"] = "2026-05-15"
@@ -337,6 +343,7 @@ def _reviewed_mapping_text() -> str:
         "reviewed_at": "2026-05-15",
         "review_note": "Seeded reviewed mappings for V1 provider validation.",
     }
+    payload["trust_metadata"] = _trust_metadata()
     for mapping in payload["mappings"]:
         mapping["method"] = "reviewed_mapping"
         mapping["review"] = {
@@ -346,3 +353,13 @@ def _reviewed_mapping_text() -> str:
             "review_note": "Seeded from accepted V1 mapping fixture.",
         }
     return json.dumps(payload, ensure_ascii=False)
+
+
+def _trust_metadata() -> dict:
+    return {
+        "trust_schema_version": "trust-metadata-v1",
+        "trust_status": "untrusted_experimental",
+        "trust_note": "Local seed data only; not validated as trusted production knowledge.",
+        "limitations": ["Limited review coverage."],
+        "required_for_trusted_status": ["Run a documented source and logic audit."],
+    }

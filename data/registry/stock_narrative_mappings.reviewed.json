@@ -735,5 +735,20 @@
     "reviewed_by": "codex-review",
     "reviewed_at": "2026-05-15",
     "review_note": "Updated reviewed mappings with 515880 光通信 / 光模块 approvals."
+  },
+  "trust_metadata": {
+    "trust_schema_version": "trust-metadata-v1",
+    "trust_status": "untrusted_experimental",
+    "trust_note": "These stock-to-narrative mappings are reviewed local seed mappings, but their mapping logic, source chain, and coverage rules have not yet been proven rigorous enough for trusted production interpretation.",
+    "limitations": [
+      "Mappings mix fixture seeds, model-assisted candidates, and limited manual approvals.",
+      "Confidence values are heuristic and should not be treated as statistically validated probabilities.",
+      "Coverage is partial and may omit important holdings or over-assign broad themes to individual stocks."
+    ],
+    "required_for_trusted_status": [
+      "Attach auditable source evidence and rationale to every stock-to-narrative mapping.",
+      "Define repeatable mapping rules, negative examples, and reviewer acceptance criteria.",
+      "Run coverage and contradiction audits across representative fund holdings before promoting the store to trusted status."
+    ]
   }
 }

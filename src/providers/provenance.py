@@ -119,6 +119,9 @@ def _normalize_layer(layer: str, payload: dict[str, Any]) -> dict[str, Any]:
     review_metadata = payload.get("review_metadata")
     if isinstance(review_metadata, dict):
         normalized["review_metadata"] = dict(review_metadata)
+    trust_metadata = payload.get("trust_metadata")
+    if isinstance(trust_metadata, dict):
+        normalized["trust_metadata"] = dict(trust_metadata)
     return normalized
 
 

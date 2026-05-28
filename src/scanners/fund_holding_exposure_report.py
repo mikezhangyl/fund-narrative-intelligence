@@ -57,6 +57,10 @@ def execute_fund_holding_exposure_report(
         ),
         "config": config.to_dict(),
         "fund": _fund_payload(config.fund_code, profile_rows),
+        "intelligence_trust": _intelligence_trust(
+            narrative_registry=narrative_registry,
+            stock_narrative_mappings=stock_narrative_mappings,
+        ),
         "summary": {
             "profile_row_count": len(profile_rows),
             "holding_count": len(holdings),
@@ -109,6 +113,7 @@ def render_html_report(report: dict[str, Any]) -> str:
             _html_kv("基金代码", fund.get("fund_code", "")),
             _html_kv("基金名称", fund.get("fund_name", "")),
             _html_kv("生成时间", report.get("generated_at", "")),
+            _html_trust_notice(report.get("intelligence_trust")),
             "<p>本报告用于观察基金持仓的行业、板块与叙事暴露，不构成投资建议、交易策略或涨跌预测。</p>",
             "</section>",
             "<section>",
@@ -370,6 +375,44 @@ def _narrative_exposures(
             }
         )
     return sorted(rows, key=lambda row: (-float(row["raw_exposure"]), str(row["narrative_name"])))
+
+
+def _intelligence_trust(
+    *,
+    narrative_registry: dict[str, Any],
+    stock_narrative_mappings: list[dict[str, Any]],
+) -> dict[str, Any]:
+    registry_trust = _mapping(narrative_registry.get("trust_metadata"))
+    mapping_statuses = sorted(
+        {
+            str(mapping.get("source_trust_status") or "unspecified")
+            for mapping in stock_narrative_mappings
+        }
+    )
+    mapping_notes = sorted(
+        {
+            str(mapping.get("source_trust_note") or "")
+            for mapping in stock_narrative_mappings
+            if mapping.get("source_trust_note")
+        }
+    )
+    registry_status = str(registry_trust.get("trust_status") or "unspecified")
+    return {
+        "registry_trust_status": registry_status,
+        "mapping_trust_statuses": mapping_statuses,
+        "trust_warning_zh": _trust_warning(registry_status, mapping_statuses),
+        "registry_trust_note": str(registry_trust.get("trust_note") or ""),
+        "mapping_trust_notes": mapping_notes,
+    }
+
+
+def _trust_warning(registry_status: str, mapping_statuses: list[str]) -> str:
+    if registry_status == "trusted_validated" and mapping_statuses == ["trusted_validated"]:
+        return "叙事定义和股票映射已标记为可信验证数据。"
+    return (
+        "当前叙事定义和股票映射仅为实验性本地知识种子，尚未证明来源链条、"
+        "映射逻辑和复核标准足够严谨；相关暴露只能用于观察和审计。"
+    )
 
 
 def _data_gaps(
@@ -661,6 +704,14 @@ def _html_metric(label: str, value: Any) -> str:
     )
 
 
+def _html_trust_notice(value: Any) -> str:
+    trust = _mapping(value)
+    warning = trust.get("trust_warning_zh")
+    if not warning:
+        return ""
+    return f'<p class="trust-warning">{_html_text(warning)}</p>'
+
+
 def _status_label(status: str) -> str:
     return {
         "completed": "完成",
@@ -683,6 +734,7 @@ h1 { font-size: 30px; margin: 0 0 16px; }
 h2 { font-size: 20px; margin: 0 0 12px; }
 p { line-height: 1.65; }
 .summary { border-left: 4px solid #2563eb; }
+.trust-warning { border: 1px solid #f59e0b; background: #fffbeb; color: #92400e; padding: 10px; }
 .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
 .metric { border: 1px solid #e3e8ef; padding: 10px; background: #fbfcfe; }
 .metric span { display: block; color: #5b6472; font-size: 12px; }

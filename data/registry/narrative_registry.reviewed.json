@@ -1333,5 +1333,20 @@
     "reviewed_at": "2026-05-15",
     "reviewed_by": "seed-curation"
   },
+  "trust_metadata": {
+    "trust_schema_version": "trust-metadata-v1",
+    "trust_status": "untrusted_experimental",
+    "trust_note": "This registry is a reviewed local seed store, but its narrative logic, source chain, and validation criteria have not yet been proven rigorous enough for trusted production interpretation.",
+    "limitations": [
+      "Narratives were seeded from fixtures, model-assisted generation, and limited human review.",
+      "Source citations and inclusion/exclusion criteria are not yet consistently audited across every narrative.",
+      "The registry has not passed an independent methodology review or repeated out-of-sample validation."
+    ],
+    "required_for_trusted_status": [
+      "Document the source chain and promotion rationale for every narrative.",
+      "Define repeatable inclusion and exclusion tests for each narrative.",
+      "Run an audit report that verifies evidence coverage, reviewer identity, date, and reproducible mapping logic."
+    ]
+  },
   "version": "registry-v1"
 }

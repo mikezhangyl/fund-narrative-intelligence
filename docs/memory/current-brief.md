@@ -52,6 +52,8 @@ FNI now also has a Can-Do multi-fund exposure comparison report at `scripts/run_
 
 FNI now has a Can-Do fund narrative exposure matrix report at `scripts/run_fund_narrative_exposure_matrix_report.py`. It renders a fund-by-narrative matrix plus high-homogeneity fund pairs, narrative coverage, differentiating narratives, and data gaps. Live output on 2026-05-28 for `161725,515880,512760`: `outputs/fund_narrative_exposure_matrix/2026-05-28-live-gateway/`; status is `partial`, with 5 narrative columns, 0 high-homogeneity pairs, and structured stock-sector membership degradation.
 
+Narrative governance note: the current reviewed narrative registry and reviewed stock-to-narrative mapping store are explicitly marked `trust_status=untrusted_experimental`. In this project, `reviewed` means the local seed files passed syntax/audit metadata checks and limited approval steps; it does not mean the source chain, mapping logic, or validation criteria are rigorous enough to treat the narratives as trusted production knowledge. Reports should disclose this trust status and use narrative exposure only for observation/audit until a dedicated source-and-logic audit promotes the stores.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

@@ -89,6 +89,10 @@ class MembershipFailureSource(FakeFundExposureSource):
 
 
 NARRATIVE_REGISTRY = {
+    "trust_metadata": {
+        "trust_status": "untrusted_experimental",
+        "trust_note": "Test registry is not trusted.",
+    },
     "narratives": [
         {
             "narrative_id": "N_BAIJIU_CONSUMPTION",
@@ -105,6 +109,8 @@ STOCK_MAPPINGS = [
         "mapping_weight": 0.9,
         "confidence": 0.86,
         "method": "test_mapping",
+        "source_trust_status": "untrusted_experimental",
+        "source_trust_note": "Test mapping is not trusted.",
     },
     {
         "stock_code": "000858",
@@ -112,6 +118,8 @@ STOCK_MAPPINGS = [
         "mapping_weight": 0.8,
         "confidence": 0.82,
         "method": "test_mapping",
+        "source_trust_status": "untrusted_experimental",
+        "source_trust_note": "Test mapping is not trusted.",
     },
 ]
 
@@ -149,6 +157,10 @@ def test_execute_fund_holding_exposure_report_aggregates_gateway_holdings():
     assert report["narrative_exposures"][0]["narrative_id"] == "N_BAIJIU_CONSUMPTION"
     assert report["narrative_exposures"][0]["narrative_name"] == "高端白酒消费"
     assert report["narrative_exposures"][0]["raw_exposure"] == 0.29409
+    assert report["intelligence_trust"]["registry_trust_status"] == "untrusted_experimental"
+    assert report["intelligence_trust"]["mapping_trust_statuses"] == [
+        "untrusted_experimental"
+    ]
     assert report["data_gaps"] == []
 
 
@@ -192,6 +204,7 @@ def test_render_fund_holding_exposure_html_contains_key_sections():
     assert "<h1>基金持仓暴露报告</h1>" in html
     assert "招商中证白酒指数" in html
     assert "高端白酒消费" in html
+    assert "实验性本地知识种子" in html
     assert "不构成投资建议" in html
 
 
