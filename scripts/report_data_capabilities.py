@@ -70,6 +70,10 @@ def _markdown_report(registry: DataCapabilityRegistry) -> str:
         f"- Dataset count: `{summary['dataset_count']}`",
         f"- Analysis capability count: `{summary['analysis_capability_count']}`",
         "",
+        "## Gateway Ownership Boundary",
+        "",
+        *_ownership_policy_lines(registry.ownership_policy),
+        "",
         "## Dataset Status",
         "",
     ]
@@ -136,6 +140,18 @@ def _counts_markdown(counts: dict[str, int]) -> list[str]:
     if not counts:
         return ["- None"]
     return [f"- `{key}`: `{value}`" for key, value in sorted(counts.items())]
+
+
+def _ownership_policy_lines(policy: dict[str, object]) -> list[str]:
+    if not policy:
+        return ["- Not declared"]
+    return [
+        f"- External source expansion owner: `{policy.get('external_source_expansion_owner', '')}`",
+        f"- FNI role: `{policy.get('fni_role', '')}`",
+        f"- Direct external source rule: `{policy.get('direct_external_source_rule', '')}`",
+        f"- Change request location: `{policy.get('change_request_location', '')}`",
+        f"- Report disclosure required: `{policy.get('report_disclosure_required', '')}`",
+    ]
 
 
 if __name__ == "__main__":

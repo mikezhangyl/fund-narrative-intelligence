@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "MIK-45 records and enforces FNI-side gateway boundary coverage, but it does not validate live gateway uptime.",
+    "A future MIK-36 inventory report should render the boundary and dataset status in Chinese HTML for reader-facing consumption."
+  ]
+}

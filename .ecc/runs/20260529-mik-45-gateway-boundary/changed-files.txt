@@ -1,0 +1,13 @@
+config/data_capabilities.yaml
+docs/product/README.md
+docs/product/market-data-gateway-boundary.md
+scripts/report_data_capabilities.py
+src/market_data/capabilities.py
+tests/test_market_data_capabilities.py
+.ecc/runs/20260529-mik-45-gateway-boundary/task-brief.md
+.ecc/runs/20260529-mik-45-gateway-boundary/task-handoff.md
+.ecc/runs/20260529-mik-45-gateway-boundary/changed-files.txt
+.ecc/runs/20260529-mik-45-gateway-boundary/artifacts/generated-files-manifest.json
+.ecc/runs/20260529-mik-45-gateway-boundary/quality-agent/findings.json
+.ecc/runs/20260529-mik-45-gateway-boundary/quality-agent/review-state.json
+.ecc/runs/20260529-mik-45-gateway-boundary/run-state.json

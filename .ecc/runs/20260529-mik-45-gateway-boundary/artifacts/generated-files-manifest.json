@@ -1,0 +1,14 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "product_doc",
+      "path": "docs/product/market-data-gateway-boundary.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Gateway-owned market-data boundary decisions for Linear MIK-45.",
+      "checksum_sha256": "62112029ffe2c244cac3d5be5ea52188cf2b3e2898aee51b857294222c931087",
+      "mtime_epoch": 1779987214,
+      "size_bytes": 3235
+    }
+  ]
+}

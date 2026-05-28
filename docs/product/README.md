@@ -8,6 +8,7 @@ This directory contains product and architecture source documents for Fund Narra
 - [V1 Implementation Spec](./v1-implementation-spec.md)
 - [Narrative Mapping Methodology v0](./narrative-mapping-methodology-v0.md)
 - [Narrative Service Boundary](./narrative-service-boundary.md)
+- [Market Data Gateway Boundary](./market-data-gateway-boundary.md)
 - [Narrative Service Implementation Request](./narrative-service-implementation-request-2026-05-28.md)
 - [Narrative Store Migration Checklist](./narrative-store-migration-checklist.md)
 - [Stock Narrative Service Bootstrap Prompt](./stock-narrative-service-bootstrap-prompt.md)

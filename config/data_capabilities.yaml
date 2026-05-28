@@ -4,23 +4,40 @@ purpose: >
   Market-data capability ledger for deciding which datasets each analysis needs,
   whether the platform can acquire them reliably, and what must move into the
   local data gateway over time.
+ownership_policy:
+  external_source_expansion_owner: stock-data-gateway
+  fni_role: consumer_of_gateway_contracts
+  direct_external_source_rule: gateway_change_request_first
+  change_request_location: /Users/mikezhang/Coding/AI-Learning/stock-data-gateway/docs/product/
+  report_disclosure_required: true
+  allowed_fni_direct_source_exception: narrow_compatibility_shim_or_local_fixture
+  can_do_stability_labels:
+    - available
+    - unstable
+    - missing
+    - planned
+    - disabled
 
 datasets:
   latest_stock_quotes:
     description: Latest stock quote snapshot for report-time market context.
     current_status: available
     acquisition_difficulty: low
-    gateway_mode: gateway_planned
+    gateway_mode: gateway_ready
     required_fields:
       - stock_code
       - latest_price
       - retrieved_at
     freshness: intraday_snapshot
     primary_source:
-      provider: eastmoney
-      endpoint: market_quote
-      access_mode: public_web
-    fallback_sources: []
+      provider: gateway
+      endpoint: eastmoney/market-quotes
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: eastmoney
+        endpoint: market_quote
+        access_mode: public_web
+        current_status: existing_direct_provider
     validation:
       live_probe_capability: latest_stock_quotes
     risks:
@@ -31,7 +48,7 @@ datasets:
       - report_market_context
       - market_quote_derived_signals
     notes:
-      - Existing EastMoney quote path works as report context, not tick-level infrastructure.
+      - FNI should try the local gateway first and keep the direct EastMoney adapter only as a compatibility fallback.
 
   stock_metadata:
     description: A-share stock identity and listing metadata.
@@ -224,17 +241,21 @@ datasets:
     description: Concept and sector board snapshots for sector rotation ranking.
     current_status: unstable
     acquisition_difficulty: medium
-    gateway_mode: gateway_planned
+    gateway_mode: gateway_ready
     required_fields:
       - sector_name
       - pct_change
       - source
     freshness: intraday_or_after_market
     primary_source:
-      provider: akshare
-      endpoint: stock_board_concept_name_em
-      access_mode: public_web
+      provider: gateway
+      endpoint: sectors/concepts
+      access_mode: normalized_gateway
     fallback_sources:
+      - provider: akshare
+        endpoint: stock_board_concept_name_em
+        access_mode: public_web
+        current_status: existing_direct_provider
       - provider: eastmoney
         endpoint: concept_board
         access_mode: public_web
@@ -255,17 +276,21 @@ datasets:
     description: Daily limit-up and limit-down pool counts for market heat and risk appetite.
     current_status: available
     acquisition_difficulty: medium
-    gateway_mode: gateway_planned
+    gateway_mode: gateway_ready
     required_fields:
       - trade_date
       - limit_up_count
       - limit_down_count
     freshness: after_market_daily
     primary_source:
-      provider: akshare
-      endpoint: stock_zt_pool_em+stock_zt_pool_dtgc_em
-      access_mode: public_web
-    fallback_sources: []
+      provider: gateway
+      endpoint: market/limit-up-down
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: akshare
+        endpoint: stock_zt_pool_em+stock_zt_pool_dtgc_em
+        access_mode: public_web
+        current_status: existing_direct_provider
     validation:
       live_probe_capability: limit_up_down_stats
     risks:
@@ -277,7 +302,71 @@ datasets:
       - risk_appetite
       - breadth_context
     notes:
-      - Current live probes classify this as fallback-safe rather than core primary infrastructure.
+      - Gateway provider-neutral route is the preferred FNI consumption path; direct AkShare remains a compatibility fallback.
+
+  etf_spot_ranking:
+    description: ETF spot ranking snapshot for market structure and ETF heat context.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - name
+      - pct_change
+      - source
+    freshness: intraday_snapshot
+    primary_source:
+      provider: gateway
+      endpoint: etf/spot
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: akshare
+        endpoint: fund_etf_spot_em
+        access_mode: public_web
+        current_status: candidate
+    validation:
+      live_probe_capability: etf_spot_ranking
+    risks:
+      rate_limit: medium_public_web_endpoint
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - etf_ranking
+      - daily_market_structure_report
+    notes:
+      - Gateway route `/api/v1/market-data/etf/spot` is the FNI-owned consumption surface for ETF spot heat.
+
+  news_briefs:
+    description: Structured market news briefs for background context and future candidate narrative intake.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - datetime
+      - title
+      - content
+      - source
+    freshness: intraday_or_time_window_snapshot
+    primary_source:
+      provider: gateway
+      endpoint: news/briefs
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: tushare
+        endpoint: news
+        access_mode: token_api
+        current_status: gateway_upstream
+    validation:
+      live_probe_capability: news_briefs
+    risks:
+      rate_limit: medium_token_permission_dependent
+      anti_bot: low_token_api
+      operational_cost: token_and_permission_policy_dependent
+    analysis_use_cases:
+      - daily_market_structure_report
+      - candidate_narrative_intake
+    notes:
+      - FNI should consume structured news through the gateway before considering any direct news-site crawling.
 
   cyq_chips:
     description: A-share daily cost-basis/chip distribution rows by price bucket.

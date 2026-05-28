@@ -192,6 +192,7 @@ class DataCapabilityRegistry:
     version: str
     updated_at: str
     purpose: str
+    ownership_policy: dict[str, Any]
     datasets: dict[str, DatasetCapability]
     analysis_capabilities: dict[str, AnalysisCapability]
 
@@ -224,6 +225,7 @@ class DataCapabilityRegistry:
             version=_required_text(raw, "version", context=str(config_path)),
             updated_at=_required_text(raw, "updated_at", context=str(config_path)),
             purpose=_required_text(raw, "purpose", context=str(config_path)),
+            ownership_policy=dict(_optional_mapping(raw, "ownership_policy") or {}),
             datasets=datasets,
             analysis_capabilities=analysis_capabilities,
         )
@@ -302,6 +304,41 @@ class DataCapabilityRegistry:
                 return dataset
         return None
 
+    def gateway_contract_coverage(self, contract: Any) -> dict[str, Any]:
+        contract_dataset_ids = sorted(
+            {
+                str(endpoint.dataset_id)
+                for endpoint in getattr(contract, "endpoints", ())
+                if str(getattr(endpoint, "maturity", "available")) != "planned"
+            }
+        )
+        covered = [
+            dataset_id
+            for dataset_id in contract_dataset_ids
+            if dataset_id in self.datasets
+        ]
+        missing = [
+            dataset_id
+            for dataset_id in contract_dataset_ids
+            if dataset_id not in self.datasets
+        ]
+        planned = [
+            dataset_id
+            for dataset_id in covered
+            if self.datasets[dataset_id].current_status in {"missing", "planned", "disabled"}
+        ]
+        return {
+            "contract_dataset_ids": contract_dataset_ids,
+            "covered_dataset_ids": covered,
+            "missing_dataset_ids": missing,
+            "planned_contract_dataset_ids": planned,
+            "registry_dataset_ids_without_contract": [
+                dataset_id
+                for dataset_id in sorted(self.datasets)
+                if dataset_id not in contract_dataset_ids
+            ],
+        }
+
     def annotate_probe_matrix(
         self,
         matrix: list[dict[str, Any]],
@@ -359,6 +396,7 @@ class DataCapabilityRegistry:
             "version": self.version,
             "updated_at": self.updated_at,
             "purpose": self.purpose,
+            "ownership_policy": dict(self.ownership_policy),
             "summary": self.summary(),
             "datasets": {
                 dataset_id: dataset.to_dict()

@@ -8,6 +8,7 @@ from src.market_data.capabilities import (
     DataCapabilityRegistry,
     load_data_capability_registry,
 )
+from src.market_data.gateway_contract import load_gateway_contract
 
 
 def test_data_capability_registry_loads_datasets_and_analysis_links():
@@ -56,6 +57,30 @@ def test_data_capability_registry_summary_counts_status_and_difficulty():
     assert summary["dataset_status_counts"]["unstable"] >= 1
     assert summary["difficulty_counts"]["medium"] >= 1
     assert summary["gateway_mode_counts"]["gateway_ready"] >= 1
+
+
+def test_data_capability_registry_covers_available_gateway_contract_datasets():
+    registry = load_data_capability_registry()
+    contract = load_gateway_contract()
+
+    coverage = registry.gateway_contract_coverage(contract)
+
+    assert coverage["missing_dataset_ids"] == []
+    assert coverage["planned_contract_dataset_ids"] == []
+    assert "etf_spot_ranking" in coverage["covered_dataset_ids"]
+    assert "news_briefs" in coverage["covered_dataset_ids"]
+
+
+def test_data_capability_registry_declares_gateway_ownership_policy():
+    registry = load_data_capability_registry()
+
+    policy = registry.ownership_policy
+
+    assert policy["external_source_expansion_owner"] == "stock-data-gateway"
+    assert policy["fni_role"] == "consumer_of_gateway_contracts"
+    assert policy["direct_external_source_rule"] == "gateway_change_request_first"
+    assert policy["report_disclosure_required"] is True
+    assert policy["change_request_location"].endswith("/stock-data-gateway/docs/product/")
 
 
 def test_data_capability_registry_reports_analysis_readiness_with_warnings():
@@ -131,9 +156,15 @@ def test_data_capability_report_builds_markdown_and_json():
 
     markdown = build_report(registry, output_format="markdown")
     assert "# Data Capability Registry" in markdown
+    assert "## Gateway Ownership Boundary" in markdown
+    assert "stock-data-gateway" in markdown
     assert "a_share_daily_bars" in markdown
     assert "market_breadth_ma20" in markdown
 
     payload = json.loads(build_report(registry, output_format="json"))
+    assert (
+        payload["ownership_policy"]["external_source_expansion_owner"]
+        == "stock-data-gateway"
+    )
     assert payload["summary"]["dataset_count"] == len(registry.datasets)
     assert payload["datasets"]["a_share_daily_bars"]["primary_source"]["provider"] == "tushare"
