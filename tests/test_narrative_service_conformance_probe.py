@@ -126,6 +126,29 @@ def test_narrative_service_contract_declares_versioning_and_error_semantics():
     )
 
 
+def test_narrative_service_contract_declares_append_only_ledger_policy():
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    policy = contract["storage_policy"]
+    ledgers = policy["append_only_ledgers"]
+
+    assert policy["current_store"] == "json_file_ledgers_v1"
+    assert ledgers["candidate_intake_events"]["version"] == "service-intake-events-v1"
+    assert ledgers["narrative_review_actions"]["version"] == (
+        "narrative-review-actions-v1"
+    )
+    assert ledgers["promotion_decisions"]["status"] == "reserved"
+    assert "source_metadata" in ledgers["candidate_intake_events"]["required_record_fields"]
+    assert "source_metadata" in ledgers["narrative_review_actions"]["required_record_fields"]
+    assert policy["mutation_policy"]["failed_intake_writes"] == "none"
+    assert "registry" in policy["mutation_policy"]["review_actions_must_not_mutate"]
+    assert policy["migration"]["http_contract_change_allowed"] is False
+
+
 def test_fni_report_entrypoints_do_not_import_narrative_service_internals():
     report_paths = [
         PROJECT_ROOT / "src" / "scanners" / "fund_holding_exposure_report.py",

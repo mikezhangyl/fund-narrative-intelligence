@@ -151,6 +151,34 @@ The service must preserve current trust state:
 - promotion preflight may return `ready_for_trust_audit`, but it must not write
   trusted records or mutate registry/mapping stores.
 
+## Ledger Storage
+
+The current durable store is JSON-file-backed append-only ledgers:
+
+- candidate intake writes `service-intake-events-v1` records to
+  `candidate_intake_events.json`;
+- review actions write `narrative-review-actions-v1` records to
+  `review_actions.json`;
+- trusted promotion decisions are reserved for a separate
+  `narrative-promotion-decisions-v1` ledger and must not reuse the review-action
+  file.
+
+Each ledger record must preserve a schema version, record type, ledger sequence,
+recorded timestamp, actor/action or event fields, note where applicable, source
+metadata, and `promotion_effect=none` unless a future trusted-promotion endpoint
+explicitly owns the write.
+
+Reads replay seed fixture events first and intake ledger events second. Duplicate
+candidate ids collapse to one candidate detail/read model, but duplicate intake
+events remain in the append-only ledger for auditability. Repeated reads must not
+write cache files or negative records. Failed intake validation must not create
+ledger files.
+
+SQLite or Postgres becomes the next store when concurrent reviewers, transactional
+queries, or indexed ledger lookups are needed. That migration must not change the
+HTTP contract: endpoint names, envelopes, trust states, append-only semantics,
+and non-promotion invariants remain stable while only the storage adapter changes.
+
 ## Troubleshooting
 
 If conformance fails:

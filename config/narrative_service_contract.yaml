@@ -125,3 +125,70 @@ trust_policy:
     - mapping_rationale
     - exclusion_criteria
     - trust_audit
+
+storage_policy:
+  current_store: json_file_ledgers_v1
+  append_only_ledgers:
+    candidate_intake_events:
+      path: services/stock-narrative-service/data/runtime/candidate_intake_events.json
+      version: service-intake-events-v1
+      collection_key: events
+      record_type: candidate_intake_event
+      required_record_fields:
+        - schema_version
+        - ledger_record_type
+        - ledger_sequence
+        - recorded_at
+        - event_id
+        - source_type
+        - event_time
+        - source_metadata
+        - candidate_narratives
+        - promotion_effect
+    narrative_review_actions:
+      path: services/stock-narrative-service/data/runtime/review_actions.json
+      version: narrative-review-actions-v1
+      collection_key: items
+      record_type: review_action
+      required_record_fields:
+        - schema_version
+        - ledger_record_type
+        - ledger_sequence
+        - recorded_at
+        - review_action_id
+        - candidate_narrative_id
+        - action
+        - reviewed_by
+        - reviewed_at
+        - review_note
+        - source_metadata
+        - promotion_effect
+    promotion_decisions:
+      path: services/stock-narrative-service/data/runtime/promotion_decisions.json
+      version: narrative-promotion-decisions-v1
+      collection_key: items
+      record_type: promotion_decision
+      status: reserved
+      note: Future trusted-promotion decisions must use a separate append-only ledger.
+  mutation_policy:
+    review_actions_mutate:
+      - review_action_ledger
+    review_actions_must_not_mutate:
+      - registry
+      - mappings
+      - evidence_packs
+      - candidate_intake_ledger
+      - trusted_stores
+    failed_intake_writes: none
+  replay_policy:
+    candidate_reads:
+      source_order:
+        - seed_fixture_events
+        - candidate_intake_events
+      duplicate_candidate_rule: latest_event_view_by_candidate_id
+      read_side_effects_allowed: false
+  migration:
+    next_store: sqlite_or_postgres
+    threshold: multiple reviewers, concurrent writes, or ledger queries that need transactional indexes
+    http_contract_change_allowed: false
+    invariant: Storage adapters may change, but HTTP endpoints, envelopes, trust states, and append-only record semantics must remain stable.

@@ -184,6 +184,138 @@ def test_review_actions_are_persisted_without_trusted_promotion(tmp_path):
     assert "trusted_validated" not in json.dumps(actions, ensure_ascii=False)
 
 
+def test_review_actions_are_append_only_and_do_not_mutate_trusted_sources(tmp_path):
+    config = _write_seed_files(tmp_path)
+    source_snapshots = {
+        config.registry_path: config.registry_path.read_text(encoding="utf-8"),
+        config.mappings_path: config.mappings_path.read_text(encoding="utf-8"),
+        config.evidence_packs_path: config.evidence_packs_path.read_text(
+            encoding="utf-8"
+        ),
+    }
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        first = _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "test-reviewer",
+                "review_note": "First ledger decision.",
+                "source_metadata": {
+                    "source": "review-workspace",
+                    "request_id": "REQ_APPEND_1",
+                },
+            },
+        )
+        second = _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "defer",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Second ledger decision.",
+                "source_metadata": {
+                    "source": "review-workspace",
+                    "request_id": "REQ_APPEND_2",
+                },
+            },
+        )
+        actions = _get_json(f"{base_url}/api/v1/narratives/review-actions")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert first["data"]["decision"]["ledger_record_type"] == "review_action"
+    assert first["data"]["decision"]["ledger_sequence"] == 1
+    assert first["data"]["decision"]["source_metadata"] == {
+        "source": "review-workspace",
+        "request_id": "REQ_APPEND_1",
+    }
+    assert second["data"]["decision"]["ledger_sequence"] == 2
+    assert actions["data"]["version"] == "narrative-review-actions-v1"
+    assert [item["ledger_sequence"] for item in actions["data"]["items"]] == [1, 2]
+    assert actions["data"]["items"][0]["review_note"] == "First ledger decision."
+    assert actions["data"]["items"][1]["review_note"] == "Second ledger decision."
+    for path, before_text in source_snapshots.items():
+        assert path.read_text(encoding="utf-8") == before_text
+
+
+def test_failed_intake_payload_does_not_create_ledger_or_negative_cache(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        before = _get_json(f"{base_url}/api/v1/narratives/candidates")
+        try:
+            _post_json(
+                f"{base_url}/api/v1/narratives/intake/events",
+                {"events": ["not-an-event-object"]},
+            )
+        except Exception as exc:
+            assert "HTTP Error 400" in str(exc)
+        else:
+            raise AssertionError("expected 400 for invalid event payload")
+        after = _get_json(f"{base_url}/api/v1/narratives/candidates")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert before["data"] == after["data"]
+    assert not config.intake_ledger_path.exists()
+
+
+def test_duplicate_intake_replays_append_events_but_dedupes_candidate_reads(tmp_path):
+    config = _write_seed_files(tmp_path)
+    event = {
+        "event_id": "EVT_DUPLICATE",
+        "source_type": "manual",
+        "event_time": "2026-05-28T10:00:00+08:00",
+        "title": "重复候选",
+        "source_url": "manual://duplicate",
+        "source_metadata": {"provider": "manual", "permission": "internal_review"},
+        "candidate_narratives": [
+            {
+                "candidate_narrative_id": "C_DUPLICATE",
+                "name": "重复候选",
+                "canonical_taxonomy": "测试",
+                "confidence": 0.5,
+            }
+        ],
+    }
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        _post_json(f"{base_url}/api/v1/narratives/intake/events", {"events": [event]})
+        _post_json(f"{base_url}/api/v1/narratives/intake/events", {"events": [event]})
+        candidates = _get_json(f"{base_url}/api/v1/narratives/candidates")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    ledger = json.loads(config.intake_ledger_path.read_text(encoding="utf-8"))
+    duplicate_candidates = [
+        item
+        for item in candidates["data"]["candidate_narratives"]
+        if item["candidate_narrative_id"] == "C_DUPLICATE"
+    ]
+    assert ledger["version"] == "service-intake-events-v1"
+    assert [item["ledger_sequence"] for item in ledger["events"]] == [1, 2]
+    assert {item["ledger_record_type"] for item in ledger["events"]} == {
+        "candidate_intake_event"
+    }
+    assert ledger["events"][0]["source_metadata"] == {
+        "provider": "manual",
+        "permission": "internal_review",
+    }
+    assert len(duplicate_candidates) == 1
+    assert duplicate_candidates[0]["source_event_ids"] == ["EVT_DUPLICATE"]
+
+
 def test_review_queue_reflects_latest_review_action_and_preflight_state(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)

@@ -9,6 +9,9 @@ from typing import Any
 
 from stock_narrative_service.config import ServiceConfig
 
+INTAKE_LEDGER_VERSION = "service-intake-events-v1"
+REVIEW_ACTION_LEDGER_VERSION = "narrative-review-actions-v1"
+
 
 class NarrativeStore:
     def __init__(self, config: ServiceConfig):
@@ -29,13 +32,13 @@ class NarrativeStore:
     def intake_ledger(self) -> dict[str, Any]:
         path = self.config.intake_ledger_path
         if not path.exists():
-            return {"version": "service-intake-events-v1", "events": []}
+            return {"version": INTAKE_LEDGER_VERSION, "events": []}
         return _load_object(path, label="intake ledger")
 
     def review_actions(self) -> dict[str, Any]:
         path = self.config.review_actions_path
         if not path.exists():
-            return {"version": "narrative-review-actions-v0", "items": []}
+            return {"version": REVIEW_ACTION_LEDGER_VERSION, "items": []}
         return _load_object(path, label="review actions")
 
     def candidates(self) -> dict[str, Any]:
@@ -131,13 +134,26 @@ class NarrativeStore:
         }
 
     def ingest_events(self, payload: dict[str, Any]) -> dict[str, Any]:
-        events = _list(payload.get("events"))
+        events = _event_list(payload.get("events"))
         dry_run = bool(payload.get("dry_run"))
-        normalized = [_normalize_event(event) for event in events]
-        if normalized and not dry_run:
+        if events and not dry_run:
             ledger = self.intake_ledger()
-            ledger["events"] = [*_list(ledger.get("events")), *normalized]
+            existing_events = _list(ledger.get("events"))
+            normalized = [
+                _normalize_event(
+                    event,
+                    ledger_sequence=len(existing_events) + index + 1,
+                )
+                for index, event in enumerate(events)
+            ]
+            ledger = {
+                **ledger,
+                "version": INTAKE_LEDGER_VERSION,
+                "events": [*existing_events, *normalized],
+            }
             _write_object(self.config.intake_ledger_path, ledger)
+        else:
+            normalized = [_normalize_event(event) for event in events]
         candidates = _candidates_from_events(normalized)
         return {
             "ingested_event_count": len(normalized),
@@ -175,8 +191,14 @@ class NarrativeStore:
         }
         if candidate_id not in candidate_ids:
             raise ValueError(f"Unknown candidate_narrative_id: {candidate_id}")
+        actions = self.review_actions()
+        existing_actions = _list(actions.get("items"))
         reviewed_at = _now()
         decision = {
+            "schema_version": "review-action-ledger-record-v1",
+            "ledger_record_type": "review_action",
+            "ledger_sequence": len(existing_actions) + 1,
+            "recorded_at": reviewed_at,
             "review_action_id": _stable_id(
                 "RA",
                 [candidate_id, action, reviewed_by, review_note, reviewed_at],
@@ -186,6 +208,7 @@ class NarrativeStore:
             "reviewed_by": reviewed_by,
             "reviewed_at": reviewed_at,
             "review_note": review_note,
+            "source_metadata": _mapping(payload.get("source_metadata")),
             "trust_status_after_action": "candidate_untrusted",
             "promotion_effect": "none",
             "promotion_note": (
@@ -193,8 +216,11 @@ class NarrativeStore:
                 "separate source, rationale, exclusion, and trust audit gates."
             ),
         }
-        actions = self.review_actions()
-        actions["items"] = [*_list(actions.get("items")), decision]
+        actions = {
+            **actions,
+            "version": REVIEW_ACTION_LEDGER_VERSION,
+            "items": [*existing_actions, decision],
+        }
         _write_object(self.config.review_actions_path, actions)
         return {"decision": decision}
 
@@ -355,13 +381,28 @@ def _gate(gate_id: str, passed: bool, message: str) -> dict[str, str]:
     }
 
 
-def _normalize_event(event: dict[str, Any]) -> dict[str, Any]:
-    return {
+def _normalize_event(
+    event: dict[str, Any],
+    *,
+    ledger_sequence: int | None = None,
+) -> dict[str, Any]:
+    normalized = {
         **dict(event),
         "event_id": str(event.get("event_id") or _stable_id("EVT", [event])),
         "source_type": str(event.get("source_type") or "unknown"),
         "event_time": str(event.get("event_time") or _now()),
+        "source_metadata": _mapping(event.get("source_metadata")),
         "candidate_narratives": _list(event.get("candidate_narratives")),
+    }
+    if ledger_sequence is None:
+        return normalized
+    return {
+        **normalized,
+        "schema_version": "candidate-intake-ledger-record-v1",
+        "ledger_record_type": "candidate_intake_event",
+        "ledger_sequence": ledger_sequence,
+        "recorded_at": _now(),
+        "promotion_effect": "none",
     }
 
 
@@ -427,6 +468,16 @@ def _write_object(path: Path, payload: dict[str, Any]) -> None:
 
 def _list(value: Any) -> list[dict[str, Any]]:
     return value if isinstance(value, list) else []
+
+
+def _event_list(value: Any) -> list[dict[str, Any]]:
+    if value in (None, ""):
+        return []
+    if not isinstance(value, list):
+        raise ValueError("events must be a list")
+    if not all(isinstance(item, dict) for item in value):
+        raise ValueError("events must contain JSON objects")
+    return value
 
 
 def _mapping(value: Any) -> dict[str, Any]:

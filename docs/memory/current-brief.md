@@ -82,6 +82,8 @@ The in-repo Narrative Service acceptance command is `uv run python scripts/valid
 
 The Narrative Service contract now declares an explicit `api_policy`: v1 lives under `/api/v1/narratives`, compatibility is additive/non-breaking, required envelopes are `status/source/provider/provider_version/data/warnings/trust_metadata`, and missing-id / invalid-request / degraded-service semantics are documented in `config/narrative_service_contract.yaml` and `docs/product/stock-narrative-service-runbook.md`.
 
+The Narrative Service ledger policy is append-only JSON for the current slice: candidate intake uses `service-intake-events-v1`, review actions use `narrative-review-actions-v1`, promotion decisions are reserved for a separate future ledger, and any SQLite/Postgres migration must keep the HTTP contract and append-only semantics stable.
+
 The in-repo Narrative Service now records human review actions through `POST /api/v1/narratives/review-actions` and exposes them through `GET /api/v1/narratives/review-actions`. Actions support `approve`, `reject`, and `defer`, are persisted in a local JSON ledger, and remain explicitly non-promotional: candidates stay `candidate_untrusted` until a separate trusted promotion workflow exists.
 
 The Narrative Service also exposes `POST /api/v1/narratives/promotion/preflight`. It checks candidate source evidence, rationale, exclusion criteria, and service-ledger approval, then returns `blocked` or `ready_for_trust_audit`. It is intentionally non-mutating and cannot create trusted records.
