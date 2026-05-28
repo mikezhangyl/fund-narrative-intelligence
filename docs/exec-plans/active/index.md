@@ -9,6 +9,7 @@ This index is intentionally short. It is the default startup surface; do not exp
 - [provider-routing-akshare-tushare.md](./provider-routing-akshare-tushare.md)
 - [market-data-can-do-roadmap.md](./market-data-can-do-roadmap.md)
 - [narrative-intelligence-service.md](./narrative-intelligence-service.md)
+- [narrative-service-migration-roadmap.md](./narrative-service-migration-roadmap.md)
 - [information-source-diversification.md](./information-source-diversification.md)
 - [single-fund-demo.md](./single-fund-demo.md)
 

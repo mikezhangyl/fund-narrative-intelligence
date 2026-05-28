@@ -7,6 +7,7 @@ This directory contains product and architecture source documents for Fund Narra
 - [Fund Narrative Intelligence System](./fund-narrative-intelligence-system.html)
 - [V1 Implementation Spec](./v1-implementation-spec.md)
 - [Narrative Mapping Methodology v0](./narrative-mapping-methodology-v0.md)
+- [Narrative Service Boundary](./narrative-service-boundary.md)
 
 ## Current Product Definition
 
@@ -46,6 +47,11 @@ Intake accepts event-style records from future `news`, `announcement`,
 `social`, and `manual` sources. It only emits candidate narratives, candidate
 stock mappings, and review-queue items; it must not mutate the reviewed or
 trusted stores automatically.
+
+Narrative intelligence remains a future independent service boundary. FNI may
+keep local prototypes for report integration and contract discovery, but the
+future service should own registry lifecycle, stock mapping lifecycle, evidence
+packs, candidate intake, trust audits, review queues, and trusted promotion.
 
 The first engineering acceptance command is:
 
