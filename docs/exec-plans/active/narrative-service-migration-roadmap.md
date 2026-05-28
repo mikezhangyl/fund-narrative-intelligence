@@ -216,11 +216,36 @@ Acceptance:
 - service fallback does not alter trust status;
 - report JSON keeps warnings and diagnostics for downstream UI use.
 
+## Phase 3c: Provider Smoke
+
+Status: implemented on 2026-05-28.
+
+Implemented surface:
+
+- `scripts/run_narrative_service_provider_smoke.py` validates service-first
+  provider behavior and writes JSON/Markdown outputs;
+- the smoke can run with `--base-url` or `NARRATIVE_SERVICE_URL`;
+- test coverage starts a local fake HTTP narrative service and proves FNI reads
+  registry/mapping rows through the HTTP provider;
+- fallback coverage proves an unreachable service produces a visible
+  `NARRATIVE_SERVICE_FALLBACK` warning while still returning local prototype
+  data.
+
+Acceptance:
+
+- service-first behavior is tested without needing a real independent service;
+- fallback behavior is visible and non-silent;
+- the script remains a provider smoke/probe utility, not production service
+  runtime.
+
 ## Next Recommended Slice
 
-Implement the next Phase 3 service smoke slice:
+Implement Phase 4 migration preparation:
 
-1. Add a small fake narrative service fixture/server for local dry-run smoke.
-2. Prove `NARRATIVE_SERVICE_URL=<fake>` makes FNI use HTTP service data.
-3. Prove service failure falls back to local prototype with visible warning.
-4. Keep this as a test/probe utility, not production service code.
+1. Generate a migration checklist for moving authoritative narrative stores out
+   of FNI.
+2. Mark FNI local narrative files as fallback/test fixtures in docs.
+3. Add explicit TODO/backlog entries for service-side review UI and durable
+   storage.
+4. Defer actual deletion of local files until the independent service passes
+   conformance and provider smoke.

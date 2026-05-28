@@ -70,6 +70,8 @@ FNI now has first HTTP narrative-service consumption in `src/providers/narrative
 
 Narrative source disclosure is now present in fund holding exposure, fund exposure comparison, and fund narrative exposure matrix reports. Their JSON/HTML outputs expose `narrative_source`, including provider, source, warnings, and diagnostics when available. The next service-consumption slice should add a local fake HTTP narrative service smoke/probe to prove `NARRATIVE_SERVICE_URL` service-first routing and fallback behavior end to end.
 
+FNI now has a narrative service provider smoke script at `scripts/run_narrative_service_provider_smoke.py`. It can run against `NARRATIVE_SERVICE_URL` or `--base-url`, writes JSON/Markdown output, and reports whether data came from `narrative_service` or `local_prototype`. Tests include a local fake HTTP narrative service and an unreachable-service fallback case. The next narrative-service step should be migration preparation: make it explicit that FNI local narrative stores are fallback/test fixtures until the independent service becomes authoritative.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

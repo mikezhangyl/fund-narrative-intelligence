@@ -61,6 +61,16 @@ with explicit local fallback through `FallbackNarrativeDataProvider`. Fund
 holding exposure, fund exposure comparison, and fund narrative exposure matrix
 reports disclose the narrative data source in JSON/HTML.
 
+The provider smoke entry point is:
+
+```bash
+python scripts/run_narrative_service_provider_smoke.py
+```
+
+Set `NARRATIVE_SERVICE_URL` or pass `--base-url` to verify service-first HTTP
+consumption. If the service is unavailable, the smoke should show an explicit
+local fallback warning rather than a silent success.
+
 The first engineering acceptance command is:
 
 ```bash
