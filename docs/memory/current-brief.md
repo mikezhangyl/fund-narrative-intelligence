@@ -64,6 +64,8 @@ Narrative intelligence remains a future independent service boundary, documented
 
 FNI now has the first narrative-service consumer contract at `config/narrative_service_contract.yaml` and a local fallback implementation at `src/providers/narrative_service.py`. `LocalNarrativePrototypeProvider` reads the current reviewed registry, reviewed stock mappings, mapping evidence packs, and candidate intake events through one provider-neutral snapshot; `scripts/run_fund_holding_exposure_report.py` uses it for default reviewed narrative inputs. The next slice should prepare the cross-repo service implementation request and a future `NARRATIVE_SERVICE_URL` conformance probe.
 
+FNI prepared the first narrative-service implementation request at `docs/product/narrative-service-implementation-request-2026-05-28.md` and the conformance probe at `scripts/run_narrative_service_conformance_probe.py`. Without `NARRATIVE_SERVICE_URL`, the probe reports `not_configured`; once a service exists, it checks every endpoint declared in `config/narrative_service_contract.yaml` for the required normalized envelope. The next FNI slice is an HTTP `NarrativeServiceProvider` with service-first/local-fallback routing.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

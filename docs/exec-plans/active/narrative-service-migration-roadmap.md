@@ -92,6 +92,9 @@ Implemented surface:
 When a dedicated narrative service project exists, FNI should send it a
 documented implementation request instead of copying report code across repos.
 
+Status: request document and FNI conformance probe skeleton implemented on
+2026-05-28.
+
 Requested service capabilities:
 
 - registry snapshot endpoint;
@@ -109,6 +112,15 @@ Acceptance:
 - service can reproduce the FNI local prototype outputs through HTTP;
 - service returns structured degraded results when source data is missing;
 - FNI can run report smoke tests with `NARRATIVE_SERVICE_URL`.
+
+Implemented surface:
+
+- `docs/product/narrative-service-implementation-request-2026-05-28.md`
+  describes the first service-side build request;
+- `scripts/run_narrative_service_conformance_probe.py` checks the endpoint
+  envelope declared in `config/narrative_service_contract.yaml`;
+- when `NARRATIVE_SERVICE_URL` is absent, the probe writes an explicit
+  `not_configured` report instead of pretending the service passed.
 
 ## Phase 3: FNI Service Consumption
 
@@ -172,12 +184,11 @@ Do not do in this lane yet:
 
 ## Next Recommended Slice
 
-Implement Phase 2 request preparation:
+Implement Phase 3 FNI service consumption:
 
-1. Generate a narrative-service implementation request document for the future
-   service repo.
-2. Specify normalized envelopes for registry, mappings, evidence packs, trust
-   audit, intake, and review queue.
-3. Add an FNI conformance probe skeleton that can hit `NARRATIVE_SERVICE_URL`
-   once the service exists.
-4. Keep local prototype fallback active until the service passes conformance.
+1. Add an HTTP `NarrativeServiceProvider` behind the same provider-neutral
+   interface as `LocalNarrativePrototypeProvider`.
+2. Select service-first mode when `NARRATIVE_SERVICE_URL` is configured.
+3. Preserve explicit fallback diagnostics when local prototype files are used.
+4. Update one report path to disclose `narrative_service`, `local_prototype`,
+   or `not_configured` as the narrative fetch mode.
