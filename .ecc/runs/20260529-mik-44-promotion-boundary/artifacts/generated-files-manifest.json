@@ -1,0 +1,44 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "stock_narrative_service_acceptance_conformance_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T180954+0000/conformance/narrative_service_conformance_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Final MIK-44 acceptance conformance report from a temporary local Narrative Service.",
+      "checksum_sha256": "c1cc1712f4d70c5a16852e09d9c39465f6d4c73e285f562f433ec15ea1fdbf20",
+      "mtime_epoch": 1779991794,
+      "size_bytes": 3280
+    },
+    {
+      "type": "stock_narrative_service_acceptance_provider_smoke_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T180954+0000/provider_smoke/narrative_service_provider_smoke.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Provider smoke output proving FNI consumed narrative data from the local Narrative Service.",
+      "checksum_sha256": "d23c3f72a9f1f11be63c047a35df86f67b4d13320fd30092fb95db1c55faa5ff",
+      "mtime_epoch": 1779991794,
+      "size_bytes": 641
+    },
+    {
+      "type": "stock_narrative_service_acceptance_report_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T180954+0000/fund_holding_exposure_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated fund holding exposure JSON after promotion boundary contract changes.",
+      "checksum_sha256": "f0b6787f0abe825d16d3264a75b8e3547f0f2ad4e29f8512662e1d223f106ab9",
+      "mtime_epoch": 1779991794,
+      "size_bytes": 4989
+    },
+    {
+      "type": "stock_narrative_service_acceptance_report_html",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T180954+0000/fund_holding_exposure_report.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated Chinese HTML fund holding exposure report after promotion boundary contract changes.",
+      "checksum_sha256": "30c62a02ca8bbf4041efec4970fddcb3989517604f4c07b0d367c8f73e2f6c90",
+      "mtime_epoch": 1779991794,
+      "size_bytes": 4512
+    }
+  ]
+}

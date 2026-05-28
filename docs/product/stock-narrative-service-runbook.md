@@ -31,7 +31,8 @@ uv run python scripts/run_stock_narrative_service.py \
   --evidence-packs-path data/registry/mapping_evidence_packs.v0.json \
   --candidate-events-path data/fixtures/candidate_narrative_events.v1.json \
   --intake-ledger-path services/stock-narrative-service/data/runtime/candidate_intake_events.json \
-  --review-actions-path services/stock-narrative-service/data/runtime/review_actions.json
+  --review-actions-path services/stock-narrative-service/data/runtime/review_actions.json \
+  --promotion-decisions-path services/stock-narrative-service/data/runtime/promotion_decisions.json
 ```
 
 ## Health Check
@@ -204,6 +205,36 @@ Forbidden transitions:
 - promotion preflight is read-only and must not create trusted records;
 - trust audit can produce an audit result, but only the future promotion
   transaction may write `trusted_validated`.
+
+## Promotion Transaction Boundary
+
+The reserved promotion command surface is:
+
+```text
+POST /api/v1/narratives/promotion/commit
+```
+
+It is not enabled in the current slice. When implemented, it is the only legal
+write boundary for `candidate_untrusted -> trusted_validated` and must require:
+
+- candidate id and target narrative id;
+- review action id with latest action `approve`;
+- trust audit id with result `passed`;
+- promoter identity and promotion note;
+- source evidence, mapping rationale, and exclusion criteria gates already
+  satisfied.
+
+The transaction write set is all-or-none:
+
+- trusted registry record;
+- trusted stock mapping record;
+- trusted evidence pack record;
+- promotion decision ledger record.
+
+Partial writes are forbidden. Failed promotion commands must write no records.
+Retry semantics must be idempotent only after a successful decision exists.
+Promotion decisions use the reserved `narrative-promotion-decisions-v1` ledger
+and `PD_*` immutable decision ids.
 
 ## Trust Rules
 

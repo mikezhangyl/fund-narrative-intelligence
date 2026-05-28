@@ -18,6 +18,7 @@ from stock_narrative_service.identity import (
 
 INTAKE_LEDGER_VERSION = "service-intake-events-v1"
 REVIEW_ACTION_LEDGER_VERSION = "narrative-review-actions-v1"
+PROMOTION_DECISION_LEDGER_VERSION = "narrative-promotion-decisions-v1"
 PROVIDER_PREFERENCE_BY_SOURCE_TYPE = {
     "news": ["gateway_news_briefs", "tushare_news"],
     "announcement": ["gateway_announcements", "tushare_announcements"],
@@ -85,6 +86,12 @@ class NarrativeStore:
         if not path.exists():
             return {"version": REVIEW_ACTION_LEDGER_VERSION, "items": []}
         return _load_object(path, label="review actions")
+
+    def promotion_decisions(self) -> dict[str, Any]:
+        path = self.config.promotion_decisions_path
+        if not path.exists():
+            return {"version": PROMOTION_DECISION_LEDGER_VERSION, "items": []}
+        return _load_object(path, label="promotion decisions")
 
     def candidates(self) -> dict[str, Any]:
         registry_candidates = _list(self.registry().get("candidate_narratives"))

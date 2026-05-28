@@ -258,6 +258,50 @@ def test_narrative_service_contract_declares_trust_state_machine():
         ]
 
 
+def test_narrative_service_contract_declares_promotion_transaction_boundary():
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    boundary = contract["promotion_transaction_boundary"]
+
+    assert boundary["command_surface"] == {
+        "mode": "reserved_http_endpoint",
+        "endpoint": "/api/v1/narratives/promotion/commit",
+        "current_status": "reserved_until_trusted_promotion_workflow",
+    }
+    assert boundary["command_required_fields"] == [
+        "candidate_narrative_id",
+        "target_narrative_id",
+        "review_action_id",
+        "trust_audit_id",
+        "promoted_by",
+        "promotion_note",
+    ]
+    assert boundary["atomic_write_set"] == [
+        "trusted_registry_record",
+        "trusted_stock_mapping_record",
+        "trusted_evidence_pack_record",
+        "promotion_decision_ledger_record",
+    ]
+    assert boundary["transaction_rule"] == "all_or_none"
+    assert boundary["failure_behavior"]["partial_write_allowed"] is False
+    assert boundary["failure_behavior"]["rollback_required"] is True
+    assert boundary["audit_record_schema"]["record_type"] == "promotion_decision"
+    assert boundary["audit_record_schema"]["decision_id_prefix"] == "PD"
+    assert "promotion_decision_id" in boundary["audit_record_schema"][
+        "required_fields"
+    ]
+    assert boundary["forbidden_callers"] == [
+        "candidate_intake",
+        "review_action",
+        "promotion_preflight",
+        "trust_audit_read",
+    ]
+
+
 def test_narrative_service_contract_declares_candidate_detail_endpoint():
     contract = yaml.safe_load(
         (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(

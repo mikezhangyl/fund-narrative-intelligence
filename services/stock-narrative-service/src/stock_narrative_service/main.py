@@ -17,6 +17,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--candidate-events-path", type=Path)
     parser.add_argument("--intake-ledger-path", type=Path)
     parser.add_argument("--review-actions-path", type=Path)
+    parser.add_argument("--promotion-decisions-path", type=Path)
     return parser
 
 
@@ -43,6 +44,9 @@ def _config_from_args(args: argparse.Namespace) -> ServiceConfig:
         candidate_events_path=args.candidate_events_path or defaults.candidate_events_path,
         intake_ledger_path=args.intake_ledger_path or defaults.intake_ledger_path,
         review_actions_path=args.review_actions_path or defaults.review_actions_path,
+        promotion_decisions_path=(
+            args.promotion_decisions_path or defaults.promotion_decisions_path
+        ),
     )
 
 

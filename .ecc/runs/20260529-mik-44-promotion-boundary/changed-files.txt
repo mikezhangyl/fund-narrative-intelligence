@@ -1,0 +1,16 @@
+config/narrative_service_contract.yaml
+docs/memory/current-brief.md
+docs/product/stock-narrative-service-runbook.md
+scripts/validate_stock_narrative_service_acceptance.py
+services/stock-narrative-service/src/stock_narrative_service/config.py
+services/stock-narrative-service/src/stock_narrative_service/main.py
+services/stock-narrative-service/src/stock_narrative_service/storage.py
+services/stock-narrative-service/tests/test_http_service.py
+tests/test_narrative_service_conformance_probe.py
+.ecc/runs/20260529-mik-44-promotion-boundary/artifacts/generated-files-manifest.json
+.ecc/runs/20260529-mik-44-promotion-boundary/changed-files.txt
+.ecc/runs/20260529-mik-44-promotion-boundary/quality-agent/findings.json
+.ecc/runs/20260529-mik-44-promotion-boundary/quality-agent/review-state.json
+.ecc/runs/20260529-mik-44-promotion-boundary/run-state.json
+.ecc/runs/20260529-mik-44-promotion-boundary/task-brief.md
+.ecc/runs/20260529-mik-44-promotion-boundary/task-handoff.md

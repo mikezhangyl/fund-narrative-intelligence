@@ -1,0 +1,10 @@
+{
+  "reviewed_snapshot_type": "working_tree",
+  "reviewed_commit": null,
+  "review_outcome": "passed",
+  "reviewer": "parent-self-review",
+  "notes": [
+    "Reviewed promotion boundary contract, reserved ledger path, and non-promotion invariants for intake, review action, and preflight.",
+    "No critical or high findings."
+  ]
+}

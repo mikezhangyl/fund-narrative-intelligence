@@ -236,6 +236,70 @@ trust_state_machine:
         to: trusted_validated
         required_queue_status: ready_for_trust_audit
 
+promotion_transaction_boundary:
+  command_surface:
+    mode: reserved_http_endpoint
+    endpoint: /api/v1/narratives/promotion/commit
+    current_status: reserved_until_trusted_promotion_workflow
+  command_required_fields:
+    - candidate_narrative_id
+    - target_narrative_id
+    - review_action_id
+    - trust_audit_id
+    - promoted_by
+    - promotion_note
+  optional_fields:
+    - idempotency_key
+    - target_stock_codes
+    - target_mapping_ids
+    - evidence_pack_ids
+  prerequisites:
+    candidate_state: candidate_untrusted
+    queue_status: ready_for_trust_audit
+    latest_review_action: approve
+    trust_audit_result: passed
+    source_evidence: present
+    mapping_rationale: present
+    exclusion_criteria: present
+  atomic_write_set:
+    - trusted_registry_record
+    - trusted_stock_mapping_record
+    - trusted_evidence_pack_record
+    - promotion_decision_ledger_record
+  transaction_rule: all_or_none
+  failure_behavior:
+    partial_write_allowed: false
+    rollback_required: true
+    failed_command_writes: none
+    retry_semantics: idempotency_key_replays_existing_decision_after_success_only
+  audit_record_schema:
+    ledger_version: narrative-promotion-decisions-v1
+    record_type: promotion_decision
+    decision_id_prefix: PD
+    required_fields:
+      - schema_version
+      - ledger_record_type
+      - ledger_sequence
+      - recorded_at
+      - promotion_decision_id
+      - candidate_narrative_id
+      - target_narrative_id
+      - review_action_id
+      - trust_audit_id
+      - promoted_by
+      - promoted_at
+      - promotion_note
+      - source_metadata
+      - trust_status_before
+      - trust_status_after
+      - atomic_write_set
+      - rollback_plan
+  forbidden_callers:
+    - candidate_intake
+    - review_action
+    - promotion_preflight
+    - trust_audit_read
+
 storage_policy:
   current_store: json_file_ledgers_v1
   append_only_ledgers:

@@ -47,6 +47,7 @@ def main(argv: list[str] | None = None) -> int:
     config = ServiceConfig(
         intake_ledger_path=output_dir / "runtime" / "candidate_intake_events.json",
         review_actions_path=output_dir / "runtime" / "review_actions.json",
+        promotion_decisions_path=output_dir / "runtime" / "promotion_decisions.json",
     )
     server = create_server((args.host, args.port), config=config)
     thread = threading.Thread(target=server.serve_forever, daemon=True)

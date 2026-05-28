@@ -963,6 +963,77 @@ def test_promotion_preflight_blocks_until_review_action_exists(tmp_path):
     assert "trusted_validated" not in json.dumps(ready, ensure_ascii=False)
 
 
+def test_intake_review_and_preflight_cannot_create_trusted_records(tmp_path):
+    config = _write_seed_files(tmp_path)
+    source_snapshots = {
+        config.registry_path: config.registry_path.read_text(encoding="utf-8"),
+        config.mappings_path: config.mappings_path.read_text(encoding="utf-8"),
+        config.evidence_packs_path: config.evidence_packs_path.read_text(
+            encoding="utf-8"
+        ),
+    }
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        intake = _post_json(
+            f"{base_url}/api/v1/narratives/intake/events",
+            {
+                "events": [
+                    {
+                        "event_id": "EVT_PROMOTION_BOUNDARY",
+                        "source_type": "manual",
+                        "event_time": "2026-05-28T10:00:00+08:00",
+                        "title": "Boundary candidate",
+                        "source_url": "manual://promotion-boundary",
+                        "candidate_narratives": [
+                            {
+                                "candidate_narrative_id": "C_BOUNDARY",
+                                "name": "Boundary candidate",
+                                "canonical_taxonomy": "boundary",
+                                "confidence": 0.7,
+                            }
+                        ],
+                    }
+                ]
+            },
+        )
+        review = _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Approval alone must not promote.",
+            },
+        )
+        preflight = _post_json(
+            f"{base_url}/api/v1/narratives/promotion/preflight",
+            {"candidate_narrative_id": "C_SEED"},
+        )
+        candidates = _get_json(f"{base_url}/api/v1/narratives/candidates")
+        audit = _get_json(f"{base_url}/api/v1/narratives/trust-audits/latest")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert intake["data"]["candidate_narratives"][0]["trust_status"] == (
+        "candidate_untrusted"
+    )
+    assert review["data"]["decision"]["promotion_effect"] == "none"
+    assert preflight["data"]["result"] == "ready_for_trust_audit"
+    assert preflight["data"]["promotion_effect"] == "none"
+    assert audit["data"]["result"] == "blocked"
+    assert {
+        item["trust_status"] for item in candidates["data"]["candidate_narratives"]
+    } == {"candidate_untrusted"}
+    for payload in (intake, review, preflight, candidates, audit):
+        assert "trusted_validated" not in json.dumps(payload, ensure_ascii=False)
+    for path, before_text in source_snapshots.items():
+        assert path.read_text(encoding="utf-8") == before_text
+    assert not config.promotion_decisions_path.exists()
+
+
 def test_promotion_preflight_rejects_unknown_candidate(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -1007,6 +1078,7 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
     events_path = tmp_path / "events.json"
     intake_ledger_path = tmp_path / "runtime" / "intake_events.json"
     review_actions_path = tmp_path / "runtime" / "review_actions.json"
+    promotion_decisions_path = tmp_path / "runtime" / "promotion_decisions.json"
     registry_path.write_text(
         json.dumps(
             {
@@ -1070,6 +1142,7 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
         candidate_events_path=events_path,
         intake_ledger_path=intake_ledger_path,
         review_actions_path=review_actions_path,
+        promotion_decisions_path=promotion_decisions_path,
     )
 
 
