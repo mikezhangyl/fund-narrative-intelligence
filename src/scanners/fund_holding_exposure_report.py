@@ -26,6 +26,7 @@ def execute_fund_holding_exposure_report(
     config: FundHoldingExposureConfig,
     narrative_registry: dict[str, Any],
     stock_narrative_mappings: list[dict[str, Any]],
+    narrative_source: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     failures: list[dict[str, str]] = []
     profile_rows = _safe_fetch_profile(data_source, config, failures)
@@ -34,6 +35,7 @@ def execute_fund_holding_exposure_report(
     membership_rows = _safe_fetch_memberships(data_source, config, holdings, failures)
     industry_exposures = _industry_exposures(holdings)
     sector_exposures = _sector_exposures(holdings, membership_rows)
+    narrative_source_payload = _narrative_source_payload(narrative_source)
     narrative_exposures = _narrative_exposures(
         holdings=holdings,
         narrative_registry=narrative_registry,
@@ -69,8 +71,10 @@ def execute_fund_holding_exposure_report(
             "industry_exposure_count": len(industry_exposures),
             "sector_exposure_count": len(sector_exposures),
             "narrative_exposure_count": len(narrative_exposures),
+            "narrative_source": narrative_source_payload["source"],
             "data_gap_count": len(data_gaps),
         },
+        "narrative_source": narrative_source_payload,
         "holdings": holdings,
         "industry_exposures": industry_exposures,
         "sector_exposures": sector_exposures,
@@ -114,6 +118,7 @@ def render_html_report(report: dict[str, Any]) -> str:
             _html_kv("基金名称", fund.get("fund_name", "")),
             _html_kv("生成时间", report.get("generated_at", "")),
             _html_trust_notice(report.get("intelligence_trust")),
+            _html_narrative_source_notice(report.get("narrative_source")),
             "<p>本报告用于观察基金持仓的行业、板块与叙事暴露，不构成投资建议、交易策略或涨跌预测。</p>",
             "</section>",
             "<section>",
@@ -403,6 +408,21 @@ def _intelligence_trust(
         "trust_warning_zh": _trust_warning(registry_status, mapping_statuses),
         "registry_trust_note": str(registry_trust.get("trust_note") or ""),
         "mapping_trust_notes": mapping_notes,
+    }
+
+
+def _narrative_source_payload(value: dict[str, Any] | None) -> dict[str, Any]:
+    source = _mapping(value)
+    warnings = source.get("warnings") if isinstance(source.get("warnings"), list) else []
+    diagnostics = _mapping(source.get("diagnostics"))
+    return {
+        "source": str(source.get("source") or "unspecified"),
+        "provider": str(source.get("provider") or ""),
+        "provider_version": str(source.get("provider_version") or ""),
+        "data_fetch_mode": str(source.get("data_fetch_mode") or ""),
+        "warning_count": len(warnings),
+        "warnings": [dict(item) for item in warnings if isinstance(item, dict)],
+        "diagnostics": dict(diagnostics),
     }
 
 
@@ -712,6 +732,21 @@ def _html_trust_notice(value: Any) -> str:
     return f'<p class="trust-warning">{_html_text(warning)}</p>'
 
 
+def _html_narrative_source_notice(value: Any) -> str:
+    source = _mapping(value)
+    return "\n".join(
+        [
+            '<div class="source-notice">',
+            "<h2>叙事数据来源</h2>",
+            _html_kv("来源", source.get("source", "unspecified")),
+            _html_kv("Provider", source.get("provider", "")),
+            _html_kv("模式", source.get("data_fetch_mode", "")),
+            _html_kv("告警数", source.get("warning_count", 0)),
+            "</div>",
+        ]
+    )
+
+
 def _status_label(status: str) -> str:
     return {
         "completed": "完成",
@@ -735,6 +770,9 @@ h2 { font-size: 20px; margin: 0 0 12px; }
 p { line-height: 1.65; }
 .summary { border-left: 4px solid #2563eb; }
 .trust-warning { border: 1px solid #f59e0b; background: #fffbeb; color: #92400e; padding: 10px; }
+.source-notice { border: 1px solid #cbd5e1; background: #f8fafc; padding: 10px; margin: 10px 0; }
+.source-notice h2 { font-size: 16px; margin: 0 0 8px; }
+.source-notice p { margin: 4px 0; }
 .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
 .metric { border: 1px solid #e3e8ef; padding: 10px; background: #fbfcfe; }
 .metric span { display: block; color: #5b6472; font-size: 12px; }

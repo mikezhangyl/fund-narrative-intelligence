@@ -12,6 +12,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts.run_fund_holding_exposure_report import (  # noqa: E402
     INTELLIGENCE_MODES,
+    _normalize_context,
     load_intelligence_context,
 )
 from src.config import DEFAULT_OUTPUT_DIR  # noqa: E402
@@ -69,9 +70,11 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--sector-types must contain at least one type")
     output_dir = args.output_dir or DEFAULT_OUTPUT_DIR / "fund_narrative_exposure_matrix"
     output_dir.mkdir(parents=True, exist_ok=True)
-    narrative_registry, stock_mappings = load_intelligence_context(
-        registry_mode=args.narrative_registry_mode,
-        stock_mapping_mode=args.stock_mapping_mode,
+    narrative_registry, stock_mappings, narrative_source = _normalize_context(
+        load_intelligence_context(
+            registry_mode=args.narrative_registry_mode,
+            stock_mapping_mode=args.stock_mapping_mode,
+        )
     )
     report = execute_fund_narrative_exposure_matrix_report(
         data_source=ConsolidatedMarketDataSource(),
@@ -87,6 +90,7 @@ def main(argv: list[str] | None = None) -> int:
         ),
         narrative_registry=narrative_registry,
         stock_narrative_mappings=stock_mappings,
+        narrative_source=narrative_source,
     )
     _write_outputs(output_dir=output_dir, report=report)
     print(

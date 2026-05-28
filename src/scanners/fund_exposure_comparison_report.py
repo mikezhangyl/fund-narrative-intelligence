@@ -32,6 +32,7 @@ def execute_fund_exposure_comparison_report(
     config: FundExposureComparisonConfig,
     narrative_registry: dict[str, Any],
     stock_narrative_mappings: list[dict[str, Any]],
+    narrative_source: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     fund_codes = _unique_fund_codes(config.fund_codes)
     fund_reports = [
@@ -47,6 +48,7 @@ def execute_fund_exposure_comparison_report(
             ),
             narrative_registry=narrative_registry,
             stock_narrative_mappings=stock_narrative_mappings,
+            narrative_source=narrative_source,
         )
         for fund_code in fund_codes
     ]
@@ -71,7 +73,9 @@ def execute_fund_exposure_comparison_report(
             "holding_overlap_pair_count": len(overlap_pairs),
             "common_narrative_count": len(common_narratives),
             "differentiating_narrative_count": len(differentiating_narratives),
+            "narrative_source": _narrative_source(fund_reports),
         },
+        "narrative_source": _first_narrative_source(fund_reports),
         "funds": funds,
         "holding_overlap_pairs": overlap_pairs,
         "common_narrative_exposures": common_narratives,
@@ -105,6 +109,7 @@ def render_html_report(report: dict[str, Any]) -> str:
             '<section class="summary">',
             _html_kv("报告状态", _status_label(str(report.get("status", "")))),
             _html_kv("生成时间", report.get("generated_at", "")),
+            _html_narrative_source_notice(report.get("narrative_source")),
             "<p>本报告用于横向观察基金持仓、行业与叙事暴露差异，不构成投资建议、交易策略或涨跌预测。</p>",
             "</section>",
             "<section>",
@@ -190,6 +195,18 @@ def _fund_summary(report: dict[str, Any]) -> dict[str, Any]:
         "top_narrative_raw_exposure": _float(top_narrative.get("raw_exposure")),
         "data_gap_count": len(_list(report.get("data_gaps"))),
     }
+
+
+def _first_narrative_source(fund_reports: list[dict[str, Any]]) -> dict[str, Any]:
+    for report in fund_reports:
+        source = report.get("narrative_source")
+        if isinstance(source, dict):
+            return dict(source)
+    return {"source": "unspecified"}
+
+
+def _narrative_source(fund_reports: list[dict[str, Any]]) -> str:
+    return str(_first_narrative_source(fund_reports).get("source") or "unspecified")
 
 
 def _concentration(holdings: list[dict[str, Any]]) -> dict[str, float]:
@@ -406,6 +423,20 @@ def _html_metric(label: str, value: Any) -> str:
     )
 
 
+def _html_narrative_source_notice(value: Any) -> str:
+    source = _mapping(value)
+    return "\n".join(
+        [
+            '<div class="source-notice">',
+            "<h2>叙事数据来源</h2>",
+            _html_kv("来源", source.get("source", "unspecified")),
+            _html_kv("Provider", source.get("provider", "")),
+            _html_kv("告警数", source.get("warning_count", 0)),
+            "</div>",
+        ]
+    )
+
+
 def _status_label(status: str) -> str:
     return {
         "completed": "完成",
@@ -450,6 +481,9 @@ h1 { font-size: 30px; margin: 0 0 16px; }
 h2 { font-size: 20px; margin: 0 0 12px; }
 p { line-height: 1.65; }
 .summary { border-left: 4px solid #2563eb; }
+.source-notice { border: 1px solid #cbd5e1; background: #f8fafc; padding: 10px; margin: 10px 0; }
+.source-notice h2 { font-size: 16px; margin: 0 0 8px; }
+.source-notice p { margin: 4px 0; }
 .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
 .metric { border: 1px solid #e3e8ef; padding: 10px; background: #fbfcfe; }
 .metric span { display: block; color: #5b6472; font-size: 12px; }

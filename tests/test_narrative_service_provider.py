@@ -73,7 +73,7 @@ def test_fund_holding_exposure_loader_uses_local_prototype_for_reviewed_inputs(
 ):
     monkeypatch.delenv("NARRATIVE_SERVICE_URL", raising=False)
 
-    registry, mappings = load_intelligence_context(
+    registry, mappings, source = load_intelligence_context(
         registry_mode="reviewed",
         stock_mapping_mode="reviewed",
     )
@@ -83,6 +83,7 @@ def test_fund_holding_exposure_loader_uses_local_prototype_for_reviewed_inputs(
     assert {mapping["source_trust_status"] for mapping in mappings} == {
         "untrusted_experimental"
     }
+    assert source["source"] == "local_prototype"
 
 
 def test_narrative_service_contract_declares_required_surfaces():

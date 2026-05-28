@@ -195,12 +195,32 @@ Do not do in this lane yet:
   Tushare news, company announcements, market-data gateway news briefs, or
   curated manual research?
 
+## Phase 3b: Report Source Disclosure
+
+Status: implemented on 2026-05-28.
+
+Implemented surface:
+
+- fund holding exposure report JSON/HTML now includes `narrative_source`;
+- fund exposure comparison report propagates narrative source from child fund
+  reports and renders it in HTML;
+- fund narrative exposure matrix propagates narrative source from comparison
+  output and renders it in HTML;
+- CLI paths remain compatible with older two-value test doubles through
+  `_normalize_context`.
+
+Acceptance:
+
+- users can see whether narrative data came from `narrative_service`,
+  `local_prototype`, or an unspecified/legacy path;
+- service fallback does not alter trust status;
+- report JSON keeps warnings and diagnostics for downstream UI use.
+
 ## Next Recommended Slice
 
-Implement the next Phase 3 reporting disclosure slice:
+Implement the next Phase 3 service smoke slice:
 
-1. Carry provider snapshot diagnostics into fund exposure reports.
-2. Render narrative fetch mode as `narrative_service`, `local_prototype`, or
-   service-failed fallback in JSON/HTML.
-3. Add a dry-run smoke with a fake HTTP service fixture.
-4. Keep trusted status unchanged when service fallback occurs.
+1. Add a small fake narrative service fixture/server for local dry-run smoke.
+2. Prove `NARRATIVE_SERVICE_URL=<fake>` makes FNI use HTTP service data.
+3. Prove service failure falls back to local prototype with visible warning.
+4. Keep this as a test/probe utility, not production service code.

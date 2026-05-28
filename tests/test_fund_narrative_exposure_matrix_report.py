@@ -113,7 +113,9 @@ def test_execute_fund_narrative_exposure_matrix_identifies_overlap_and_differenc
         "high_homogeneity_pair_count": 1,
         "differentiating_narrative_count": 3,
         "data_gap_count": 5,
+        "narrative_source": "unspecified",
     }
+    assert report["narrative_source"]["source"] == "unspecified"
     assert report["narrative_columns"][0] == {
         "narrative_id": "N_BAIJIU_CONSUMPTION",
         "narrative_name": "高端白酒消费",
@@ -148,6 +150,8 @@ def test_render_fund_narrative_exposure_matrix_html_contains_key_sections():
     assert "同质化基金对" in html
     assert "差异化叙事" in html
     assert "数据缺口" in html
+    assert "叙事数据来源" in html
+    assert "unspecified" in html
     assert "不构成投资建议" in html
 
 
@@ -182,8 +186,10 @@ def test_run_fund_narrative_exposure_matrix_report_writes_json_and_html(
 
     assert exit_code == 0
     assert payload["summary"]["fund_count"] == 3
+    assert payload["summary"]["narrative_source"] == "unspecified"
     assert payload["high_homogeneity_pairs"][0]["fund_b"] == "012414"
     assert "<h1>基金组合叙事暴露矩阵</h1>" in html
+    assert "叙事数据来源" in html
 
 
 def _holding(

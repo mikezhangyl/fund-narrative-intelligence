@@ -57,7 +57,9 @@ The first FNI consumer contract is recorded in
 `config/narrative_service_contract.yaml`, with local fallback implemented by
 `src/providers/narrative_service.py`. When `NARRATIVE_SERVICE_URL` is
 configured, FNI can now use `NarrativeServiceProvider` in service-first mode
-with explicit local fallback through `FallbackNarrativeDataProvider`.
+with explicit local fallback through `FallbackNarrativeDataProvider`. Fund
+holding exposure, fund exposure comparison, and fund narrative exposure matrix
+reports disclose the narrative data source in JSON/HTML.
 
 The first engineering acceptance command is:
 

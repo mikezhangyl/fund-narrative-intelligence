@@ -70,9 +70,12 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--sector-types must contain at least one type")
     output_dir = args.output_dir or DEFAULT_OUTPUT_DIR / "fund_holding_exposure"
     output_dir.mkdir(parents=True, exist_ok=True)
-    narrative_registry, stock_mappings = load_intelligence_context(
+    intelligence_context = load_intelligence_context(
         registry_mode=args.narrative_registry_mode,
         stock_mapping_mode=args.stock_mapping_mode,
+    )
+    narrative_registry, stock_mappings, narrative_source = _normalize_context(
+        intelligence_context
     )
     report = execute_fund_holding_exposure_report(
         data_source=ConsolidatedMarketDataSource(),
@@ -86,6 +89,7 @@ def main(argv: list[str] | None = None) -> int:
         ),
         narrative_registry=narrative_registry,
         stock_narrative_mappings=stock_mappings,
+        narrative_source=narrative_source,
     )
     _write_outputs(output_dir=output_dir, report=report)
     print(
@@ -105,9 +109,14 @@ def load_intelligence_context(
     *,
     registry_mode: str,
     stock_mapping_mode: str,
-) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
     if registry_mode == "reviewed" and stock_mapping_mode == "reviewed":
-        return build_narrative_data_provider().get_report_inputs()
+        snapshot = build_narrative_data_provider().get_snapshot()
+        return (
+            snapshot["narrative_registry"],
+            snapshot["stock_narrative_mappings"],
+            _narrative_source_from_snapshot(snapshot),
+        )
     registry_provider = (
         ReviewedNarrativeRegistryProvider()
         if registry_mode == "reviewed"
@@ -118,10 +127,56 @@ def load_intelligence_context(
         if stock_mapping_mode == "reviewed"
         else MockStockNarrativeMappingProvider()
     )
+    registry = registry_provider.get_narrative_registry()
+    mappings = mapping_provider.get_stock_narrative_mappings()
     return (
-        registry_provider.get_narrative_registry(),
-        mapping_provider.get_stock_narrative_mappings(),
+        registry,
+        mappings,
+        {
+            "source": "legacy_intelligence_provider",
+            "provider": type(registry_provider).__name__,
+            "provider_version": "",
+            "data_fetch_mode": f"{registry_mode}/{stock_mapping_mode}",
+            "warnings": [],
+            "diagnostics": {"service_ready": False},
+        },
     )
+
+
+def _normalize_context(
+    value: Any,
+) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
+    if not isinstance(value, tuple):
+        raise TypeError("load_intelligence_context must return a tuple")
+    if len(value) == 2:
+        registry, mappings = value
+        return (
+            registry,
+            mappings,
+            {
+                "source": "unspecified",
+                "provider": "",
+                "provider_version": "",
+                "data_fetch_mode": "",
+                "warnings": [],
+                "diagnostics": {},
+            },
+        )
+    if len(value) == 3:
+        registry, mappings, source = value
+        return registry, mappings, source
+    raise ValueError("load_intelligence_context must return 2 or 3 values")
+
+
+def _narrative_source_from_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "source": str(snapshot.get("source") or ""),
+        "provider": str(snapshot.get("provider") or ""),
+        "provider_version": str(snapshot.get("provider_version") or ""),
+        "data_fetch_mode": str(snapshot.get("source") or ""),
+        "warnings": list(snapshot.get("warnings") or []),
+        "diagnostics": dict(snapshot.get("diagnostics") or {}),
+    }
 
 
 def _write_outputs(*, output_dir: Path, report: dict[str, Any]) -> None:

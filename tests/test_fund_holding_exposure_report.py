@@ -161,7 +161,30 @@ def test_execute_fund_holding_exposure_report_aggregates_gateway_holdings():
     assert report["intelligence_trust"]["mapping_trust_statuses"] == [
         "untrusted_experimental"
     ]
+    assert report["narrative_source"]["source"] == "unspecified"
     assert report["data_gaps"] == []
+
+
+def test_execute_fund_holding_exposure_report_includes_narrative_source_diagnostics():
+    report = execute_fund_holding_exposure_report(
+        data_source=FakeFundExposureSource(),
+        config=FundHoldingExposureConfig(fund_code="161725"),
+        narrative_registry=NARRATIVE_REGISTRY,
+        stock_narrative_mappings=STOCK_MAPPINGS,
+        narrative_source={
+            "source": "local_prototype",
+            "provider": "local-narrative-prototype-provider",
+            "provider_version": "local-narrative-prototype-v1",
+            "data_fetch_mode": "local_fallback",
+            "warnings": [{"code": "LOCAL_PROTOTYPE_FALLBACK", "message": "fallback"}],
+            "diagnostics": {"service_ready": False},
+        },
+    )
+
+    assert report["narrative_source"]["source"] == "local_prototype"
+    assert report["narrative_source"]["provider"] == "local-narrative-prototype-provider"
+    assert report["narrative_source"]["warning_count"] == 1
+    assert report["summary"]["narrative_source"] == "local_prototype"
 
 
 def test_execute_fund_holding_exposure_report_keeps_partial_result_on_membership_failure():
@@ -205,6 +228,8 @@ def test_render_fund_holding_exposure_html_contains_key_sections():
     assert "招商中证白酒指数" in html
     assert "高端白酒消费" in html
     assert "实验性本地知识种子" in html
+    assert "叙事数据来源" in html
+    assert "unspecified" in html
     assert "不构成投资建议" in html
 
 
@@ -243,3 +268,44 @@ def test_run_fund_holding_exposure_report_writes_json_and_html(monkeypatch, tmp_
     assert payload["summary"]["holding_count"] == 2
     assert payload["narrative_exposures"][0]["narrative_name"] == "高端白酒消费"
     assert "<h1>基金持仓暴露报告</h1>" in html
+
+
+def test_run_fund_holding_exposure_report_writes_narrative_source(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        run_fund_holding_exposure_report,
+        "ConsolidatedMarketDataSource",
+        lambda: FakeFundExposureSource(),
+    )
+    monkeypatch.setattr(
+        run_fund_holding_exposure_report,
+        "load_intelligence_context",
+        lambda registry_mode, stock_mapping_mode: (
+            NARRATIVE_REGISTRY,
+            STOCK_MAPPINGS,
+            {
+                "source": "narrative_service",
+                "provider": "fake-service",
+                "provider_version": "fake-v1",
+                "data_fetch_mode": "narrative_service",
+                "warnings": [],
+                "diagnostics": {"service_ready": True},
+            },
+        ),
+    )
+
+    exit_code = run_fund_holding_exposure_report.main(
+        [
+            "--fund-code",
+            "161725",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    payload = json.loads((tmp_path / "fund_holding_exposure_report.json").read_text())
+    html = (tmp_path / "fund_holding_exposure_report.html").read_text()
+
+    assert exit_code == 0
+    assert payload["narrative_source"]["source"] == "narrative_service"
+    assert payload["narrative_source"]["provider"] == "fake-service"
+    assert "narrative_service" in html

@@ -34,6 +34,7 @@ def execute_fund_narrative_exposure_matrix_report(
     config: FundNarrativeExposureMatrixConfig,
     narrative_registry: dict[str, Any],
     stock_narrative_mappings: list[dict[str, Any]],
+    narrative_source: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     comparison = execute_fund_exposure_comparison_report(
         data_source=data_source,
@@ -47,6 +48,7 @@ def execute_fund_narrative_exposure_matrix_report(
         ),
         narrative_registry=narrative_registry,
         stock_narrative_mappings=stock_narrative_mappings,
+        narrative_source=narrative_source,
     )
     fund_reports = _list(comparison.get("fund_reports"))
     fund_rows = _fund_rows(fund_reports, exposure_floor=config.exposure_floor)
@@ -70,7 +72,9 @@ def execute_fund_narrative_exposure_matrix_report(
             "high_homogeneity_pair_count": len(high_pairs),
             "differentiating_narrative_count": len(differentiating),
             "data_gap_count": len(data_gaps),
+            "narrative_source": _narrative_source(comparison),
         },
+        "narrative_source": _mapping(comparison.get("narrative_source")),
         "narrative_columns": narrative_columns,
         "fund_rows": fund_rows,
         "narrative_coverage_rows": _narrative_coverage_rows(fund_rows, narrative_columns),
@@ -107,6 +111,7 @@ def render_html_report(report: dict[str, Any]) -> str:
             '<section class="summary">',
             _html_kv("报告状态", _status_label(str(report.get("status", "")))),
             _html_kv("生成时间", report.get("generated_at", "")),
+            _html_narrative_source_notice(report.get("narrative_source")),
             "<p>本报告用于观察一组基金的叙事暴露重合、同质化与差异化，不构成投资建议、交易策略或涨跌预测。</p>",
             "</section>",
             "<section>",
@@ -316,6 +321,11 @@ def _data_gaps(fund_reports: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+def _narrative_source(comparison: dict[str, Any]) -> str:
+    source = _mapping(comparison.get("narrative_source"))
+    return str(source.get("source") or "unspecified")
+
+
 def _top_narratives(report: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         {
@@ -419,6 +429,20 @@ def _html_metric(label: str, value: Any) -> str:
     )
 
 
+def _html_narrative_source_notice(value: Any) -> str:
+    source = _mapping(value)
+    return "\n".join(
+        [
+            '<div class="source-notice">',
+            "<h2>叙事数据来源</h2>",
+            _html_kv("来源", source.get("source", "unspecified")),
+            _html_kv("Provider", source.get("provider", "")),
+            _html_kv("告警数", source.get("warning_count", 0)),
+            "</div>",
+        ]
+    )
+
+
 def _status_label(status: str) -> str:
     return {
         "completed": "完成",
@@ -459,6 +483,9 @@ h1 { font-size: 30px; margin: 0 0 16px; }
 h2 { font-size: 20px; margin: 0 0 12px; }
 p { line-height: 1.65; }
 .summary { border-left: 4px solid #2563eb; }
+.source-notice { border: 1px solid #cbd5e1; background: #f8fafc; padding: 10px; margin: 10px 0; }
+.source-notice h2 { font-size: 16px; margin: 0 0 8px; }
+.source-notice p { margin: 4px 0; }
 .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
 .metric { border: 1px solid #e3e8ef; padding: 10px; background: #fbfcfe; }
 .metric span { display: block; color: #5b6472; font-size: 12px; }

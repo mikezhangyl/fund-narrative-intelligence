@@ -127,6 +127,8 @@ def test_render_fund_exposure_comparison_html_contains_key_sections():
     assert "招商中证白酒指数" in html
     assert "持仓重合" in html
     assert "差异叙事" in html
+    assert "叙事数据来源" in html
+    assert "unspecified" in html
     assert "不构成投资建议" in html
 
 
@@ -158,8 +160,10 @@ def test_run_fund_exposure_comparison_report_writes_json_and_html(monkeypatch, t
 
     assert exit_code == 0
     assert payload["summary"]["fund_count"] == 2
+    assert payload["summary"]["narrative_source"] == "unspecified"
     assert payload["holding_overlap_pairs"][0]["shared_symbols"] == ["600519"]
     assert "<h1>基金暴露横向比较报告</h1>" in html
+    assert "叙事数据来源" in html
 
 
 def _holding(
