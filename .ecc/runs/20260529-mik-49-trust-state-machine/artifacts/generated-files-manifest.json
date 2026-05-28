@@ -1,0 +1,44 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "stock_narrative_service_acceptance_conformance_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T180424+0000/conformance/narrative_service_conformance_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Final MIK-49 acceptance conformance report from a temporary local Narrative Service.",
+      "checksum_sha256": "97920014797f89722982e0319bfb844c1c2f938a725586e3d6457ca0ae9da454",
+      "mtime_epoch": 1779991464,
+      "size_bytes": 3280
+    },
+    {
+      "type": "stock_narrative_service_acceptance_provider_smoke_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T180424+0000/provider_smoke/narrative_service_provider_smoke.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Provider smoke output proving FNI consumed narrative data from the local Narrative Service.",
+      "checksum_sha256": "4907537d7c8d06b7696cedce12fbdeb78f9d79c4e79b2b2f619dcc8923d0db47",
+      "mtime_epoch": 1779991464,
+      "size_bytes": 641
+    },
+    {
+      "type": "stock_narrative_service_acceptance_report_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T180424+0000/fund_holding_exposure_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated fund holding exposure JSON after trust state disclosure labels were added.",
+      "checksum_sha256": "84719e4b64e1c2557cc070bb8e560073f945c86c63556a5352a2cdb14c0693d7",
+      "mtime_epoch": 1779991464,
+      "size_bytes": 4989
+    },
+    {
+      "type": "stock_narrative_service_acceptance_report_html",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T180424+0000/fund_holding_exposure_report.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated Chinese HTML fund holding exposure report with trust state disclosure labels.",
+      "checksum_sha256": "9b8579d0068a66e4ca2844484aed20452b9a868c62f0a1f490d748d5779cfcc6",
+      "mtime_epoch": 1779991464,
+      "size_bytes": 4512
+    }
+  ]
+}

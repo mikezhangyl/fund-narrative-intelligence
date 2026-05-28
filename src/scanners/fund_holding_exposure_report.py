@@ -6,6 +6,8 @@ from datetime import UTC, datetime
 from html import escape
 from typing import Any
 
+from src.scanners.trust_state_disclosure import trust_state_display_zh
+
 
 @dataclass(frozen=True)
 class FundHoldingExposureConfig:
@@ -404,7 +406,11 @@ def _intelligence_trust(
     registry_status = str(registry_trust.get("trust_status") or "unspecified")
     return {
         "registry_trust_status": registry_status,
+        "registry_trust_status_label_zh": trust_state_display_zh(registry_status),
         "mapping_trust_statuses": mapping_statuses,
+        "mapping_trust_status_labels_zh": [
+            trust_state_display_zh(status) for status in mapping_statuses
+        ],
         "trust_warning_zh": _trust_warning(registry_status, mapping_statuses),
         "registry_trust_note": str(registry_trust.get("trust_note") or ""),
         "mapping_trust_notes": mapping_notes,
@@ -658,6 +664,10 @@ def _mapping(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
+def _list_text(value: Any) -> list[str]:
+    return [str(item) for item in value] if isinstance(value, list) else []
+
+
 def _html_rows_section(
     title: str,
     value: Any,
@@ -729,7 +739,14 @@ def _html_trust_notice(value: Any) -> str:
     warning = trust.get("trust_warning_zh")
     if not warning:
         return ""
-    return f'<p class="trust-warning">{_html_text(warning)}</p>'
+    mapping_labels = _list_text(trust.get("mapping_trust_status_labels_zh"))
+    rows = [
+        f'<p class="trust-warning">{_html_text(warning)}</p>',
+        _html_kv("注册表信任状态", trust.get("registry_trust_status_label_zh", "")),
+    ]
+    if mapping_labels:
+        rows.append(_html_kv("映射信任状态", ", ".join(mapping_labels)))
+    return "\n".join(rows)
 
 
 def _html_narrative_source_notice(value: Any) -> str:

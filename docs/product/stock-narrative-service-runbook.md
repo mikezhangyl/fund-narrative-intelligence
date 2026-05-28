@@ -178,6 +178,33 @@ Neither output promotes registry narratives, stock mappings, evidence packs, or
 trusted stores. Existing narrative reinforcement is source evidence for human
 review and later gates only.
 
+## Trust State Machine
+
+Record states:
+
+- `local_fixture`: local fixture or fallback data only.
+- `candidate_untrusted`: review input created by intake, evidence packs, or
+  other candidate surfaces.
+- `reviewed_experimental`: limited human-reviewed or seeded data that is useful
+  for observation/audit but is not trusted production knowledge. Existing
+  `untrusted_experimental` and `reviewed_untrusted` values are disclosure
+  aliases for this state.
+- `trusted_validated`: data promoted only through a future atomic promotion
+  transaction after evidence, rationale, exclusion criteria, human approval,
+  trust-audit pass, and auditable decision record.
+
+Queue statuses are separate from record states: `pending_review`,
+`approved_blocked_by_evidence`, `ready_for_trust_audit`, `rejected`, and
+`deferred`.
+
+Forbidden transitions:
+
+- intake must not create `reviewed_experimental` or `trusted_validated`;
+- review actions must not mutate record state;
+- promotion preflight is read-only and must not create trusted records;
+- trust audit can produce an audit result, but only the future promotion
+  transaction may write `trusted_validated`.
+
 ## Trust Rules
 
 The service must preserve current trust state:

@@ -1,0 +1,10 @@
+{
+  "reviewed_snapshot_type": "working_tree",
+  "reviewed_commit": null,
+  "review_outcome": "passed",
+  "reviewer": "parent-self-review",
+  "notes": [
+    "Reviewed record-state versus queue-status distinction, forbidden transition assertions, and report label rendering.",
+    "No critical or high findings."
+  ]
+}

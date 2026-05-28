@@ -1,0 +1,10 @@
+{
+  "review_outcome": "passed",
+  "findings": [],
+  "residual_risks": [
+    {
+      "severity": "low",
+      "summary": "The state machine is contract-level and disclosure-level only; MIK-44 still needs to implement the actual promotion transaction boundary."
+    }
+  ]
+}

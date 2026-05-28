@@ -1,0 +1,17 @@
+config/narrative_service_contract.yaml
+docs/memory/current-brief.md
+docs/product/stock-narrative-service-runbook.md
+src/scanners/fund_holding_exposure_report.py
+src/scanners/mapping_evidence_pack_report.py
+src/scanners/trust_state_disclosure.py
+tests/test_fund_holding_exposure_report.py
+tests/test_mapping_evidence_pack_report.py
+tests/test_narrative_service_conformance_probe.py
+tests/test_trust_state_disclosure.py
+.ecc/runs/20260529-mik-49-trust-state-machine/artifacts/generated-files-manifest.json
+.ecc/runs/20260529-mik-49-trust-state-machine/changed-files.txt
+.ecc/runs/20260529-mik-49-trust-state-machine/quality-agent/findings.json
+.ecc/runs/20260529-mik-49-trust-state-machine/quality-agent/review-state.json
+.ecc/runs/20260529-mik-49-trust-state-machine/run-state.json
+.ecc/runs/20260529-mik-49-trust-state-machine/task-brief.md
+.ecc/runs/20260529-mik-49-trust-state-machine/task-handoff.md

@@ -47,6 +47,7 @@ def test_mapping_evidence_pack_html_contains_core_sections():
     assert "映射理由" in html
     assert "排除理由" in html
     assert "candidate_untrusted" in html
+    assert "候选未信任（candidate_untrusted）" in html
 
 
 def test_run_mapping_evidence_pack_report_writes_json_and_html(tmp_path):

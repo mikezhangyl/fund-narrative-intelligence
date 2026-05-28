@@ -214,6 +214,50 @@ def test_narrative_service_contract_declares_provider_aware_intake_policy():
     ]
 
 
+def test_narrative_service_contract_declares_trust_state_machine():
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    machine = contract["trust_state_machine"]
+
+    assert machine["record_states"] == [
+        "local_fixture",
+        "candidate_untrusted",
+        "reviewed_experimental",
+        "trusted_validated",
+    ]
+    assert machine["queue_statuses"] == [
+        "pending_review",
+        "approved_blocked_by_evidence",
+        "ready_for_trust_audit",
+        "rejected",
+        "deferred",
+    ]
+    assert machine["state_aliases"]["untrusted_experimental"] == (
+        "reviewed_experimental"
+    )
+    assert machine["state_aliases"]["reviewed_untrusted"] == (
+        "reviewed_experimental"
+    )
+    assert machine["operations"]["intake"]["record_transitions"] == [
+        {"from": "local_fixture", "to": "candidate_untrusted"}
+    ]
+    assert machine["operations"]["review_action"]["record_transitions"] == []
+    assert machine["operations"]["preflight"]["write_behavior"] == "read_only"
+    assert machine["operations"]["promotion"]["record_transition"] == {
+        "from": "candidate_untrusted",
+        "to": "trusted_validated",
+        "required_queue_status": "ready_for_trust_audit",
+    }
+    for operation in ("intake", "review_action", "preflight"):
+        assert "trusted_validated" in machine["operations"][operation][
+            "forbidden_to_record_states"
+        ]
+
+
 def test_narrative_service_contract_declares_candidate_detail_endpoint():
     contract = yaml.safe_load(
         (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(

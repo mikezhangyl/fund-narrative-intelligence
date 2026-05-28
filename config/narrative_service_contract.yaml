@@ -170,6 +170,72 @@ intake_policy:
     reinforcement_promotion_effect: none
     trusted_promotion_allowed: false
 
+trust_state_machine:
+  record_states:
+    - local_fixture
+    - candidate_untrusted
+    - reviewed_experimental
+    - trusted_validated
+  queue_statuses:
+    - pending_review
+    - approved_blocked_by_evidence
+    - ready_for_trust_audit
+    - rejected
+    - deferred
+  state_aliases:
+    untrusted_experimental: reviewed_experimental
+    reviewed_untrusted: reviewed_experimental
+  report_disclosure_labels_zh:
+    local_fixture: 本地夹具
+    candidate_untrusted: 候选未信任
+    reviewed_experimental: 实验性复核
+    ready_for_trust_audit: 待可信审计
+    trusted_validated: 可信已验证
+    rejected: 已拒绝
+    deferred: 已暂缓
+  operations:
+    intake:
+      write_behavior: append_only_intake_ledger
+      record_transitions:
+        - from: local_fixture
+          to: candidate_untrusted
+      forbidden_to_record_states:
+        - reviewed_experimental
+        - trusted_validated
+    review_action:
+      write_behavior: append_only_review_action_ledger
+      record_transitions: []
+      queue_transitions:
+        approve: ready_for_trust_audit_or_approved_blocked_by_evidence
+        reject: rejected
+        defer: deferred
+      forbidden_to_record_states:
+        - reviewed_experimental
+        - trusted_validated
+    preflight:
+      write_behavior: read_only
+      record_transitions: []
+      queue_transitions:
+        gates_missing: approved_blocked_by_evidence
+        gates_passed: ready_for_trust_audit
+      forbidden_to_record_states:
+        - reviewed_experimental
+        - trusted_validated
+    trust_audit:
+      write_behavior: read_only_audit_result
+      required_input_queue_status: ready_for_trust_audit
+      success_state: ready_for_promotion_command
+      forbidden_to_record_states:
+        - trusted_validated
+    promotion:
+      write_behavior: atomic_promotion_transaction
+      required_input_queue_status: ready_for_trust_audit
+      required_audit_result: passed
+      record_transition:
+        from: candidate_untrusted
+        to: trusted_validated
+        required_queue_status: ready_for_trust_audit
+
 storage_policy:
   current_store: json_file_ledgers_v1
   append_only_ledgers:

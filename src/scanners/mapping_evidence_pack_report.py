@@ -4,6 +4,8 @@ from datetime import UTC, datetime
 from html import escape
 from typing import Any
 
+from src.scanners.trust_state_disclosure import trust_state_display_zh
+
 
 def build_mapping_evidence_pack_report(
     *,
@@ -63,9 +65,13 @@ def render_html_report(report: dict[str, Any]) -> str:
             '<main class="page">',
             "<h1>股票叙事映射证据包</h1>",
             '<section class="summary">',
-            _html_kv("报告状态", report.get("status", "")),
+            _html_kv("报告状态", trust_state_display_zh(report.get("status", ""))),
             _html_kv("生成时间", report.get("generated_at", "")),
-            "<p>本报告用于人工审核候选股票叙事映射。当前证据包仍为 candidate_untrusted，不能直接写入可信映射库。</p>",
+            (
+                "<p>本报告用于人工审核候选股票叙事映射。当前证据包仍为 "
+                f"{_html_text(trust_state_display_zh('candidate_untrusted'))}"
+                "，不能直接写入可信映射库。</p>"
+            ),
             "</section>",
             "<section>",
             "<h2>覆盖概览</h2>",
@@ -149,7 +155,9 @@ def _packs_html(value: Any) -> str:
             sections.append(
                 "<div class=\"mapping\">"
                 f"<h4>{_html_text(mapping.get('narrative_name'))} "
-                f"<span>{_html_text(mapping.get('trust_status'))}</span></h4>"
+                "<span>"
+                f"{_html_text(trust_state_display_zh(mapping.get('trust_status')))}"
+                "</span></h4>"
                 f"<p><strong>映射理由:</strong> {_html_text(mapping.get('mapping_rationale'))}</p>"
                 f"<p><strong>排除理由:</strong> {_html_text(_cell_value(mapping.get('exclusion_rationale')))}</p>"
                 f"<p><strong>证据:</strong> {_html_text(_evidence_summary(mapping.get('evidence_items')))}</p>"

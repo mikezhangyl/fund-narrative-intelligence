@@ -228,6 +228,7 @@ def test_render_fund_holding_exposure_html_contains_key_sections():
     assert "招商中证白酒指数" in html
     assert "高端白酒消费" in html
     assert "实验性本地知识种子" in html
+    assert "实验性复核（reviewed_experimental）" in html
     assert "叙事数据来源" in html
     assert "unspecified" in html
     assert "不构成投资建议" in html
