@@ -88,6 +88,8 @@ Narrative Service identity rules now preserve explicit IDs and otherwise derive 
 
 Narrative Service now exposes `GET /api/v1/narratives/candidates/{candidate_narrative_id}` for candidate detail. The detail read model includes candidate metadata, trust status, full review history, latest review action, promotion preflight gates, missing gates, recommended action, and source evidence references. Unknown candidates return a `status=missing` envelope without writing registry, mapping, evidence, intake, or review-action files.
 
+Narrative Service now exposes evidence pack detail through `GET /api/v1/narratives/evidence-packs/{evidence_pack_id}` and query lookup `GET /api/v1/narratives/evidence-packs/detail?stock_code=...&narrative_id=...`. The detail read model includes mapping rationale, exclusion rationale, confidence components, normalized evidence item source fields, supported claim types, and `promotion_effect=none`; missing packs return a `status=missing` envelope without writes.
+
 The in-repo Narrative Service now records human review actions through `POST /api/v1/narratives/review-actions` and exposes them through `GET /api/v1/narratives/review-actions`. Actions support `approve`, `reject`, and `defer`, are persisted in a local JSON ledger, and remain explicitly non-promotional: candidates stay `candidate_untrusted` until a separate trusted promotion workflow exists.
 
 The Narrative Service also exposes `POST /api/v1/narratives/promotion/preflight`. It checks candidate source evidence, rationale, exclusion criteria, and service-ledger approval, then returns `blocked` or `ready_for_trust_audit`. It is intentionally non-mutating and cannot create trusted records.

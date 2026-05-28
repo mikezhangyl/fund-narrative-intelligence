@@ -72,6 +72,12 @@ endpoints:
     path: /api/v1/narratives/evidence-packs
     purpose: Return mapping evidence packs and source citation chains.
   - method: GET
+    path: /api/v1/narratives/evidence-packs/{evidence_pack_id}
+    conformance_path: /api/v1/narratives/evidence-packs/EPACK_7AF6C98698
+    alternate_lookup: /api/v1/narratives/evidence-packs/detail?stock_code=600519&narrative_id=N_BAIJIU_CONSUMPTION
+    purpose: Return one stock-to-narrative evidence pack detail with rationale, exclusions, confidence components, and source evidence items.
+    missing_id_behavior: missing_envelope
+  - method: GET
     path: /api/v1/narratives/trust-audits/latest
     purpose: Return latest registry and mapping trust audit result.
   - method: GET

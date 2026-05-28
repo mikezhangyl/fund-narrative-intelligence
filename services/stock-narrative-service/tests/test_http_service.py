@@ -441,6 +441,104 @@ def test_evidence_packs_expose_stable_pack_and_mapping_ids(tmp_path):
     }
 
 
+def test_evidence_pack_detail_by_stock_and_narrative_returns_source_drilldown(tmp_path):
+    config = _write_seed_files(tmp_path)
+    _write_detail_evidence_pack(config)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(
+            f"{base_url}/api/v1/narratives/evidence-packs/detail"
+            "?stock_code=600519&narrative_id=N_BAIJIU"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "available"
+    assert response["trust_metadata"]["trust_status"] == "candidate_untrusted"
+    payload = response["data"]
+    assert payload["version"] == "mapping-evidence-pack-detail-v1"
+    assert payload["lookup"] == {
+        "evidence_pack_id": payload["evidence_pack_id"],
+        "stock_code": "600519",
+        "narrative_id": "N_BAIJIU",
+    }
+    assert payload["mapping_rationale"] == "主营产品和品牌事实直接支撑白酒消费叙事。"
+    assert payload["exclusion_rationale"] == ["不是一般食品饮料泛标签。"]
+    assert payload["confidence_components"]["business_relevance"] == 0.95
+    assert payload["promotion_effect"] == "none"
+    assert payload["recommended_action"] == "human_review"
+    assert payload["evidence_items"] == [
+        {
+            "source_name": "Annual report",
+            "source_url": "https://example.test/a",
+            "source_type": "annual_report",
+            "evidence_date": "2026-04-17",
+            "evidence_summary": "Annual report support.",
+            "supports": ["business_relevance", "durability"],
+            "supported_claim_types": ["business_relevance", "durability"],
+        }
+    ]
+
+
+def test_evidence_pack_detail_by_pack_id_matches_stock_narrative_lookup(tmp_path):
+    config = _write_seed_files(tmp_path)
+    _write_detail_evidence_pack(config)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        packs = _get_json(f"{base_url}/api/v1/narratives/evidence-packs")
+        evidence_pack_id = packs["data"]["packs"][0]["proposed_mappings"][0][
+            "evidence_pack_id"
+        ]
+        by_id = _get_json(
+            f"{base_url}/api/v1/narratives/evidence-packs/{evidence_pack_id}"
+        )
+        by_query = _get_json(
+            f"{base_url}/api/v1/narratives/evidence-packs/detail"
+            "?stock_code=600519&narrative_id=N_BAIJIU"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert by_id["data"] == by_query["data"]
+
+
+def test_evidence_pack_detail_missing_returns_missing_envelope_without_mutation(tmp_path):
+    config = _write_seed_files(tmp_path)
+    _write_detail_evidence_pack(config)
+    source_snapshots = {
+        config.registry_path: config.registry_path.read_text(encoding="utf-8"),
+        config.mappings_path: config.mappings_path.read_text(encoding="utf-8"),
+        config.evidence_packs_path: config.evidence_packs_path.read_text(
+            encoding="utf-8"
+        ),
+    }
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(
+            f"{base_url}/api/v1/narratives/evidence-packs/detail"
+            "?stock_code=600519&narrative_id=N_UNKNOWN"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "missing"
+    assert response["data"]["error"]["code"] == "EVIDENCE_PACK_NOT_FOUND"
+    assert response["warnings"][0]["code"] == "EVIDENCE_PACK_NOT_FOUND"
+    assert not config.review_actions_path.exists()
+    assert not config.intake_ledger_path.exists()
+    for path, before_text in source_snapshots.items():
+        assert path.read_text(encoding="utf-8") == before_text
+
+
 def test_candidate_detail_returns_review_history_preflight_and_evidence_refs(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -761,6 +859,50 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
         candidate_events_path=events_path,
         intake_ledger_path=intake_ledger_path,
         review_actions_path=review_actions_path,
+    )
+
+
+def _write_detail_evidence_pack(config: ServiceConfig) -> None:
+    config.evidence_packs_path.write_text(
+        json.dumps(
+            {
+                "version": "mapping-evidence-pack-v0",
+                "trust_status": "candidate_untrusted",
+                "packs": [
+                    {
+                        "stock_code": "600519",
+                        "stock_name": "贵州茅台",
+                        "proposed_mappings": [
+                            {
+                                "narrative_id": "N_BAIJIU",
+                                "narrative_name": "白酒",
+                                "trust_status": "candidate_untrusted",
+                                "mapping_rationale": "主营产品和品牌事实直接支撑白酒消费叙事。",
+                                "exclusion_rationale": ["不是一般食品饮料泛标签。"],
+                                "confidence_components": {
+                                    "business_relevance": 0.95,
+                                    "evidence_quality": 0.8,
+                                },
+                                "evidence_items": [
+                                    {
+                                        "source_name": "Annual report",
+                                        "source_url": "https://example.test/a",
+                                        "source_type": "annual_report",
+                                        "evidence_date": "2026-04-17",
+                                        "evidence_summary": "Annual report support.",
+                                        "supports": [
+                                            "business_relevance",
+                                            "durability",
+                                        ],
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
     )
 
 

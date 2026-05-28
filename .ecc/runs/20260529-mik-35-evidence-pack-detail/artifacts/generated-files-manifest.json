@@ -1,0 +1,84 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "acceptance_summary",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T173922+0000/acceptance_summary.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Narrative Service acceptance summary for MIK-35.",
+      "checksum_sha256": "7e0bcf1bc7a37a599575552500c26fdf9282abe4d069feceb8084d2d6b1952ed",
+      "mtime_epoch": 1779989962,
+      "size_bytes": 1227
+    },
+    {
+      "type": "conformance_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T173922+0000/conformance/narrative_service_conformance_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Conformance report JSON with evidence detail endpoint.",
+      "checksum_sha256": "ac02a40d610574b8ece2f3d3ef9d79c8af35b1ecb90c2cdc5bfd169284eff719",
+      "mtime_epoch": 1779989962,
+      "size_bytes": 3280
+    },
+    {
+      "type": "conformance_markdown",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T173922+0000/conformance/narrative_service_conformance_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Conformance report Markdown with evidence detail endpoint.",
+      "checksum_sha256": "2bd1347baa81b8ac6ddab1ea3f6ea326190c9cb76301d4249e6b2e02f8bd3973",
+      "mtime_epoch": 1779989962,
+      "size_bytes": 906
+    },
+    {
+      "type": "provider_smoke_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T173922+0000/provider_smoke/narrative_service_provider_smoke.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Provider smoke JSON.",
+      "checksum_sha256": "01c3e1ea5b53dc7bd8e7fb51e6c71f4097a1829cae19b4dd0bfdbeb40d87a003",
+      "mtime_epoch": 1779989962,
+      "size_bytes": 641
+    },
+    {
+      "type": "provider_smoke_markdown",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T173922+0000/provider_smoke/narrative_service_provider_smoke.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Provider smoke Markdown.",
+      "checksum_sha256": "6427e5a82a3be4fcae01644986f407cbb20ceb3dfb3c829932fde53c825bc87c",
+      "mtime_epoch": 1779989962,
+      "size_bytes": 192
+    },
+    {
+      "type": "report_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T173922+0000/fund_holding_exposure_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Acceptance report JSON.",
+      "checksum_sha256": "811a3ef9ce1364ef568028065d7ee581bde33551093fa40337941d43c427c33e",
+      "mtime_epoch": 1779989962,
+      "size_bytes": 4820
+    },
+    {
+      "type": "report_html",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T173922+0000/fund_holding_exposure_report.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Acceptance report HTML.",
+      "checksum_sha256": "5e903615b4b34960990c28fb047cc735a8f71a6c971d7b9086c6633d48073902",
+      "mtime_epoch": 1779989962,
+      "size_bytes": 4348
+    },
+    {
+      "type": "runtime_ledger",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T173922+0000/runtime/review_actions.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Runtime review-action ledger generated during acceptance.",
+      "checksum_sha256": "aa14abf5291371ef1a06d74a8e4d3d5d915aa08d1c69903bcd746d4dd0e6a7f7",
+      "mtime_epoch": 1779989962,
+      "size_bytes": 1073
+    }
+  ]
+}

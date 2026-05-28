@@ -198,6 +198,29 @@ def test_narrative_service_contract_declares_candidate_detail_endpoint():
     assert endpoint["missing_id_behavior"] == "missing_envelope"
 
 
+def test_narrative_service_contract_declares_evidence_pack_detail_endpoint():
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    endpoint = next(
+        item
+        for item in contract["endpoints"]
+        if item["path"] == "/api/v1/narratives/evidence-packs/{evidence_pack_id}"
+    )
+
+    assert endpoint["method"] == "GET"
+    assert endpoint["conformance_path"] == (
+        "/api/v1/narratives/evidence-packs/EPACK_7AF6C98698"
+    )
+    assert endpoint["alternate_lookup"] == (
+        "/api/v1/narratives/evidence-packs/detail?stock_code=600519&narrative_id=N_BAIJIU_CONSUMPTION"
+    )
+    assert endpoint["missing_id_behavior"] == "missing_envelope"
+
+
 def test_fni_report_entrypoints_do_not_import_narrative_service_internals():
     report_paths = [
         PROJECT_ROOT / "src" / "scanners" / "fund_holding_exposure_report.py",

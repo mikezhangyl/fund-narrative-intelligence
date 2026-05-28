@@ -46,6 +46,54 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 },
             )
             return
+        if path == "/api/v1/narratives/evidence-packs/detail":
+            data = self.server.store.evidence_pack_detail(
+                stock_code=_first_query_value(query, "stock_code"),
+                narrative_id=_first_query_value(query, "narrative_id"),
+            )
+            if data is None:
+                self._send_missing(
+                    code="EVIDENCE_PACK_NOT_FOUND",
+                    message="Evidence pack not found for the requested lookup.",
+                    data={
+                        "lookup": {
+                            "stock_code": _first_query_value(query, "stock_code"),
+                            "narrative_id": _first_query_value(query, "narrative_id"),
+                        }
+                    },
+                )
+                return
+            self._send_json(
+                HTTPStatus.OK,
+                _envelope(
+                    config=self.server.config,
+                    data=data,
+                    trust_status="candidate_untrusted",
+                ),
+            )
+            return
+        evidence_detail_prefix = "/api/v1/narratives/evidence-packs/"
+        if path.startswith(evidence_detail_prefix):
+            evidence_pack_id = unquote(path.removeprefix(evidence_detail_prefix)).strip()
+            data = self.server.store.evidence_pack_detail(
+                evidence_pack_id=evidence_pack_id,
+            )
+            if data is None:
+                self._send_missing(
+                    code="EVIDENCE_PACK_NOT_FOUND",
+                    message=f"Evidence pack not found: {evidence_pack_id}",
+                    data={"evidence_pack_id": evidence_pack_id},
+                )
+                return
+            self._send_json(
+                HTTPStatus.OK,
+                _envelope(
+                    config=self.server.config,
+                    data=data,
+                    trust_status="candidate_untrusted",
+                ),
+            )
+            return
         candidate_detail_prefix = "/api/v1/narratives/candidates/"
         if path.startswith(candidate_detail_prefix):
             candidate_id = unquote(path.removeprefix(candidate_detail_prefix)).strip()
@@ -53,18 +101,10 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
             if data is None:
                 code = "CANDIDATE_NOT_FOUND"
                 message = f"Candidate narrative not found: {candidate_id}"
-                self._send_json(
-                    HTTPStatus.OK,
-                    _envelope(
-                        config=self.server.config,
-                        status="missing",
-                        data={
-                            "candidate_narrative_id": candidate_id,
-                            "error": {"code": code, "message": message},
-                        },
-                        warnings=[{"code": code, "message": message}],
-                        trust_status="candidate_untrusted",
-                    ),
+                self._send_missing(
+                    code=code,
+                    message=message,
+                    data={"candidate_narrative_id": candidate_id},
                 )
                 return
             self._send_json(
@@ -192,6 +232,27 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 status="degraded",
                 data={"error": {"code": code, "message": message}},
                 warnings=[{"code": code, "message": message}],
+            ),
+        )
+
+    def _send_missing(
+        self,
+        *,
+        code: str,
+        message: str,
+        data: dict[str, Any],
+    ) -> None:
+        self._send_json(
+            HTTPStatus.OK,
+            _envelope(
+                config=self.server.config,
+                status="missing",
+                data={
+                    **data,
+                    "error": {"code": code, "message": message},
+                },
+                warnings=[{"code": code, "message": message}],
+                trust_status="candidate_untrusted",
             ),
         )
 

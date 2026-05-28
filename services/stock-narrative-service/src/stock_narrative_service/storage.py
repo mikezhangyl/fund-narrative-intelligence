@@ -33,6 +33,31 @@ class NarrativeStore:
         payload = _load_object(self.config.evidence_packs_path, label="evidence packs")
         return _evidence_packs_with_identity(payload)
 
+    def evidence_pack_detail(
+        self,
+        *,
+        evidence_pack_id: str = "",
+        stock_code: str = "",
+        narrative_id: str = "",
+    ) -> dict[str, Any] | None:
+        evidence_pack_id = str(evidence_pack_id or "").strip()
+        stock_code = str(stock_code or "").strip()
+        narrative_id = str(narrative_id or "").strip()
+        for pack in _list(self.evidence_packs().get("packs")):
+            for mapping in _list(pack.get("proposed_mappings")):
+                if evidence_pack_id and mapping.get("evidence_pack_id") != evidence_pack_id:
+                    continue
+                if not evidence_pack_id and (
+                    str(pack.get("stock_code") or "") != stock_code
+                    or str(mapping.get("narrative_id") or "") != narrative_id
+                ):
+                    continue
+                return _evidence_pack_detail_payload(
+                    pack=pack,
+                    mapping=mapping,
+                )
+        return None
+
     def seed_events(self) -> dict[str, Any]:
         return _load_object(self.config.candidate_events_path, label="candidate events")
 
@@ -554,6 +579,53 @@ def _evidence_packs_with_identity(payload: dict[str, Any]) -> dict[str, Any]:
             )
         packs.append({**pack, "proposed_mappings": mappings})
     return {**payload, "packs": packs}
+
+
+def _evidence_pack_detail_payload(
+    *,
+    pack: dict[str, Any],
+    mapping: dict[str, Any],
+) -> dict[str, Any]:
+    stock_code = str(pack.get("stock_code") or "")
+    narrative_id = str(mapping.get("narrative_id") or "")
+    evidence_pack_id = str(mapping.get("evidence_pack_id") or "")
+    return {
+        "version": "mapping-evidence-pack-detail-v1",
+        "lookup": {
+            "evidence_pack_id": evidence_pack_id,
+            "stock_code": stock_code,
+            "narrative_id": narrative_id,
+        },
+        "evidence_pack_id": evidence_pack_id,
+        "candidate_mapping_id": str(mapping.get("candidate_mapping_id") or ""),
+        "stock_code": stock_code,
+        "stock_name": str(pack.get("stock_name") or ""),
+        "narrative_id": narrative_id,
+        "narrative_name": str(mapping.get("narrative_name") or ""),
+        "trust_status": str(mapping.get("trust_status") or "candidate_untrusted"),
+        "mapping_rationale": str(mapping.get("mapping_rationale") or ""),
+        "exclusion_rationale": _strings(mapping.get("exclusion_rationale")),
+        "confidence_components": _mapping(mapping.get("confidence_components")),
+        "evidence_items": [
+            _evidence_item_payload(item)
+            for item in _list(mapping.get("evidence_items"))
+        ],
+        "promotion_effect": "none",
+        "recommended_action": "human_review",
+    }
+
+
+def _evidence_item_payload(item: dict[str, Any]) -> dict[str, Any]:
+    supports = _strings(item.get("supports"))
+    return {
+        "source_name": str(item.get("source_name") or ""),
+        "source_url": str(item.get("source_url") or ""),
+        "source_type": str(item.get("source_type") or ""),
+        "evidence_date": str(item.get("evidence_date") or ""),
+        "evidence_summary": str(item.get("evidence_summary") or ""),
+        "supports": supports,
+        "supported_claim_types": supports,
+    }
 
 
 def _source_evidence_refs(candidate: dict[str, Any]) -> dict[str, Any]:

@@ -95,6 +95,8 @@ POST /api/v1/narratives/intake/events
 GET  /api/v1/narratives/candidates
 GET  /api/v1/narratives/candidates/{candidate_narrative_id}
 GET  /api/v1/narratives/evidence-packs
+GET  /api/v1/narratives/evidence-packs/{evidence_pack_id}
+GET  /api/v1/narratives/evidence-packs/detail?stock_code=...&narrative_id=...
 GET  /api/v1/narratives/trust-audits/latest
 GET  /api/v1/narratives/ops/summary
 GET  /api/v1/narratives/review-queue
@@ -114,6 +116,12 @@ latest review action, promotion preflight gates, missing gates, recommended next
 action, and source evidence references. Unknown candidate ids return a
 `status=missing` envelope with `CANDIDATE_NOT_FOUND`; they must not write review,
 intake, registry, mapping, or evidence files.
+
+Evidence pack detail can be loaded by `evidence_pack_id` or by stock+narrative
+query fields. The response includes mapping rationale, exclusion rationale,
+confidence components, normalized evidence items, and `promotion_effect=none`.
+Missing packs return a `status=missing` envelope with `EVIDENCE_PACK_NOT_FOUND`
+and must not write review, intake, registry, mapping, or evidence files.
 
 Every narrative endpoint must return:
 
