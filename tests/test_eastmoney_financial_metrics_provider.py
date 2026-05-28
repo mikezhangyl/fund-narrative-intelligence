@@ -70,3 +70,15 @@ def test_eastmoney_financial_metrics_provider_returns_unavailable_without_crashi
     assert payload["metrics"] == []
     assert payload["missing_stock_codes"] == ["600519"]
     assert provider.degradation_events[-1]["type"] == "provider_unavailable"
+
+
+def test_eastmoney_financial_metrics_provider_marks_hong_kong_stock_as_unsupported():
+    provider = EastmoneyFinancialMetricsProvider()
+
+    payload = provider.get_financial_metrics(["00700"])
+
+    assert payload["provider_name"] == "eastmoney-financial-metrics"
+    assert payload["data_quality"] == "unavailable"
+    assert payload["metrics"] == []
+    assert payload["missing_stock_codes"] == ["00700"]
+    assert provider.degradation_events[-1]["type"] == "provider_unsupported_market"

@@ -15,6 +15,7 @@ from src.config import (
     PROJECT_ROOT,
 )
 from src.errors import FixtureNotFoundError
+from src.modules.narrative_intelligence.model import normalize_registry_payload
 from src.providers.provenance import (
     MOCK_PROVIDER_NAME,
     MOCK_PROVIDER_VERSION,
@@ -88,7 +89,9 @@ class MockNarrativeRegistryProvider:
     fixture_dir: Path = FIXTURE_DIR
 
     def get_narrative_registry(self) -> dict[str, Any]:
-        payload = _load_fixture(self.fixture_dir, "narrative_registry.json")
+        payload = normalize_registry_payload(
+            _load_fixture(self.fixture_dir, "narrative_registry.json")
+        )
         validate_registry_payload(payload)
         return deepcopy(payload)
 
@@ -105,14 +108,15 @@ class ReviewedNarrativeRegistryProvider:
     data_quality = "fresh"
 
     def get_narrative_registry(self) -> dict[str, Any]:
-        payload = _load_json_object(self.registry_path)
+        raw_payload = _load_json_object(self.registry_path)
+        _require_reviewed_registry_metadata(raw_payload)
+        payload = normalize_registry_payload(raw_payload)
         validate_registry_payload(payload)
-        _require_reviewed_registry_metadata(payload)
         return deepcopy(payload)
 
     def get_provider_layer(self) -> dict[str, Any]:
         payload = _load_json_object(self.registry_path)
-        _require_reviewed_store_metadata(payload, context="reviewed registry")
+        _require_reviewed_registry_metadata(payload)
         return {
             "layer": "narrative_registry",
             "provider_name": self.provider_name,
@@ -366,9 +370,18 @@ def _reviewed_registry_source_url(path: Path) -> str:
 def _require_reviewed_registry_metadata(payload: dict[str, Any]) -> None:
     _require_reviewed_store_metadata(payload, context="reviewed registry")
     for index, narrative in enumerate(payload["narratives"]):
+        _require_localized_narrative_fields(
+            narrative,
+            context=f"narratives[{index}]",
+        )
         if narrative.get("human_review_status") != "approved":
             continue
         _require_review_fields(narrative, context=f"narratives[{index}]")
+    for index, candidate in enumerate(payload.get("candidate_narratives", [])):
+        _require_localized_candidate_fields(
+            candidate,
+            context=f"candidate_narratives[{index}]",
+        )
 
 
 def _require_reviewed_store_metadata(payload: dict[str, Any], context: str) -> None:
@@ -421,6 +434,46 @@ def _require_reviewed_mapping_methods(mappings: list[dict[str, Any]]) -> None:
             "reviewed mapping store entries must use method reviewed_mapping; "
             f"found: {', '.join(invalid_methods)}"
         )
+
+
+def _require_localized_narrative_fields(payload: dict[str, Any], context: str) -> None:
+    _require_localized_text(payload, "canonical_name_zh", context)
+    _require_localized_text(payload, "display_name", context)
+    _require_localized_text(payload, "canonical_taxonomy_zh", context)
+    _require_string_list(payload.get("aliases_zh"), f"{context}.aliases_zh")
+    _require_string_list(
+        payload.get("related_terms_zh"),
+        f"{context}.related_terms_zh",
+    )
+
+
+def _require_localized_candidate_fields(payload: dict[str, Any], context: str) -> None:
+    _require_localized_text(payload, "canonical_name_zh", context)
+    _require_localized_text(payload, "display_name", context)
+    _require_localized_text(payload, "canonical_taxonomy_zh", context)
+    _require_string_list(payload.get("aliases_zh"), f"{context}.aliases_zh")
+    _require_string_list(
+        payload.get("related_terms_zh"),
+        f"{context}.related_terms_zh",
+    )
+    why_not_company_event = payload.get("why_not_company_event_zh")
+    if not isinstance(why_not_company_event, str):
+        raise ValueError(f"{context}.why_not_company_event_zh must be a string")
+
+
+def _require_localized_text(
+    payload: dict[str, Any],
+    field: str,
+    context: str,
+) -> None:
+    value = payload.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{context}.{field} must be a non-empty string")
+
+
+def _require_string_list(value: Any, context: str) -> None:
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise ValueError(f"{context} must be a list of strings")
 
 
 def _reviewed_source_url(scheme: str, path: Path) -> str:

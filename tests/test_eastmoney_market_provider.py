@@ -4,6 +4,7 @@ from src.providers.eastmoney_market import (
     EASTMONEY_MARKET_QUOTE_URL,
     EastmoneyMarketDataProvider,
     build_eastmoney_quote_url,
+    build_yahoo_quote_url,
     normalize_eastmoney_quote_response,
 )
 
@@ -14,6 +15,13 @@ def test_builds_eastmoney_quote_url_with_market_prefixed_secids():
     assert url.startswith(EASTMONEY_MARKET_QUOTE_URL)
     assert "secid=1.600519" in url
     assert "klt=101" in url
+
+
+def test_builds_yahoo_quote_url_for_hong_kong_stock():
+    url = build_yahoo_quote_url("00700")
+
+    assert "0700.HK" in url
+    assert "interval=1d" in url
 
 
 def test_normalizes_eastmoney_quote_response():
@@ -123,3 +131,54 @@ def test_eastmoney_market_provider_falls_back_to_yahoo_chart():
     assert payload["quotes"][0]["source_provider"] == "yahoo-chart"
     assert payload["quotes"][0]["change_amount"] == -1.92
     assert provider.degradation_events[0]["type"] == "provider_fallback"
+
+
+def test_eastmoney_market_provider_uses_yahoo_directly_for_hong_kong_stock():
+    called = {"eastmoney": 0, "yahoo": 0}
+
+    def fake_eastmoney(_url: str) -> dict:
+        called["eastmoney"] += 1
+        raise AssertionError("Hong Kong stocks should not call A-share Eastmoney quote path")
+
+    def fake_yahoo(url: str) -> dict:
+        called["yahoo"] += 1
+        assert "0700.HK" in url
+        return {
+            "chart": {
+                "result": [
+                    {
+                        "meta": {
+                            "symbol": "0700.HK",
+                            "shortName": "腾讯控股",
+                            "chartPreviousClose": 560.0,
+                        },
+                        "timestamp": [1778722200],
+                        "indicators": {
+                            "quote": [
+                                {
+                                    "open": [563.0],
+                                    "close": [551.0],
+                                    "high": [566.0],
+                                    "low": [547.0],
+                                    "volume": [29212000],
+                                }
+                            ]
+                        },
+                    }
+                ],
+                "error": None,
+            }
+        }
+
+    provider = EastmoneyMarketDataProvider(
+        fetcher=fake_eastmoney,
+        yahoo_fetcher=fake_yahoo,
+    )
+
+    payload = provider.get_stock_quotes(["00700"])
+
+    assert payload["provider_name"] == "yahoo-chart"
+    assert payload["data_quality"] == "fresh"
+    assert payload["quotes"][0]["stock_code"] == "00700"
+    assert payload["quotes"][0]["stock_name"] == "腾讯控股"
+    assert called == {"eastmoney": 0, "yahoo": 1}

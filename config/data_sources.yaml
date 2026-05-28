@@ -1,0 +1,60 @@
+v0_market_data:
+  default_cache_dir: data/cache
+  request_log_path: data/logs/provider_requests.jsonl
+  gateway:
+    enabled: true
+    base_url_env: MARKET_DATA_GATEWAY_URL
+    timeout_seconds_env: MARKET_DATA_GATEWAY_TIMEOUT_SECONDS
+    default_timeout_seconds: 10
+    contract_path: config/market_data_gateway_contract.yaml
+    route_mode: normalized_rest
+    async_daily_bars:
+      enabled: true
+      threshold_symbols_env: MARKET_DATA_GATEWAY_ASYNC_DAILY_BARS_THRESHOLD
+      default_threshold_symbols: 100
+      max_wait_seconds_env: MARKET_DATA_GATEWAY_ASYNC_DAILY_BARS_MAX_WAIT_SECONDS
+      default_max_wait_seconds: 900
+      poll_interval_seconds_env: MARKET_DATA_GATEWAY_ASYNC_DAILY_BARS_POLL_INTERVAL_SECONDS
+      default_poll_interval_seconds: 2
+    fallback_to_direct_providers: true
+  providers:
+    tushare:
+      enabled: true
+      api_url_env: TUSHARE_API_URL
+      gateway_base_url_env: MARKET_DATA_GATEWAY_URL
+      default_api_url: https://api.tushare.pro
+      token_env: TUSHARE_TOKEN
+      pacing_seconds: 0.2
+      retry_attempts: 2
+      endpoints:
+        daily: stock daily OHLCV
+        index_daily: index OHLCV
+        daily_basic: turnover rate and daily basics
+        stock_basic: stock metadata
+        trade_cal: trading calendar
+        fund_daily: ETF daily bars
+    akshare:
+      enabled: true
+      gateway_base_url_env: MARKET_DATA_GATEWAY_URL
+      pacing_seconds: 0.5
+      retry_attempts: 2
+      endpoints:
+        stock_board_concept_name_em: concept sector snapshot
+        stock_zh_a_hist: supplementary A-share daily bars
+        fund_etf_hist_em: ETF supplementary daily bars
+        stock_zt_pool_em: limit-up pool
+        stock_zt_pool_dtgc_em: limit-down pool
+    eastmoney:
+      enabled: true
+      gateway_base_url_env: MARKET_DATA_GATEWAY_URL
+      pacing_seconds: 0.2
+      retry_attempts: 2
+      endpoints:
+        market_quote: latest stock quote snapshot
+  excluded_v0:
+    - snowball_scraping
+    - taoguba_scraping
+    - twitter
+    - reddit
+    - browser_automation
+    - proxy_rotation

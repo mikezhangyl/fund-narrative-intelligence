@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
+from src.modules.narrative_intelligence.model import narrative_display_name
+
 FALLBACK_MAPPING_CONFIDENCE = 0.52
 BROAD_INDUSTRY_FALLBACK_CONFIDENCE = 0.48
 MULTI_MATCH_FALLBACK_CONFIDENCE = 0.42
@@ -167,7 +169,7 @@ def _excluded_mapping_candidate(
         "industry": holding.get("industry"),
         "weight": holding.get("weight"),
         "narrative_id": narrative_id,
-        "narrative_name": narrative.get("name", narrative_id),
+        "narrative_name": narrative_display_name(narrative, narrative_id),
         "method": "registry_term_rule",
         "matched_terms": [str(term) for term in matched_terms],
         "reason": exclusion.get("reason"),
@@ -200,7 +202,10 @@ def _mapping_precision_flags(
                     "mapping_method": "registry_term_rule",
                     "narrative_ids": [narrative_id],
                     "narratives": [
-                        registry.get(narrative_id, {}).get("name", narrative_id)
+                        narrative_display_name(
+                            registry.get(narrative_id, {}),
+                            narrative_id,
+                        )
                     ],
                     "confidence_before": FALLBACK_MAPPING_CONFIDENCE,
                     "confidence_after": BROAD_INDUSTRY_FALLBACK_CONFIDENCE,
@@ -226,7 +231,10 @@ def _mapping_precision_flags(
                 "mapping_method": "registry_term_rule",
                 "narrative_ids": narrative_ids,
                 "narratives": [
-                    registry.get(narrative_id, {}).get("name", narrative_id)
+                    narrative_display_name(
+                        registry.get(narrative_id, {}),
+                        narrative_id,
+                    )
                     for narrative_id in narrative_ids
                 ],
                 "confidence_before": FALLBACK_MAPPING_CONFIDENCE,
@@ -255,8 +263,9 @@ def _mapping_rationales(
                 "stock_name": holding.get("stock_name"),
                 "industry": holding.get("industry"),
                 "narrative_id": narrative_id,
-                "narrative_name": registry.get(narrative_id, {}).get(
-                    "name", narrative_id
+                "narrative_name": narrative_display_name(
+                    registry.get(narrative_id, {}),
+                    narrative_id,
                 ),
                 "method": method,
                 "confidence": mapping["confidence"],

@@ -118,6 +118,47 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
                 "last_updated_at": "2026-05-14",
             }
         ],
+        "generated_candidate_narratives": [
+            {
+                "candidate_narrative_id": "C_OPTICAL_MODULE",
+                "canonical_name_zh": "光模块",
+                "display_name": "光模块",
+                "canonical_taxonomy_zh": "通信",
+                "triggering_stock_codes": ["NVDA"],
+                "confidence": 0.74,
+                "why_not_company_event_zh": "该候选由多只持仓共同触发，不是单一公司的孤立事件。",
+            }
+        ],
+        "candidate_generation_failures": [
+            {
+                "seed_id": "SEED_FAILED",
+                "provider_name": "minimax-narrative-curator",
+                "model": "MiniMax-M2.7",
+                "attempt_count": 3,
+                "triggering_stock_codes": ["NVDA"],
+                "reason": "timed out after retries",
+            }
+        ],
+        "candidate_generation_summary": {
+            "generated_candidate_count": 1,
+            "failed_candidate_count": 1,
+            "attempted_seed_count": 2,
+        },
+        "fund_exposure_tags": [
+            {
+                "tag_name_zh": "光模块",
+                "tag_name_en": "Optical Module",
+                "raw_exposure": 0.12,
+                "normalized_exposure": 0.62,
+                "confidence": 0.74,
+                "stock_codes": ["NVDA"],
+                "stock_names": ["NVIDIA"],
+                "linked_narrative_ids": [],
+                "linked_narrative_names": [],
+                "link_method": None,
+                "link_confidence": None,
+            }
+        ],
         "supporting_evidence": [
             {
                 "title": "Guidance raised",
@@ -260,6 +301,8 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert '<section class="mapping-rationales">' in html
     assert '<section class="excluded-mapping-candidates">' in html
     assert '<section class="candidate-narratives">' in html
+    assert '<section class="candidate-generation-issues">' in html
+    assert '<section class="emerging-narratives">' in html
     assert '<section class="financial-metrics">' in html
     assert '<section class="valuation-snapshots">' in html
     assert '<section class="market-quotes">' in html
@@ -272,6 +315,11 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "Mapping Rationales" in html
     assert "Excluded Mapping Candidates" in html
     assert "Candidate Narratives For Review" in html
+    assert "Narrative Generation Issues" in html
+    assert "Emerging Narrative Signals" in html
+    assert "Five-Dimension Radar" in html
+    assert 'class="radar-chart"' in html
+    assert "光模块" in html
     assert "Consumer Electronics Globalization" in html
     assert "candidate_narrative_review" in html
     assert "传音控股" in html
@@ -284,6 +332,8 @@ def test_html_report_renders_structured_sections_without_raw_markdown():
     assert "Market Quotes" in markdown
     assert "News Evidence" in markdown
     assert "Announcement Evidence" in markdown
+    assert "Narrative Generation Issues" in markdown
+    assert "Emerging Narrative Signals" in markdown
     assert "eastmoney-financial-metrics" in markdown
     assert "eastmoney-valuation" in markdown
     assert "eastmoney-market-quote" in markdown

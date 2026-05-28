@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from src.errors import ProviderContractError
+from src.providers.security_market import eastmoney_a_share_secucode
 from src.validation import validate_financial_metrics_payload
 
 EASTMONEY_FINANCIAL_METRICS_URL = (
@@ -31,6 +32,19 @@ class EastmoneyFinancialMetricsProvider:
         payloads = []
         failed_stock_codes = []
         for stock_code in stock_codes:
+            if _eastmoney_secucode(stock_code) is None:
+                failed_stock_codes.append(str(stock_code))
+                self.degradation_events.append(
+                    {
+                        "type": "provider_unsupported_market",
+                        "provider": self.provider_name,
+                        "reason": (
+                            "Eastmoney financial metrics currently support A-share stock codes only: "
+                            f"{stock_code}"
+                        ),
+                    }
+                )
+                continue
             url = build_eastmoney_financial_metrics_url(stock_code)
             try:
                 response = _fetch_with_retry(self.fetcher, url)
@@ -75,10 +89,15 @@ class EastmoneyFinancialMetricsProvider:
 
 
 def build_eastmoney_financial_metrics_url(stock_code: str) -> str:
+    secucode = _eastmoney_secucode(stock_code)
+    if secucode is None:
+        raise ProviderContractError(
+            f"Eastmoney financial metrics do not support stock code: {stock_code}"
+        )
     params = {
         "type": "RPT_F10_FINANCE_MAINFINADATA",
         "sty": "APP_F10_MAINFINADATA",
-        "filter": f'(SECUCODE="{_eastmoney_secucode(stock_code)}")',
+        "filter": f'(SECUCODE="{secucode}")',
         "p": "1",
         "ps": "1",
         "sr": "-1",
@@ -165,10 +184,7 @@ def _combined_source_url(payloads: list[dict[str, Any]]) -> str:
 
 
 def _eastmoney_secucode(stock_code: str) -> str:
-    code = str(stock_code)
-    if code.startswith(("5", "6", "9")):
-        return f"{code}.SH"
-    return f"{code}.SZ"
+    return eastmoney_a_share_secucode(stock_code)
 
 
 def _fetch_with_retry(

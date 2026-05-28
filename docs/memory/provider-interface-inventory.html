@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider 接口清单</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --paper: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #111827;
+      --soft: #f3f4f6;
+      --code-bg: #0f172a;
+      --code-text: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.65;
+    }
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 40px 24px 64px;
+    }
+    .paper {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 40px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+    }
+    h1, h2, h3 {
+      color: var(--accent);
+      line-height: 1.25;
+    }
+    h1 {
+      font-size: 34px;
+      margin: 0 0 10px;
+    }
+    h2 {
+      font-size: 24px;
+      margin: 36px 0 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    p, li { font-size: 15px; }
+    .subtitle {
+      color: var(--muted);
+      margin: 0 0 22px;
+      font-size: 16px;
+    }
+    .badge {
+      display: inline-block;
+      border: 1px solid var(--border);
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 13px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+    code {
+      background: #f3f4f6;
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-size: 0.95em;
+    }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: var(--soft);
+      color: var(--accent);
+    }
+    ul, ol {
+      padding-left: 22px;
+    }
+    li {
+      margin: 6px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <article class="paper">
+      <h1>Provider 接口清单</h1>
+      <p class="subtitle">当前 pipeline 实际使用的数据接口、provider fallback、routing fallback 与国内优先配置清单。</p>
+      <div>
+        <span class="badge">A 股优先</span>
+        <span class="badge">国内市场优先</span>
+        <span class="badge">信息源优先</span>
+        <span class="badge">Routing 可见</span>
+        <span class="badge">Fallback 显式化</span>
+      </div>
+
+      <h2>范围</h2>
+      <ul>
+        <li>优先覆盖 A 股和国内市场基金。</li>
+        <li>港股只记录当前已实现或已明确缺失的部分。</li>
+        <li>只描述代码当前真实行为，不描述未来规划态。</li>
+      </ul>
+
+      <h2>外部 Provider 层</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>数据层</th>
+            <th>当前默认</th>
+            <th>外部接口</th>
+            <th>Provider 内部 fallback</th>
+            <th>Routing fallback</th>
+            <th>适用市场</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>holdings</code></td>
+            <td><code>--provider-mode eastmoney</code> 时使用 <code>eastmoney-fundmobapi</code></td>
+            <td>Eastmoney FundMNewApi：<br /><code>https://fundmobapi.eastmoney.com/FundMNewApi/FundMNInverstPosition</code></td>
+            <td><code>EastmoneyFundHoldingProvider</code> 在抓取失败时回退到 <code>MockDataProvider</code></td>
+            <td><code>holdings</code> routing 支持 <code>eastmoney</code>、<code>mock</code>、<code>real</code>；当前 <code>real</code> 实际解析到 <code>mock</code></td>
+            <td>国内公募基金</td>
+            <td>当前主链路中唯一真实的持仓源。</td>
+          </tr>
+          <tr>
+            <td><code>market_quotes</code></td>
+            <td>默认 routing primary 是 <code>eastmoney</code></td>
+            <td>Eastmoney K 线行情接口：<br /><code>https://push2his.eastmoney.com/api/qt/stock/kline/get</code></td>
+            <td><code>EastmoneyMarketDataProvider</code> 内部会对单只失败的 A 股报价回退到 Yahoo Chart；港股报价直接走 Yahoo</td>
+            <td>可选 routing，目前设计为 <code>akshare -&gt; eastmoney</code>；Eastmoney 内部仍可能继续回退到 Yahoo</td>
+            <td>以 A 股为主；港股通过 Yahoo symbol 归一化支持</td>
+            <td>最终 payload provider 可能是 <code>eastmoney-market-quote</code>、<code>yahoo-chart</code> 或 <code>mixed-market-quote</code>。</td>
+          </tr>
+          <tr>
+            <td><code>valuation_snapshots</code></td>
+            <td>CLI 默认走本地衍生的 <code>quote-derived</code>；当 <code>--valuation-source provider</code> 时走 <code>eastmoney</code></td>
+            <td>Eastmoney 估值接口：<br /><code>https://push2.eastmoney.com/api/qt/stock/get</code></td>
+            <td><code>EastmoneyValuationProvider</code> 内部没有额外 provider fallback</td>
+            <td>可选 routing，目前是 <code>tushare -&gt; eastmoney</code></td>
+            <td>provider 模式仅支持 A 股</td>
+            <td><code>quote-derived</code> 不是外部接口，而是从 <code>market_quotes</code> 本地衍生。</td>
+          </tr>
+          <tr>
+            <td><code>financial_metrics</code></td>
+            <td>启用后默认 routing primary 是 <code>eastmoney</code></td>
+            <td>Eastmoney 财务指标接口：<br /><code>https://datacenter.eastmoney.com/securities/api/data/get</code></td>
+            <td><code>EastmoneyFinancialMetricsProvider</code> 内部没有额外 provider fallback</td>
+            <td>可选 routing，目前是 <code>tushare -&gt; eastmoney</code></td>
+            <td>仅支持 A 股</td>
+            <td>这是当前不充值条件下的结构化基本面主路径。</td>
+          </tr>
+          <tr>
+            <td><code>announcements</code></td>
+            <td>默认 routing primary 是 <code>cninfo</code></td>
+            <td>CNINFO 公告查询 POST 接口：<br /><code>https://www.cninfo.com.cn/new/hisAnnouncement/query</code><br />CNINFO 静态文件基址：<br /><code>https://static.cninfo.com.cn/</code></td>
+            <td><code>CNInfoAnnouncementProvider</code> 内部没有额外 provider fallback</td>
+            <td>routing 层已预留，但当前内建真实 provider 只有 <code>cninfo</code></td>
+            <td>A 股 / 北交所这类 6 位国内证券代码</td>
+            <td>不覆盖港股公告。</td>
+          </tr>
+          <tr>
+            <td><code>news_evidence</code></td>
+            <td>默认 routing primary 是 <code>multi-source-news</code></td>
+            <td>Google News RSS 搜索：<br /><code>https://news.google.com/rss/search</code><br />新浪财经滚动：<br /><code>https://finance.sina.com.cn/roll/</code></td>
+            <td><code>MultiSourceNewsEvidenceProvider</code> 会容忍任一子 provider 失败，并保留其他来源结果</td>
+            <td>routing 层支持 <code>multi-source-news</code>、<code>google-news-rss</code>、<code>sina-finance-roll</code>、<code>mock</code></td>
+            <td>混合；当前对国内叙事和部分港股新闻线索都可用</td>
+            <td>这是聚合 provider，不是简单的 primary/fallback 二选一。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Routing 可选 Provider</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>数据层</th>
+            <th>内建 provider 名称</th>
+            <th>当前推荐的国内路径</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>holdings</code></td>
+            <td><code>eastmoney</code>、<code>mock</code>、<code>real</code></td>
+            <td><code>eastmoney</code></td>
+          </tr>
+          <tr>
+            <td><code>market_quotes</code></td>
+            <td><code>eastmoney</code>、<code>akshare</code>、<code>mock</code></td>
+            <td>默认 <code>eastmoney</code>；<code>akshare -&gt; eastmoney</code> 仅作为可选实验路径</td>
+          </tr>
+          <tr>
+            <td><code>valuation_snapshots</code></td>
+            <td><code>eastmoney</code>、<code>tushare</code>、<code>mock</code></td>
+            <td>当前国内不充值场景推荐 <code>eastmoney</code></td>
+          </tr>
+          <tr>
+            <td><code>financial_metrics</code></td>
+            <td><code>eastmoney</code>、<code>tushare</code></td>
+            <td>当前国内不充值场景推荐 <code>eastmoney</code></td>
+          </tr>
+          <tr>
+            <td><code>announcements</code></td>
+            <td><code>cninfo</code>、<code>mock</code></td>
+            <td><code>cninfo</code></td>
+          </tr>
+          <tr>
+            <td><code>news_evidence</code></td>
+            <td><code>multi-source-news</code>、<code>google-news-rss</code>、<code>sina-finance-roll</code>、<code>mock</code></td>
+            <td><code>multi-source-news</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>本地衍生层</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>数据层</th>
+            <th>来源</th>
+            <th>fallback 行为</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>valuation_snapshots</code> 的 <code>quote-derived</code> 模式</td>
+            <td>由 <code>quote-derived-valuation</code> 从 <code>market_quotes</code> 构建</td>
+            <td>没有独立 fallback；质量跟随 <code>market_quotes</code></td>
+            <td>这是当前 CLI 默认估值模式，不依赖付费基本面。</td>
+          </tr>
+          <tr>
+            <td><code>announcement_evidence</code></td>
+            <td>从 <code>announcements</code> 元数据衍生</td>
+            <td>没有独立外部 fallback</td>
+            <td>V1 只分类公告元数据，不解析 PDF 正文。</td>
+          </tr>
+          <tr>
+            <td><code>derived_signals</code></td>
+            <td>从 market quotes、valuation snapshots、financial metrics、announcement evidence、news evidence 衍生</td>
+            <td>没有独立外部 fallback</td>
+            <td>provider layer 会披露输入是 mixed、fresh、partial 还是 mock。</td>
+          </tr>
+          <tr>
+            <td><code>provider-derived-evidence</code> / <code>provider-derived-signals</code></td>
+            <td>当 <code>base_intelligence_mode=provider-derived</code> 时，由 provider-backed 的 evidence / signal 层聚合生成</td>
+            <td>取决于上游 provider 层</td>
+            <td>这是 orchestration 行为，不是独立外部接口。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>国内优先方案总结</h2>
+      <p>在当前“国内股票优先、且不充值”的前提下，最实用的主栈是：</p>
+      <ol>
+        <li><code>holdings</code>：Eastmoney</li>
+        <li><code>market_quotes</code>：Eastmoney，必要时内部回退到 Yahoo</li>
+        <li><code>valuation_snapshots</code>：默认 <code>quote-derived</code>，如果显式要求 provider 模式则走 Eastmoney</li>
+        <li><code>financial_metrics</code>：Eastmoney</li>
+        <li><code>announcements</code>：CNINFO</li>
+        <li><code>news_evidence</code>：<code>multi-source-news</code>，即 Google News RSS + 新浪财经滚动</li>
+      </ol>
+
+      <p>当前已经准备好、但不是必须启用的“付费 / 实验型”路径是：</p>
+      <ol>
+        <li><code>market_quotes</code>：<code>akshare -&gt; eastmoney</code></li>
+        <li><code>valuation_snapshots</code>：<code>tushare -&gt; eastmoney</code></li>
+        <li><code>financial_metrics</code>：<code>tushare -&gt; eastmoney</code></li>
+      </ol>
+
+      <h2>信息源策略与扩展原则</h2>
+      <p>当前项目后续的国内优先方向，不是单纯“再多接几个 provider”，而是优先增加真正独立的信息源。</p>
+      <ol>
+        <li>优先新增独立源，而不是同一上游的不同封装。</li>
+        <li>优先补新闻、公告、evidence 这类信息密度高的层，再补更多数值接口。</li>
+        <li>对不确定、冲突或覆盖不完整的真实信息，优先输出 <code>partial</code>、<code>conflicting</code>、<code>low-confidence</code>。</li>
+        <li>大模型如果引入，应该放在语义判断层，不应该放在原始取数层。</li>
+        <li><code>mock</code> 仍然保留，但目标是“最后兜底”，不是默认偏好的 fallback。</li>
+      </ol>
+      <p>这里要特别区分两类“多源”：</p>
+      <ul>
+        <li>真正多源：来自不同新闻站、不同公告源、不同监管披露面。</li>
+        <li>伪多源：只是不同 wrapper，但底层仍然都依赖 Eastmoney、Sina 或同一网页源。</li>
+      </ul>
+      <p>因此后续评估一个新 provider 时，应该先回答两个问题：</p>
+      <ol>
+        <li>它有没有带来新的独立信息？</li>
+        <li>它是提升了 evidence 密度，还是只是换了一层抓取壳？</li>
+      </ol>
+
+      <h2>重要边界</h2>
+      <ul>
+        <li>目前只有 <code>market_quotes</code> 这一层存在重要的 provider 内部 fallback：Eastmoney 单只股票行情失败时可以按股票级别回退到 Yahoo。</li>
+        <li><code>news_evidence</code> 默认行为是聚合，不是简单 fallback。</li>
+        <li><code>valuation_snapshots</code> 目前有两种完全不同的模式：
+          <ul>
+            <li><code>quote-derived</code>：从 quote context 本地衍生</li>
+            <li><code>provider</code>：走 routing 外部 provider 路径</li>
+          </ul>
+        </li>
+        <li>当前代码中，<code>holdings</code> 和部分基础 intelligence 层仍然可能出现 mock 或 fixture-backed 路径；这反映的是现状，不代表后续优先方向。</li>
+        <li>后续国内 source-expansion 切片的目标，是让更多真实源以 <code>partial</code> 或 <code>conflicting</code> 方式留在结果里，而不是一遇到不确定就回落成 mock 解释。</li>
+        <li>港股的公告、估值、财务指标覆盖仍然不完整，不属于当前国内优先方案的重点。</li>
+      </ul>
+    </article>
+  </div>
+</body>
+</html>

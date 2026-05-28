@@ -1,0 +1,564 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "documentation",
+      "path": "README.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Documents normalized and Tushare-facade gateway conformance, runtime, sector scan, stress, and reliability commands.",
+      "checksum_sha256": "34354d2a34b4b7f2ab8967161eb85650308940508bd8d986d1fb5dd8ef9f0985",
+      "mtime_epoch": 1779644596,
+      "size_bytes": 23864
+    },
+    {
+      "type": "config",
+      "path": "config/data_sources.yaml",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Adds local gateway route configuration across Tushare, AkShare, and EastMoney providers.",
+      "checksum_sha256": "661f47b32b42281e72027a6e9dedffb227aa14d2bf9fb6b8758e0378d7a5b15e",
+      "mtime_epoch": 1779643033,
+      "size_bytes": 1559
+    },
+    {
+      "type": "config",
+      "path": "config/market_data_gateway_contract.yaml",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable multi-source local market-data gateway contract with /tushare compatibility path and minimum row completeness rules.",
+      "checksum_sha256": "d1684270fb30c29186d2684a5786c8495469c4fe032bd86684dbf9b722878404",
+      "mtime_epoch": 1779645873,
+      "size_bytes": 7368
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/gateway_contract.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Typed gateway contract loader, validator, response helpers, and minimum row contract support.",
+      "checksum_sha256": "6b42c3b370ef7a311ebf98f31183bc86c1bcc5fc857a2127cc716e6c305be2f3",
+      "mtime_epoch": 1779645855,
+      "size_bytes": 8206
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/providers/local_gateway.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Optional normalized REST local gateway provider used before direct external providers when configured.",
+      "checksum_sha256": "b231caf83eba6e715a41eaffe3075366f77a91ae8e60ce02d82f34dc814c6b07",
+      "mtime_epoch": 1779643033,
+      "size_bytes": 5999
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/runtime_config.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Extends runtime reporting with gateway configuration and provider-level gateway readiness.",
+      "checksum_sha256": "19d844b26d1d7aeaec2be163dbcbf9fac8fff6600cf76f8f4bf1531707753fa0",
+      "mtime_epoch": 1779643059,
+      "size_bytes": 8871
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/source_layer.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Routes consolidated source requests through the optional local gateway before direct providers.",
+      "checksum_sha256": "2bb397ca2d0c1b0a325782c2543b9cd5facf55b61afbcf18d23d2b009aafce3b",
+      "mtime_epoch": 1779643033,
+      "size_bytes": 17408
+    },
+    {
+      "type": "code",
+      "path": "src/scanners/sector_scanner.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Partial-safe sector scanner that records endpoint errors and empty sector payloads as degraded evidence.",
+      "checksum_sha256": "7fd00673570c2162acab1beee97ce183559a53b33ff38e2ca5c844292032e99b",
+      "mtime_epoch": 1779645877,
+      "size_bytes": 2900
+    },
+    {
+      "type": "code",
+      "path": "src/scanners/__init__.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Exports partial-safe sector scan types and execution helper.",
+      "checksum_sha256": "ede83bf5251c148277c26fb4bf8d22bab98870d6b448088f2499dd03c6b89527",
+      "mtime_epoch": 1779643218,
+      "size_bytes": 432
+    },
+    {
+      "type": "script",
+      "path": "scripts/validate_market_data_gateway_contract.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Validates normalized REST gateway routes and the Tushare-compatible /tushare facade, including minimum row completeness.",
+      "checksum_sha256": "65a2d5f358ad7922c3ff3d3bf211a5b7ebaf5e54672dadb52526b74f75971cec",
+      "mtime_epoch": 1779645864,
+      "size_bytes": 19176
+    },
+    {
+      "type": "script",
+      "path": "scripts/report_market_data_runtime.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Reports redacted runtime provider and gateway wiring.",
+      "checksum_sha256": "43acc211111f2cb48b666196700f21efa3b448226035de194471764f6c8f3245",
+      "mtime_epoch": 1779643059,
+      "size_bytes": 3558
+    },
+    {
+      "type": "script",
+      "path": "scripts/build_market_data_reliability_report.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Builds consolidated V0 reliability reports from runtime, capability, live, and stress evidence.",
+      "checksum_sha256": "1a94b2bcdd3828f316d0243b90df604eb1164e8e4f60f3c49e99aa5564678a98",
+      "mtime_epoch": 1779643315,
+      "size_bytes": 11523
+    },
+    {
+      "type": "script",
+      "path": "scripts/run_sector_scan.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Runs partial-safe sector scans and writes JSON/Markdown evidence.",
+      "checksum_sha256": "6ae9a6b0369c973ce75e1bc6bc152f1ae82625f6989d5cbdcc2ec0c3f10429da",
+      "mtime_epoch": 1779643192,
+      "size_bytes": 3136
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_gateway_contract.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers gateway contract loading, response helpers, normalized conformance, Tushare facade conformance, and minimum row failures.",
+      "checksum_sha256": "8b0b8df75826146ce39f8088260b1265128bdee201a2bb532562b5f3967d9208",
+      "mtime_epoch": 1779645828,
+      "size_bytes": 9078
+    },
+    {
+      "type": "test",
+      "path": "tests/test_local_gateway_provider.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers normalized local gateway provider route construction and response parsing.",
+      "checksum_sha256": "dbde3c7016329444fa35abe8e9855bc04512d9ee02b65ee311f555932ed43af7",
+      "mtime_epoch": 1779643097,
+      "size_bytes": 2850
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_runtime_config.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers runtime gateway configuration and redacted token reporting.",
+      "checksum_sha256": "b6e6c4e84c21c932fe4910ffda6433e0d165e38fa4c93a16e4bd1584b30507e5",
+      "mtime_epoch": 1779643115,
+      "size_bytes": 4530
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_source_layer.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers gateway-first source routing and fallback to direct providers.",
+      "checksum_sha256": "e2f506147f206432435ae3b7c2a65ad37a65458ce35c6798ad250a037421b9a6",
+      "mtime_epoch": 1779643097,
+      "size_bytes": 8243
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_scanners.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers breadth scanner and partial-safe sector scanner behavior, including empty sector payloads.",
+      "checksum_sha256": "2c70eb1ffd6acd4fc92d4ee269d4bcbd19fbe832f71be23b1e8649e7ae7cd5a2",
+      "mtime_epoch": 1779645836,
+      "size_bytes": 8035
+    },
+    {
+      "type": "test",
+      "path": "tests/test_sector_scan_script.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers sector scan CLI partial reporting.",
+      "checksum_sha256": "b1cf487b40bb850ce9694390c03247c2662bf4ae96b1957051b7b17d9f6acb01",
+      "mtime_epoch": 1779643208,
+      "size_bytes": 1252
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_reliability_report.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers reliability report status, gateway runtime fields, recommendations, and rendering.",
+      "checksum_sha256": "44c2227c0456b7c74b6b6ad5c9647da1497ce30fa6a11df18c1cd5211e7706ef",
+      "mtime_epoch": 1779643315,
+      "size_bytes": 3943
+    },
+    {
+      "type": "documentation",
+      "path": "/Users/mikezhang/Coding/AI-Learning/stock-data-gateway/docs/product/fni-upstream-change-request-2026-05-25.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Cross-project gateway change request, acceptance commands, and clean rerun feedback: 13/13 conformance, 100-symbol success, 500-symbol improved but still has daily 504 failures.",
+      "checksum_sha256": "ab448385677a40942ded159cd9b7324d7b56627efd7cda7c4654e26507a51f0a",
+      "mtime_epoch": 1779683275,
+      "size_bytes": 14604
+    },
+    {
+      "type": "documentation",
+      "path": "docs/memory/current-brief.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Startup memory records document-driven gateway coordination and current gateway consumption surfaces.",
+      "checksum_sha256": "63508841707d7c7c73e3993d9f3824118160c691f218ce3e308fae4abd213cdb",
+      "mtime_epoch": 1779644802,
+      "size_bytes": 4597
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/stress.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Counts empty sector rows as a stress completeness failure.",
+      "checksum_sha256": "4a7ff8013d71a06341bfd15abe8e7fe0c70f647cf8cc470782f5a0e350ef9ccc",
+      "mtime_epoch": 1779645880,
+      "size_bytes": 5575
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_stress.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers stress request volume, failure reasons, and empty-sector completeness failures.",
+      "checksum_sha256": "d89a3fe17d30dfa83b45ea32849765fadd45321c5740b467bd7c17c0b4fcc3a7",
+      "mtime_epoch": 1779645841,
+      "size_bytes": 2655
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/gateway_conformance_2026-05-25.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Live gateway conformance report for normalized and /tushare facade surfaces.",
+      "checksum_sha256": "be1105354b505edf9e8a63d8ee1b0414a6a70ea259a60dde41a1a643278eb960",
+      "mtime_epoch": 1779645893,
+      "size_bytes": 1423
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/gateway_conformance_2026-05-25.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable live gateway conformance report.",
+      "checksum_sha256": "3b62a8a1f13933797db99792849bf8a3ca43289b99621d9ead56415acd4825a4",
+      "mtime_epoch": 1779645893,
+      "size_bytes": 5739
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_runtime_gateway_2026-05-25.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Runtime configuration report with MARKET_DATA_GATEWAY_URL enabled.",
+      "checksum_sha256": "52d266e64e54757ee875734ef59b4d4bb321437bc10cd6b4d5ac9dd9eb0fb59d",
+      "mtime_epoch": 1779645646,
+      "size_bytes": 1033
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_runtime_gateway_2026-05-25.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable gateway runtime configuration report.",
+      "checksum_sha256": "9123c366a7b92834a694041154226ec43507d857080d201b1c9ee82f1ceaca98",
+      "mtime_epoch": 1779645646,
+      "size_bytes": 2625
+    },
+    {
+      "type": "report",
+      "path": "outputs/sector_scan/2026-05-25-gateway/sector_scan_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Gateway-backed sector scan report showing empty sector completeness degradation.",
+      "checksum_sha256": "a95d03059ba490c1fe6358beb3c2f484f1121bcaf2a1bc42e168141a883d56e5",
+      "mtime_epoch": 1779645903,
+      "size_bytes": 172
+    },
+    {
+      "type": "report",
+      "path": "outputs/sector_scan/2026-05-25-gateway/sector_scan_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable gateway-backed sector scan report.",
+      "checksum_sha256": "c7dbd1b7c0bed13b2841be4f7781271833b625a0e3f7a946eae21a1705596c73",
+      "mtime_epoch": 1779645903,
+      "size_bytes": 1018
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-100/stress_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Gateway-backed 100-symbol stress report.",
+      "checksum_sha256": "800fc1fd0c8a1e305ea447831dcea608c5f821d9808aed996451778156ea25ac",
+      "mtime_epoch": 1779645903,
+      "size_bytes": 426
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-100/stress_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable gateway-backed 100-symbol stress report.",
+      "checksum_sha256": "0ca4cb5bb42c90e8b79adead4a6b77a3aaa52337a9e22231dfbb44e218c1bfdf",
+      "mtime_epoch": 1779645903,
+      "size_bytes": 1553
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_reliability_gateway_2026-05-25.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Gateway-backed V0 reliability rollup using runtime and 100-symbol stress evidence.",
+      "checksum_sha256": "117b39a37041c2a0db4ae08d2cd79c7774b629d8ab322bc1044babef612f7417",
+      "mtime_epoch": 1779646306,
+      "size_bytes": 1115
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_reliability_gateway_2026-05-25.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable gateway-backed V0 reliability rollup.",
+      "checksum_sha256": "6aa2448872a1147ee50ba6a6a4a701aabaf3e75f351df37a33ca159e7d73a8da",
+      "mtime_epoch": 1779646299,
+      "size_bytes": 4047
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/gateway_conformance_2026-05-25-postfix.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Post-fix live gateway conformance report showing 13/13 checks passed.",
+      "checksum_sha256": "573f4d77f35358dc5e6b0afc29e3a04a8447b0d3d10a0e04d06ffa15bf38f41b",
+      "mtime_epoch": 1779681611,
+      "size_bytes": 1363
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/gateway_conformance_2026-05-25-postfix.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable post-fix live gateway conformance report.",
+      "checksum_sha256": "c4247cf04638747d31bf2c88b48e6e5deaed97477b12debfc1ae838022bbc770",
+      "mtime_epoch": 1779681611,
+      "size_bytes": 5683
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_runtime_gateway_2026-05-25-postfix.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Post-fix runtime configuration report with gateway enabled.",
+      "checksum_sha256": "14c6e950bb6546aff8847a0d85172074d1cd86c597d789a518aaf0c1f4ea6bb7",
+      "mtime_epoch": 1779681609,
+      "size_bytes": 1033
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_runtime_gateway_2026-05-25-postfix.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable post-fix gateway runtime configuration report.",
+      "checksum_sha256": "bd506ca4fa0b01e7030e8364eeaf3a056a2100f5beb63ad9fa78ea88056718ad",
+      "mtime_epoch": 1779681609,
+      "size_bytes": 2625
+    },
+    {
+      "type": "report",
+      "path": "outputs/sector_scan/2026-05-25-gateway-postfix/sector_scan_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Post-fix gateway-backed sector scan report showing completed sector and ETF rows.",
+      "checksum_sha256": "4dc0f280f36b833ed8509c59db7df8b5e9292727c80c23aac4d6560f53415c84",
+      "mtime_epoch": 1779681627,
+      "size_bytes": 129
+    },
+    {
+      "type": "report",
+      "path": "outputs/sector_scan/2026-05-25-gateway-postfix/sector_scan_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable post-fix gateway-backed sector scan report.",
+      "checksum_sha256": "c6cc45f4c41a3538b517ac9a7122a21f149a3a36bb5411faca317ff339a9db6c",
+      "mtime_epoch": 1779681627,
+      "size_bytes": 3181
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-postfix-100/stress_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Post-fix gateway-backed 100-symbol stress report showing zero failures.",
+      "checksum_sha256": "98d63a52f6f97bb8c5355c377f0731dcdd983d910874db9e20870e4ed6bcb833",
+      "mtime_epoch": 1779681664,
+      "size_bytes": 351
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-postfix-100/stress_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable post-fix gateway-backed 100-symbol stress report.",
+      "checksum_sha256": "7948cc29aca877f7b1bc8d94d269cfc06b629a2cbcaf303a946d69432255d583",
+      "mtime_epoch": 1779681664,
+      "size_bytes": 1496
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-strict-postfix-500/stress_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Gateway-strict post-fix 500-symbol stress report showing HTTP 504 daily batch failures.",
+      "checksum_sha256": "e130d01ffbc8989e44c7fb8d10c9f7f2e8d2e2b6ce5c7a3c907049156cc923e7",
+      "mtime_epoch": 1779682078,
+      "size_bytes": 703
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-strict-postfix-500/stress_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable gateway-strict post-fix 500-symbol stress report.",
+      "checksum_sha256": "fd07d334fcbbdd66f9ca0f9d18f40395b7feac4d19772a9902ead36107b2ee79",
+      "mtime_epoch": 1779682078,
+      "size_bytes": 1819
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_reliability_gateway_2026-05-25-postfix.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Post-fix gateway-backed V0 reliability rollup using 100-symbol stress evidence.",
+      "checksum_sha256": "bf7175dac0ac4c9486de3855dfa28eb307b87a6894b4c54dd9cc7f1530544e4c",
+      "mtime_epoch": 1779682113,
+      "size_bytes": 1023
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_reliability_gateway_2026-05-25-postfix.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable post-fix gateway-backed V0 reliability rollup.",
+      "checksum_sha256": "cd8b6c01b05a3ca5e80f0de642aca59878dd1d69934e02256e94b4106644e6a9",
+      "mtime_epoch": 1779682113,
+      "size_bytes": 3780
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/gateway_conformance_2026-05-25-rerun.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Clean rerun gateway conformance report showing 13/13 checks passed.",
+      "checksum_sha256": "573f4d77f35358dc5e6b0afc29e3a04a8447b0d3d10a0e04d06ffa15bf38f41b",
+      "mtime_epoch": 1779683144,
+      "size_bytes": 1363
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/gateway_conformance_2026-05-25-rerun.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable clean rerun gateway conformance report.",
+      "checksum_sha256": "9d70dcdb935f7a659f1fc2c7812a18a38556fb618a9b29a377c53ff544a859df",
+      "mtime_epoch": 1779683144,
+      "size_bytes": 5683
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_runtime_gateway_2026-05-25-rerun.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Clean rerun runtime configuration report with gateway enabled.",
+      "checksum_sha256": "2b84dfb33b0578b7456ab16a3b0ce3ad21d0c4e7e8999abab4afee914a38fb67",
+      "mtime_epoch": 1779683143,
+      "size_bytes": 1033
+    },
+    {
+      "type": "report",
+      "path": "outputs/data_capabilities/market_data_runtime_gateway_2026-05-25-rerun.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable clean rerun gateway runtime report.",
+      "checksum_sha256": "e712e0029cb359dd8ca88363b786bd68a1be761163f5cd883e95931c928331c9",
+      "mtime_epoch": 1779683143,
+      "size_bytes": 2625
+    },
+    {
+      "type": "report",
+      "path": "outputs/sector_scan/2026-05-25-gateway-rerun/sector_scan_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Clean rerun gateway sector scan report showing completed sector and ETF rows.",
+      "checksum_sha256": "4dc0f280f36b833ed8509c59db7df8b5e9292727c80c23aac4d6560f53415c84",
+      "mtime_epoch": 1779683154,
+      "size_bytes": 129
+    },
+    {
+      "type": "report",
+      "path": "outputs/sector_scan/2026-05-25-gateway-rerun/sector_scan_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable clean rerun gateway sector scan report.",
+      "checksum_sha256": "16fcd9d7e3d20524daeb95a1509cb176508dd380b184aa6be75d661595ab5981",
+      "mtime_epoch": 1779683154,
+      "size_bytes": 3181
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-rerun-100/stress_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Clean rerun gateway 100-symbol stress report showing zero failures.",
+      "checksum_sha256": "37ed93fbefe36c813ca86391c253a1a42dab057136f151ad145cf55a8bd4dc78",
+      "mtime_epoch": 1779683154,
+      "size_bytes": 351
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-rerun-100/stress_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable clean rerun gateway 100-symbol stress report.",
+      "checksum_sha256": "099959b74842e0f76add7a34b85f620620d5cc535ed26347ad815968db090cbb",
+      "mtime_epoch": 1779683154,
+      "size_bytes": 1494
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-strict-rerun-500/stress_report.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Clean rerun gateway-strict 500-symbol stress report showing remaining HTTP 504 daily failures.",
+      "checksum_sha256": "c2759da47f65e6ab2d97f62719fc5bbee25368cd10ea6a588a732e07cb37e5a2",
+      "mtime_epoch": 1779683224,
+      "size_bytes": 593
+    },
+    {
+      "type": "report",
+      "path": "outputs/market_data_stress/2026-05-25-gateway-strict-rerun-500/stress_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable clean rerun gateway-strict 500-symbol stress report.",
+      "checksum_sha256": "dfd856356febe054861eca7d091a2d4ae140ec23c8c8b03a8e3d731edd18938e",
+      "mtime_epoch": 1779683224,
+      "size_bytes": 1709
+    }
+  ]
+}

@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from src.errors import ProviderContractError
+from src.providers.security_market import eastmoney_a_share_secid
 from src.validation import validate_valuation_snapshot_payload
 
 EASTMONEY_VALUATION_URL = "https://push2.eastmoney.com/api/qt/stock/get"
@@ -29,6 +30,19 @@ class EastmoneyValuationProvider:
         payloads = []
         failed_stock_codes = []
         for stock_code in stock_codes:
+            if _eastmoney_secid(stock_code) is None:
+                failed_stock_codes.append(str(stock_code))
+                self.degradation_events.append(
+                    {
+                        "type": "provider_unsupported_market",
+                        "provider": self.provider_name,
+                        "reason": (
+                            "Eastmoney valuation currently supports A-share stock codes only: "
+                            f"{stock_code}"
+                        ),
+                    }
+                )
+                continue
             url = build_eastmoney_valuation_url(stock_code)
             try:
                 response = _fetch_with_retry(self.fetcher, url)
@@ -78,8 +92,13 @@ class EastmoneyValuationProvider:
 
 
 def build_eastmoney_valuation_url(stock_code: str) -> str:
+    secid = _eastmoney_secid(stock_code)
+    if secid is None:
+        raise ProviderContractError(
+            f"Eastmoney valuation does not support stock code: {stock_code}"
+        )
     params = {
-        "secid": _eastmoney_secid(stock_code),
+        "secid": secid,
         "fields": ",".join(
             [
                 "f43",
@@ -181,10 +200,7 @@ def _combined_source_url(payloads: list[dict[str, Any]]) -> str:
 
 
 def _eastmoney_secid(stock_code: str) -> str:
-    code = str(stock_code)
-    if code.startswith(("5", "6", "9")):
-        return f"1.{code}"
-    return f"0.{code}"
+    return eastmoney_a_share_secid(stock_code)
 
 
 def _fetch_with_retry(

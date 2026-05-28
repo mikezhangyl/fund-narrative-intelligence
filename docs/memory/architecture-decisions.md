@@ -1716,3 +1716,158 @@ Consequences:
   `financial_metrics`, and `news_evidence` across raw and scoring JSON.
 - Drift in any of those payloads fails before text reports or workspace
   snapshots are consumed.
+
+## ADR-0067: Resolve Security Market Before Provider Symbol Formatting
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Introduce a shared stock-market resolver and require provider adapters to
+choose symbol and code formats from resolved market identity instead of
+hard-coding A-share prefix rules.
+
+Rationale:
+
+- `513010` exposed that Hong Kong holdings were being pushed through Shanghai
+  and Shenzhen symbol formatting logic.
+- Quote, valuation, and financial adapters should not each invent market rules
+  independently.
+- Market-aware formatting is the smallest durable fix that improves Hong Kong
+  support without rewriting provider orchestration.
+
+Consequences:
+
+- Hong Kong quote lookup can use the correct Yahoo Finance HK symbols such as
+  `0700.HK`, `0981.HK`, and `9988.HK`.
+- Eastmoney valuation and financial adapters now fail explicitly as
+  `provider_unsupported_market` for Hong Kong stock codes instead of
+  fabricating `.SH` or `.SZ` identifiers.
+- Future Hong Kong providers can plug into the same market resolver instead of
+  re-implementing code-format logic.
+
+## ADR-0068: Use Multi-Source News Evidence For Default Narrative Headlines
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+Make the default news evidence path aggregate multiple headline sources instead
+of relying on Google News RSS alone. The current default sources are Google
+News RSS and Sina Finance roll headlines.
+
+Rationale:
+
+- Chinese-market narrative coverage was too sparse when only Google News RSS
+  was queried.
+- Sina Finance behaves like a news source and fits the current evidence model
+  more naturally than community-discussion sources.
+- A multi-source provider improves coverage without changing the scoring or
+  evidence payload contracts.
+
+Consequences:
+
+- Default news payloads now use provider `multi-source-news`.
+- News evidence can contain `google_news_rss`, `sina_finance_roll`, and later
+  supplemental community-discussion records while preserving the same
+  validation contract.
+
+## ADR-0069: Prefer Independent Source Diversification Over Wrapper Count
+
+- Status: accepted
+- Date: 2026-05-15
+
+Decision:
+
+For the next domestic-market intelligence slices, prioritize independent
+information-source expansion and explicit uncertainty disclosure over adding
+more wrappers around the same upstream data websites.
+
+Rationale:
+
+- The product's core value is narrative intelligence, not merely duplicating
+  quote or fundamentals fetch paths.
+- Many free adapters overlap on the same upstream sources, so a larger provider
+  list does not necessarily produce more independent evidence.
+- For uncertain or conflicting real information, surfacing `partial`,
+  `conflicting`, or `low-confidence` is more honest and more useful than
+  immediately substituting mock-backed evidence.
+- Large models are better suited to semantic judgment after source fetching
+  than to raw fact retrieval or fabricated numeric completion.
+
+Consequences:
+
+- Upcoming source work should favor additional news, announcement, and evidence
+  sources before wrapper-only numerical-provider expansion.
+- New provider proposals should document whether they add an independent source
+  or only a new access path to an existing source.
+- LLM-assisted reasoning, when introduced, should operate in the semantic
+  judgment layer for tasks such as event clustering, narrative classification,
+  and conflict detection.
+- Mock-backed intelligence remains a deterministic safety net, but no longer
+  represents the preferred direction for future real-source slices.
+
+## ADR-0070: Use Summary-First Harness Context Loading
+
+- Status: accepted
+- Date: 2026-05-21
+
+Decision:
+
+Use token-light startup context for the ECC harness. The default context surface
+is `.ecc/framework-state.json`, `docs/memory/current-brief.md`,
+`docs/memory/architecture-decisions.index.md`, and
+`docs/exec-plans/active/index.md`. Full project memory, full ADR history,
+historical execution plans, and `.ecc/runs/**` artifacts are loaded only on
+demand.
+
+Rationale:
+
+- The full memory files and accumulated active plans are now large enough to
+  waste tokens on routine implementation turns.
+- Most tasks need current project shape, active queue, and lookup paths, not
+  every historical fact.
+- Keeping full memory as on-demand reference preserves recoverability without
+  making every turn pay for it.
+
+Consequences:
+
+- `AGENTS.md`, `project-bootstrap`, and `memory-governance` use summary-first
+  defaults.
+- `scripts/context_brief.py` provides a bounded generated context view for new
+  sessions.
+- `docs/memory/current-brief.md` and
+  `docs/memory/architecture-decisions.index.md` must stay concise and
+  operational.
+- Historical files remain in place for audit continuity and must be searched or
+  opened only when needed.
+
+## ADR-0071: Use HTML As The Canonical Formal Report Output
+
+- Status: accepted
+- Date: 2026-05-26
+
+Decision:
+
+All formal reader-facing reports must include HTML output as the canonical
+readable artifact. JSON remains the machine-readable data artifact. Markdown may
+exist as auxiliary compatibility output, but new formal reports must not depend
+on Markdown as their primary reading surface.
+
+Rationale:
+
+- The project needs reports that are easier to read and can display dense data
+  with tables, layout, and visual hierarchy.
+- HTML aligns better with the future web workspace and reduces the gap between
+  CLI artifacts and web-readable research views.
+- JSON is still required for validation, manifests, workspace loading, and
+  downstream automation.
+
+Consequences:
+
+- New report CLIs should write JSON plus HTML by default.
+- Existing Markdown-only formal reports should be upgraded when touched.
+- Markdown outputs, if retained, are compatibility artifacts rather than the
+  canonical user-facing report.

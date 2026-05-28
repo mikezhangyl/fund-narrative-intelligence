@@ -4,7 +4,9 @@ from dataclasses import dataclass, field
 
 from src.providers.base import DataProvider
 from src.providers.eastmoney import EastmoneyFundHoldingProvider
+from src.providers.local_gateway_fund import LocalGatewayFundHoldingProvider
 from src.providers.mock import MockDataProvider
+from src.providers.tushare_holdings import TushareFundHoldingProvider
 
 
 @dataclass(frozen=True)
@@ -19,6 +21,12 @@ def select_data_provider(provider_mode: str) -> ProviderSelection:
 
     if provider_mode == "eastmoney":
         return ProviderSelection(provider=EastmoneyFundHoldingProvider())
+
+    if provider_mode == "tushare":
+        return ProviderSelection(provider=TushareFundHoldingProvider())
+
+    if provider_mode == "gateway":
+        return ProviderSelection(provider=LocalGatewayFundHoldingProvider())
 
     if provider_mode == "real":
         return ProviderSelection(

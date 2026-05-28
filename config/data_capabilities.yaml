@@ -1,0 +1,957 @@
+version: data-capabilities-v1
+updated_at: "2026-05-27"
+purpose: >
+  Market-data capability ledger for deciding which datasets each analysis needs,
+  whether the platform can acquire them reliably, and what must move into the
+  local data gateway over time.
+
+datasets:
+  latest_stock_quotes:
+    description: Latest stock quote snapshot for report-time market context.
+    current_status: available
+    acquisition_difficulty: low
+    gateway_mode: gateway_planned
+    required_fields:
+      - stock_code
+      - latest_price
+      - retrieved_at
+    freshness: intraday_snapshot
+    primary_source:
+      provider: eastmoney
+      endpoint: market_quote
+      access_mode: public_web
+    fallback_sources: []
+    validation:
+      live_probe_capability: latest_stock_quotes
+    risks:
+      rate_limit: medium_public_web_endpoint
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - report_market_context
+      - market_quote_derived_signals
+    notes:
+      - Existing EastMoney quote path works as report context, not tick-level infrastructure.
+
+  stock_metadata:
+    description: A-share stock identity and listing metadata.
+    current_status: available
+    acquisition_difficulty: low
+    gateway_mode: gateway_ready
+    required_fields:
+      - ts_code
+      - symbol
+      - name
+      - industry
+      - list_date
+    freshness: daily_or_manual_refresh
+    primary_source:
+      provider: tushare
+      endpoint: stock_basic
+      access_mode: token_api
+    fallback_sources: []
+    validation:
+      live_probe_capability: stock_metadata
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_token_api
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - universe_selection
+      - breadth_scanner
+      - sector_mapping
+    notes:
+      - Should move behind local gateway early because it is shared by almost every scanner.
+
+  trade_calendar:
+    description: Exchange trading calendar for converting natural date ranges into trading-day windows.
+    current_status: available
+    acquisition_difficulty: low
+    gateway_mode: gateway_ready
+    required_fields:
+      - exchange
+      - cal_date
+      - is_open
+    freshness: long_lived
+    primary_source:
+      provider: tushare
+      endpoint: trade_cal
+      access_mode: token_api
+    fallback_sources: []
+    validation:
+      live_probe_capability: trade_calendar
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_token_api
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - all_scanners
+      - historical_replay
+      - gateway_backfill_planning
+    notes:
+      - Implemented in the V0 Tushare provider; scanners should use this instead of natural-day assumptions.
+
+  a_share_daily_bars:
+    description: A-share daily OHLCV bars for trend, breadth, and historical replay.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - trade_date
+      - open
+      - high
+      - low
+      - close
+      - volume
+      - amount
+    freshness: after_market_daily
+    primary_source:
+      provider: tushare
+      endpoint: daily
+      access_mode: token_api
+    fallback_sources:
+      - provider: akshare
+        endpoint: stock_zh_a_hist
+        access_mode: public_web
+        current_status: disabled
+    validation:
+      live_probe_capability: a_share_daily_bars
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_token_api
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - market_breadth_ma20
+      - advance_decline
+      - new_high_new_low
+      - volume_expansion
+      - trend_scanner
+    notes:
+      - AkShare fallback exists but observed public endpoint instability keeps it disabled until repeated validation improves.
+
+  turnover_rate:
+    description: Daily turnover and market-cap fields used for activity and liquidity filters.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - trade_date
+      - turnover_rate
+      - total_mv
+      - circ_mv
+    freshness: after_market_daily
+    primary_source:
+      provider: tushare
+      endpoint: daily_basic
+      access_mode: token_api
+    fallback_sources: []
+    validation:
+      live_probe_capability: turnover_rate
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_token_api
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - market_activity
+      - liquidity_filters
+      - volume_expansion
+    notes:
+      - Should be cached with daily bars to avoid doubling Tushare calls in broad scans.
+
+  index_bars:
+    description: Index daily OHLCV bars for market-regime context and scanner benchmarks.
+    current_status: available
+    acquisition_difficulty: low
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - trade_date
+      - close
+    freshness: after_market_daily
+    primary_source:
+      provider: tushare
+      endpoint: index_daily
+      access_mode: token_api
+    fallback_sources: []
+    validation:
+      live_probe_capability: index_bars
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_token_api
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - market_regime
+      - breadth_context
+    notes:
+      - Low-volume endpoint; direct access is acceptable until gateway is ready.
+
+  etf_daily:
+    description: ETF daily bars for ETF ranking and sector proxy analysis.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - trade_date
+      - close
+      - volume
+      - amount
+    freshness: after_market_daily
+    primary_source:
+      provider: tushare
+      endpoint: fund_daily
+      access_mode: token_api
+    fallback_sources:
+      - provider: akshare
+        endpoint: fund_etf_hist_em
+        access_mode: public_web
+        current_status: disabled
+    validation:
+      live_probe_capability: etf_daily
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_token_api
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - etf_ranking
+      - sector_rotation_proxy
+    notes:
+      - AkShare ETF fallback is useful conceptually but currently unreliable in live probes.
+
+  sector_concepts:
+    description: Concept and sector board snapshots for sector rotation ranking.
+    current_status: unstable
+    acquisition_difficulty: medium
+    gateway_mode: gateway_planned
+    required_fields:
+      - sector_name
+      - pct_change
+      - source
+    freshness: intraday_or_after_market
+    primary_source:
+      provider: akshare
+      endpoint: stock_board_concept_name_em
+      access_mode: public_web
+    fallback_sources:
+      - provider: eastmoney
+        endpoint: concept_board
+        access_mode: public_web
+        current_status: planned
+    validation:
+      live_probe_capability: sector_concepts
+    risks:
+      rate_limit: medium_public_web_endpoint
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - sector_rotation_scan
+      - narrative_sector_mapping
+    notes:
+      - AkShare 1.18.63 improved behavior but concept board remains intermittently failing in current network windows.
+
+  limit_up_down_stats:
+    description: Daily limit-up and limit-down pool counts for market heat and risk appetite.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_planned
+    required_fields:
+      - trade_date
+      - limit_up_count
+      - limit_down_count
+    freshness: after_market_daily
+    primary_source:
+      provider: akshare
+      endpoint: stock_zt_pool_em+stock_zt_pool_dtgc_em
+      access_mode: public_web
+    fallback_sources: []
+    validation:
+      live_probe_capability: limit_up_down_stats
+    risks:
+      rate_limit: medium_public_web_endpoint
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - market_heat
+      - risk_appetite
+      - breadth_context
+    notes:
+      - Current live probes classify this as fallback-safe rather than core primary infrastructure.
+
+  cyq_chips:
+    description: A-share daily cost-basis/chip distribution rows by price bucket.
+    current_status: available
+    acquisition_difficulty: high
+    gateway_mode: gateway_owned
+    required_fields:
+      - ts_code
+      - trade_date
+      - price
+      - percent
+    freshness: after_market_daily
+    primary_source:
+      provider: local_gateway
+      endpoint: tushare.cyq_chips
+      access_mode: read_through_cache
+    fallback_sources:
+      - provider: tushare
+        endpoint: cyq_chips
+        access_mode: token_api
+        current_status: planned
+    validation:
+      live_probe_capability: cyq_chips
+    risks:
+      rate_limit: high_without_gateway
+      anti_bot: low_token_api
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - cost_basis_analysis
+      - chip_distribution_factors
+      - future_narrative_engine_context
+    notes:
+      - Gateway live conformance passed for /api/v1/market-data/chips/cyq on 2026-05-26; deeper backfill scheduling remains a separate operations task.
+
+  northbound_capital:
+    description: Northbound capital flow for optional macro liquidity context.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - trade_date
+      - net_buy_amount
+    freshness: after_market_daily
+    primary_source:
+      provider: akshare
+      endpoint: northbound_capital
+      access_mode: public_web
+    fallback_sources: []
+    validation:
+      live_probe_capability: northbound_capital
+    risks:
+      rate_limit: medium_public_web_endpoint
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - macro_liquidity_context
+    notes:
+      - Priority tier 2; do not block V0 scanners on this.
+
+  main_capital_flow:
+    description: Main capital flow snapshot for optional money-flow layer.
+    current_status: available
+    acquisition_difficulty: high
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - trade_date
+      - net_inflow
+    freshness: intraday_or_after_market
+    primary_source:
+      provider: eastmoney
+      endpoint: main_capital_flow
+      access_mode: public_web
+    fallback_sources: []
+    validation:
+      live_probe_capability: main_capital_flow
+    risks:
+      rate_limit: medium_public_web_endpoint
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - optional_money_flow_layer
+    notes:
+      - Priority tier 2; validate only after V0 market structure data is reliable.
+
+  etf_flow:
+    description: ETF fund-flow rows for optional ETF rotation and liquidity context.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - trade_date
+      - net_inflow
+    freshness: intraday_or_after_market
+    primary_source:
+      provider: eastmoney
+      endpoint: etf_flow
+      access_mode: public_web
+    fallback_sources:
+      - provider: akshare
+        endpoint: etf_flow
+        access_mode: public_web
+        current_status: planned
+    validation:
+      live_probe_capability: etf_flow
+    risks:
+      rate_limit: medium_public_web_endpoint
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - etf_rotation_context
+      - optional_money_flow_layer
+
+  dragon_tiger_list:
+    description: Daily 龙虎榜 rows for unusual trading and event-driven market context.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - trade_date
+      - reason
+    freshness: after_market_daily
+    primary_source:
+      provider: akshare
+      endpoint: stock_lhb_detail_em
+      access_mode: public_web
+    fallback_sources: []
+    validation:
+      live_probe_capability: dragon_tiger_list
+    risks:
+      rate_limit: medium_public_web_endpoint
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - event_driven_market_context
+      - optional_money_flow_layer
+
+  sector_constituents:
+    description: Constituent stock list for a concept or sector board.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - sector_name
+      - symbol
+      - name
+    freshness: intraday_or_after_market
+    primary_source:
+      provider: gateway
+      endpoint: sectors/constituents
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: akshare
+        endpoint: stock_board_concept_cons_em
+        access_mode: public_web
+        current_status: candidate
+      - provider: eastmoney
+        endpoint: concept_board_constituents
+        access_mode: public_web
+        current_status: candidate
+    validation:
+      live_probe_capability: sector_constituents
+    risks:
+      rate_limit: medium_public_web_endpoint
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - sector_rotation_scan
+      - narrative_sector_mapping
+      - holding_sector_exposure
+    notes:
+      - This is a structure-mapping dataset; it should be more useful for FNI than adding another volatile quote endpoint.
+
+  stock_sector_membership:
+    description: Reverse mapping from stock symbols to sector/concept memberships.
+    current_status: unstable
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - sector_name
+      - sector_type
+      - source
+    freshness: daily_or_after_market
+    primary_source:
+      provider: gateway
+      endpoint: stocks/sector-memberships
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: gateway
+        endpoint: materialized_sector_constituents_reverse_index
+        access_mode: derived_cache
+        current_status: candidate
+    validation:
+      live_probe_capability: stock_sector_membership
+    risks:
+      rate_limit: medium_if_built_by_scanning_all_boards
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_api_fee_observed
+    analysis_use_cases:
+      - holding_sector_exposure
+      - narrative_sector_mapping
+      - stock_explainability_context
+    notes:
+      - "Gateway endpoint implemented on 2026-05-27 with a persistent reverse-index cache. Current local smoke can return structured degraded payloads when EastMoney/AkShare public upstreams are unreachable, so keep this as unstable until repeated rows are observed."
+      - "FNI live probes can bound reverse-index expansion with `--sector-universe-limit`; use `0` for seed-only Can-Do checks and raise it only when upstream stability is acceptable."
+      - "Gateway timeout hardening accepted on 2026-05-27: bounded FNI smoke now returns HTTP 200 degraded `REQUEST_TIMEOUT` metadata instead of 404 or socket timeout."
+
+  fund_profile:
+    description: Fund identity and metadata used by fund narrative reports.
+    current_status: available
+    acquisition_difficulty: low
+    gateway_mode: gateway_ready
+    required_fields:
+      - fund_code
+      - fund_name
+      - fund_type
+      - currency
+      - source
+    freshness: daily_or_periodic_snapshot
+    primary_source:
+      provider: gateway
+      endpoint: funds/profile
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: eastmoney
+        endpoint: fundmobapi_profile_or_holdings_metadata
+        access_mode: public_web
+        current_status: existing_direct_provider
+      - provider: tushare
+        endpoint: fund_basic
+        access_mode: token_api
+        current_status: candidate
+    validation:
+      live_probe_capability: fund_profile
+    risks:
+      rate_limit: low_to_medium_public_web_or_token_quota
+      anti_bot: medium_if_public_web_primary
+      operational_cost: no_direct_fee_for_eastmoney_token_policy_for_tushare
+    analysis_use_cases:
+      - fund_gateway_foundation
+      - fund_report_source_foundation
+    notes:
+      - "Gateway endpoint accepted on 2026-05-27 at `/api/v1/market-data/funds/profile`; live conformance passed against `161725` and returned normalized profile rows."
+      - "Repeatable FNI smoke entry: `scripts/run_fund_profile_holdings_probe.py --fund-code 161725 --limit 10`."
+      - "Use profile rows for identity metadata only; holding disclosure date should come from `fund_holdings.as_of_date` when building fund reports."
+
+  fund_holdings:
+    description: Latest fund top holdings normalized to stock codes, names, weights, and as-of date.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - fund_code
+      - as_of_date
+      - stock_code
+      - stock_name
+      - weight
+      - source
+    freshness: periodic_disclosure_or_provider_latest
+    primary_source:
+      provider: gateway
+      endpoint: funds/holdings
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: eastmoney
+        endpoint: FundMNewApi/FundMNInverstPosition
+        access_mode: public_web
+        current_status: existing_direct_provider
+      - provider: tushare
+        endpoint: fund_portfolio
+        access_mode: token_api
+        current_status: existing_direct_provider
+    validation:
+      live_probe_capability: fund_holdings
+    risks:
+      rate_limit: medium_public_web_or_token_quota
+      anti_bot: medium_public_web_endpoint
+      operational_cost: no_direct_fee_for_eastmoney_token_policy_for_tushare
+    analysis_use_cases:
+      - fund_gateway_foundation
+      - holding_sector_exposure
+      - narrative_exposure_aggregation
+    notes:
+      - "Gateway endpoint accepted on 2026-05-27 at `/api/v1/market-data/funds/holdings`; live conformance passed and a `provider_mode=gateway` report for `161725` returned 10 fresh holdings with no FNI degradation events."
+      - "Repeatable FNI smoke entry: `scripts/run_fund_profile_holdings_probe.py --fund-code 161725 --limit 10`."
+      - "Gateway owns cache, Tushare/EastMoney upstream fallback, and structured degraded metadata. It must not silently return mock holdings."
+
+  etf_basic:
+    description: ETF identity, classification, issuer, and optional tracking-index metadata.
+    current_status: available
+    acquisition_difficulty: low
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - name
+    freshness: daily_or_manual_refresh
+    primary_source:
+      provider: gateway
+      endpoint: etf/basic
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: tushare
+        endpoint: fund_basic
+        access_mode: token_api
+        current_status: candidate
+      - provider: akshare
+        endpoint: fund_etf_spot_em
+        access_mode: public_web
+        current_status: candidate
+    validation:
+      live_probe_capability: etf_basic
+    risks:
+      rate_limit: low_to_medium
+      anti_bot: low_if_tushare_primary_medium_if_public_web
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - etf_rotation_context
+      - sector_proxy_mapping
+      - fund_holding_exposure
+    notes:
+      - Prefer returning classification fields in the same endpoint before splitting a separate category route.
+
+  index_constituents:
+    description: Index constituent stocks and optional weights for benchmark and breadth segmentation.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - index_symbol
+      - symbol
+      - name
+    freshness: daily_or_periodic_snapshot
+    primary_source:
+      provider: gateway
+      endpoint: index/constituents
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: tushare
+        endpoint: index_weight
+        access_mode: token_api
+        current_status: candidate
+      - provider: akshare
+        endpoint: index_constituents
+        access_mode: public_web
+        current_status: candidate
+    validation:
+      live_probe_capability: index_constituents
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_if_tushare_primary_medium_if_public_web
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - benchmark_context
+      - breadth_segmentation
+      - index_exposure_mapping
+
+  margin_summary:
+    description: Market-level margin financing and securities lending summary.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - trade_date
+      - financing_balance
+    freshness: after_market_daily
+    primary_source:
+      provider: gateway
+      endpoint: margin/summary
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: tushare
+        endpoint: margin
+        access_mode: token_api
+        current_status: candidate
+      - provider: akshare
+        endpoint: margin_summary
+        access_mode: public_web
+        current_status: candidate
+    validation:
+      live_probe_capability: margin_summary
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_if_tushare_primary_medium_if_public_web
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - leverage_context
+      - market_risk_appetite
+
+  margin_detail:
+    description: Stock-level margin financing and securities lending details.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - trade_date
+      - symbol
+      - financing_balance
+    freshness: after_market_daily
+    primary_source:
+      provider: gateway
+      endpoint: margin/detail
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: tushare
+        endpoint: margin_detail
+        access_mode: token_api
+        current_status: candidate
+      - provider: akshare
+        endpoint: margin_detail
+        access_mode: public_web
+        current_status: candidate
+    validation:
+      live_probe_capability: margin_detail
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_if_tushare_primary_medium_if_public_web
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - stock_leverage_context
+      - unusual_activity_context
+
+  earnings_calendar:
+    description: Earnings announcement and forecast calendar for event context.
+    current_status: available
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - symbol
+      - name
+      - ann_date
+      - event_type
+    freshness: daily_or_event_snapshot
+    primary_source:
+      provider: gateway
+      endpoint: fundamentals/earnings-calendar
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: tushare
+        endpoint: forecast_or_disclosure_calendar
+        access_mode: token_api
+        current_status: candidate
+      - provider: akshare
+        endpoint: earnings_calendar
+        access_mode: public_web
+        current_status: candidate
+    validation:
+      live_probe_capability: earnings_calendar
+    risks:
+      rate_limit: medium_token_quota_dependent
+      anti_bot: low_if_tushare_primary_medium_if_public_web
+      operational_cost: token_and_point_policy_dependent
+    analysis_use_cases:
+      - event_calendar_context
+      - narrative_event_risk
+      - report_explainability
+
+analysis_capabilities:
+  market_breadth_ma20:
+    description: Percent of A-share universe trading above MA20.
+    complexity: simple
+    implementation_status: prototype
+    required_datasets:
+      - a_share_daily_bars
+      - stock_metadata
+      - trade_calendar
+    output_metrics:
+      - ma20_breadth
+    notes:
+      - First deterministic breadth metric to harden after trade calendar support.
+
+  advance_decline:
+    description: Rising versus falling stock count for a trading day.
+    complexity: simple
+    implementation_status: prototype
+    required_datasets:
+      - a_share_daily_bars
+      - stock_metadata
+      - trade_calendar
+    output_metrics:
+      - advancers
+      - decliners
+      - advance_decline_ratio
+
+  new_high_new_low:
+    description: 52-week high and low statistics across the A-share universe.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - a_share_daily_bars
+      - stock_metadata
+      - trade_calendar
+    output_metrics:
+      - new_high_52w_count
+      - new_low_52w_count
+
+  volume_expansion:
+    description: Market-wide volume expansion versus rolling baseline.
+    complexity: simple
+    implementation_status: prototype
+    required_datasets:
+      - a_share_daily_bars
+      - turnover_rate
+      - trade_calendar
+    output_metrics:
+      - total_volume_ratio
+      - expanding_volume_count
+
+  sector_rotation_scan:
+    description: Rank sectors and concept boards by price and activity momentum.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - sector_concepts
+      - etf_daily
+      - trade_calendar
+    output_metrics:
+      - sector_rank
+      - sector_momentum
+      - etf_proxy_rank
+
+  holding_sector_exposure:
+    description: Map arbitrary fund or stock holdings back to concept/sector memberships.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - stock_sector_membership
+      - stock_metadata
+      - trade_calendar
+    output_metrics:
+      - sector_membership_count
+      - holding_sector_overlap
+      - unmatched_holding_count
+    notes:
+      - Implemented as a thin Can-Do report in `scripts/run_holding_sector_exposure_report.py`; keep data stability warning until stock_sector_membership repeatedly returns rows in live checks.
+
+  fund_gateway_foundation:
+    description: Move fund identity and top-holding acquisition behind the local gateway.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - fund_profile
+      - fund_holdings
+    output_metrics:
+      - fund_profile_rows
+      - fund_holding_rows
+      - provider_degradation_events
+    notes:
+      - "FNI can now run fund reports with `--provider-mode gateway`; non-holdings layers still use existing fallback providers, so this remains a prototype foundation rather than full production sourcing."
+
+  fund_holding_exposure_report:
+    description: Explain a fund's gateway holdings through industry, sector membership, and local narrative mapping exposure.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - fund_profile
+      - fund_holdings
+      - stock_sector_membership
+    output_metrics:
+      - holding_count
+      - industry_exposure_count
+      - sector_exposure_count
+      - narrative_exposure_count
+      - data_gap_count
+    notes:
+      - "Implemented as `scripts/run_fund_holding_exposure_report.py`. It keeps industry and narrative exposure available even when stock-sector membership returns a structured degraded result."
+      - "This is a Can-Do explanation layer, not a trading signal or prediction."
+
+  benchmark_context:
+    description: Daily report context from index daily bars and ETF daily bars.
+    complexity: simple
+    implementation_status: prototype
+    required_datasets:
+      - index_bars
+      - etf_daily
+      - trade_calendar
+    output_metrics:
+      - index_daily_rows
+      - etf_daily_rows
+      - benchmark_close_samples
+
+  market_heat:
+    description: Market risk-appetite context from limit-up/down and breadth state.
+    complexity: simple
+    implementation_status: planned
+    required_datasets:
+      - limit_up_down_stats
+      - a_share_daily_bars
+      - trade_calendar
+    output_metrics:
+      - limit_up_down_ratio
+      - heat_score_inputs
+
+  cost_basis_analysis:
+    description: Future cost-basis and chip-distribution analysis based on local gateway cache.
+    complexity: complex
+    implementation_status: planned
+    required_datasets:
+      - cyq_chips
+      - a_share_daily_bars
+      - trade_calendar
+    output_metrics:
+      - chip_concentration
+      - profit_chip_ratio
+      - cost_basis_shift
+
+  cost_basis_context:
+    description: Daily report sample context from gateway CYQ chip distribution rows.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - cyq_chips
+    output_metrics:
+      - cost_distribution_bucket_count
+      - peak_cost_distribution_price
+      - peak_cost_distribution_percent
+
+  leverage_context:
+    description: Deterministic market leverage context from margin financing and lending data.
+    complexity: medium
+    implementation_status: planned
+    required_datasets:
+      - margin_summary
+      - margin_detail
+      - trade_calendar
+    output_metrics:
+      - financing_balance_trend
+      - margin_activity_rank
+
+  event_calendar_context:
+    description: Upcoming and recently announced earnings or forecast events for report context.
+    complexity: medium
+    implementation_status: planned
+    required_datasets:
+      - earnings_calendar
+      - stock_metadata
+      - trade_calendar
+    output_metrics:
+      - upcoming_event_count
+      - forecast_event_count
+
+  flow_event_context:
+    description: Daily report context combining northbound capital, main capital flow, ETF flow, and dragon-tiger rows.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - northbound_capital
+      - main_capital_flow
+      - etf_flow
+      - dragon_tiger_list
+    output_metrics:
+      - northbound_net_buy_amount
+      - top_main_capital_flow
+      - top_etf_flow
+      - dragon_tiger_sample_count
+      - flow_event_cross_links
+
+  structure_mapping_report:
+    description: Can-Do report linking sector constituents, ETF metadata, index constituents, margin context, and event calendar data.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - sector_constituents
+      - etf_basic
+      - index_constituents
+      - margin_summary
+      - margin_detail
+      - earnings_calendar
+    output_metrics:
+      - sector_constituent_rows
+      - etf_basic_rows
+      - index_constituent_rows
+      - margin_summary_rows
+      - margin_detail_rows
+      - earnings_calendar_rows

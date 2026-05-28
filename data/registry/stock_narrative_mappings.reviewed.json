@@ -2,9 +2,308 @@
   "version": "mapping-v1",
   "mappings": [
     {
-      "stock_code": "NVDA",
-      "narrative_id": "N_AI_INFRA",
+      "stock_code": "000063",
+      "narrative_id": "N_COMMUNICATION_EQUIPMENT",
+      "mapping_weight": 0.5,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-16",
+        "review_note": "Approved to complete 515880 reviewed coverage. 中兴通讯 belongs to the communication equipment layer rather than being forced into 光模块 or 半导体 fallback."
+      }
+    },
+    {
+      "stock_code": "000568",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.88,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "000596",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.82,
+      "confidence": 0.76,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "000799",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.8,
+      "confidence": 0.74,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "000858",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.92,
+      "confidence": 0.84,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "002281",
+      "narrative_id": "N_OPTICAL_COMMUNICATION",
+      "mapping_weight": 0.55,
+      "confidence": 0.9,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Approved from 515880 光通信 candidate mapping review."
+      }
+    },
+    {
+      "stock_code": "002304",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.86,
+      "confidence": 0.78,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "00700",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.95,
+      "confidence": 0.88,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "00981",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.76,
+      "confidence": 0.76,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "01024",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.88,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "01211",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.7,
+      "confidence": 0.7,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "01810",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.86,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "03690",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.92,
+      "confidence": 0.84,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "09618",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
       "mapping_weight": 0.9,
+      "confidence": 0.84,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "09888",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.86,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "09988",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.95,
+      "confidence": 0.88,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "09999",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "mapping_weight": 0.82,
+      "confidence": 0.8,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
+      }
+    },
+    {
+      "stock_code": "300136",
+      "narrative_id": "N_COMMUNICATION_EQUIPMENT",
+      "mapping_weight": 0.42,
+      "confidence": 0.74,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-16",
+        "review_note": "Approved to complete 515880 reviewed coverage. 信维通信 fits the communication equipment and connector device theme with a lower weight than core optical holdings."
+      }
+    },
+    {
+      "stock_code": "300308",
+      "narrative_id": "N_OPTICAL_MODULE_CHAIN",
+      "mapping_weight": 0.55,
+      "confidence": 0.874,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Approved from 515880 光模块 candidate mapping review."
+      }
+    },
+    {
+      "stock_code": "300394",
+      "narrative_id": "N_OPTICAL_MODULE_CHAIN",
+      "mapping_weight": 0.55,
+      "confidence": 0.874,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Approved from 515880 光模块 candidate mapping review."
+      }
+    },
+    {
+      "stock_code": "300502",
+      "narrative_id": "N_OPTICAL_MODULE_CHAIN",
+      "mapping_weight": 0.55,
+      "confidence": 0.874,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Approved from 515880 光模块 candidate mapping review."
+      }
+    },
+    {
+      "stock_code": "600487",
+      "narrative_id": "N_OPTICAL_COMMUNICATION",
+      "mapping_weight": 0.55,
+      "confidence": 0.9,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Approved from 515880 光通信 candidate mapping review."
+      }
+    },
+    {
+      "stock_code": "600498",
+      "narrative_id": "N_OPTICAL_COMMUNICATION",
+      "mapping_weight": 0.55,
+      "confidence": 0.9,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Approved from 515880 光通信 candidate mapping review."
+      }
+    },
+    {
+      "stock_code": "600519",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.95,
       "confidence": 0.86,
       "method": "reviewed_mapping",
       "review": {
@@ -15,10 +314,231 @@
       }
     },
     {
-      "stock_code": "NVDA",
-      "narrative_id": "N_SEMI_CAPEX",
-      "mapping_weight": 0.7,
+      "stock_code": "600522",
+      "narrative_id": "N_OPTICAL_COMMUNICATION",
+      "mapping_weight": 0.55,
+      "confidence": 0.9,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Approved from 515880 光通信 candidate mapping review."
+      }
+    },
+    {
+      "stock_code": "601138",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.46,
+      "confidence": 0.78,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "codex-review",
+        "reviewed_at": "2026-05-16",
+        "review_note": "Approved to complete 515880 reviewed coverage. 工业富联 is treated as AI infrastructure hardware exposure rather than broad electronics noise."
+      }
+    },
+    {
+      "stock_code": "600702",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.78,
       "confidence": 0.74,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "600779",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.76,
+      "confidence": 0.7,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "600809",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.9,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "603198",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.78,
+      "confidence": 0.74,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "603369",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.78,
+      "confidence": 0.72,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "603589",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "mapping_weight": 0.74,
+      "confidence": 0.68,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "ALB",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.55,
+      "confidence": 0.64,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "AMZN",
+      "narrative_id": "N_AI_APPS",
+      "mapping_weight": 0.5,
+      "confidence": 0.69,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "AMZN",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.5,
+      "confidence": 0.68,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "ASML",
+      "narrative_id": "N_SEMI_CAPEX",
+      "mapping_weight": 0.85,
+      "confidence": 0.8,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "AVGO",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.85,
+      "confidence": 0.8,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "BYD",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.9,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "CEG",
+      "narrative_id": "N_AI_POWER",
+      "mapping_weight": 0.9,
+      "confidence": 0.82,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "ETN",
+      "narrative_id": "N_AI_POWER",
+      "mapping_weight": 0.8,
+      "confidence": 0.78,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "GOOGL",
+      "narrative_id": "N_AI_APPS",
+      "mapping_weight": 0.7,
+      "confidence": 0.73,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "LI",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.8,
+      "confidence": 0.76,
       "method": "reviewed_mapping",
       "review": {
         "status": "approved",
@@ -54,10 +574,10 @@
       }
     },
     {
-      "stock_code": "VST",
+      "stock_code": "NEE",
       "narrative_id": "N_AI_POWER",
-      "mapping_weight": 0.9,
-      "confidence": 0.84,
+      "mapping_weight": 0.65,
+      "confidence": 0.7,
       "method": "reviewed_mapping",
       "review": {
         "status": "approved",
@@ -67,9 +587,74 @@
       }
     },
     {
-      "stock_code": "VST",
+      "stock_code": "NIO",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.9,
+      "confidence": 0.8,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "NVDA",
       "narrative_id": "N_AI_INFRA",
-      "mapping_weight": 0.6,
+      "mapping_weight": 0.9,
+      "confidence": 0.86,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "NVDA",
+      "narrative_id": "N_SEMI_CAPEX",
+      "mapping_weight": 0.7,
+      "confidence": 0.74,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "PWR",
+      "narrative_id": "N_AI_POWER",
+      "mapping_weight": 0.75,
+      "confidence": 0.76,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "SMCI",
+      "narrative_id": "N_AI_INFRA",
+      "mapping_weight": 0.75,
+      "confidence": 0.69,
+      "method": "reviewed_mapping",
+      "review": {
+        "status": "approved",
+        "reviewed_by": "seed-curation",
+        "reviewed_at": "2026-05-15",
+        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
+      }
+    },
+    {
+      "stock_code": "TSLA",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "mapping_weight": 0.85,
       "confidence": 0.78,
       "method": "reviewed_mapping",
       "review": {
@@ -106,113 +691,9 @@
       }
     },
     {
-      "stock_code": "AVGO",
+      "stock_code": "VST",
       "narrative_id": "N_AI_INFRA",
-      "mapping_weight": 0.85,
-      "confidence": 0.8,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "SMCI",
-      "narrative_id": "N_AI_INFRA",
-      "mapping_weight": 0.75,
-      "confidence": 0.69,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "GOOGL",
-      "narrative_id": "N_AI_APPS",
-      "mapping_weight": 0.7,
-      "confidence": 0.73,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "NEE",
-      "narrative_id": "N_AI_POWER",
-      "mapping_weight": 0.65,
-      "confidence": 0.7,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "AMZN",
-      "narrative_id": "N_AI_INFRA",
-      "mapping_weight": 0.5,
-      "confidence": 0.68,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "AMZN",
-      "narrative_id": "N_AI_APPS",
-      "mapping_weight": 0.5,
-      "confidence": 0.69,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "ASML",
-      "narrative_id": "N_SEMI_CAPEX",
-      "mapping_weight": 0.85,
-      "confidence": 0.8,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "CEG",
-      "narrative_id": "N_AI_POWER",
-      "mapping_weight": 0.9,
-      "confidence": 0.82,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "ETN",
-      "narrative_id": "N_AI_POWER",
-      "mapping_weight": 0.8,
+      "mapping_weight": 0.6,
       "confidence": 0.78,
       "method": "reviewed_mapping",
       "review": {
@@ -223,62 +704,10 @@
       }
     },
     {
-      "stock_code": "PWR",
+      "stock_code": "VST",
       "narrative_id": "N_AI_POWER",
-      "mapping_weight": 0.75,
-      "confidence": 0.76,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "TSLA",
-      "narrative_id": "N_EV_PRICE_WAR",
-      "mapping_weight": 0.85,
-      "confidence": 0.78,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "BYD",
-      "narrative_id": "N_EV_PRICE_WAR",
       "mapping_weight": 0.9,
-      "confidence": 0.82,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "NIO",
-      "narrative_id": "N_EV_PRICE_WAR",
-      "mapping_weight": 0.9,
-      "confidence": 0.8,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "LI",
-      "narrative_id": "N_EV_PRICE_WAR",
-      "mapping_weight": 0.8,
-      "confidence": 0.76,
+      "confidence": 0.84,
       "method": "reviewed_mapping",
       "review": {
         "status": "approved",
@@ -299,311 +728,12 @@
         "reviewed_at": "2026-05-15",
         "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
       }
-    },
-    {
-      "stock_code": "ALB",
-      "narrative_id": "N_EV_PRICE_WAR",
-      "mapping_weight": 0.55,
-      "confidence": 0.64,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "600519",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.95,
-      "confidence": 0.86,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "000858",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.92,
-      "confidence": 0.84,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "000568",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.88,
-      "confidence": 0.82,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "600809",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.9,
-      "confidence": 0.82,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "002304",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.86,
-      "confidence": 0.78,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "000596",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.82,
-      "confidence": 0.76,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "000799",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.8,
-      "confidence": 0.74,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "603198",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.78,
-      "confidence": 0.74,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "600702",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.78,
-      "confidence": 0.74,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "603369",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.78,
-      "confidence": 0.72,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "600779",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.76,
-      "confidence": 0.7,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "603589",
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "mapping_weight": 0.74,
-      "confidence": 0.68,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Seeded from accepted V1 mapping fixture and reviewed mapping additions."
-      }
-    },
-    {
-      "stock_code": "01211",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.7,
-      "confidence": 0.7,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
-    },
-    {
-      "stock_code": "03690",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.92,
-      "confidence": 0.84,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
-    },
-    {
-      "stock_code": "01810",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.86,
-      "confidence": 0.82,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
-    },
-    {
-      "stock_code": "00700",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.95,
-      "confidence": 0.88,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
-    },
-    {
-      "stock_code": "09988",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.95,
-      "confidence": 0.88,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
-    },
-    {
-      "stock_code": "09999",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.82,
-      "confidence": 0.8,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
-    },
-    {
-      "stock_code": "00981",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.76,
-      "confidence": 0.76,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
-    },
-    {
-      "stock_code": "09618",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.9,
-      "confidence": 0.84,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
-    },
-    {
-      "stock_code": "01024",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.88,
-      "confidence": 0.82,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
-    },
-    {
-      "stock_code": "09888",
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "mapping_weight": 0.86,
-      "confidence": 0.82,
-      "method": "reviewed_mapping",
-      "review": {
-        "status": "approved",
-        "reviewed_by": "seed-curation",
-        "reviewed_at": "2026-05-15",
-        "review_note": "Added to support 513010 Hong Kong technology platform demo coverage."
-      }
     }
   ],
   "review_metadata": {
     "review_schema_version": "review-metadata-v1",
-    "reviewed_by": "seed-curation",
+    "reviewed_by": "codex-review",
     "reviewed_at": "2026-05-15",
-    "review_note": "Seeded reviewed store for V1 provider validation and future web approval workflows."
+    "review_note": "Updated reviewed mappings with 515880 光通信 / 光模块 approvals."
   }
 }

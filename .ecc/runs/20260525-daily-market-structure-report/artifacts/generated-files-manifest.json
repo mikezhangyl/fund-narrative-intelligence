@@ -1,0 +1,64 @@
+{
+  "generated_artifacts": [
+    {
+      "checksum_sha256": "8afd78f73630f92d3446bc85f5f303383bad7c08e2c381124d166169eed5359a",
+      "mtime_epoch": 1779723428,
+      "owned_by_task": true,
+      "path": "outputs/daily_market_structure/2026-05-25-can-do-smoke/daily_market_structure_report.json",
+      "reviewed_snapshot_type": "working_tree",
+      "size_bytes": 17067,
+      "summary": "Live gateway Can-Do JSON smoke output for the daily market structure report.",
+      "type": "report_json"
+    },
+    {
+      "checksum_sha256": "9ddf4549acda969ea7bb4f2ded3fb28ba4feee4c943fffbaf0d2c9205f964362",
+      "mtime_epoch": 1779723428,
+      "owned_by_task": true,
+      "path": "outputs/daily_market_structure/2026-05-25-can-do-smoke/daily_market_structure_report.md",
+      "reviewed_snapshot_type": "working_tree",
+      "size_bytes": 1730,
+      "summary": "Historical live gateway Can-Do Markdown smoke output before the HTML report rule was applied.",
+      "type": "report_markdown"
+    },
+    {
+      "checksum_sha256": "289ddee36c72886471565bef38cee87e8c113e7c1b4c5ca21a88d1e531c39efe",
+      "mtime_epoch": 1779726339,
+      "owned_by_task": true,
+      "path": "outputs/daily_market_structure/2026-05-26-can-do-html-smoke/daily_market_structure_report.json",
+      "reviewed_snapshot_type": "working_tree",
+      "size_bytes": 17067,
+      "summary": "Live gateway Can-Do JSON smoke output for the HTML daily market structure report.",
+      "type": "report_json"
+    },
+    {
+      "checksum_sha256": "52ab7304bb6602f56eb053cc84da27ecdce44124d68c13f6ac3ec77d9e5a79b5",
+      "mtime_epoch": 1779726339,
+      "owned_by_task": true,
+      "path": "outputs/daily_market_structure/2026-05-26-can-do-html-smoke/daily_market_structure_report.html",
+      "reviewed_snapshot_type": "working_tree",
+      "size_bytes": 6942,
+      "summary": "Live gateway Can-Do HTML smoke output for the daily market structure report.",
+      "type": "report_html"
+    },
+    {
+      "checksum_sha256": "7faa3609d6a7adf85fa9d4a2165c7b6758f41b5cb07b0c790ad77b6e5d1ec26a",
+      "mtime_epoch": 1779763901,
+      "owned_by_task": true,
+      "path": "outputs/daily_market_structure/2026-05-26-relative-complete/daily_market_structure_report.json",
+      "reviewed_snapshot_type": "working_tree",
+      "size_bytes": 101371,
+      "summary": "Relative-complete daily market structure JSON with data gaps and title-level news deduplication.",
+      "type": "report_json"
+    },
+    {
+      "checksum_sha256": "4586f0a21ea62437c18beab31f6f5911db08da4c037feb6e75514ce4c9c99ee0",
+      "mtime_epoch": 1779763901,
+      "owned_by_task": true,
+      "path": "outputs/daily_market_structure/2026-05-26-relative-complete/daily_market_structure_report.html",
+      "reviewed_snapshot_type": "working_tree",
+      "size_bytes": 14145,
+      "summary": "Relative-complete Chinese HTML daily market structure report with hover source notes, gap diagnostics, and news deduplication.",
+      "type": "report_html"
+    }
+  ]
+}

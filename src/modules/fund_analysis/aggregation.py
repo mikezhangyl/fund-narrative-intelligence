@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any
 
+from src.modules.narrative_intelligence.model import narrative_display_name
+
 
 def aggregate_fund_narratives(
     holdings: list[dict[str, Any]],
@@ -37,7 +39,7 @@ def aggregate_fund_narratives(
         exposures.append(
             {
                 "narrative_id": narrative_id,
-                "name": registry_item.get("name", narrative_id),
+                "name": narrative_display_name(registry_item, narrative_id),
                 "level": registry_item.get("level"),
                 "raw_exposure": round(raw_exposure, 6),
                 "normalized_exposure": round(raw_exposure / total_exposure, 6),

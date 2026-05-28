@@ -19,7 +19,31 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2023-01-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-13",
+      "canonical_name_zh": "人工智能",
+      "canonical_name_en": "AI",
+      "display_name": "人工智能",
+      "canonical_taxonomy_zh": "人工智能",
+      "canonical_taxonomy_en": "AI",
+      "aliases_zh": [
+        "artificial intelligence"
+      ],
+      "aliases_en": [
+        "artificial intelligence"
+      ],
+      "related_terms_zh": [
+        "accelerated computing",
+        "machine learning"
+      ],
+      "related_terms_en": [
+        "accelerated computing",
+        "machine learning"
+      ],
+      "definition_zh": "人工智能",
+      "definition_en": "AI",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_AI_INFRA",
@@ -42,7 +66,37 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2023-03-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-13",
+      "canonical_name_zh": "人工智能基础设施",
+      "canonical_name_en": "AI Infrastructure",
+      "display_name": "人工智能基础设施",
+      "canonical_taxonomy_zh": "人工智能",
+      "canonical_taxonomy_en": "AI",
+      "aliases_zh": [
+        "AI compute infrastructure",
+        "AI datacenter infrastructure"
+      ],
+      "aliases_en": [
+        "AI compute infrastructure",
+        "AI datacenter infrastructure"
+      ],
+      "related_terms_zh": [
+        "GPU",
+        "datacenter",
+        "networking",
+        "servers"
+      ],
+      "related_terms_en": [
+        "GPU",
+        "datacenter",
+        "networking",
+        "servers"
+      ],
+      "definition_zh": "人工智能基础设施",
+      "definition_en": "AI Infrastructure",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_AI_POWER",
@@ -65,7 +119,37 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2024-09-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-13",
+      "canonical_name_zh": "人工智能电力需求",
+      "canonical_name_en": "AI Power Demand",
+      "display_name": "人工智能电力需求",
+      "canonical_taxonomy_zh": "人工智能",
+      "canonical_taxonomy_en": "AI",
+      "aliases_zh": [
+        "AI electricity demand",
+        "datacenter power demand"
+      ],
+      "aliases_en": [
+        "AI electricity demand",
+        "datacenter power demand"
+      ],
+      "related_terms_zh": [
+        "power grid",
+        "nuclear",
+        "cooling",
+        "data center electricity"
+      ],
+      "related_terms_en": [
+        "power grid",
+        "nuclear",
+        "cooling",
+        "data center electricity"
+      ],
+      "definition_zh": "人工智能电力需求",
+      "definition_en": "AI Power Demand",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_AI_APPS",
@@ -87,7 +171,35 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2023-06-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-13",
+      "canonical_name_zh": "人工智能应用",
+      "canonical_name_en": "AI Applications",
+      "display_name": "人工智能应用",
+      "canonical_taxonomy_zh": "人工智能",
+      "canonical_taxonomy_en": "AI",
+      "aliases_zh": [
+        "AI software",
+        "enterprise AI applications"
+      ],
+      "aliases_en": [
+        "AI software",
+        "enterprise AI applications"
+      ],
+      "related_terms_zh": [
+        "copilot",
+        "agents",
+        "AI productivity"
+      ],
+      "related_terms_en": [
+        "copilot",
+        "agents",
+        "AI productivity"
+      ],
+      "definition_zh": "人工智能应用",
+      "definition_en": "AI Applications",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_SEMI_CAPEX",
@@ -122,7 +234,61 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2022-01-01",
-      "last_updated_at": "2026-05-14"
+      "last_updated_at": "2026-05-14",
+      "canonical_name_zh": "半导体资本开支周期",
+      "canonical_name_en": "Semiconductor Capex Cycle",
+      "display_name": "半导体资本开支周期",
+      "canonical_taxonomy_zh": "半导体",
+      "canonical_taxonomy_en": "Semiconductors",
+      "aliases_zh": [
+        "semi equipment cycle",
+        "chip capex cycle"
+      ],
+      "aliases_en": [
+        "semi equipment cycle",
+        "chip capex cycle"
+      ],
+      "related_terms_zh": [
+        "lithography",
+        "foundry",
+        "advanced packaging",
+        "电子",
+        "计算机",
+        "通信",
+        "半导体",
+        "芯片",
+        "集成电路",
+        "北方华创",
+        "中微公司",
+        "中芯国际",
+        "圣邦股份",
+        "华大九天",
+        "中科飞测",
+        "拓荆科技"
+      ],
+      "related_terms_en": [
+        "lithography",
+        "foundry",
+        "advanced packaging",
+        "电子",
+        "计算机",
+        "通信",
+        "半导体",
+        "芯片",
+        "集成电路",
+        "北方华创",
+        "中微公司",
+        "中芯国际",
+        "圣邦股份",
+        "华大九天",
+        "中科飞测",
+        "拓荆科技"
+      ],
+      "definition_zh": "半导体资本开支周期",
+      "definition_en": "Semiconductor Capex Cycle",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_EV_PRICE_WAR",
@@ -149,7 +315,45 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2023-01-01",
-      "last_updated_at": "2026-05-13"
+      "last_updated_at": "2026-05-13",
+      "canonical_name_zh": "新能源车价格战",
+      "canonical_name_en": "EV Price War",
+      "display_name": "新能源车价格战",
+      "canonical_taxonomy_zh": "新能源汽车",
+      "canonical_taxonomy_en": "EV",
+      "aliases_zh": [
+        "electric vehicle price war",
+        "EV margin compression"
+      ],
+      "aliases_en": [
+        "electric vehicle price war",
+        "EV margin compression"
+      ],
+      "related_terms_zh": [
+        "discounting",
+        "inventory",
+        "gross margin",
+        "demand slowdown",
+        "汽车",
+        "新能源汽车",
+        "比亚迪",
+        "宇通客车"
+      ],
+      "related_terms_en": [
+        "discounting",
+        "inventory",
+        "gross margin",
+        "demand slowdown",
+        "汽车",
+        "新能源汽车",
+        "比亚迪",
+        "宇通客车"
+      ],
+      "definition_zh": "新能源车价格战",
+      "definition_en": "EV Price War",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_BAIJIU_CONSUMPTION",
@@ -180,7 +384,53 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "last_updated_at": "2026-05-14",
+      "canonical_name_zh": "高端白酒消费",
+      "canonical_name_en": "Premium Baijiu Consumption",
+      "display_name": "高端白酒消费",
+      "canonical_taxonomy_zh": "消费",
+      "canonical_taxonomy_en": "Consumption",
+      "aliases_zh": [
+        "baijiu consumption",
+        "premium liquor demand"
+      ],
+      "aliases_en": [
+        "baijiu consumption",
+        "premium liquor demand"
+      ],
+      "related_terms_zh": [
+        "Kweichow Moutai",
+        "Wuliangye",
+        "贵州茅台",
+        "五粮液",
+        "泸州老窖",
+        "山西汾酒",
+        "迎驾贡酒",
+        "舍得酒业",
+        "白酒",
+        "食品饮料",
+        "consumer upgrade",
+        "food and beverage"
+      ],
+      "related_terms_en": [
+        "Kweichow Moutai",
+        "Wuliangye",
+        "贵州茅台",
+        "五粮液",
+        "泸州老窖",
+        "山西汾酒",
+        "迎驾贡酒",
+        "舍得酒业",
+        "白酒",
+        "食品饮料",
+        "consumer upgrade",
+        "food and beverage"
+      ],
+      "definition_zh": "高端白酒消费",
+      "definition_en": "Premium Baijiu Consumption",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_HEALTHCARE_INNOVATION",
@@ -213,7 +463,57 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "last_updated_at": "2026-05-14",
+      "canonical_name_zh": "医疗创新",
+      "canonical_name_en": "Healthcare Innovation",
+      "display_name": "医疗创新",
+      "canonical_taxonomy_zh": "医疗健康",
+      "canonical_taxonomy_en": "Healthcare",
+      "aliases_zh": [
+        "innovative drugs",
+        "CRO healthcare"
+      ],
+      "aliases_en": [
+        "innovative drugs",
+        "CRO healthcare"
+      ],
+      "related_terms_zh": [
+        "医药生物",
+        "创新药",
+        "医疗服务",
+        "CRO",
+        "恒瑞医药",
+        "药明康德",
+        "康龙化成",
+        "凯莱英",
+        "海思科",
+        "百利天恒",
+        "科伦药业",
+        "信立泰",
+        "泰格医药",
+        "艾力斯"
+      ],
+      "related_terms_en": [
+        "医药生物",
+        "创新药",
+        "医疗服务",
+        "CRO",
+        "恒瑞医药",
+        "药明康德",
+        "康龙化成",
+        "凯莱英",
+        "海思科",
+        "百利天恒",
+        "科伦药业",
+        "信立泰",
+        "泰格医药",
+        "艾力斯"
+      ],
+      "definition_zh": "医疗创新",
+      "definition_en": "Healthcare Innovation",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_NEW_ENERGY_EQUIPMENT",
@@ -245,7 +545,55 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "last_updated_at": "2026-05-14",
+      "canonical_name_zh": "新能源设备",
+      "canonical_name_en": "New Energy Equipment",
+      "display_name": "新能源设备",
+      "canonical_taxonomy_zh": "新能源",
+      "canonical_taxonomy_en": "New Energy",
+      "aliases_zh": [
+        "新能源设备",
+        "battery and solar equipment"
+      ],
+      "aliases_en": [
+        "新能源设备",
+        "battery and solar equipment"
+      ],
+      "related_terms_zh": [
+        "电力设备",
+        "新能源",
+        "电池",
+        "光伏",
+        "储能",
+        "宁德时代",
+        "阳光电源",
+        "思源电气",
+        "科达利",
+        "璞泰来",
+        "金风科技",
+        "福斯特",
+        "大金重工"
+      ],
+      "related_terms_en": [
+        "电力设备",
+        "新能源",
+        "电池",
+        "光伏",
+        "储能",
+        "宁德时代",
+        "阳光电源",
+        "思源电气",
+        "科达利",
+        "璞泰来",
+        "金风科技",
+        "福斯特",
+        "大金重工"
+      ],
+      "definition_zh": "新能源设备",
+      "definition_en": "New Energy Equipment",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_DEFENSE_AEROSPACE",
@@ -278,7 +626,57 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "last_updated_at": "2026-05-14",
+      "canonical_name_zh": "国防航天",
+      "canonical_name_en": "Defense Aerospace",
+      "display_name": "国防航天",
+      "canonical_taxonomy_zh": "国防军工",
+      "canonical_taxonomy_en": "Defense",
+      "aliases_zh": [
+        "军工",
+        "defense aerospace"
+      ],
+      "aliases_en": [
+        "军工",
+        "defense aerospace"
+      ],
+      "related_terms_zh": [
+        "国防军工",
+        "军工",
+        "航空",
+        "航发",
+        "睿创微纳",
+        "航发动力",
+        "中航西飞",
+        "中国动力",
+        "长川科技",
+        "应流股份",
+        "北化股份",
+        "航材股份",
+        "航宇科技",
+        "中航沈飞"
+      ],
+      "related_terms_en": [
+        "国防军工",
+        "军工",
+        "航空",
+        "航发",
+        "睿创微纳",
+        "航发动力",
+        "中航西飞",
+        "中国动力",
+        "长川科技",
+        "应流股份",
+        "北化股份",
+        "航材股份",
+        "航宇科技",
+        "中航沈飞"
+      ],
+      "definition_zh": "国防航天",
+      "definition_en": "Defense Aerospace",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     },
     {
       "narrative_id": "N_REAL_ESTATE_STABILIZATION",
@@ -314,7 +712,63 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "last_updated_at": "2026-05-14",
+      "canonical_name_zh": "房地产企稳",
+      "canonical_name_en": "Real Estate Stabilization",
+      "display_name": "房地产企稳",
+      "canonical_taxonomy_zh": "房地产",
+      "canonical_taxonomy_en": "Real Estate",
+      "aliases_zh": [
+        "地产链修复",
+        "property stabilization"
+      ],
+      "aliases_en": [
+        "地产链修复",
+        "property stabilization"
+      ],
+      "related_terms_zh": [
+        "房地产",
+        "建筑材料",
+        "建筑装饰",
+        "地产",
+        "保利发展",
+        "招商蛇口",
+        "华发股份",
+        "中国建筑",
+        "东方雨虹",
+        "家居",
+        "家具",
+        "陶瓷",
+        "索菲亚",
+        "顾家家居",
+        "蒙娜丽莎",
+        "三棵树",
+        "金地集团"
+      ],
+      "related_terms_en": [
+        "房地产",
+        "建筑材料",
+        "建筑装饰",
+        "地产",
+        "保利发展",
+        "招商蛇口",
+        "华发股份",
+        "中国建筑",
+        "东方雨虹",
+        "家居",
+        "家具",
+        "陶瓷",
+        "索菲亚",
+        "顾家家居",
+        "蒙娜丽莎",
+        "三棵树",
+        "金地集团"
+      ],
+      "definition_zh": "房地产企稳",
+      "definition_en": "Real Estate Stabilization",
+      "inclusion_criteria_zh": [],
+      "exclusion_criteria_zh": [],
+      "representative_stocks": []
     }
   ],
   "candidate_narratives": [
@@ -344,7 +798,31 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2026-05-14",
-      "last_updated_at": "2026-05-14"
+      "last_updated_at": "2026-05-14",
+      "canonical_name_zh": "消费电子全球化",
+      "canonical_name_en": "Consumer Electronics Globalization",
+      "display_name": "消费电子全球化",
+      "canonical_taxonomy_zh": "消费电子",
+      "canonical_taxonomy_en": "Technology Hardware",
+      "aliases_zh": [
+        "consumer electronics exports",
+        "device globalization"
+      ],
+      "aliases_en": [
+        "consumer electronics exports",
+        "device globalization"
+      ],
+      "related_terms_zh": [
+        "消费电子",
+        "终端设备",
+        "海外手机"
+      ],
+      "related_terms_en": [
+        "消费电子",
+        "终端设备",
+        "海外手机"
+      ],
+      "why_not_company_event_zh": ""
     },
     {
       "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
@@ -372,7 +850,31 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2026-05-14",
-      "last_updated_at": "2026-05-14"
+      "last_updated_at": "2026-05-14",
+      "canonical_name_zh": "国产数据库基础设施",
+      "canonical_name_en": "Domestic Database Infrastructure",
+      "display_name": "国产数据库基础设施",
+      "canonical_taxonomy_zh": "软件基础设施",
+      "canonical_taxonomy_en": "Enterprise Software",
+      "aliases_zh": [
+        "domestic database software",
+        "xinchuang database"
+      ],
+      "aliases_en": [
+        "domestic database software",
+        "xinchuang database"
+      ],
+      "related_terms_zh": [
+        "数据库",
+        "基础软件",
+        "信创"
+      ],
+      "related_terms_en": [
+        "数据库",
+        "基础软件",
+        "信创"
+      ],
+      "why_not_company_event_zh": ""
     },
     {
       "candidate_narrative_id": "C_COMMUNICATION_POWER_INFRASTRUCTURE",
@@ -400,7 +902,31 @@
       "reviewed_by": null,
       "reviewed_at": null,
       "first_seen_at": "2026-05-14",
-      "last_updated_at": "2026-05-14"
+      "last_updated_at": "2026-05-14",
+      "canonical_name_zh": "通信与电力基础设施",
+      "canonical_name_en": "Communication And Power Infrastructure",
+      "display_name": "通信与电力基础设施",
+      "canonical_taxonomy_zh": "基础设施设备",
+      "canonical_taxonomy_en": "Infrastructure Equipment",
+      "aliases_zh": [
+        "communication infrastructure",
+        "power cable infrastructure"
+      ],
+      "aliases_en": [
+        "communication infrastructure",
+        "power cable infrastructure"
+      ],
+      "related_terms_zh": [
+        "通信",
+        "电力电缆",
+        "海缆"
+      ],
+      "related_terms_en": [
+        "通信",
+        "电力电缆",
+        "海缆"
+      ],
+      "why_not_company_event_zh": ""
     }
   ]
 }

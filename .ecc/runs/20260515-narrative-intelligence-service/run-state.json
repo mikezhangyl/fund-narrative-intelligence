@@ -1,0 +1,72 @@
+{
+  "task_run_id": "20260515-narrative-intelligence-service",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/hk-market-and-sina-news",
+  "worktree": "main",
+  "base_commit": "4d4c20f",
+  "head_commit": "pending-commit",
+  "merge_base": "4d4c20f",
+  "quality_reviewed_commit": null,
+  "reviewed_snapshot_type": null,
+  "working_tree_dirty": true,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "ready_for_review",
+  "review_outcome": "Completed the narrative V1 service lane end to end: the service boundary now owns source scouting, deterministic candidate seeding, optional OpenAI-backed candidate curation, candidate mapping proposals, narrative-evidence synthesis, merged review packaging, and a dedicated acceptance script, while keeping durable registry and mapping writes human-gated.",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "ready_for_quality",
+  "verification": {
+    "narrative_intelligence_service_pytest": "7 passed",
+    "narrative_intelligence_acceptance_script_pytest": "2 passed",
+    "expanded_narrative_regression_pytest": "170 passed",
+    "full_pytest": "335 passed",
+    "minimax_curator_smoke": "passed with provider=minimax-narrative-curator and one generated candidate under outputs/minimax_narrative_smoke",
+    "narrative_service_acceptance_script": "passed via scripts/validate_narrative_intelligence_service.py --fund-code 161725 --output-dir outputs/minimax_narrative_smoke --require-generated-candidates",
+    "ruff": "passed",
+    "compileall": "passed"
+  },
+  "decisions": [
+    {
+      "id": "NIS-001",
+      "date": "2026-05-15",
+      "decision": "Keep provider fetching in orchestrator for the first slice, and move only registry/mapping/evidence/signal assembly behind the service boundary.",
+      "rationale": "This establishes the new runtime boundary without coupling the first cut to provider-routing or source-expansion refactors."
+    },
+    {
+      "id": "NIS-002",
+      "date": "2026-05-15",
+      "decision": "Expose narrative-intelligence diagnostics as structured raw/scoring payload fields instead of changing report rendering in the first cut.",
+      "rationale": "The acceptance target is pipeline boundary visibility first; report/UI presentation can consume the new diagnostics payload in later slices."
+    },
+    {
+      "id": "NIS-003",
+      "date": "2026-05-15",
+      "decision": "Define low-confidence mappings as any mapping below 0.60 confidence or already marked needs_review.",
+      "rationale": "This captures current fallback-derived ambiguity immediately while preserving exact higher-confidence mappings and avoiding scoring changes in the first cut."
+    },
+    {
+      "id": "NIS-004",
+      "date": "2026-05-15",
+      "decision": "Keep generated narratives opt-in through an explicit pipeline flag while always emitting source-catalog and seed artifacts.",
+      "rationale": "This preserves current default behavior for existing acceptance and report flows while making the new narrative lane fully runnable today."
+    },
+    {
+      "id": "NIS-005",
+      "date": "2026-05-15",
+      "decision": "Use OpenAI structured output only as an optional curator layer and fall back to deterministic curation when no API key is present or the request fails.",
+      "rationale": "The project keeps a no-dependency deterministic baseline while still enabling bounded AI abstraction when credentials are available."
+    },
+    {
+      "id": "NIS-006",
+      "date": "2026-05-15",
+      "decision": "Prefer MiniMax as the default narrative curator in auto mode, using its Anthropic-compatible endpoint and falling back to OpenAI only when MiniMax credentials are absent.",
+      "rationale": "This matches the intended default provider while preserving the same bounded JSON-only narrative curation contract and deterministic fallback path."
+    }
+  ]
+}

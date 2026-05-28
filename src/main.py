@@ -8,6 +8,7 @@ from pathlib import Path
 from src.announcement_smoke import run_announcement_evidence_smoke
 from src.config import DEFAULT_OUTPUT_DIR, FIXTURE_DIR
 from src.errors import PipelineError
+from src.local_env import get_config_value
 from src.modules.narrative_review.persistence import persist_review_action_registry
 from src.modules.narrative_review.preview import write_review_action_preview
 from src.modules.workspace_snapshot.builder import build_workspace_snapshot
@@ -26,6 +27,7 @@ from src.orchestrator import (
     run_pipeline,
 )
 from src.providers.mock import MockDataProvider
+from src.providers.routing import ProviderRoutingConfig
 from src.real_fund_smoke import run_real_fund_smoke
 from src.validation import (
     validate_announcement_evidence_payload,
@@ -51,9 +53,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fund-code", help="Fund code to analyze.")
     parser.add_argument(
         "--provider-mode",
-        choices=["mock", "real", "eastmoney"],
+        choices=["mock", "real", "eastmoney", "tushare", "gateway"],
         default="mock",
-        help="Provider mode. V1 real mode falls back to mock fixtures; eastmoney tries no-key fund holdings.",
+        help=(
+            "Provider mode. V1 real mode falls back to mock fixtures; eastmoney "
+            "tries no-key fund holdings; tushare uses fund_portfolio; gateway "
+            "uses the local market-data gateway for fund profile/holdings and "
+            "falls back to mock on provider failure."
+        ),
     )
     parser.add_argument(
         "--narrative-registry-mode",
@@ -241,7 +248,26 @@ def build_parser() -> argparse.ArgumentParser:
         default=VALUATION_SOURCE_QUOTE_DERIVED,
         help=(
             "Valuation snapshot source. quote-derived uses market quote context; "
-            "eastmoney fetches Eastmoney valuation metrics."
+            "provider uses the routed provider layer; eastmoney remains a "
+            "compatibility alias for provider-backed valuation metrics."
+        ),
+    )
+    parser.add_argument(
+        "--provider-routing-config",
+        type=Path,
+        help=(
+            "Optional JSON file containing per-layer provider routing, for example "
+            '{"financial_metrics":{"primary":"tushare","fallback":"eastmoney"}}.'
+        ),
+    )
+    parser.add_argument(
+        "--provider-route",
+        action="append",
+        default=[],
+        help=(
+            "Optional per-layer routing override in the form "
+            "layer=primary[:fallback], for example "
+            "financial_metrics=tushare:eastmoney."
         ),
     )
     parser.add_argument(
@@ -253,6 +279,32 @@ def build_parser() -> argparse.ArgumentParser:
         "--include-financial-metrics",
         action="store_true",
         help="Optionally fetch provider financial metrics and derive earnings signals.",
+    )
+    parser.add_argument(
+        "--enable-narrative-generation",
+        action="store_true",
+        help=(
+            "Generate candidate narratives, source-led seeds, and mapping proposals "
+            "from unmapped or low-confidence holdings."
+        ),
+    )
+    parser.add_argument(
+        "--narrative-curator-mode",
+        choices=["auto", "deterministic", "minimax", "openai"],
+        default="auto",
+        help=(
+            "Curator mode for generated candidate narratives. auto uses MiniMax "
+            "when MINIMAX_API_KEY is available, otherwise OpenAI when "
+            "OPENAI_API_KEY is available, otherwise deterministic."
+        ),
+    )
+    parser.add_argument(
+        "--narrative-curator-model",
+        default=get_config_value("MINIMAX_MODEL") or "MiniMax-M2.7",
+        help=(
+            "Model name used when --narrative-curator-mode resolves to MiniMax "
+            "or OpenAI."
+        ),
     )
     parser.add_argument(
         "--announcement-start-date",
@@ -285,6 +337,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--narrative-registry-path requires --narrative-registry-mode reviewed")
     if args.stock_mappings_path and args.stock_mapping_mode != "reviewed":
         parser.error("--stock-mappings-path requires --stock-mapping-mode reviewed")
+    if args.provider_routing_config and not args.provider_routing_config.exists():
+        parser.error(f"{args.provider_routing_config} does not exist")
     if args.review_action_output and not args.preview_review_action:
         parser.error("--review-action-output requires --preview-review-action")
     if args.registry_output and not args.persist_review_action:
@@ -382,6 +436,20 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(
             "--base-intelligence-mode is only supported with single --fund-code report generation"
         )
+    if args.provider_routing_config and _uses_non_pipeline_action(args):
+        parser.error(
+            "--provider-routing-config is only supported with single --fund-code report generation"
+        )
+    if args.provider_route and _uses_non_pipeline_action(args):
+        parser.error(
+            "--provider-route is only supported with single --fund-code report generation"
+        )
+
+    try:
+        provider_routing = _provider_routing_from_args(args)
+    except ValueError as exc:
+        parser.error(str(exc))
+        return 2
 
     if args.validate_review_preview:
         try:
@@ -814,6 +882,10 @@ def main(argv: list[str] | None = None) -> int:
             stock_mapping_mode=args.stock_mapping_mode,
             stock_mappings_path=args.stock_mappings_path,
             base_intelligence_mode=args.base_intelligence_mode,
+            enable_narrative_generation=args.enable_narrative_generation,
+            narrative_curator_mode=args.narrative_curator_mode,
+            narrative_curator_model=args.narrative_curator_model,
+            provider_routing=provider_routing,
         )
     except PipelineError as exc:
         print(str(exc), file=sys.stderr)
@@ -838,6 +910,48 @@ def _read_json_object(path: Path) -> dict:
     if not isinstance(payload, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return payload
+
+
+def _provider_routing_from_args(args: argparse.Namespace) -> dict | None:
+    config_payload: dict[str, object] = {}
+    if args.provider_routing_config:
+        config_payload = _read_json_object(args.provider_routing_config)
+    route_payload = _parse_provider_routes(args.provider_route or [])
+    merged = {
+        **config_payload,
+        **route_payload,
+    }
+    if not merged:
+        return None
+    return ProviderRoutingConfig.from_dict(merged).routes_as_dict()
+
+
+def _parse_provider_routes(route_specs: list[str]) -> dict[str, dict[str, str]]:
+    parsed: dict[str, dict[str, str]] = {}
+    for spec in route_specs:
+        layer_part, separator, provider_part = str(spec).partition("=")
+        layer = layer_part.strip()
+        providers = provider_part.strip()
+        if separator != "=" or not layer or not providers:
+            raise ValueError(
+                "provider route must use layer=primary[:fallback], for example "
+                "financial_metrics=tushare:eastmoney"
+            )
+        primary, fallback_separator, fallback = providers.partition(":")
+        route: dict[str, str] = {"primary": primary.strip()}
+        if not route["primary"]:
+            raise ValueError(
+                f"provider route primary must be non-empty for layer {layer}"
+            )
+        if fallback_separator:
+            fallback_value = fallback.strip()
+            if not fallback_value:
+                raise ValueError(
+                    f"provider route fallback must be non-empty for layer {layer}"
+                )
+            route["fallback"] = fallback_value
+        parsed[layer] = route
+    return parsed
 
 
 def _uses_non_pipeline_action(args: argparse.Namespace) -> bool:

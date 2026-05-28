@@ -1,0 +1,104 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "config",
+      "path": "pyproject.toml",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Project dependency metadata with optional market-data extra pinning AkShare 1.18.63.",
+      "checksum_sha256": "fbfc925fb55a1eb40c22e9812b5434f4df2867922d70c094989ea4355d3e1916",
+      "mtime_epoch": 1779633805,
+      "size_bytes": 773
+    },
+    {
+      "type": "config",
+      "path": "config/data_sources.yaml",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "V0 market data source endpoint and cache/logging configuration.",
+      "checksum_sha256": "050b2d452febec24c05d33431b4c0bd86991c31765a5ceab1ae63a8f602b66f7",
+      "mtime_epoch": 1779616697,
+      "size_bytes": 931
+    },
+    {
+      "type": "script",
+      "path": "scripts/run_market_data_live_validation.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Repeatable low-volume no-cache live validation probe runner with repeat-window support, endpoint status matrix, secrets redacted, and runtime versions captured.",
+      "checksum_sha256": "e7be50ee89a7154413cb70ef974d5afd87908b1b71dbee7356195442d9b8d0e1",
+      "mtime_epoch": 1779634157,
+      "size_bytes": 22003
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/source_layer.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Consolidated V0 data source interface and endpoint-level live validation report layer.",
+      "checksum_sha256": "2a4c17875c8f38fa6b111a5c7e8d287705e1caad190817bdbcf1d3e681cdc922",
+      "mtime_epoch": 1779618395,
+      "size_bytes": 12690
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/providers/tushare.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Thin Tushare V0 extension over the existing Tushare market quote provider, adding historical bars, index bars, ETF daily data, turnover, stock metadata, health checks, retry, cache, and logging.",
+      "checksum_sha256": "bdc06a043a787b77eccfeab3fc48f91369fc2cba9d0af3d548969d12ca125424",
+      "mtime_epoch": 1779617545,
+      "size_bytes": 7920
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/providers/akshare.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Thin AkShare V0 extension over the existing AkShare market quote provider, adding A-share history, concept sectors, ETF history, limit statistics, health checks, retry, cache, and logging.",
+      "checksum_sha256": "2b36eb01ce609be62c65120d07b88205035d8b42b6d53f8483998b1507e09ce2",
+      "mtime_epoch": 1779617524,
+      "size_bytes": 8981
+    },
+    {
+      "type": "code",
+      "path": "src/scanners/breadth_scanner.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Deterministic breadth metrics for MA20 breadth, advance/decline, new high/low, and volume expansion.",
+      "checksum_sha256": "c8275a874c80af4bab19942249b2e35c1bbec8ceebd04eb6904483575f302ef9",
+      "mtime_epoch": 1779616637,
+      "size_bytes": 3316
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_live_validation_script.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Unit tests for repeat-window endpoint status matrix classification.",
+      "checksum_sha256": "abc45ff33c3f10d45af7be3fe68865477ddfe13288b2963d2833217de796ba9f",
+      "mtime_epoch": 1779634107,
+      "size_bytes": 5337
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_source_layer.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Consolidated source routing, fallback, and live validation tests.",
+      "checksum_sha256": "71e537a84ed5b8975533c71634dfa821787d052f22f5a424243e2ce67ad80eb4",
+      "mtime_epoch": 1779618335,
+      "size_bytes": 5223
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_v0_providers.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Provider contract tests for Tushare and AkShare V0 adapters.",
+      "checksum_sha256": "53b244b1dc9bf1caf37dbcc276fb33c13a7d621f61c67918f9146e19bd6bab9c",
+      "mtime_epoch": 1779617535,
+      "size_bytes": 7583
+    }
+  ]
+}

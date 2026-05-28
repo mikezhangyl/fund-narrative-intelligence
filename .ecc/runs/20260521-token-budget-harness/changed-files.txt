@@ -1,0 +1,16 @@
+AGENTS.md
+.ecc/framework-state.json
+.ecc/runs/20260521-token-budget-harness/
+docs/exec-plans/active/index.md
+docs/exec-plans/active/token-budget-harness.md
+docs/memory/current-brief.md
+docs/memory/architecture-decisions.index.md
+docs/memory/architecture-decisions.md
+docs/memory/operating-rules.md
+docs/memory/project-context.md
+scripts/context_brief.py
+skills/ecc-task-subagent-workflow/SKILL.md
+skills/ecc-task-subagent-workflow/references/run-contract.md
+skills/memory-governance/SKILL.md
+skills/project-bootstrap/SKILL.md
+tests/test_context_brief.py

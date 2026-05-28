@@ -1,0 +1,294 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "documentation",
+      "path": "README.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Documents the data capability registry, runtime inspection, controlled breadth scan, stress probe, and reliability report commands.",
+      "checksum_sha256": "19cb543d7808b839a645e717803b926f659f5115ba8d534cebf81b0fb8975e4f",
+      "mtime_epoch": 1779642439,
+      "size_bytes": 22943
+    },
+    {
+      "type": "config",
+      "path": "pyproject.toml",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Adds PyYAML runtime dependency for machine-readable YAML registry parsing.",
+      "checksum_sha256": "3696e9dc2517c09de9af955cf02ad8577e85efaec5eef2e31b2363321711f5b2",
+      "mtime_epoch": 1779639359,
+      "size_bytes": 793
+    },
+    {
+      "type": "config",
+      "path": "config/data_capabilities.yaml",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Market-data capability ledger covering datasets, analysis needs, acquisition difficulty, source ownership, and gateway readiness.",
+      "checksum_sha256": "0cf1b5aaab1a7e1d383ccdfc721b8c47b52612405510cd3eb4e7d1e077569c8e",
+      "mtime_epoch": 1779640205,
+      "size_bytes": 13513
+    },
+    {
+      "type": "config",
+      "path": "config/data_sources.yaml",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "V0 provider runtime configuration with Tushare trade calendar endpoint and cache/log settings.",
+      "checksum_sha256": "46d397ffe2abffbbd8c192a2776bf5f6b22e5437affeba011983d756fa90b6d1",
+      "mtime_epoch": 1779642276,
+      "size_bytes": 1049
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/capabilities.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Typed data capability registry loader, validator, summary builder, analysis readiness evaluator, and live-probe annotation helper.",
+      "checksum_sha256": "d465a75e9a5ae06d0dcbe48318a0b78583bf75fc645f4d192834a68c1381acc6",
+      "mtime_epoch": 1779640939,
+      "size_bytes": 17652
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/runtime_config.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Read-only runtime config inspector for provider URL kind, cache/log paths, pacing/retry settings, and redacted token presence.",
+      "checksum_sha256": "a4e1b0e8fd720721d13e151f1f24a83b4b7666317ca7ac54997816a38fa54b70",
+      "mtime_epoch": 1779642276,
+      "size_bytes": 6075
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/providers/tushare.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Adds Tushare trade calendar support to the V0 market-data provider.",
+      "checksum_sha256": "817125859962ad3b2575fd2fc4590e0138cc02be35620141a6b24066381c834f",
+      "mtime_epoch": 1779640156,
+      "size_bytes": 9051
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/source_layer.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Exposes trade calendar through the consolidated source layer and its live validation matrix.",
+      "checksum_sha256": "48d27955e3d005d55e8cfdc748b6ea6d72f32b63e6a555759ffc5fc732c71436",
+      "mtime_epoch": 1779640893,
+      "size_bytes": 14153
+    },
+    {
+      "type": "code",
+      "path": "src/market_data/stress.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Normalizes peak memory reporting to KB and preserves structured failure reasons across stress runs.",
+      "checksum_sha256": "7fccb17f33ce94f8919b8c136a439c42215f82c1f9691dfd1d0e7230da58b552",
+      "mtime_epoch": 1779641762,
+      "size_bytes": 5403
+    },
+    {
+      "type": "code",
+      "path": "src/scanners/breadth_scanner.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Adds capability-driven breadth scan planning and execution over consolidated data-source methods.",
+      "checksum_sha256": "594c20646ef536cd9f1bf8944083d2eb81f3b51b49206485c2516a5bbe28241f",
+      "mtime_epoch": 1779641310,
+      "size_bytes": 9096
+    },
+    {
+      "type": "code",
+      "path": "src/scanners/__init__.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Exports breadth scan planner and execution helpers from the scanner package.",
+      "checksum_sha256": "2ea95feaa3920fa866e37b96f7d5d2f76531ba79dfc2412a9452eef739778f05",
+      "mtime_epoch": 1779640847,
+      "size_bytes": 325
+    },
+    {
+      "type": "script",
+      "path": "scripts/report_data_capabilities.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "CLI for producing Markdown or JSON summaries of the data capability registry and analysis readiness.",
+      "checksum_sha256": "8c6c1a3665eb10bec8f7804d3479efe06829470b00bc679167a75a2a5420c5b7",
+      "mtime_epoch": 1779640948,
+      "size_bytes": 4732
+    },
+    {
+      "type": "script",
+      "path": "scripts/report_market_data_runtime.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "CLI for producing redacted Markdown or JSON runtime wiring reports.",
+      "checksum_sha256": "e449bc06c58a31354e699ce794f729835dbac466115eee2fec38639ded91f69e",
+      "mtime_epoch": 1779642276,
+      "size_bytes": 3337
+    },
+    {
+      "type": "script",
+      "path": "scripts/run_market_data_live_validation.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Live validation report now probes trade_cal and annotates endpoint status rows with capability-registry metadata.",
+      "checksum_sha256": "88e6c618a0ce483ffc73c45e4d4873c110670397b9ee59caacc5991a6f26593a",
+      "mtime_epoch": 1779640201,
+      "size_bytes": 23882
+    },
+    {
+      "type": "script",
+      "path": "scripts/run_breadth_scan.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Controlled breadth scan CLI with safe defaults, plan-only mode, and JSON/Markdown output.",
+      "checksum_sha256": "6e2f99f4fa0d7e04911e58705cae8d60f8b2ce6a2494c0ee7f26cff0ff070bb9",
+      "mtime_epoch": 1779641310,
+      "size_bytes": 8601
+    },
+    {
+      "type": "script",
+      "path": "scripts/run_market_data_stress.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Controlled V0 stress CLI for historical, incremental daily, and sector-rotation probes.",
+      "checksum_sha256": "fe8fdfa90d19f8f72fe339166758489a512490945c3d514f0dec69149e0b4299",
+      "mtime_epoch": 1779641768,
+      "size_bytes": 7894
+    },
+    {
+      "type": "script",
+      "path": "scripts/build_market_data_reliability_report.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Consolidates capability readiness, runtime wiring, live validation, and stress evidence into one V0 reliability report.",
+      "checksum_sha256": "bc4a20b39e7f2f388251811f47cc9729f2a2b269b4e49d39afd631aa1631663e",
+      "mtime_epoch": 1779642396,
+      "size_bytes": 11209
+    },
+    {
+      "type": "test",
+      "path": "tests/test_breadth_scan_script.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers controlled breadth scan CLI execution, plan-only mode, report writing, and symbol input validation.",
+      "checksum_sha256": "fc547f760b3322d73857c280bd7350afe9152276768e585cca52bf5e32dd9f2e",
+      "mtime_epoch": 1779641357,
+      "size_bytes": 4307
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_stress_script.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers controlled stress suite aggregation, failure reasons, symbol limiting, and CLI report writing.",
+      "checksum_sha256": "336910ce97500af743f6c9e7464e748d21d89b671e6dcac2c83850648b2fa0e4",
+      "mtime_epoch": 1779641779,
+      "size_bytes": 3790
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_stress.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers stress tester request metrics, duplicate handling, memory reporting, and failure reasons.",
+      "checksum_sha256": "c6877ce36415f9df2149888e87deedd1f5815b5dd3d10e169926b5d3000389b6",
+      "mtime_epoch": 1779641779,
+      "size_bytes": 2119
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_runtime_config.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers runtime config inspection, local gateway URL classification, redacted token source reporting, and CLI rendering.",
+      "checksum_sha256": "285c6cc4fe0a71a44458a58cf54b90b94ecbd4d135d58719a04fee23bd5ebcb5",
+      "mtime_epoch": 1779642309,
+      "size_bytes": 4097
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_reliability_report.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers consolidated reliability status, recommendations, and Markdown/JSON rendering.",
+      "checksum_sha256": "00226d8ec967a374fa02a67d683f07036055c6b5bf3edee84da9becbf0f7c058",
+      "mtime_epoch": 1779642415,
+      "size_bytes": 3725
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_capabilities.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Tests registry loading, validation, readiness blockers/warnings, missing dataset detection, and report generation.",
+      "checksum_sha256": "20d8e92f814a8710d9c48360f9b34384f61ffbff2e27bbb3008fc57e14f44958",
+      "mtime_epoch": 1779640917,
+      "size_bytes": 3571
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_live_validation_script.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Adds coverage for annotating live validation status rows from the capability registry.",
+      "checksum_sha256": "3eb24a20f9fa3fe6431bbf0a71827307316c88f352bed2d481d1fadbad9eba5b",
+      "mtime_epoch": 1779639539,
+      "size_bytes": 6058
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_v0_providers.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Adds V0 Tushare trade calendar provider coverage.",
+      "checksum_sha256": "2916c0d603784ab15d605ced92c4ad455444a807f7e120d308220c00abea3653",
+      "mtime_epoch": 1779640138,
+      "size_bytes": 9112
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_source_layer.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Adds consolidated source trade calendar routing and live validation coverage.",
+      "checksum_sha256": "809d15438a539c0ea1342b94879319e86bc5c7ff310610673a59b3dce2a64a0b",
+      "mtime_epoch": 1779640899,
+      "size_bytes": 5940
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_scanners.py",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Covers breadth scan planning from registry/calendar/metadata and execution through the consolidated data source.",
+      "checksum_sha256": "9bc6b408b6724fd295926c8acdda962cc97c4b0cadb1a833b0b9515aa7019a75",
+      "mtime_epoch": 1779640872,
+      "size_bytes": 6292
+    },
+    {
+      "type": "documentation",
+      "path": "docs/memory/current-brief.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Records the data-source platform objective in startup memory.",
+      "checksum_sha256": "985fd20219b6d609e04e396800d294d5e9a513378153a8140184296ec6ccf3f5",
+      "mtime_epoch": 1779638787,
+      "size_bytes": 4119
+    },
+    {
+      "type": "documentation",
+      "path": ".ecc/memory/project/system-facts.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Records the reusable project fact that data-source work is a capability-gap closure loop, not API collection.",
+      "checksum_sha256": "b468d2f83042a0228dff7c6c3cf03a9f689e06115c65da6fa486aefc3434066a",
+      "mtime_epoch": 1779638794,
+      "size_bytes": 729
+    }
+  ]
+}

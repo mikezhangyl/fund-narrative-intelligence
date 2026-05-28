@@ -1,0 +1,760 @@
+version: market-data-gateway-contract-v1
+updated_at: "2026-05-27"
+base_path: /api/v1/market-data
+description: >
+  Contract expected by this project for a local market-data gateway. The gateway
+  owns cache-hit decisions and upstream fetching; this project only sees a
+  stable normalized API surface. The gateway is multi-source, not Tushare-only.
+response_envelope:
+  success:
+    required_top_level_fields:
+      - data
+      - meta
+    rows_path: data.rows
+    meta_required_fields:
+      - provider
+      - endpoint
+      - cache
+      - generated_at
+  error:
+    required_top_level_fields:
+      - error
+    error_required_fields:
+      - code
+      - message
+  cache_meta:
+    required_fields:
+      - hit
+      - mode
+    allowed_modes:
+      - cache
+      - upstream
+      - stale_cache
+      - mixed
+compatibility:
+  tushare_native_post:
+    enabled: true
+    method: POST
+    path: /tushare
+    request_contract:
+      required_fields:
+        - api_name
+        - token
+        - params
+        - fields
+    response_contract:
+      required_top_level_fields:
+        - code
+        - data
+      notes:
+        - This optional route preserves the Tushare request shape for low-friction migration.
+        - The normalized routes below remain the project-owned long-term contract.
+endpoints:
+  - endpoint_id: tushare_daily
+    dataset_id: a_share_daily_bars
+    provider: tushare
+    endpoint: daily
+    method: POST
+    path: /api/v1/market-data/tushare/daily
+    cache_policy: read_through_cache
+    required_request_fields:
+      - symbols
+      - start_date
+      - end_date
+    sample_request:
+      json:
+        symbols:
+          - 600519.SH
+        start_date: "2026-05-22"
+        end_date: "2026-05-22"
+        include_turnover: true
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - symbol
+        - trade_date
+        - close
+        - volume
+      optional_fields:
+        - open
+        - high
+        - low
+        - pre_close
+        - turnover_rate
+        - amount
+        - source
+  - endpoint_id: tushare_index_daily
+    dataset_id: index_bars
+    provider: tushare
+    endpoint: index_daily
+    method: POST
+    path: /api/v1/market-data/tushare/index-daily
+    cache_policy: read_through_cache
+    required_request_fields:
+      - symbols
+      - start_date
+      - end_date
+    sample_request:
+      json:
+        symbols:
+          - 000001.SH
+        start_date: "2026-05-22"
+        end_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - symbol
+        - trade_date
+        - close
+  - endpoint_id: tushare_fund_daily
+    dataset_id: etf_daily
+    provider: tushare
+    endpoint: fund_daily
+    method: POST
+    path: /api/v1/market-data/tushare/fund-daily
+    cache_policy: read_through_cache
+    required_request_fields:
+      - symbols
+      - start_date
+      - end_date
+    sample_request:
+      json:
+        symbols:
+          - 510300.SH
+        start_date: "2026-05-22"
+        end_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - symbol
+        - trade_date
+        - close
+  - endpoint_id: tushare_stock_basic
+    dataset_id: stock_metadata
+    provider: tushare
+    endpoint: stock_basic
+    method: POST
+    path: /api/v1/market-data/tushare/stock-basic
+    cache_policy: persistent_snapshot
+    required_request_fields: []
+    sample_request:
+      json:
+        list_status: L
+        limit: 10
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - ts_code
+        - symbol
+        - name
+  - endpoint_id: tushare_trade_cal
+    dataset_id: trade_calendar
+    provider: tushare
+    endpoint: trade_cal
+    method: POST
+    path: /api/v1/market-data/tushare/trade-cal
+    cache_policy: persistent_snapshot
+    required_request_fields:
+      - exchange
+      - start_date
+      - end_date
+    sample_request:
+      json:
+        exchange: SSE
+        start_date: "2026-05-22"
+        end_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - exchange
+        - cal_date
+        - is_open
+  - endpoint_id: eastmoney_market_quote
+    dataset_id: latest_stock_quotes
+    provider: eastmoney
+    endpoint: market_quote
+    method: GET
+    path: /api/v1/market-data/eastmoney/market-quotes
+    cache_policy: short_ttl
+    required_request_fields:
+      - stock_codes
+    sample_request:
+      query:
+        stock_codes: "600519"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - stock_code
+        - latest_price
+        - retrieved_at
+  - endpoint_id: akshare_sector_concepts
+    dataset_id: sector_concepts
+    provider: akshare
+    endpoint: stock_board_concept_name_em
+    method: GET
+    path: /api/v1/market-data/akshare/sector-concepts
+    cache_policy: short_ttl
+    unstable: true
+    required_request_fields: []
+    sample_request:
+      query:
+        limit: "5"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - sector_name
+        - pct_change
+        - source
+  - endpoint_id: akshare_limit_up_down
+    dataset_id: limit_up_down_stats
+    provider: akshare
+    endpoint: stock_zt_pool_em+stock_zt_pool_dtgc_em
+    method: GET
+    path: /api/v1/market-data/akshare/limit-up-down
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - limit_up_count
+        - limit_down_count
+  - endpoint_id: gateway_sector_concepts
+    dataset_id: sector_concepts
+    provider: gateway
+    endpoint: sector_concepts
+    method: GET
+    path: /api/v1/market-data/sectors/concepts
+    cache_policy: short_ttl
+    unstable: true
+    required_request_fields: []
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+        limit: "20"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - sector_name
+        - pct_change
+        - source
+      optional_fields:
+        - trade_date
+        - amount
+        - turnover_rate
+        - leading_stock
+        - provider
+  - endpoint_id: gateway_etf_spot
+    dataset_id: etf_spot_ranking
+    provider: gateway
+    endpoint: etf_spot
+    method: GET
+    path: /api/v1/market-data/etf/spot
+    cache_policy: short_ttl
+    required_request_fields: []
+    sample_request:
+      query:
+        limit: "20"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - symbol
+        - name
+        - pct_change
+        - source
+      optional_fields:
+        - trade_date
+        - close
+        - amount
+        - volume
+        - provider
+  - endpoint_id: gateway_limit_up_down
+    dataset_id: limit_up_down_stats
+    provider: gateway
+    endpoint: limit_up_down
+    method: GET
+    path: /api/v1/market-data/market/limit-up-down
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - limit_up_count
+        - limit_down_count
+        - source
+      optional_fields:
+        - provider
+        - limit_up_symbols
+        - limit_down_symbols
+  - endpoint_id: gateway_news_briefs
+    dataset_id: news_briefs
+    provider: gateway
+    endpoint: news_briefs
+    method: POST
+    path: /api/v1/market-data/news/briefs
+    cache_policy: time_window_snapshot
+    required_request_fields:
+      - source_provider
+      - src
+      - start_datetime
+      - end_datetime
+    sample_request:
+      json:
+        source_provider: tushare
+        src: sina
+        start_datetime: "2026-05-22 09:00:00"
+        end_datetime: "2026-05-22 15:30:00"
+        limit: 20
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - datetime
+        - title
+        - content
+        - source
+      optional_fields:
+        - channels
+        - src
+        - provider
+  - endpoint_id: eastmoney_northbound_capital
+    dataset_id: northbound_capital
+    provider: eastmoney
+    endpoint: northbound_capital
+    method: GET
+    path: /api/v1/market-data/eastmoney/northbound-capital
+    cache_policy: daily_snapshot
+    maturity: available
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - net_buy_amount
+        - source
+  - endpoint_id: eastmoney_main_capital_flow
+    dataset_id: main_capital_flow
+    provider: eastmoney
+    endpoint: main_capital_flow
+    method: GET
+    path: /api/v1/market-data/eastmoney/main-capital-flow
+    cache_policy: daily_snapshot
+    maturity: available
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - symbol
+        - main_net_inflow
+        - source
+  - endpoint_id: local_gateway_cyq_chips
+    dataset_id: cyq_chips
+    provider: local_gateway
+    endpoint: cyq_chips
+    method: POST
+    path: /api/v1/market-data/chips/cyq
+    cache_policy: gateway_owned_persistent
+    required_request_fields:
+      - symbols
+      - trade_date
+    sample_request:
+      json:
+        symbols:
+          - 600519.SH
+        trade_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - symbol
+        - trade_date
+        - cost_distribution
+        - source
+  - endpoint_id: gateway_northbound_capital
+    dataset_id: northbound_capital
+    provider: gateway
+    endpoint: northbound_capital
+    method: GET
+    path: /api/v1/market-data/capital/northbound
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - net_buy_amount
+        - source
+      optional_fields:
+        - buy_amount
+        - sell_amount
+        - provider
+  - endpoint_id: gateway_main_capital_flow
+    dataset_id: main_capital_flow
+    provider: gateway
+    endpoint: main_capital_flow
+    method: GET
+    path: /api/v1/market-data/capital/main-flow
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+        limit: "50"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - symbol
+        - main_net_inflow
+        - source
+      optional_fields:
+        - name
+        - pct_change
+        - amount
+        - provider
+  - endpoint_id: gateway_etf_flow
+    dataset_id: etf_flow
+    provider: gateway
+    endpoint: etf_flow
+    method: GET
+    path: /api/v1/market-data/etf/flow
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+        limit: "50"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - symbol
+        - net_inflow
+        - source
+      optional_fields:
+        - name
+        - pct_change
+        - amount
+        - provider
+  - endpoint_id: gateway_dragon_tiger
+    dataset_id: dragon_tiger_list
+    provider: gateway
+    endpoint: dragon_tiger
+    method: GET
+    path: /api/v1/market-data/market/dragon-tiger
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+        limit: "50"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - symbol
+        - reason
+        - source
+      optional_fields:
+        - name
+        - buy_amount
+        - sell_amount
+        - net_buy_amount
+        - provider
+  - endpoint_id: gateway_sector_constituents
+    dataset_id: sector_constituents
+    provider: gateway
+    endpoint: sector_constituents
+    method: GET
+    path: /api/v1/market-data/sectors/constituents
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - sector_name
+    sample_request:
+      query:
+        sector_name: "机器人"
+        trade_date: "2026-05-22"
+        limit: "50"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - sector_name
+        - symbol
+        - name
+        - source
+      optional_fields:
+        - trade_date
+        - pct_change
+        - weight
+        - provider
+  - endpoint_id: gateway_etf_basic
+    dataset_id: etf_basic
+    provider: gateway
+    endpoint: etf_basic
+    method: GET
+    path: /api/v1/market-data/etf/basic
+    cache_policy: persistent_snapshot
+    required_request_fields: []
+    sample_request:
+      query:
+        market: "cn"
+        limit: "50"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - symbol
+        - name
+        - source
+      optional_fields:
+        - category
+        - fund_type
+        - issuer
+        - tracking_index
+        - list_date
+        - provider
+  - endpoint_id: gateway_index_constituents
+    dataset_id: index_constituents
+    provider: gateway
+    endpoint: index_constituents
+    method: GET
+    path: /api/v1/market-data/index/constituents
+    cache_policy: persistent_snapshot
+    required_request_fields:
+      - index_symbol
+    sample_request:
+      query:
+        index_symbol: "000300.SH"
+        trade_date: "2026-05-22"
+        limit: "50"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - index_symbol
+        - symbol
+        - name
+        - source
+      optional_fields:
+        - trade_date
+        - weight
+        - industry
+        - provider
+  - endpoint_id: gateway_margin_summary
+    dataset_id: margin_summary
+    provider: gateway
+    endpoint: margin_summary
+    method: GET
+    path: /api/v1/market-data/margin/summary
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - financing_balance
+        - source
+      optional_fields:
+        - securities_lending_balance
+        - financing_buy_amount
+        - repayment_amount
+        - provider
+  - endpoint_id: gateway_margin_detail
+    dataset_id: margin_detail
+    provider: gateway
+    endpoint: margin_detail
+    method: GET
+    path: /api/v1/market-data/margin/detail
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - trade_date
+    sample_request:
+      query:
+        trade_date: "2026-05-22"
+        limit: "50"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - trade_date
+        - symbol
+        - financing_balance
+        - source
+      optional_fields:
+        - name
+        - financing_buy_amount
+        - securities_lending_balance
+        - provider
+  - endpoint_id: gateway_earnings_calendar
+    dataset_id: earnings_calendar
+    provider: gateway
+    endpoint: earnings_calendar
+    method: GET
+    path: /api/v1/market-data/fundamentals/earnings-calendar
+    cache_policy: daily_snapshot
+    required_request_fields:
+      - start_date
+      - end_date
+    sample_request:
+      query:
+        start_date: "2026-05-22"
+        end_date: "2026-06-05"
+        limit: "50"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - symbol
+        - name
+        - ann_date
+        - event_type
+        - source
+      optional_fields:
+        - forecast_type
+        - net_profit_min
+        - net_profit_max
+        - provider
+  - endpoint_id: gateway_stock_sector_memberships
+    dataset_id: stock_sector_membership
+    provider: gateway
+    endpoint: stock_sector_memberships
+    method: POST
+    path: /api/v1/market-data/stocks/sector-memberships
+    cache_policy: materialized_reverse_index
+    unstable: true
+    required_request_fields:
+      - symbols
+    sample_request:
+      json:
+        symbols:
+          - 600519.SH
+          - 300024.SZ
+        trade_date: "2026-05-22"
+        sector_types:
+          - concept
+        limit_per_symbol: 20
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - symbol
+        - sector_name
+        - sector_type
+        - source
+      optional_fields:
+        - name
+        - sector_code
+        - trade_date
+        - pct_change
+        - weight
+        - provider
+        - membership_source
+  - endpoint_id: gateway_fund_profile
+    dataset_id: fund_profile
+    provider: gateway
+    endpoint: fund_profile
+    method: GET
+    path: /api/v1/market-data/funds/profile
+    cache_policy: persistent_snapshot
+    maturity: available
+    required_request_fields:
+      - fund_code
+    sample_request:
+      query:
+        fund_code: "161725"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - fund_code
+        - fund_name
+        - fund_type
+        - currency
+        - source
+      optional_fields:
+        - as_of_date
+        - provider
+        - source_url
+        - retrieved_at
+        - data_quality
+  - endpoint_id: gateway_fund_holdings
+    dataset_id: fund_holdings
+    provider: gateway
+    endpoint: fund_holdings
+    method: GET
+    path: /api/v1/market-data/funds/holdings
+    cache_policy: read_through_cache
+    maturity: available
+    required_request_fields:
+      - fund_code
+    sample_request:
+      query:
+        fund_code: "161725"
+        limit: "10"
+    response:
+      rows_path: data.rows
+      minimum_rows: 1
+      required_fields:
+        - fund_code
+        - as_of_date
+        - stock_code
+        - stock_name
+        - weight
+        - source
+      optional_fields:
+        - rank
+        - holding_change
+        - industry
+        - market
+        - ts_code
+        - provider
+        - source_url
+        - retrieved_at

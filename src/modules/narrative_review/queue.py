@@ -2,6 +2,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from src.modules.narrative_intelligence.model import (
+    candidate_display_name,
+    candidate_taxonomy_display,
+)
+
 
 def build_candidate_review_queue(
     candidate_narratives: list[dict[str, Any]],
@@ -40,8 +45,8 @@ def _queue_item(
         "review_item_id": f"RQ_{candidate_id}",
         "item_type": "candidate_narrative",
         "candidate_narrative_id": candidate_id,
-        "name": candidate["name"],
-        "canonical_taxonomy": candidate["canonical_taxonomy"],
+        "name": candidate_display_name(candidate, candidate_id),
+        "canonical_taxonomy": candidate_taxonomy_display(candidate, ""),
         "status": candidate["status"],
         "human_review_status": candidate["human_review_status"],
         "source": candidate["source"],
@@ -63,8 +68,11 @@ def _queue_item(
                 "narrative_id": None,
                 "parent_id": None,
                 "level": 2,
-                "aliases": candidate.get("aliases", []),
-                "related_terms": candidate.get("related_terms", []),
+                "aliases": candidate.get("aliases_zh", candidate.get("aliases", [])),
+                "related_terms": candidate.get(
+                    "related_terms_zh",
+                    candidate.get("related_terms", []),
+                ),
             },
         },
     }

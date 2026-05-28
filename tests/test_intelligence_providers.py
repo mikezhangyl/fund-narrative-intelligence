@@ -1,5 +1,6 @@
 import json
 
+import pytest
 from src.config import FIXTURE_DIR
 from src.errors import FixtureNotFoundError
 from src.providers.intelligence import (
@@ -90,6 +91,9 @@ def test_reviewed_narrative_registry_provider_loads_validated_store(tmp_path):
 
     assert fresh_registry["version"] == "registry-v1"
     assert fresh_registry["narratives"][0]["name"] != "mutated"
+    assert fresh_registry["narratives"][0]["canonical_name_zh"]
+    assert fresh_registry["narratives"][0]["display_name"]
+    assert fresh_registry["candidate_narratives"][0]["canonical_name_zh"]
     assert layer["layer"] == "narrative_registry"
     assert layer["provider_name"] == "reviewed-registry-store"
     assert layer["provider_version"] == "reviewed-registry-v1"
@@ -134,6 +138,19 @@ def test_reviewed_narrative_registry_provider_rejects_unreviewed_approved_entry(
         assert "narratives[0].reviewed_by" in str(exc)
     else:
         raise AssertionError("expected ValueError for unreviewed approved narrative")
+
+
+def test_reviewed_narrative_registry_provider_rejects_missing_localized_fields(
+    tmp_path,
+):
+    registry_path = tmp_path / "narrative_registry.reviewed.json"
+    payload = json.loads(_reviewed_registry_text())
+    del payload["narratives"][0]["canonical_name_zh"]
+    registry_path.write_text(json.dumps(payload), encoding="utf-8")
+    provider = ReviewedNarrativeRegistryProvider(registry_path=registry_path)
+
+    with pytest.raises(ValueError, match="canonical_name_zh"):
+        provider.get_narrative_registry()
 
 
 def test_reviewed_narrative_registry_provider_rejects_non_object_store(tmp_path):

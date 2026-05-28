@@ -6,6 +6,10 @@
 - Status: V1 mock pipeline implemented
 - Framework: merged ECC + Superpower + memory
 
+## Context Loading Policy
+
+This is the full project context file and should be read on demand, not at every startup. Use `docs/memory/current-brief.md` and `python scripts/context_brief.py --max-words 900` for routine startup context. Open this file only when a task needs detailed product, provider, or historical project facts.
+
 ## Product Goal
 
 Build a Fund Narrative Intelligence System: users enter a fund code, the system reads or mocks the fund's top holdings, infers the market narratives the fund is exposed to, evaluates whether those narratives are still supported by evidence, and generates a report with supporting and risk evidence.
@@ -33,9 +37,9 @@ Experienced individual investors or researchers who want to understand what mark
 - Map stocks to multi-level weighted narratives with confidence.
 - Aggregate primary and secondary fund narrative exposure.
 - Score narrative sustainability across five dimensions: earnings validation, capital reinforcement, valuation pressure, narrative momentum, and counter-evidence risk.
-- Generate Markdown / HTML reports with evidence and an explicit non-investment-advice disclaimer.
+- Generate formal reader-facing HTML reports with evidence and an explicit non-investment-advice disclaimer.
 - Support mock providers so V1 runs without real API credentials.
-- Emit raw JSON, scoring JSON, Markdown report, and HTML report artifacts under `outputs/`.
+- Emit raw JSON, scoring JSON, and HTML report artifacts under `outputs/`; Markdown can exist only as auxiliary compatibility output, not the canonical reader-facing report.
 - Emit a dedicated review queue JSON artifact for future web approval workspace loading.
 - Emit a dedicated source table JSON artifact for future web source/provenance table rendering.
 - Emit a dedicated signal trace JSON artifact for future web score-provenance rendering.
@@ -88,7 +92,9 @@ Expected artifacts:
 - Optional Eastmoney valuation metrics command: `python -m src.main --fund-code 161725 --provider-mode eastmoney --include-valuation-snapshots --valuation-source eastmoney`.
 - Optional Eastmoney financial metrics command: `python -m src.main --fund-code 161725 --provider-mode eastmoney --include-financial-metrics`.
 - Optional RSS-derived news evidence command: `python -m src.main --fund-code 000001 --include-news-evidence`.
+- Optional narrative-generation command: `python -m src.main --fund-code 161725 --provider-mode eastmoney --include-cninfo-announcements --enable-narrative-generation --narrative-curator-mode auto`.
 - Strict live market quote acceptance command: `python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_quotes_161725`.
+- Narrative service acceptance command: `python scripts/validate_narrative_intelligence_service.py --fund-code 161725 --output-dir outputs/<run> --require-generated-candidates`.
 - Provider payloads are validated before orchestration proceeds.
 - Real holdings adapter: `python -m src.main --fund-code 161725 --provider-mode eastmoney` tries Eastmoney/Tiantian Fund fund holdings and keeps local fixtures for all other V1 intelligence layers.
 - Strict real-holdings acceptance validates fund `161725` with Eastmoney holdings and fixture-backed registry/mapping/evidence/signal layers. It fails on provider fallback instead of accepting mock degradation.
@@ -186,6 +192,9 @@ Expected artifacts:
 - Reviewed-store audit metadata is seeded with `review_schema_version=review-metadata-v1` and reviewer `seed-curation` until future web approvals replace it with user-level approval metadata.
 - Single-fund demo now also covers fund `513010` as a degraded real-data demo: Eastmoney holdings are fresh, reviewed mappings cover all ten Hong Kong technology top holdings, primary narrative is `Hong Kong Tech Platforms` / `diverging`, and no mock layers are used. Current HK optional provider coverage is incomplete: CNINFO announcements, Eastmoney market quotes, Eastmoney valuation, and Eastmoney financial metrics are marked `unavailable`, so the demo must be run and validated with `--allow-degraded` and must disclose those unavailable layers in the HTML data-source section.
 - The reviewed registry includes `N_HK_TECH_PLATFORMS`, and the reviewed mapping store includes `01211`, `03690`, `01810`, `00700`, `09988`, `09999`, `00981`, `09618`, `01024`, and `09888` mapped to that narrative for `513010` demo coverage.
+- Hong Kong stock quote lookup now uses market-aware symbol resolution instead of A-share prefix rules. For Yahoo Finance, Hong Kong symbols must be formatted as four digits plus `.HK`, for example `0700.HK`, `0981.HK`, and `9988.HK`; using the five-digit fund-holding code form such as `00700.HK` or `09988.HK` can return the wrong instrument or a 404.
+- Default news evidence is now multi-source. The pipeline still uses Google News RSS, but it also pulls from Sina Finance roll headlines and merges/de-duplicates evidence under provider `multi-source-news`. This improves Chinese-market headline coverage without introducing discussion-style sources into the default path.
+- Eastmoney valuation and Eastmoney financial metrics are still A-share-only in the current implementation. For Hong Kong holdings they now fail explicitly as `provider_unsupported_market` instead of retrying Shanghai or Shenzhen code formats.
 
 ## Deferred Scope
 
@@ -226,6 +235,17 @@ Expected artifacts:
 - Reviewed stores should fail fast when audit metadata is missing rather than silently presenting fixture-derived data as reviewed.
 - Future web source tables should read provider layer `source_url`, `data_quality`, `is_mock`, and optional `review_metadata` directly from generated artifacts.
 - Future web data panels should read workspace snapshot `data_layers` for payload availability/count summaries first, then open raw/scoring artifacts only for drill-down payloads.
+- The `provider-routing-akshare-tushare` slice now exists as an opt-in routing layer with per-layer `primary/fallback` configuration for `holdings`, `market_quotes`, `valuation_snapshots`, `financial_metrics`, `announcements`, and `news_evidence`, while preserving current defaults when no routing config is supplied.
+- Current provider/interface inventory, including default domestic-stack choices and fallback behavior, is maintained in [provider-interface-inventory.md](./provider-interface-inventory.md).
+- The next domestic-market intelligence priority is independent source diversification, not wrapper count: more news, announcement, and evidence sources are preferred over adding multiple adapters that still depend on the same upstream website.
+- For uncertain real information, the preferred output is `partial`, `conflicting`, or `low-confidence` with preserved provenance, rather than immediate fallback to mock-backed evidence.
+- Large-model usage should be introduced in the semantic judgment layer only, for tasks such as event clustering, narrative classification, and conflict resolution after structured source fetching has already completed.
+- Narrative generation is now an opt-in pipeline mode. The service always emits source-catalog and candidate-seed artifacts, but generated candidate narratives and mapping proposals are enabled explicitly so existing default acceptance paths remain stable.
+- Default narrative curation now prefers MiniMax through the Anthropic-compatible endpoint in `.local.env` (`MINIMAX_API_KEY`, optional `MINIMAX_MODEL`, optional `MINIMAX_ANTHROPIC_BASE_URL`). `auto` falls back to OpenAI only when MiniMax credentials are absent, and then to deterministic curation when no model credentials exist.
+- Mock-backed intelligence remains available as a deterministic safety net, but it should be treated as a last-resort fallback for future source-expansion slices instead of the desired default operating path.
+- User collaboration preference: unless the user explicitly asks for explanation, default to terse execution updates that state only what was completed and what the next step is.
+- Provider-routing fallback acceptance command: `python scripts/validate_provider_routing_acceptance.py --output-dir outputs/provider_routing_161725`. It validates the sample `AKShare -> Eastmoney` and `Tushare -> Eastmoney` routing config end to end, requires recorded fallback events for the routed layers, and now forces the routed primary providers into an unavailable state so local tokens or optional libraries do not change the result.
+- Strict Tushare primary-success acceptance command: `python scripts/validate_tushare_primary_acceptance.py --output-dir outputs/tushare_primary_161725`. It reads `TUSHARE_TOKEN` from `.local.env` first and then from the process environment, and rejects any `valuation_snapshots` or `financial_metrics` layer fallback away from Tushare while still allowing partial row-level degradation inside the selected Tushare provider.
 
 ## Open Questions
 

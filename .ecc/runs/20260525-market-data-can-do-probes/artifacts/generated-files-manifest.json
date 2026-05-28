@@ -1,0 +1,103 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "source",
+      "path": "src/market_data/providers/local_gateway.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "1c9e8349fb7f9695b9aa54daa5da4438b42c744f3953a7416b28da5fbc23d5d1",
+      "mtime_epoch": 1779700207,
+      "size_bytes": 16414,
+      "summary": "Consumes provider-neutral gateway Can-Do endpoints."
+    },
+    {
+      "type": "source",
+      "path": "src/market_data/source_layer.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "10ec9a57e813bedcd48253e2a5d49c174910170ffd461c3c717ba3b63a66dbf1",
+      "mtime_epoch": 1779700232,
+      "size_bytes": 20584,
+      "summary": "Exposes gateway-backed ETF spot and news brief source methods."
+    },
+    {
+      "type": "script",
+      "path": "scripts/run_sector_scan.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "3597a5a135b9602df84266b2c0e436939f81599d932a7f34412d77fc20343947",
+      "mtime_epoch": 1779700499,
+      "size_bytes": 3853,
+      "summary": "Adds data fetch mode and source metadata to sector reports."
+    },
+    {
+      "type": "script",
+      "path": "scripts/run_etf_spot_probe.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "d2ee8c50548344714d245d1112157b5930350c63644c678f863bd9ec9a4d648d",
+      "mtime_epoch": 1779700445,
+      "size_bytes": 4373,
+      "summary": "Adds runnable ETF spot probe report command."
+    },
+    {
+      "type": "script",
+      "path": "scripts/run_limit_up_down_probe.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "54de779d07cfa6b05ecbb5b1ce656059f78db24b829366073d9fb7f2d9b15694",
+      "mtime_epoch": 1779700460,
+      "size_bytes": 4424,
+      "summary": "Adds runnable limit-up/down probe report command."
+    },
+    {
+      "type": "script",
+      "path": "scripts/run_news_briefs_smoke.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "09ce1e24211a65b1bbaed95e767cd193ecc88366d456bea6f6aad40cac2ab82f",
+      "mtime_epoch": 1779700314,
+      "size_bytes": 4819,
+      "summary": "Adds runnable Tushare news brief smoke report command."
+    },
+    {
+      "type": "test",
+      "path": "tests/test_local_gateway_provider.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "20de95abdd1162b1ed5d728defe934ab802bc2f46189343c25fad6382dd2de1d",
+      "mtime_epoch": 1779700338,
+      "size_bytes": 13886,
+      "summary": "Covers provider-neutral gateway route calls."
+    },
+    {
+      "type": "test",
+      "path": "tests/test_market_data_source_layer.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "9d2077e8f4a1bb47b07aada6acf9a8a11133d15b761aede308b5aa2837840d1e",
+      "mtime_epoch": 1779700116,
+      "size_bytes": 12846,
+      "summary": "Covers consolidated source Can-Do methods."
+    },
+    {
+      "type": "test",
+      "path": "tests/test_can_do_probe_scripts.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "aa43692f90ea2c9e0b80fb52b8311f38d97ddb100a61f9fbbedac73584a0d7dc",
+      "mtime_epoch": 1779700141,
+      "size_bytes": 3080,
+      "summary": "Covers new probe command report artifacts."
+    }
+  ]
+}

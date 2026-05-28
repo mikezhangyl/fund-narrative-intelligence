@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from src.config import (
     DEFAULT_OUTPUT_DIR,
@@ -11,11 +11,9 @@ from src.config import (
     DEFAULT_REVIEWED_STOCK_MAPPINGS_PATH,
     VERSION_DEFAULTS,
 )
+from src.errors import ProviderContractError
 from src.modules.evidence.announcements import convert_announcements_to_evidence
-from src.modules.fund_analysis.aggregation import aggregate_fund_narratives
-from src.modules.fund_analysis.mapping import build_mapping_result
-from src.modules.narrative_review.queue import build_candidate_review_queue
-from src.modules.report_writer.interpretation import interpret_narrative
+from src.modules.narrative_intelligence import NarrativeIntelligenceService
 from src.modules.report_writer.writer import write_reports
 from src.modules.signal_service.derived import (
     ANNOUNCEMENT_DERIVED_SIGNAL_PROVIDER,
@@ -29,20 +27,13 @@ from src.modules.signal_service.derived import (
     derive_news_signal_events,
     derive_valuation_signal_events,
 )
-from src.modules.signal_service.scoring import score_narrative_state
 from src.modules.signal_service.trace import build_signal_trace_payload
 from src.modules.snapshot_writer.writer import write_json_artifact
 from src.modules.valuation.snapshots import (
     build_quote_derived_valuation_snapshots,
     valuation_provider_layer,
 )
-from src.providers.cninfo import (
-    CNINFO_ANNOUNCEMENT_QUERY_URL,
-    CNInfoAnnouncementProvider,
-)
-from src.providers.eastmoney_financials import EastmoneyFinancialMetricsProvider
-from src.providers.eastmoney_market import EastmoneyMarketDataProvider
-from src.providers.eastmoney_valuation import EastmoneyValuationProvider
+from src.providers.cninfo import CNINFO_ANNOUNCEMENT_QUERY_URL
 from src.providers.factory import select_data_provider
 from src.providers.intelligence import (
     ReviewedNarrativeRegistryProvider,
@@ -53,9 +44,9 @@ from src.providers.news import (
     GOOGLE_NEWS_RSS_PROVIDER,
     GOOGLE_NEWS_RSS_SOURCE_URL,
     GOOGLE_NEWS_RSS_VERSION,
-    GoogleNewsRssEvidenceProvider,
 )
 from src.providers.provenance import build_provider_foundation
+from src.providers.routing import ProviderRouter, ResolvedLayerProviderSelection
 from src.validation import (
     validate_announcement_payload,
     validate_financial_metrics_payload,
@@ -85,9 +76,15 @@ BASE_INTELLIGENCE_MODES = {
     BASE_INTELLIGENCE_MODE_PROVIDER_DERIVED,
 }
 VALUATION_SOURCE_QUOTE_DERIVED = "quote-derived"
+VALUATION_SOURCE_PROVIDER = "provider"
 VALUATION_SOURCE_EASTMONEY = "eastmoney"
 VALUATION_SNAPSHOT_SOURCES = {
     VALUATION_SOURCE_QUOTE_DERIVED,
+    VALUATION_SOURCE_PROVIDER,
+    VALUATION_SOURCE_EASTMONEY,
+}
+VALUATION_PROVIDER_SOURCES = {
+    VALUATION_SOURCE_PROVIDER,
     VALUATION_SOURCE_EASTMONEY,
 }
 
@@ -113,6 +110,11 @@ def run_pipeline(
     stock_mapping_mode: str = STOCK_MAPPING_MODE_FIXTURE,
     stock_mappings_path: str | Path | None = None,
     base_intelligence_mode: str = BASE_INTELLIGENCE_MODE_FIXTURE,
+    enable_narrative_generation: bool = False,
+    narrative_curator_mode: str = "auto",
+    narrative_curator_model: str = "MiniMax-M2.7",
+    provider_routing: dict[str, Any] | None = None,
+    provider_factory_overrides: dict[str, dict[str, Callable[[], Any]]] | None = None,
 ) -> dict[str, Any]:
     if not fund_code.isdigit():
         raise ValueError("fund_code must contain digits only")
@@ -150,9 +152,17 @@ def run_pipeline(
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    provider_selection = select_data_provider(provider_mode)
-    provider = provider_selection.provider
-    fund_payload = provider.get_fund_holdings(fund_code)
+    provider_router = ProviderRouter(
+        provider_routing=provider_routing,
+        provider_factory_overrides=provider_factory_overrides,
+    )
+    provider_result = _select_fund_provider(
+        fund_code=fund_code,
+        provider_mode=provider_mode,
+        provider_router=provider_router,
+    )
+    provider = provider_result["provider"]
+    fund_payload = provider_result["fund_payload"]
     registry_result = _narrative_registry_inputs(
         provider=provider,
         narrative_registry_mode=narrative_registry_mode,
@@ -180,36 +190,33 @@ def run_pipeline(
     fund = fund_payload["fund"]
     holdings = fund_payload["holdings"]
     as_of_date = fund_payload["as_of_date"]
-    registry_items = registry_payload["narratives"]
-    candidate_narratives = registry_payload.get("candidate_narratives", [])
-    registry_by_id = {item["narrative_id"]: item for item in registry_items}
-    mapping_result = build_mapping_result(
+    narrative_service = NarrativeIntelligenceService(
         holdings=holdings,
+        registry_payload=registry_payload,
         mappings=all_mappings,
-        registry=registry_by_id,
-        exclusions=mapping_exclusions_payload["exclusions"],
+        mapping_exclusions=mapping_exclusions_payload["exclusions"],
         allow_registry_term_fallback=(
             stock_mapping_mode != STOCK_MAPPING_MODE_REVIEWED
         ),
+        enable_narrative_generation=enable_narrative_generation,
+        narrative_curator_mode=narrative_curator_mode,
+        narrative_curator_model=narrative_curator_model,
     )
+    intelligence_context = narrative_service.build_context()
+    registry_items = intelligence_context["registry_snapshot"]["narratives"]
+    registry_by_id = {item["narrative_id"]: item for item in registry_items}
+    mapping_snapshot = intelligence_context["mapping_snapshot"]
     stock_mapping_layer = stock_mapping_store_layer or _stock_mapping_provider_layer(
         stock_mapping_mode=stock_mapping_mode,
-        mapping_result=mapping_result,
+        mapping_result={
+            "mappings": mapping_snapshot["mappings"],
+            "coverage": mapping_snapshot["coverage"],
+            "mapping_precision_flags": mapping_snapshot["precision_flags"],
+        },
         fund_provider_metadata=fund["provider_metadata"],
     )
-    selected_mappings = mapping_result["mappings"]
-    in_scope_candidate_narratives = _candidate_narratives_for_excluded_candidates(
-        candidate_narratives=candidate_narratives,
-        excluded_mapping_candidates=mapping_result["excluded_mapping_candidates"],
-    )
-    candidate_review_queue = build_candidate_review_queue(
-        candidate_narratives=in_scope_candidate_narratives,
-        excluded_mapping_candidates=mapping_result["excluded_mapping_candidates"],
-    )
-    degradation_events = [
-        *provider_selection.degradation_events,
-        *getattr(provider, "degradation_events", []),
-    ]
+    selected_mappings = mapping_snapshot["mappings"]
+    degradation_events = list(provider_result["degradation_events"])
     announcements_payload: dict[str, Any] | None = None
     announcement_evidence_payload: dict[str, Any] | None = None
     announcement_layer: dict[str, Any] | None = None
@@ -231,6 +238,7 @@ def run_pipeline(
         market_result = _run_market_quotes(
             stock_codes=[holding["stock_code"] for holding in holdings],
             market_data_provider=market_data_provider,
+            provider_router=provider_router,
         )
         market_quotes_payload = market_result["market_quotes"]
         market_quotes_layer = market_result["provider_layer"]
@@ -271,11 +279,12 @@ def run_pipeline(
         raise ValueError("include_valuation_snapshots requires include_market_quotes")
     if (
         include_valuation_snapshots
-        and valuation_snapshot_source == VALUATION_SOURCE_EASTMONEY
+        and valuation_snapshot_source in VALUATION_PROVIDER_SOURCES
     ):
         valuation_result = _run_valuation_snapshots(
             stock_codes=[holding["stock_code"] for holding in holdings],
             valuation_provider=valuation_provider,
+            provider_router=provider_router,
         )
         valuation_snapshots_payload = valuation_result["valuation_snapshots"]
         valuation_layer = valuation_result["provider_layer"]
@@ -306,6 +315,7 @@ def run_pipeline(
         financial_metrics_result = _run_financial_metrics(
             stock_codes=[holding["stock_code"] for holding in holdings],
             financial_metrics_provider=financial_metrics_provider,
+            provider_router=provider_router,
         )
         financial_metrics_payload = financial_metrics_result["financial_metrics"]
         financial_metrics_layer = financial_metrics_result["provider_layer"]
@@ -338,6 +348,7 @@ def run_pipeline(
             as_of_date=as_of_date,
             start_date=announcement_start_date,
             announcement_provider=announcement_provider,
+            provider_router=provider_router,
         )
         announcements_payload = announcement_result["announcements"]
         announcement_evidence_payload = announcement_result["announcement_evidence"]
@@ -367,11 +378,7 @@ def run_pipeline(
                 *announcement_signal_events,
             ]
 
-    exposures = aggregate_fund_narratives(
-        holdings=holdings,
-        mappings=selected_mappings,
-        registry=registry_by_id,
-    )
+    exposures = intelligence_context["exposures"]
     if include_news_evidence:
         news_narratives = [
             registry_by_id[exposure["narrative_id"]]
@@ -383,6 +390,7 @@ def run_pipeline(
             all_narrative_ids=[exposure["narrative_id"] for exposure in exposures],
             as_of_date=as_of_date,
             news_evidence_provider=news_evidence_provider,
+            provider_router=provider_router,
         )
         news_evidence_payload = news_result["news_evidence"]
         news_evidence_layer = news_result["provider_layer"]
@@ -440,19 +448,42 @@ def run_pipeline(
         signals_layer=signals_layer,
     )
     effective_data_quality = provider_foundation["effective_data_quality"]
-    narrative_results = [
-        _with_state(
-            exposure=exposure,
-            signal_events=signal_events,
-            evidence=evidence,
-            as_of_date=as_of_date,
-            data_quality=effective_data_quality,
-        )
-        for exposure in exposures
+    intelligence_snapshot = narrative_service.build_snapshot(
+        context=intelligence_context,
+        evidence=evidence,
+        signal_events=signal_events,
+        as_of_date=as_of_date,
+        data_quality=effective_data_quality,
+        announcements_payload=announcements_payload,
+        market_quotes_payload=market_quotes_payload,
+        valuation_snapshots_payload=valuation_snapshots_payload,
+        financial_metrics_payload=financial_metrics_payload,
+    )
+    narrative_results = intelligence_snapshot["all_narratives"]
+    primary_narrative = intelligence_snapshot["primary_narrative"]
+    secondary_narratives = intelligence_snapshot["secondary_narratives"]
+    candidate_narratives = intelligence_snapshot["candidate_narratives"]
+    generated_candidate_narratives = intelligence_snapshot[
+        "generated_candidate_narratives"
     ]
-
-    primary_narrative = narrative_results[0] if narrative_results else None
-    secondary_narratives = narrative_results[1:4]
+    candidate_generation_failures = intelligence_snapshot[
+        "candidate_generation_failures"
+    ]
+    candidate_generation_summary = intelligence_snapshot[
+        "candidate_generation_summary"
+    ]
+    candidate_review_queue = intelligence_snapshot["candidate_review_queue"]
+    source_catalog = intelligence_snapshot["source_catalog"]
+    company_facts = intelligence_snapshot["company_facts"]
+    company_fact_stats = intelligence_snapshot["company_fact_stats"]
+    company_exposure_tags = intelligence_snapshot["company_exposure_tags"]
+    company_exposure_tag_stats = intelligence_snapshot["company_exposure_tag_stats"]
+    fund_exposure_tags = intelligence_snapshot["fund_exposure_tags"]
+    fund_exposure_tag_stats = intelligence_snapshot["fund_exposure_tag_stats"]
+    candidate_seeds = intelligence_snapshot["candidate_seeds"]
+    mapping_proposals = intelligence_snapshot["mapping_proposals"]
+    narrative_evidence = intelligence_snapshot["narrative_evidence"]
+    diagnostics = intelligence_snapshot["diagnostics"]
     metadata = _metadata(
         fund_code=fund_code,
         as_of_date=as_of_date,
@@ -466,21 +497,37 @@ def run_pipeline(
         "narrative_registry_version": registry_payload["version"],
         "narrative_registry": registry_items,
         "candidate_narrative_registry_version": registry_payload["version"],
-        "candidate_narratives": in_scope_candidate_narratives,
+        "candidate_narratives": candidate_narratives,
+        "generated_candidate_narratives": generated_candidate_narratives,
+        "candidate_generation_failures": candidate_generation_failures,
+        "candidate_generation_summary": candidate_generation_summary,
         "candidate_review_queue": candidate_review_queue,
         "base_intelligence_mode": base_intelligence_mode,
         "narrative_registry_mode": narrative_registry_mode,
         "stock_mapping_mode": stock_mapping_mode,
+        "narrative_generation_enabled": enable_narrative_generation,
+        "narrative_curator_mode": narrative_curator_mode,
+        "narrative_curator_model": narrative_curator_model,
         "stock_narrative_mappings": selected_mappings,
         "mapping_exclusions_version": mapping_exclusions_payload["version"],
         "mapping_exclusions": mapping_exclusions_payload["exclusions"],
-        "mapping_coverage": mapping_result["coverage"],
-        "mapping_rationales": mapping_result["mapping_rationales"],
-        "mapping_precision_flags": mapping_result["mapping_precision_flags"],
-        "excluded_mapping_candidates": mapping_result[
-            "excluded_mapping_candidates"
-        ],
-        "unmapped_holdings": mapping_result["unmapped_holdings"],
+        "mapping_coverage": mapping_snapshot["coverage"],
+        "mapping_rationales": mapping_snapshot["rationales"],
+        "mapping_precision_flags": mapping_snapshot["precision_flags"],
+        "excluded_mapping_candidates": mapping_snapshot["excluded_mapping_candidates"],
+        "unmapped_holdings": mapping_snapshot["unmapped_holdings"],
+        "source_items": source_catalog["items"],
+        "source_item_stats": source_catalog["stats"],
+        "company_facts": company_facts,
+        "company_fact_stats": company_fact_stats,
+        "company_exposure_tags": company_exposure_tags,
+        "company_exposure_tag_stats": company_exposure_tag_stats,
+        "fund_exposure_tags": fund_exposure_tags,
+        "fund_exposure_tag_stats": fund_exposure_tag_stats,
+        "candidate_seeds": candidate_seeds,
+        "mapping_proposals": mapping_proposals,
+        "narrative_evidence": narrative_evidence,
+        "diagnostics": diagnostics,
         "evidence": evidence,
         "signal_events": signal_events,
         "degradation_events": degradation_events,
@@ -507,18 +554,31 @@ def run_pipeline(
         "secondary_narratives": secondary_narratives,
         "all_narratives": narrative_results,
         "provider_foundation": provider_foundation,
-        "mapping_coverage": mapping_result["coverage"],
+        "mapping_coverage": mapping_snapshot["coverage"],
         "base_intelligence_mode": base_intelligence_mode,
         "narrative_registry_mode": narrative_registry_mode,
         "stock_mapping_mode": stock_mapping_mode,
-        "mapping_rationales": mapping_result["mapping_rationales"],
-        "mapping_precision_flags": mapping_result["mapping_precision_flags"],
-        "excluded_mapping_candidates": mapping_result[
-            "excluded_mapping_candidates"
-        ],
-        "candidate_narratives": in_scope_candidate_narratives,
+        "mapping_rationales": mapping_snapshot["rationales"],
+        "mapping_precision_flags": mapping_snapshot["precision_flags"],
+        "excluded_mapping_candidates": mapping_snapshot["excluded_mapping_candidates"],
+        "candidate_narratives": candidate_narratives,
+        "generated_candidate_narratives": generated_candidate_narratives,
+        "candidate_generation_failures": candidate_generation_failures,
+        "candidate_generation_summary": candidate_generation_summary,
         "candidate_review_queue": candidate_review_queue,
-        "unmapped_holdings": mapping_result["unmapped_holdings"],
+        "unmapped_holdings": mapping_snapshot["unmapped_holdings"],
+        "source_items": source_catalog["items"],
+        "source_item_stats": source_catalog["stats"],
+        "company_facts": company_facts,
+        "company_fact_stats": company_fact_stats,
+        "company_exposure_tags": company_exposure_tags,
+        "company_exposure_tag_stats": company_exposure_tag_stats,
+        "fund_exposure_tags": fund_exposure_tags,
+        "fund_exposure_tag_stats": fund_exposure_tag_stats,
+        "candidate_seeds": candidate_seeds,
+        "mapping_proposals": mapping_proposals,
+        "narrative_evidence": narrative_evidence,
+        "diagnostics": diagnostics,
         "supporting_evidence": _top_evidence(
             evidence, narrative_results, sentiments={"positive", "mixed"}
         ),
@@ -545,10 +605,8 @@ def run_pipeline(
         "fund": fund,
         "provider_foundation": provider_foundation,
         "candidate_review_queue": candidate_review_queue,
-        "candidate_narratives": in_scope_candidate_narratives,
-        "excluded_mapping_candidates": mapping_result[
-            "excluded_mapping_candidates"
-        ],
+        "candidate_narratives": candidate_narratives,
+        "excluded_mapping_candidates": mapping_snapshot["excluded_mapping_candidates"],
     }
     signal_trace_payload = build_signal_trace_payload(
         fund_code=fund_code,
@@ -606,31 +664,6 @@ def run_pipeline(
         "markdown": report_paths["markdown"],
         "html": report_paths["html"],
     }
-
-
-def _candidate_narratives_for_excluded_candidates(
-    candidate_narratives: list[dict[str, Any]],
-    excluded_mapping_candidates: list[dict[str, Any]],
-) -> list[dict[str, Any]]:
-    exclusion_ids = {
-        str(candidate["exclusion_id"])
-        for candidate in excluded_mapping_candidates
-        if candidate.get("exclusion_id")
-    }
-    stock_codes = {
-        str(candidate["stock_code"])
-        for candidate in excluded_mapping_candidates
-        if candidate.get("stock_code")
-    }
-    in_scope = []
-    for candidate_narrative in candidate_narratives:
-        related_exclusion_ids = set(candidate_narrative.get("related_exclusion_ids", []))
-        triggering_stock_codes = set(candidate_narrative.get("triggering_stock_codes", []))
-        if related_exclusion_ids & exclusion_ids or triggering_stock_codes & stock_codes:
-            in_scope.append(candidate_narrative)
-    return in_scope
-
-
 def _artifact_manifest(
     fund_code: str,
     as_of_date: str,
@@ -728,41 +761,249 @@ def inspect_provider_foundation(
     }
 
 
+def _select_fund_provider(
+    fund_code: str,
+    provider_mode: str,
+    provider_router: ProviderRouter,
+) -> dict[str, Any]:
+    selection = provider_router.resolve(
+        layer="holdings",
+        default_primary=provider_mode,
+    )
+    execution = _execute_routed_provider_call(
+        selection=selection,
+        invoke=lambda provider: provider.get_fund_holdings(fund_code),
+        validate=lambda payload: None,
+        is_unavailable=_fund_payload_is_unavailable,
+    )
+    return {
+        "provider": execution["provider"],
+        "fund_payload": execution["payload"],
+        "degradation_events": execution["degradation_events"],
+    }
+
+
+def _execute_routed_provider_call(
+    selection: ResolvedLayerProviderSelection,
+    invoke: Callable[[Any], dict[str, Any]],
+    validate: Callable[[dict[str, Any]], None],
+    is_unavailable: Callable[[dict[str, Any]], bool] | None = None,
+) -> dict[str, Any]:
+    primary_provider = selection.primary_provider
+    primary_events = list(selection.primary_degradation_events)
+    try:
+        payload = invoke(primary_provider)
+        validate(payload)
+    except Exception as exc:
+        if isinstance(exc, ProviderContractError):
+            raise
+        if selection.fallback_provider is None or selection.fallback_name is None:
+            raise
+        return _execute_fallback_provider_call(
+            selection=selection,
+            invoke=invoke,
+            validate=validate,
+            reason=f"Primary provider failed: {exc}",
+        )
+
+    primary_events.extend(getattr(primary_provider, "degradation_events", []))
+    if (
+        selection.fallback_provider is not None
+        and selection.fallback_name is not None
+        and is_unavailable is not None
+        and is_unavailable(payload)
+    ):
+        return _execute_fallback_provider_call(
+            selection=selection,
+            invoke=invoke,
+            validate=validate,
+            reason="Primary provider returned unavailable payload",
+        )
+
+    return {
+        "provider": primary_provider,
+        "payload": payload,
+        "degradation_events": primary_events,
+    }
+
+
+def _execute_fallback_provider_call(
+    selection: ResolvedLayerProviderSelection,
+    invoke: Callable[[Any], dict[str, Any]],
+    validate: Callable[[dict[str, Any]], None],
+    reason: str,
+) -> dict[str, Any]:
+    if selection.fallback_provider is None or selection.fallback_name is None:
+        raise ValueError("fallback provider is required for fallback execution")
+
+    primary_events = [
+        *selection.primary_degradation_events,
+        *getattr(selection.primary_provider, "degradation_events", []),
+        _provider_fallback_event(
+            layer=selection.layer,
+            provider=selection.primary_name,
+            fallback_provider=selection.fallback_name,
+            reason=reason,
+        ),
+        *selection.fallback_degradation_events,
+    ]
+    payload = invoke(selection.fallback_provider)
+    validate(payload)
+    return {
+        "provider": selection.fallback_provider,
+        "payload": payload,
+        "degradation_events": [
+            *primary_events,
+            *getattr(selection.fallback_provider, "degradation_events", []),
+        ],
+    }
+
+
+def _provider_fallback_event(
+    layer: str,
+    provider: str,
+    fallback_provider: str,
+    reason: str,
+) -> dict[str, str]:
+    return {
+        "type": "provider_fallback",
+        "layer": layer,
+        "provider": provider,
+        "fallback_provider": fallback_provider,
+        "reason": reason,
+    }
+
+
+def _fund_payload_is_unavailable(payload: dict[str, Any]) -> bool:
+    fund = payload.get("fund")
+    if not isinstance(fund, dict):
+        return True
+    provider_metadata = fund.get("provider_metadata")
+    if not isinstance(provider_metadata, dict):
+        return True
+    return str(provider_metadata.get("data_quality") or "unavailable") == "unavailable"
+
+
+def _provider_payload_is_unavailable(payload: dict[str, Any]) -> bool:
+    return str(payload.get("data_quality") or "unavailable") == "unavailable"
+
+
 def _run_announcement_evidence(
     stock_codes: list[str],
     stock_mappings: list[dict[str, Any]],
     as_of_date: str,
     start_date: str | None,
     announcement_provider: Any | None,
+    provider_router: ProviderRouter,
 ) -> dict[str, Any]:
-    provider = announcement_provider or CNInfoAnnouncementProvider()
-    degradation_events: list[dict[str, str]] = []
+    selection = provider_router.resolve(
+        layer="announcements",
+        default_primary=provider_router.default_primary_for("announcements"),
+        explicit_provider=announcement_provider,
+    )
+    provider = selection.primary_provider
+    degradation_events: list[dict[str, str]] = list(selection.primary_degradation_events)
     try:
         announcements_payload = provider.get_announcements(
             stock_codes=stock_codes,
             as_of_date=as_of_date,
             start_date=start_date,
         )
+        validate_announcement_payload(announcements_payload)
+        degradation_events = [
+            *degradation_events,
+            *getattr(provider, "degradation_events", []),
+        ]
+        if (
+            selection.fallback_provider is not None
+            and selection.fallback_name is not None
+            and _provider_payload_is_unavailable(announcements_payload)
+        ):
+            provider = selection.fallback_provider
+            announcements_payload = provider.get_announcements(
+                stock_codes=stock_codes,
+                as_of_date=as_of_date,
+                start_date=start_date,
+            )
+            validate_announcement_payload(announcements_payload)
+            degradation_events = [
+                *degradation_events,
+                _provider_fallback_event(
+                    layer="announcements",
+                    provider=selection.primary_name,
+                    fallback_provider=selection.fallback_name,
+                    reason="Primary provider returned unavailable payload",
+                ),
+                *selection.fallback_degradation_events,
+                *getattr(provider, "degradation_events", []),
+            ]
     except Exception as exc:
-        provider_name = str(getattr(provider, "provider_name", "announcement-provider"))
-        degradation_events.append(
-            {
-                "type": "provider_unavailable",
-                "provider_name": provider_name,
-                "reason": f"Announcement provider failed: {exc}",
-            }
-        )
+        if isinstance(exc, ProviderContractError):
+            raise
+        fallback_used = False
+        if selection.fallback_provider is not None and selection.fallback_name is not None:
+            try:
+                provider = selection.fallback_provider
+                announcements_payload = provider.get_announcements(
+                    stock_codes=stock_codes,
+                    as_of_date=as_of_date,
+                    start_date=start_date,
+                )
+                validate_announcement_payload(announcements_payload)
+                degradation_events = [
+                    *selection.primary_degradation_events,
+                    *getattr(selection.primary_provider, "degradation_events", []),
+                    _provider_fallback_event(
+                        layer="announcements",
+                        provider=selection.primary_name,
+                        fallback_provider=selection.fallback_name,
+                        reason=f"Primary provider failed: {exc}",
+                    ),
+                    *selection.fallback_degradation_events,
+                    *getattr(provider, "degradation_events", []),
+                ]
+                fallback_used = True
+            except Exception as fallback_exc:
+                if isinstance(fallback_exc, ProviderContractError):
+                    raise
+                provider = selection.fallback_provider
+                degradation_events = [
+                    *selection.primary_degradation_events,
+                    *getattr(selection.primary_provider, "degradation_events", []),
+                    _provider_fallback_event(
+                        layer="announcements",
+                        provider=selection.primary_name,
+                        fallback_provider=selection.fallback_name,
+                        reason=f"Primary provider failed: {exc}",
+                    ),
+                    *selection.fallback_degradation_events,
+                    *getattr(provider, "degradation_events", []),
+                    {
+                        "type": "provider_unavailable",
+                        "provider_name": str(
+                            getattr(provider, "provider_name", "announcement-provider")
+                        ),
+                        "reason": f"Announcement fallback provider failed: {fallback_exc}",
+                    },
+                ]
+        if not fallback_used:
+            provider_name = str(
+                getattr(provider, "provider_name", "announcement-provider")
+            )
+            degradation_events = [
+                *degradation_events,
+                {
+                    "type": "provider_unavailable",
+                    "provider_name": provider_name,
+                    "reason": f"Announcement provider failed: {exc}",
+                },
+            ]
         announcements_payload = {
             "version": str(getattr(provider, "provider_version", "announcement-v1")),
             "data_quality": "unavailable",
             "announcements": [],
             "missing_stock_codes": sorted(set(stock_codes)),
         }
-
-    degradation_events = [
-        *degradation_events,
-        *getattr(provider, "degradation_events", []),
-    ]
     validate_announcement_payload(announcements_payload)
     announcement_evidence_payload = convert_announcements_to_evidence(
         announcements_payload=announcements_payload,
@@ -783,47 +1024,78 @@ def _run_announcement_evidence(
 def _run_market_quotes(
     stock_codes: list[str],
     market_data_provider: Any | None,
+    provider_router: ProviderRouter,
 ) -> dict[str, Any]:
-    provider = market_data_provider or EastmoneyMarketDataProvider()
-    market_quotes_payload = provider.get_stock_quotes(stock_codes=stock_codes)
-    validate_market_quote_payload(market_quotes_payload)
+    selection = provider_router.resolve(
+        layer="market_quotes",
+        default_primary=provider_router.default_primary_for("market_quotes"),
+        explicit_provider=market_data_provider,
+    )
+    execution = _execute_routed_provider_call(
+        selection=selection,
+        invoke=lambda provider: provider.get_stock_quotes(stock_codes=stock_codes),
+        validate=validate_market_quote_payload,
+        is_unavailable=_provider_payload_is_unavailable,
+    )
+    provider = execution["provider"]
+    market_quotes_payload = execution["payload"]
     return {
         "market_quotes": market_quotes_payload,
         "provider_layer": _market_quotes_provider_layer(
             provider=provider,
             market_quotes_payload=market_quotes_payload,
         ),
-        "degradation_events": getattr(provider, "degradation_events", []),
+        "degradation_events": execution["degradation_events"],
     }
 
 
 def _run_valuation_snapshots(
     stock_codes: list[str],
     valuation_provider: Any | None,
+    provider_router: ProviderRouter,
 ) -> dict[str, Any]:
-    provider = valuation_provider or EastmoneyValuationProvider()
-    valuation_snapshots_payload = provider.get_valuation_snapshots(stock_codes=stock_codes)
-    validate_valuation_snapshot_payload(valuation_snapshots_payload)
+    selection = provider_router.resolve(
+        layer="valuation_snapshots",
+        default_primary=provider_router.default_primary_for("valuation_snapshots"),
+        explicit_provider=valuation_provider,
+    )
+    execution = _execute_routed_provider_call(
+        selection=selection,
+        invoke=lambda provider: provider.get_valuation_snapshots(stock_codes=stock_codes),
+        validate=validate_valuation_snapshot_payload,
+        is_unavailable=_provider_payload_is_unavailable,
+    )
+    valuation_snapshots_payload = execution["payload"]
     return {
         "valuation_snapshots": valuation_snapshots_payload,
         "provider_layer": valuation_provider_layer(valuation_snapshots_payload),
-        "degradation_events": getattr(provider, "degradation_events", []),
+        "degradation_events": execution["degradation_events"],
     }
 
 
 def _run_financial_metrics(
     stock_codes: list[str],
     financial_metrics_provider: Any | None,
+    provider_router: ProviderRouter,
 ) -> dict[str, Any]:
-    provider = financial_metrics_provider or EastmoneyFinancialMetricsProvider()
-    financial_metrics_payload = provider.get_financial_metrics(stock_codes=stock_codes)
-    validate_financial_metrics_payload(financial_metrics_payload)
+    selection = provider_router.resolve(
+        layer="financial_metrics",
+        default_primary=provider_router.default_primary_for("financial_metrics"),
+        explicit_provider=financial_metrics_provider,
+    )
+    execution = _execute_routed_provider_call(
+        selection=selection,
+        invoke=lambda provider: provider.get_financial_metrics(stock_codes=stock_codes),
+        validate=validate_financial_metrics_payload,
+        is_unavailable=_provider_payload_is_unavailable,
+    )
+    financial_metrics_payload = execution["payload"]
     return {
         "financial_metrics": financial_metrics_payload,
         "provider_layer": _financial_metrics_provider_layer(
             financial_metrics_payload
         ),
-        "degradation_events": getattr(provider, "degradation_events", []),
+        "degradation_events": execution["degradation_events"],
     }
 
 
@@ -832,9 +1104,15 @@ def _run_news_evidence(
     all_narrative_ids: list[str],
     as_of_date: str,
     news_evidence_provider: Any | None,
+    provider_router: ProviderRouter,
 ) -> dict[str, Any]:
-    provider = news_evidence_provider or GoogleNewsRssEvidenceProvider()
-    degradation_events: list[dict[str, str]] = []
+    selection = provider_router.resolve(
+        layer="news_evidence",
+        default_primary=provider_router.default_primary_for("news_evidence"),
+        explicit_provider=news_evidence_provider,
+    )
+    provider = selection.primary_provider
+    degradation_events: list[dict[str, str]] = list(selection.primary_degradation_events)
     try:
         news_evidence_payload = provider.get_news_evidence(
             narratives=narratives,
@@ -847,19 +1125,117 @@ def _run_news_evidence(
             ],
             all_narrative_ids=all_narrative_ids,
         )
+        validate_news_evidence_payload(news_evidence_payload)
+        degradation_events = [
+            *degradation_events,
+            *news_evidence_payload.get("degradation_events", []),
+            *getattr(provider, "degradation_events", []),
+        ]
+        if (
+            selection.fallback_provider is not None
+            and selection.fallback_name is not None
+            and _provider_payload_is_unavailable(news_evidence_payload)
+        ):
+            provider = selection.fallback_provider
+            news_evidence_payload = provider.get_news_evidence(
+                narratives=narratives,
+                as_of_date=as_of_date,
+            )
+            news_evidence_payload = _with_news_query_scope(
+                payload=news_evidence_payload,
+                queried_narrative_ids=[
+                    str(narrative.get("narrative_id") or "") for narrative in narratives
+                ],
+                all_narrative_ids=all_narrative_ids,
+            )
+            validate_news_evidence_payload(news_evidence_payload)
+            degradation_events = [
+                *degradation_events,
+                _provider_fallback_event(
+                    layer="news_evidence",
+                    provider=selection.primary_name,
+                    fallback_provider=selection.fallback_name,
+                    reason="Primary provider returned unavailable payload",
+                ),
+                *selection.fallback_degradation_events,
+                *news_evidence_payload.get("degradation_events", []),
+                *getattr(provider, "degradation_events", []),
+            ]
     except Exception as exc:
+        if isinstance(exc, ProviderContractError):
+            raise
+        if selection.fallback_provider is not None and selection.fallback_name is not None:
+            try:
+                provider = selection.fallback_provider
+                news_evidence_payload = provider.get_news_evidence(
+                    narratives=narratives,
+                    as_of_date=as_of_date,
+                )
+                news_evidence_payload = _with_news_query_scope(
+                    payload=news_evidence_payload,
+                    queried_narrative_ids=[
+                        str(narrative.get("narrative_id") or "") for narrative in narratives
+                    ],
+                    all_narrative_ids=all_narrative_ids,
+                )
+                validate_news_evidence_payload(news_evidence_payload)
+                degradation_events = [
+                    *selection.primary_degradation_events,
+                    *getattr(selection.primary_provider, "degradation_events", []),
+                    _provider_fallback_event(
+                        layer="news_evidence",
+                        provider=selection.primary_name,
+                        fallback_provider=selection.fallback_name,
+                        reason=f"Primary provider failed: {exc}",
+                    ),
+                    *selection.fallback_degradation_events,
+                    *news_evidence_payload.get("degradation_events", []),
+                    *getattr(provider, "degradation_events", []),
+                ]
+                return {
+                    "news_evidence": news_evidence_payload,
+                    "provider_layer": _news_evidence_provider_layer(
+                        provider=provider,
+                        news_evidence_payload=news_evidence_payload,
+                    ),
+                    "degradation_events": degradation_events,
+                }
+            except Exception as fallback_exc:
+                if isinstance(fallback_exc, ProviderContractError):
+                    raise
+                provider = selection.fallback_provider
+                degradation_events = [
+                    *selection.primary_degradation_events,
+                    *getattr(selection.primary_provider, "degradation_events", []),
+                    _provider_fallback_event(
+                        layer="news_evidence",
+                        provider=selection.primary_name,
+                        fallback_provider=selection.fallback_name,
+                        reason=f"Primary provider failed: {exc}",
+                    ),
+                    *selection.fallback_degradation_events,
+                    *getattr(provider, "degradation_events", []),
+                    {
+                        "type": "provider_unavailable",
+                        "provider_name": str(
+                            getattr(provider, "provider_name", GOOGLE_NEWS_RSS_PROVIDER)
+                        ),
+                        "reason": f"News fallback provider failed: {fallback_exc}",
+                    },
+                ]
         provider_name = str(getattr(provider, "provider_name", GOOGLE_NEWS_RSS_PROVIDER))
         provider_version = str(
             getattr(provider, "provider_version", GOOGLE_NEWS_RSS_VERSION)
         )
         source_url = str(getattr(provider, "source_url", GOOGLE_NEWS_RSS_SOURCE_URL))
-        degradation_events.append(
+        degradation_events = [
+            *degradation_events,
             {
                 "type": "provider_unavailable",
                 "provider_name": provider_name,
                 "reason": f"News evidence provider failed: {exc}",
-            }
-        )
+            },
+        ]
         news_evidence_payload = {
             "version": "news-evidence-v1",
             "provider_name": provider_name,
@@ -884,12 +1260,6 @@ def _run_news_evidence(
             "skipped_item_count": 0,
             "degradation_events": degradation_events,
         }
-    else:
-        degradation_events = [
-            *degradation_events,
-            *news_evidence_payload.get("degradation_events", []),
-        ]
-    degradation_events = [*degradation_events, *getattr(provider, "degradation_events", [])]
     validate_news_evidence_payload(news_evidence_payload)
     return {
         "news_evidence": news_evidence_payload,
@@ -1299,32 +1669,6 @@ def _news_query_scope(
         "omitted_narrative_ids": sorted(set(requested) - set(queried)),
         "query_limit": 4,
     }
-
-
-def _with_state(
-    exposure: dict[str, Any],
-    signal_events: list[dict[str, Any]],
-    evidence: list[dict[str, Any]],
-    as_of_date: str,
-    data_quality: str,
-) -> dict[str, Any]:
-    narrative_id = exposure["narrative_id"]
-    evidence_count = sum(1 for item in evidence if item["narrative_id"] == narrative_id)
-    result = {
-        **exposure,
-        "state": score_narrative_state(
-            narrative_id=narrative_id,
-            signal_events=signal_events,
-            mapping_confidence=exposure["confidence"],
-            evidence_count=evidence_count,
-            as_of_date=as_of_date,
-            data_quality=data_quality,
-        ),
-    }
-    result["interpretation"] = interpret_narrative(result)
-    return result
-
-
 def _require_iso_date(value: str, field_name: str) -> None:
     try:
         date.fromisoformat(value)

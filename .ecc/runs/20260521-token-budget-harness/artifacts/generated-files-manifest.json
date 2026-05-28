@@ -1,0 +1,258 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "project-rules",
+      "path": "AGENTS.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "4a3a1639876520c56e30d0384118347de6bd3c0933c77c79e967969c0eb4a65f",
+      "mtime_epoch": 1779379490,
+      "size_bytes": 3898,
+      "summary": "Project startup rules now use token-light summary-first context."
+    },
+    {
+      "type": "framework-state",
+      "path": ".ecc/framework-state.json",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "25c10f5e2f5af9f84f24c11c70eaf0b2567c4a2832a0e6d37f03d22ebf1a50d3",
+      "mtime_epoch": 1779379048,
+      "size_bytes": 1111,
+      "summary": "Machine-readable context policy points to token-light startup files."
+    },
+    {
+      "type": "execution-plan-index",
+      "path": "docs/exec-plans/active/index.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "dbacca8ee5dffdd6e1de3510754835f020143b7b17e5f9886259affa6d36c846",
+      "mtime_epoch": 1779378664,
+      "size_bytes": 807,
+      "summary": "Active plan index is now a curated current queue instead of a historical catalog."
+    },
+    {
+      "type": "execution-plan",
+      "path": "docs/exec-plans/active/token-budget-harness.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "164a5675e8df080473b4f12108a9e79adb1d822026cf70c59f1159f4ad3b918c",
+      "mtime_epoch": 1779378655,
+      "size_bytes": 1644,
+      "summary": "Execution plan for the token-budget harness optimization."
+    },
+    {
+      "type": "memory-brief",
+      "path": "docs/memory/current-brief.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "1f4460604d9ca428423bd2d7a60d3021a95500a10a92b5eb8275b03262619e54",
+      "mtime_epoch": 1779379497,
+      "size_bytes": 3593,
+      "summary": "Short default memory entry point for routine startup."
+    },
+    {
+      "type": "memory-index",
+      "path": "docs/memory/architecture-decisions.index.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "fc9fc6bbd53889938e2a96e041401b46ec3d7969b285bde367aefc9d8163215f",
+      "mtime_epoch": 1779378381,
+      "size_bytes": 2339,
+      "summary": "Short ADR lookup surface for startup context."
+    },
+    {
+      "type": "memory-full",
+      "path": "docs/memory/architecture-decisions.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "65e7e0e554f042a9a1e1b60acf5d942d759e8505f3e7ad380a39b00eedf600a4",
+      "mtime_epoch": 1779378527,
+      "size_bytes": 73437,
+      "summary": "Full ADR history now includes summary-first context loading decision ADR-0070."
+    },
+    {
+      "type": "memory-rules",
+      "path": "docs/memory/operating-rules.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "e043c8a81a3c8deb5e55f5875aa23634b7dca64d805ca94b8a336f797f03097b",
+      "mtime_epoch": 1779378481,
+      "size_bytes": 2629,
+      "summary": "Operating rules now include summary-first memory and token budget behavior."
+    },
+    {
+      "type": "memory-full",
+      "path": "docs/memory/project-context.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "f04e138f6b0fa32ed3c75804aedcabb94cf3f6a3382cc4e1e2273706a10f1291",
+      "mtime_epoch": 1779378540,
+      "size_bytes": 35742,
+      "summary": "Full project context now marks itself as on-demand rather than default startup context."
+    },
+    {
+      "type": "script",
+      "path": "scripts/context_brief.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "aaba1cd9d0d69f260822557c3d5f598defef6301d2a02b58c4dad66a6f4d0c2b",
+      "mtime_epoch": 1779379506,
+      "size_bytes": 7260,
+      "summary": "Deterministic token-light context loader."
+    },
+    {
+      "type": "skill",
+      "path": "skills/ecc-task-subagent-workflow/SKILL.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "7bc23c8f9b1249744ad29bde6dbe5e60e5c5187e6a84816b9303ab387d2674b4",
+      "mtime_epoch": 1779378578,
+      "size_bytes": 4840,
+      "summary": "Workflow skill now keeps only core rules and defers detailed contracts to a reference."
+    },
+    {
+      "type": "skill-reference",
+      "path": "skills/ecc-task-subagent-workflow/references/run-contract.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "cdddcdc029731fdbd78f92b03b813444958758d6c5806b953954476382e777c7",
+      "mtime_epoch": 1779378606,
+      "size_bytes": 4084,
+      "summary": "On-demand detailed run-state, handoff, quality, and manifest contract."
+    },
+    {
+      "type": "skill",
+      "path": "skills/memory-governance/SKILL.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "3f1af6c8ceaec4098da9dcc736af80f90e4f2e390d087c6d3699216ad2de47ce",
+      "mtime_epoch": 1779378473,
+      "size_bytes": 1599,
+      "summary": "Memory governance now separates startup indexes from full memory."
+    },
+    {
+      "type": "skill",
+      "path": "skills/project-bootstrap/SKILL.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "72195536d33cb2968bd108185a0bb06be3ac64fc6509718c0f22a877d8cf672f",
+      "mtime_epoch": 1779378465,
+      "size_bytes": 1472,
+      "summary": "Bootstrap skill now reads summary-first context."
+    },
+    {
+      "type": "test",
+      "path": "tests/test_context_brief.py",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "2dec525a913c8f576578c7b4f8e565106eb3a4eb5a61d905348bf28a971819ea",
+      "mtime_epoch": 1779379519,
+      "size_bytes": 3301,
+      "summary": "Tests for context loader word budget and JSON output."
+    },
+    {
+      "type": "run-state",
+      "path": ".ecc/runs/20260521-token-budget-harness/run-state.json",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "1808097e59c753fed8a2897d03aff51743495d7868fb4c7f09c12221bdafc75e",
+      "mtime_epoch": 1779378789,
+      "size_bytes": 998,
+      "summary": "Run state for the harness token-budget optimization."
+    },
+    {
+      "type": "task-brief",
+      "path": ".ecc/runs/20260521-token-budget-harness/task-brief.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "cf150fe030f0f3f7575b81d592d3a48ce5420266ddd35f7add0798bab0f0ebb1",
+      "mtime_epoch": 1779378708,
+      "size_bytes": 1204,
+      "summary": "Task brief for the harness token-budget optimization."
+    },
+    {
+      "type": "changed-files",
+      "path": ".ecc/runs/20260521-token-budget-harness/changed-files.txt",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "4f1be96f8e6497d59405c2a639bfdd704c89d628f44a85775e148785c2c726c7",
+      "mtime_epoch": 1779378716,
+      "size_bytes": 554,
+      "summary": "Changed-file ledger for this harness optimization."
+    },
+    {
+      "type": "task-handoff",
+      "path": ".ecc/runs/20260521-token-budget-harness/task-handoff.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "d584986b1d7ed52d307058a11fa394616d67e3f353cdaffe59235f7c7894b817",
+      "mtime_epoch": 1779379551,
+      "size_bytes": 3536,
+      "summary": "Task handoff summarizing implementation and verification."
+    },
+    {
+      "type": "task-agent-commands",
+      "path": ".ecc/runs/20260521-token-budget-harness/task-agent/commands.jsonl",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "e3b03401b48f18ab29c6f2b1f6f1041ff03df5141c7cfad3aa9b64e556caf8c9",
+      "mtime_epoch": 1779379540,
+      "size_bytes": 3229,
+      "summary": "Command log for implementation and self-review."
+    },
+    {
+      "type": "task-agent-test-results",
+      "path": ".ecc/runs/20260521-token-budget-harness/task-agent/test-results.json",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "a41f1999c5f726913c988626544e39f80824b64d8566c13292a0416f05a91c93",
+      "mtime_epoch": 1779379546,
+      "size_bytes": 1272,
+      "summary": "Verification results for context loader and token budget checks."
+    },
+    {
+      "type": "task-agent-notes",
+      "path": ".ecc/runs/20260521-token-budget-harness/task-agent/implementation-notes.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "db20a2b1defb0d72394767ce81075ca633f9fc7b94c6306e28fbfa53796060da",
+      "mtime_epoch": 1779378747,
+      "size_bytes": 1155,
+      "summary": "Implementation notes and measured token reduction."
+    },
+    {
+      "type": "task-agent-risks",
+      "path": ".ecc/runs/20260521-token-budget-harness/task-agent/risk-notes.md",
+      "owned_by_task": true,
+      "commit": null,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "0ef149c180496752d0ae364d90a764488b8f23917fa70ab79c1afd77c5c96363",
+      "mtime_epoch": 1779378753,
+      "size_bytes": 492,
+      "summary": "Residual risks and safety choices."
+    }
+  ],
+  "manifest_note": "This manifest intentionally excludes its own checksum to avoid self-referential hash churn."
+}

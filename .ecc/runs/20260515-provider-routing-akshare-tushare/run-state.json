@@ -1,0 +1,94 @@
+{
+  "task_run_id": "20260515-provider-routing-akshare-tushare",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/hk-market-and-sina-news",
+  "worktree": "main",
+  "base_commit": "4d4c20f",
+  "head_commit": "pending-commit",
+  "merge_base": "4d4c20f",
+  "quality_reviewed_commit": null,
+  "reviewed_snapshot_type": null,
+  "working_tree_dirty": true,
+  "task_type": "implementation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "ready_for_review",
+  "review_outcome": "Added a provider routing framework with per-layer primary/fallback configuration, preserved default behavior when no routing config is supplied, upgraded the built-in Tushare financial_metrics/valuation_snapshots plus AKShare market_quotes adapters from placeholders to minimal live-path implementations with environment-aware unavailable fallback, exposed CLI/config-file routing entrypoints for single-fund runs, added `.local.env`-first Tushare credential loading, made fallback acceptance deterministic even when local credentials or optional libraries are present, and stabilized the strict Tushare-primary acceptance contract around no layer fallback rather than zero item-level degradation.",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "ready_for_quality",
+  "verification": {
+    "local_env_pytest": "3 passed",
+    "provider_routing_pytest": "6 passed",
+    "tushare_akshare_provider_pytest": "6 passed",
+    "cli_routing_pytest": "6 passed",
+    "provider_routing_acceptance_pytest": "5 passed",
+    "tushare_primary_acceptance_pytest": "4 passed",
+    "routing_acceptance_regression_pytest": "88 passed",
+    "expanded_regression_pytest": "120 passed",
+    "provider_routing_acceptance_script": "passed via scripts/validate_provider_routing_acceptance.py --output-dir /tmp/fni-provider-routing-acceptance-161725-after-token-2",
+    "tushare_primary_acceptance_script": "passed via scripts/validate_tushare_primary_acceptance.py --output-dir /tmp/fni-tushare-primary-acceptance-161725-4",
+    "ruff": "passed",
+    "compileall": "passed"
+  },
+  "decisions": [
+    {
+      "id": "PRT-001",
+      "date": "2026-05-15",
+      "decision": "Keep provider routing opt-in at the orchestration boundary instead of adding CLI flags in the first slice.",
+      "rationale": "This preserves current defaults and report acceptance behavior while giving tests and future adapters a stable routing hook."
+    },
+    {
+      "id": "PRT-002",
+      "date": "2026-05-15",
+      "decision": "Allow fallback on provider failure or unavailable payloads, but not on provider contract violations.",
+      "rationale": "Contract errors should fail fast so future adapters cannot hide malformed payloads behind fallback routing."
+    },
+    {
+      "id": "PRT-003",
+      "date": "2026-05-15",
+      "decision": "Register Tushare and AKShare as built-in routed provider names using explicit unavailable placeholders before live fetch integration.",
+      "rationale": "This stabilizes routing aliases, fallback behavior, and contract coverage now, while keeping real API implementation in a later slice."
+    },
+    {
+      "id": "PRT-004",
+      "date": "2026-05-15",
+      "decision": "Implement Tushare and AKShare adapters as minimal live-path providers with injectable fetch clients, while preserving unavailable fallback when credentials or libraries are absent.",
+      "rationale": "This keeps the routing layer production-shaped without forcing new global dependencies or making the default pipeline path non-deterministic."
+    },
+    {
+      "id": "PRT-005",
+      "date": "2026-05-15",
+      "decision": "Expose provider routing through both a JSON config file and repeatable CLI overrides, with CLI overrides winning on key collisions.",
+      "rationale": "This makes routing usable for local smoke runs immediately while keeping configuration stable enough for later automation and deployment wiring."
+    },
+    {
+      "id": "PRT-006",
+      "date": "2026-05-15",
+      "decision": "Add a dedicated provider-routing acceptance script that defaults to fallback-mode validation but can also validate primary-success artifacts through parameterized expectations.",
+      "rationale": "Routing now needs an end-to-end contract check separate from the older market-quote and enriched acceptance scripts because fallback behavior is part of the product surface."
+    },
+    {
+      "id": "PRT-007",
+      "date": "2026-05-15",
+      "decision": "Add a separate strict Tushare-primary acceptance entrypoint that hard-requires TUSHARE_TOKEN and forbids layer fallback away from Tushare on valuation_snapshots and financial_metrics.",
+      "rationale": "The fallback acceptance script proves degraded routing works, but release confidence also needs a distinct contract for the future happy path where Tushare remains the selected routed provider even if individual stock rows degrade."
+    },
+    {
+      "id": "PRT-008",
+      "date": "2026-05-15",
+      "decision": "Resolve Tushare credentials from `.local.env` before falling back to the process environment.",
+      "rationale": "This gives the repo a stable local-secret convention for provider smoke and acceptance runs without forcing shell-level exports, while still preserving environment-variable compatibility."
+    },
+    {
+      "id": "PRT-009",
+      "date": "2026-05-15",
+      "decision": "Force `akshare` and `tushare` primaries into an unavailable state inside the fallback acceptance script instead of relying on ambient machine state.",
+      "rationale": "Fallback acceptance should verify routing semantics, not whether a developer currently has valid Tushare credentials or optional provider libraries installed."
+    }
+  ]
+}

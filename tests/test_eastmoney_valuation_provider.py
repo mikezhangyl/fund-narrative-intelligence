@@ -85,3 +85,15 @@ def test_eastmoney_valuation_provider_returns_unavailable_without_crashing():
     assert payload["valuations"] == []
     assert payload["missing_stock_codes"] == ["600519"]
     assert provider.degradation_events[-1]["type"] == "provider_unavailable"
+
+
+def test_eastmoney_valuation_provider_marks_hong_kong_stock_as_unsupported():
+    provider = EastmoneyValuationProvider()
+
+    payload = provider.get_valuation_snapshots(["00700"])
+
+    assert payload["provider_name"] == "eastmoney-valuation"
+    assert payload["data_quality"] == "unavailable"
+    assert payload["valuations"] == []
+    assert payload["missing_stock_codes"] == ["00700"]
+    assert provider.degradation_events[-1]["type"] == "provider_unsupported_market"

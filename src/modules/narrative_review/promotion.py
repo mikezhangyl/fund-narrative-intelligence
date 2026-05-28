@@ -4,6 +4,11 @@ from copy import deepcopy
 from typing import Any
 
 from src.errors import ProviderContractError
+from src.modules.narrative_intelligence.model import (
+    candidate_display_name,
+    candidate_taxonomy_display,
+    normalize_narrative_entry,
+)
 from src.validation import validate_registry_payload
 
 REVIEW_ACTIONS = {"approve", "reject", "defer"}
@@ -120,15 +125,57 @@ def _promoted_narrative(
     if narrative_id in existing_ids:
         raise ProviderContractError(f"narrative_id already exists: {narrative_id}")
     reviewed_at = action_payload["reviewed_at"]
-    return {
+    promoted = {
         "narrative_id": narrative_id,
         "canonical_taxonomy": candidate["canonical_taxonomy"],
         "name": candidate["name"],
+        "canonical_name_zh": candidate_display_name(candidate, candidate["name"]),
+        "canonical_name_en": str(
+            candidate.get("canonical_name_en") or candidate["name"]
+        ),
+        "display_name": candidate_display_name(candidate, candidate["name"]),
+        "canonical_taxonomy_zh": candidate_taxonomy_display(
+            candidate,
+            candidate["canonical_taxonomy"],
+        ),
+        "canonical_taxonomy_en": str(
+            candidate.get("canonical_taxonomy_en") or candidate["canonical_taxonomy"]
+        ),
         "parent_id": promotion["parent_id"],
         "level": promotion["level"],
         "status": "active",
         "aliases": promotion["aliases"],
         "related_terms": promotion["related_terms"],
+        "aliases_zh": promotion["aliases"],
+        "aliases_en": candidate.get("aliases_en", candidate.get("aliases", [])),
+        "related_terms_zh": promotion["related_terms"],
+        "related_terms_en": candidate.get(
+            "related_terms_en",
+            candidate.get("related_terms", []),
+        ),
+        "definition_zh": str(
+            candidate.get("definition_zh")
+            or candidate.get("definition")
+            or candidate_display_name(candidate, candidate["name"])
+        ),
+        "definition_en": str(
+            candidate.get("definition_en")
+            or candidate.get("definition")
+            or candidate.get("name")
+        ),
+        "inclusion_criteria_zh": list(
+            candidate.get(
+                "inclusion_criteria_zh",
+                candidate.get("inclusion_criteria", []),
+            )
+        ),
+        "exclusion_criteria_zh": list(
+            candidate.get(
+                "exclusion_criteria_zh",
+                candidate.get("exclusion_criteria", []),
+            )
+        ),
+        "representative_stocks": list(candidate.get("triggering_stock_codes", [])),
         "human_review_status": "approved",
         "reviewed_by": action_payload["reviewed_by"],
         "reviewed_at": reviewed_at,
@@ -137,6 +184,7 @@ def _promoted_narrative(
         "promoted_from_candidate_id": candidate["candidate_narrative_id"],
         "promotion_action_id": action_payload["action_id"],
     }
+    return normalize_narrative_entry(promoted)
 
 
 def _candidate_index(

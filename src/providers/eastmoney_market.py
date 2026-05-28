@@ -8,6 +8,11 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from src.errors import ProviderContractError, ProviderFetchError
+from src.providers.security_market import (
+    eastmoney_a_share_secid,
+    is_hong_kong_stock_code,
+    yahoo_symbol_for_stock,
+)
 from src.validation import validate_market_quote_payload
 
 EASTMONEY_MARKET_QUOTE_URL = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
@@ -78,6 +83,15 @@ class EastmoneyMarketDataProvider:
         stock_code: str,
         retrieved_at: str,
     ) -> dict[str, Any]:
+        if is_hong_kong_stock_code(stock_code):
+            yahoo_url = build_yahoo_quote_url(stock_code)
+            response = _fetch_with_retry(self.yahoo_fetcher, yahoo_url)
+            return normalize_yahoo_quote_response(
+                response=response,
+                requested_stock_codes=[stock_code],
+                source_url=yahoo_url,
+                retrieved_at=retrieved_at,
+            )
         quote_url = build_eastmoney_quote_url(stock_code)
         try:
             response = _fetch_with_retry(self.fetcher, quote_url)
@@ -107,8 +121,11 @@ class EastmoneyMarketDataProvider:
 
 
 def build_eastmoney_quote_url(stock_code: str) -> str:
+    secid = _eastmoney_secid(stock_code)
+    if secid is None:
+        raise ProviderContractError(f"Eastmoney quote does not support stock code: {stock_code}")
     params = {
-        "secid": _eastmoney_secid(stock_code),
+        "secid": secid,
         "fields1": "f1,f2,f3,f4,f5,f6",
         "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
         "klt": "101",
@@ -319,19 +336,18 @@ def _list_value(values: list[Any], index: int) -> float | None:
 
 
 def _eastmoney_secid(stock_code: str) -> str:
-    code = str(stock_code)
-    market = "1" if code.startswith(("5", "6", "9")) else "0"
-    return f"{market}.{code}"
+    return eastmoney_a_share_secid(stock_code)
 
 
 def _yahoo_symbol(stock_code: str) -> str:
-    code = str(stock_code)
-    suffix = "SS" if code.startswith(("5", "6", "9")) else "SZ"
-    return f"{code}.{suffix}"
+    return yahoo_symbol_for_stock(stock_code)
 
 
 def _stock_code_from_yahoo_symbol(symbol: str) -> str:
-    return symbol.split(".", maxsplit=1)[0]
+    code = symbol.split(".", maxsplit=1)[0]
+    if symbol.endswith(".HK") and code.isdigit():
+        return code.zfill(5)
+    return code
 
 
 def _parse_optional_float(value: Any) -> float | None:

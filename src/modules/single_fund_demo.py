@@ -946,8 +946,6 @@ def _signal_row(row: dict[str, Any]) -> str:
         f"<td>{source}</td>"
         "</tr>"
     )
-
-
 def _dict_value(value: Any, context: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise SingleFundDemoError(f"{context} must be an object")

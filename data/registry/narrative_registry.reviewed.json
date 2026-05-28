@@ -1,105 +1,491 @@
 {
-  "version": "registry-v1",
+  "candidate_narratives": [
+    {
+      "aliases": [
+        "光通信产业链",
+        "光纤通信",
+        "光通信设备"
+      ],
+      "aliases_en": [],
+      "aliases_zh": [
+        "光通信",
+        "中天科技",
+        "亨通光电"
+      ],
+      "candidate_narrative_id": "C_AUTO_3D71C39000",
+      "canonical_name_en": "光通信",
+      "canonical_name_zh": "光通信",
+      "canonical_taxonomy": "通信",
+      "canonical_taxonomy_en": "通信",
+      "canonical_taxonomy_zh": "通信",
+      "confidence": 0.82,
+      "definition": "光通信指围绕光纤、光模块、光器件及光网络设备的产业链主题，涵盖传输、接入、数据中心等应用场景。本主题基于多家通信设备龙头的持仓触发，体现行业性的业绩分化与估值波动特征，而非单一公司事件。",
+      "definition_en": "光通信 refers to a recurring market theme inferred from 通信 holdings, centered on 光通信. Current candidate support comes from holdings such as 光迅科技, 亨通光电, 烽火通信.",
+      "definition_zh": "光通信是一个基于通信持仓抽象出的候选主题，当前由中天科技、亨通光电、光迅科技等持仓及光通信相关证据共同触发。",
+      "derivation": {
+        "curation_provider": "minimax-narrative-curator",
+        "curation_provider_version": "anthropic-compatible-v1",
+        "holding_count": 4,
+        "model": "MiniMax-M2.7",
+        "seed_id": "SEED_A45CD092E60B",
+        "source_item_count": 9,
+        "supporting_source_item_ids": [
+          "SRC_ANNOUNCEMENT_56B3D8CA9D6B",
+          "SRC_FINANCIAL_7EA67DA32144",
+          "SRC_FINANCIAL_97532DB7538E",
+          "SRC_FINANCIAL_D0EC0C76E76E",
+          "SRC_FINANCIAL_E70B310BACD0",
+          "SRC_QUOTE_20A4C5806EBC",
+          "SRC_QUOTE_E23820207E1B",
+          "SRC_VALUATION_20A4C5806EBC",
+          "SRC_VALUATION_E23820207E1B"
+        ]
+      },
+      "display_name": "光通信",
+      "exclusion_criteria": [
+        "不能仅凭单一持仓或单一公司公告就提升为正式主题",
+        "不能将行业波动等同于个股特殊事件",
+        "不能将公司名称、品牌名直接作为主题标签"
+      ],
+      "exclusion_criteria_zh": [
+        "不能仅凭单一通信行业标签就提升为正式主题。",
+        "不能仅凭一次性公告、单日行情或单条估值快照就提升为正式主题。"
+      ],
+      "first_seen_at": "2026-03-31",
+      "human_review_status": "approved",
+      "inclusion_criteria": [
+        "涉及多家光通信产业链公司的业绩、公告或估值数据",
+        "持仓涵盖光模块或光纤光缆等细分领域龙头",
+        "证据来源涵盖一季报财务指标、市场行情或估值快照中至少两类"
+      ],
+      "inclusion_criteria_zh": [
+        "相关证据反复出现“光通信”线索。",
+        "核心触发持仓包括中天科技、亨通光电、光迅科技。"
+      ],
+      "last_updated_at": "2026-05-15",
+      "name": "光通信",
+      "promotion_target_id": "N_OPTICAL_COMMUNICATION",
+      "rationale": "该候选主题由4只通信行业持仓共同触发，涵盖光迅科技、亨通光电、烽火通信、中天科技。证据显示业绩分化明显——亨通光电净利润 YoY +98.5%，光迅科技 +59.8%，中天科技 +46.4%，而烽火通信净利润 YoY -30.4%。近期股价出现回撤（烽火通信 -8.25%，光迅科技 -3.59%），存在估值折价压力。该主题超越单一公司事件，体现光通信行业的整体市场特征。",
+      "related_exclusion_ids": [],
+      "related_terms": [
+        "光模块",
+        "光纤光缆",
+        "光器件",
+        "通信设备",
+        "光网络"
+      ],
+      "related_terms_en": [
+        "光通信"
+      ],
+      "related_terms_zh": [
+        "光通信",
+        "通信"
+      ],
+      "representative_citation_ids": [
+        "SRC_FINANCIAL_E70B310BACD0",
+        "SRC_FINANCIAL_D0EC0C76E76E",
+        "SRC_FINANCIAL_7EA67DA32144",
+        "SRC_FINANCIAL_97532DB7538E",
+        "SRC_QUOTE_20A4C5806EBC",
+        "SRC_QUOTE_E23820207E1B"
+      ],
+      "representative_citations": [
+        {
+          "event_date": "2026-03-31",
+          "provider_name": "eastmoney-financial-metrics",
+          "source_item_id": "SRC_FINANCIAL_7EA67DA32144",
+          "source_type": "financial_metric",
+          "source_url": "https://datacenter.eastmoney.com/securities/api/data/get?type=RPT_F10_FINANCE_MAINFINADATA&sty=APP_F10_MAINFINADATA&filter=%28SECUCODE%3D%22600522.SH%22%29&p=1&ps=1&sr=-1&st=REPORT_DATE&source=HSF10&client=PC",
+          "stock_code": "600522",
+          "stock_name": "中天科技",
+          "title": "Financial metrics for 中天科技"
+        },
+        {
+          "event_date": "2026-03-31",
+          "provider_name": "eastmoney-financial-metrics",
+          "source_item_id": "SRC_FINANCIAL_97532DB7538E",
+          "source_type": "financial_metric",
+          "source_url": "https://datacenter.eastmoney.com/securities/api/data/get?type=RPT_F10_FINANCE_MAINFINADATA&sty=APP_F10_MAINFINADATA&filter=%28SECUCODE%3D%22600498.SH%22%29&p=1&ps=1&sr=-1&st=REPORT_DATE&source=HSF10&client=PC",
+          "stock_code": "600498",
+          "stock_name": "烽火通信",
+          "title": "Financial metrics for 烽火通信"
+        }
+      ],
+      "review_action_id": "approve_515880_optical_communication_20260515",
+      "review_note": "Approve for 515880 reviewed coverage. Cross-holding evidence supports an independent 光通信 narrative spanning 光迅科技、亨通光电、烽火通信、中天科技, and this should not remain collapsed into 半导体资本开支周期.",
+      "reviewed_at": "2026-05-15T23:59:00+08:00",
+      "reviewed_by": "codex-review",
+      "source": "narrative_intelligence_generation",
+      "status": "promoted",
+      "triggering_stock_codes": [
+        "002281",
+        "600487",
+        "600498",
+        "600522"
+      ],
+      "why_not_company_event_zh": "该候选由4只持仓共同触发，不是单一公司的孤立事件。"
+    },
+    {
+      "aliases": [
+        "光通信模块",
+        "光收发模块"
+      ],
+      "aliases_en": [],
+      "aliases_zh": [
+        "光模块",
+        "中际旭创",
+        "天孚通信"
+      ],
+      "candidate_narrative_id": "C_AUTO_649720149F",
+      "canonical_name_en": "光模块",
+      "canonical_name_zh": "光模块",
+      "canonical_taxonomy": "通信",
+      "canonical_taxonomy_en": "通信",
+      "canonical_taxonomy_zh": "通信",
+      "confidence": 0.78,
+      "definition": "光模块是光通信系统中实现光电转换的核心功能器件，广泛应用于数据中心、电信网络及AI算力基础设施。该叙事聚焦于全球AI算力需求爆发、算力中心扩建及高速光模块（400G/800G/1.6T）技术升级驱动的产业链景气上行周期，覆盖上游光芯片、中游光器件封装及下游设备商的整体价值链条。",
+      "definition_en": "光模块 refers to a recurring market theme inferred from 通信 holdings, centered on 光模块. Current candidate support comes from holdings such as 中际旭创, 天孚通信, 新易盛.",
+      "definition_zh": "光模块是一个基于通信持仓抽象出的候选主题，当前由中际旭创、天孚通信、新易盛等持仓及光模块相关证据共同触发。",
+      "derivation": {
+        "curation_provider": "minimax-narrative-curator",
+        "curation_provider_version": "anthropic-compatible-v1",
+        "holding_count": 3,
+        "model": "MiniMax-M2.7",
+        "seed_id": "SEED_7B51E842DD6C",
+        "source_item_count": 3,
+        "supporting_source_item_ids": [
+          "SRC_FINANCIAL_330B6F53C9C9",
+          "SRC_FINANCIAL_48848F9AFFA8",
+          "SRC_FINANCIAL_ECE73E5A8126"
+        ]
+      },
+      "display_name": "光模块",
+      "exclusion_criteria": [
+        "不能仅凭单一通信行业标签归类为该叙事",
+        "不能将业务高度多元化且光模块收入占比不明的公司强行纳入",
+        "不支持仅依赖估值水平或技术图形发出的信号"
+      ],
+      "exclusion_criteria_zh": [
+        "不能仅凭单一通信行业标签就提升为正式主题。",
+        "不能仅凭一次性公告、单日行情或单条估值快照就提升为正式主题。"
+      ],
+      "first_seen_at": "2026-03-31",
+      "human_review_status": "approved",
+      "inclusion_criteria": [
+        "至少有2家持仓公司一季报财务指标呈现光模块业务高增长（营收或净利润同比增速超过30%）",
+        "持仓组合中至少包含光模块产业链不同环节（上游芯片/中游封装/下游设备）的代表性标的",
+        "支持性证据需来自季报财务数据，非一次性公告或短期行情快照"
+      ],
+      "inclusion_criteria_zh": [
+        "相关证据反复出现“光模块”线索。",
+        "核心触发持仓包括中际旭创、天孚通信、新易盛。"
+      ],
+      "last_updated_at": "2026-05-15",
+      "name": "光模块产业链",
+      "promotion_target_id": "N_OPTICAL_MODULE_CHAIN",
+      "rationale": "基于3只通信持仓的跨股票暴露标签聚类，关联核心概念光模块，反映光通信基础设施细分领域的系统性主题机会。",
+      "related_exclusion_ids": [],
+      "related_terms": [
+        "光通信",
+        "光器件",
+        "数据中心",
+        "AI算力",
+        "800G",
+        "1.6T"
+      ],
+      "related_terms_en": [
+        "光模块"
+      ],
+      "related_terms_zh": [
+        "光模块",
+        "通信"
+      ],
+      "representative_citation_ids": [
+        "SRC_FINANCIAL_330B6F53C9C9",
+        "SRC_FINANCIAL_48848F9AFFA8",
+        "SRC_FINANCIAL_ECE73E5A8126"
+      ],
+      "representative_citations": [
+        {
+          "event_date": "2026-03-31",
+          "provider_name": "eastmoney-financial-metrics",
+          "source_item_id": "SRC_FINANCIAL_330B6F53C9C9",
+          "source_type": "financial_metric",
+          "source_url": "https://datacenter.eastmoney.com/securities/api/data/get?type=RPT_F10_FINANCE_MAINFINADATA&sty=APP_F10_MAINFINADATA&filter=%28SECUCODE%3D%22300308.SZ%22%29&p=1&ps=1&sr=-1&st=REPORT_DATE&source=HSF10&client=PC",
+          "stock_code": "300308",
+          "stock_name": "中际旭创",
+          "title": "Financial metrics for 中际旭创"
+        },
+        {
+          "event_date": "2026-03-31",
+          "provider_name": "eastmoney-financial-metrics",
+          "source_item_id": "SRC_FINANCIAL_48848F9AFFA8",
+          "source_type": "financial_metric",
+          "source_url": "https://datacenter.eastmoney.com/securities/api/data/get?type=RPT_F10_FINANCE_MAINFINADATA&sty=APP_F10_MAINFINADATA&filter=%28SECUCODE%3D%22300394.SZ%22%29&p=1&ps=1&sr=-1&st=REPORT_DATE&source=HSF10&client=PC",
+          "stock_code": "300394",
+          "stock_name": "天孚通信",
+          "title": "Financial metrics for 天孚通信"
+        },
+        {
+          "event_date": "2026-03-31",
+          "provider_name": "eastmoney-financial-metrics",
+          "source_item_id": "SRC_FINANCIAL_ECE73E5A8126",
+          "source_type": "financial_metric",
+          "source_url": "https://datacenter.eastmoney.com/securities/api/data/get?type=RPT_F10_FINANCE_MAINFINADATA&sty=APP_F10_MAINFINADATA&filter=%28SECUCODE%3D%22300502.SZ%22%29&p=1&ps=1&sr=-1&st=REPORT_DATE&source=HSF10&client=PC",
+          "stock_code": "300502",
+          "stock_name": "新易盛",
+          "title": "Financial metrics for 新易盛"
+        }
+      ],
+      "review_action_id": "approve_515880_optical_module_20260515",
+      "review_note": "Approve for 515880 reviewed coverage. Cross-holding evidence supports a distinct 光模块 narrative centered on 中际旭创、天孚通信、新易盛 rather than broad 通信 or 半导体 fallback mapping.",
+      "reviewed_at": "2026-05-15T23:59:30+08:00",
+      "reviewed_by": "codex-review",
+      "source": "narrative_intelligence_generation",
+      "status": "promoted",
+      "triggering_stock_codes": [
+        "300308",
+        "300394",
+        "300502"
+      ],
+      "why_not_company_event_zh": "该候选由3只持仓共同触发，不是单一公司的孤立事件。"
+    }
+  ],
   "narratives": [
     {
-      "narrative_id": "N_AI",
-      "canonical_taxonomy": "AI",
-      "name": "AI",
-      "parent_id": null,
-      "level": 1,
-      "status": "active",
       "aliases": [
         "artificial intelligence"
       ],
+      "aliases_en": [
+        "artificial intelligence"
+      ],
+      "aliases_zh": [
+        "artificial intelligence"
+      ],
+      "canonical_name_en": "AI",
+      "canonical_name_zh": "人工智能",
+      "canonical_taxonomy": "AI",
+      "canonical_taxonomy_en": "AI",
+      "canonical_taxonomy_zh": "人工智能",
+      "definition_en": "AI",
+      "definition_zh": "人工智能",
+      "display_name": "人工智能",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2023-01-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-16",
+      "level": 1,
+      "name": "AI",
+      "narrative_id": "N_AI",
+      "parent_id": null,
       "related_terms": [
         "accelerated computing",
         "machine learning"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
-      "reviewed_at": "2026-05-15",
-      "first_seen_at": "2023-01-01",
-      "last_updated_at": "2026-05-13"
+      "related_terms_en": [
+        "accelerated computing",
+        "machine learning"
+      ],
+      "related_terms_zh": [
+        "accelerated computing",
+        "machine learning"
+      ],
+      "representative_stocks": [],
+      "reviewed_at": "2026-05-16",
+      "reviewed_by": "codex-review",
+      "status": "active"
     },
     {
-      "narrative_id": "N_AI_INFRA",
-      "canonical_taxonomy": "AI",
-      "name": "AI Infrastructure",
-      "parent_id": "N_AI",
-      "level": 2,
-      "status": "active",
       "aliases": [
         "AI compute infrastructure",
         "AI datacenter infrastructure"
       ],
+      "aliases_en": [
+        "AI compute infrastructure",
+        "AI datacenter infrastructure"
+      ],
+      "aliases_zh": [
+        "人工智能算力基础设施",
+        "人工智能数据中心基础设施"
+      ],
+      "canonical_name_en": "AI Infrastructure",
+      "canonical_name_zh": "人工智能基础设施",
+      "canonical_taxonomy": "AI",
+      "canonical_taxonomy_en": "AI",
+      "canonical_taxonomy_zh": "人工智能",
+      "definition_en": "AI Infrastructure",
+      "definition_zh": "人工智能基础设施",
+      "display_name": "人工智能基础设施",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2023-03-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-13",
+      "level": 2,
+      "name": "AI Infrastructure",
+      "narrative_id": "N_AI_INFRA",
+      "parent_id": "N_AI",
       "related_terms": [
         "GPU",
         "datacenter",
         "networking",
         "servers"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "GPU",
+        "datacenter",
+        "networking",
+        "servers"
+      ],
+      "related_terms_zh": [
+        "GPU",
+        "数据中心",
+        "网络设备",
+        "服务器",
+        "算力基础设施",
+        "工业富联"
+      ],
+      "representative_stocks": [
+        "601138"
+      ],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2023-03-01",
-      "last_updated_at": "2026-05-13"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_AI_POWER",
-      "canonical_taxonomy": "AI",
-      "name": "AI Power Demand",
-      "parent_id": "N_AI_INFRA",
-      "level": 3,
-      "status": "active",
       "aliases": [
         "AI electricity demand",
         "datacenter power demand"
       ],
+      "aliases_en": [
+        "AI electricity demand",
+        "datacenter power demand"
+      ],
+      "aliases_zh": [
+        "AI electricity demand",
+        "datacenter power demand"
+      ],
+      "canonical_name_en": "AI Power Demand",
+      "canonical_name_zh": "人工智能电力需求",
+      "canonical_taxonomy": "AI",
+      "canonical_taxonomy_en": "AI",
+      "canonical_taxonomy_zh": "人工智能",
+      "definition_en": "AI Power Demand",
+      "definition_zh": "人工智能电力需求",
+      "display_name": "人工智能电力需求",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2024-09-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-13",
+      "level": 3,
+      "name": "AI Power Demand",
+      "narrative_id": "N_AI_POWER",
+      "parent_id": "N_AI_INFRA",
       "related_terms": [
         "power grid",
         "nuclear",
         "cooling",
         "data center electricity"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "power grid",
+        "nuclear",
+        "cooling",
+        "data center electricity"
+      ],
+      "related_terms_zh": [
+        "power grid",
+        "nuclear",
+        "cooling",
+        "data center electricity"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2024-09-01",
-      "last_updated_at": "2026-05-13"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_AI_APPS",
-      "canonical_taxonomy": "AI",
-      "name": "AI Applications",
-      "parent_id": "N_AI",
-      "level": 2,
-      "status": "active",
       "aliases": [
         "AI software",
         "enterprise AI applications"
       ],
+      "aliases_en": [
+        "AI software",
+        "enterprise AI applications"
+      ],
+      "aliases_zh": [
+        "AI software",
+        "enterprise AI applications"
+      ],
+      "canonical_name_en": "AI Applications",
+      "canonical_name_zh": "人工智能应用",
+      "canonical_taxonomy": "AI",
+      "canonical_taxonomy_en": "AI",
+      "canonical_taxonomy_zh": "人工智能",
+      "definition_en": "AI Applications",
+      "definition_zh": "人工智能应用",
+      "display_name": "人工智能应用",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2023-06-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-13",
+      "level": 2,
+      "name": "AI Applications",
+      "narrative_id": "N_AI_APPS",
+      "parent_id": "N_AI",
       "related_terms": [
         "copilot",
         "agents",
         "AI productivity"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "copilot",
+        "agents",
+        "AI productivity"
+      ],
+      "related_terms_zh": [
+        "copilot",
+        "agents",
+        "AI productivity"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2023-06-01",
-      "last_updated_at": "2026-05-13"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_SEMI_CAPEX",
-      "canonical_taxonomy": "Semiconductors",
-      "name": "Semiconductor Capex Cycle",
-      "parent_id": null,
-      "level": 2,
-      "status": "active",
       "aliases": [
         "semi equipment cycle",
         "chip capex cycle"
       ],
+      "aliases_en": [
+        "semi equipment cycle",
+        "chip capex cycle"
+      ],
+      "aliases_zh": [
+        "semi equipment cycle",
+        "chip capex cycle"
+      ],
+      "canonical_name_en": "Semiconductor Capex Cycle",
+      "canonical_name_zh": "半导体资本开支周期",
+      "canonical_taxonomy": "Semiconductors",
+      "canonical_taxonomy_en": "Semiconductors",
+      "canonical_taxonomy_zh": "半导体",
+      "definition_en": "Semiconductor Capex Cycle",
+      "definition_zh": "半导体资本开支周期",
+      "display_name": "半导体资本开支周期",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2022-01-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-14",
+      "level": 2,
+      "name": "Semiconductor Capex Cycle",
+      "narrative_id": "N_SEMI_CAPEX",
+      "parent_id": null,
       "related_terms": [
         "lithography",
         "foundry",
@@ -118,23 +504,77 @@
         "中科飞测",
         "拓荆科技"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "lithography",
+        "foundry",
+        "advanced packaging",
+        "电子",
+        "计算机",
+        "通信",
+        "半导体",
+        "芯片",
+        "集成电路",
+        "北方华创",
+        "中微公司",
+        "中芯国际",
+        "圣邦股份",
+        "华大九天",
+        "中科飞测",
+        "拓荆科技"
+      ],
+      "related_terms_zh": [
+        "lithography",
+        "foundry",
+        "advanced packaging",
+        "电子",
+        "计算机",
+        "通信",
+        "半导体",
+        "芯片",
+        "集成电路",
+        "北方华创",
+        "中微公司",
+        "中芯国际",
+        "圣邦股份",
+        "华大九天",
+        "中科飞测",
+        "拓荆科技"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2022-01-01",
-      "last_updated_at": "2026-05-14"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_EV_PRICE_WAR",
-      "canonical_taxonomy": "EV",
-      "name": "EV Price War",
-      "parent_id": null,
-      "level": 2,
-      "status": "active",
       "aliases": [
         "electric vehicle price war",
         "EV margin compression"
       ],
+      "aliases_en": [
+        "electric vehicle price war",
+        "EV margin compression"
+      ],
+      "aliases_zh": [
+        "electric vehicle price war",
+        "EV margin compression"
+      ],
+      "canonical_name_en": "EV Price War",
+      "canonical_name_zh": "新能源车价格战",
+      "canonical_taxonomy": "EV",
+      "canonical_taxonomy_en": "EV",
+      "canonical_taxonomy_zh": "新能源汽车",
+      "definition_en": "EV Price War",
+      "definition_zh": "新能源车价格战",
+      "display_name": "新能源车价格战",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2023-01-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-13",
+      "level": 2,
+      "name": "EV Price War",
+      "narrative_id": "N_EV_PRICE_WAR",
+      "parent_id": null,
       "related_terms": [
         "discounting",
         "inventory",
@@ -145,23 +585,61 @@
         "比亚迪",
         "宇通客车"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "discounting",
+        "inventory",
+        "gross margin",
+        "demand slowdown",
+        "汽车",
+        "新能源汽车",
+        "比亚迪",
+        "宇通客车"
+      ],
+      "related_terms_zh": [
+        "discounting",
+        "inventory",
+        "gross margin",
+        "demand slowdown",
+        "汽车",
+        "新能源汽车",
+        "比亚迪",
+        "宇通客车"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2023-01-01",
-      "last_updated_at": "2026-05-13"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_BAIJIU_CONSUMPTION",
-      "canonical_taxonomy": "Consumption",
-      "name": "Premium Baijiu Consumption",
-      "parent_id": null,
-      "level": 2,
-      "status": "active",
       "aliases": [
         "baijiu consumption",
         "premium liquor demand"
       ],
+      "aliases_en": [
+        "baijiu consumption",
+        "premium liquor demand"
+      ],
+      "aliases_zh": [
+        "baijiu consumption",
+        "premium liquor demand"
+      ],
+      "canonical_name_en": "Premium Baijiu Consumption",
+      "canonical_name_zh": "高端白酒消费",
+      "canonical_taxonomy": "Consumption",
+      "canonical_taxonomy_en": "Consumption",
+      "canonical_taxonomy_zh": "消费",
+      "definition_en": "Premium Baijiu Consumption",
+      "definition_zh": "高端白酒消费",
+      "display_name": "高端白酒消费",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2021-01-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-14",
+      "level": 2,
+      "name": "Premium Baijiu Consumption",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "parent_id": null,
       "related_terms": [
         "Kweichow Moutai",
         "Wuliangye",
@@ -176,23 +654,69 @@
         "consumer upgrade",
         "food and beverage"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "Kweichow Moutai",
+        "Wuliangye",
+        "贵州茅台",
+        "五粮液",
+        "泸州老窖",
+        "山西汾酒",
+        "迎驾贡酒",
+        "舍得酒业",
+        "白酒",
+        "食品饮料",
+        "consumer upgrade",
+        "food and beverage"
+      ],
+      "related_terms_zh": [
+        "Kweichow Moutai",
+        "Wuliangye",
+        "贵州茅台",
+        "五粮液",
+        "泸州老窖",
+        "山西汾酒",
+        "迎驾贡酒",
+        "舍得酒业",
+        "白酒",
+        "食品饮料",
+        "consumer upgrade",
+        "food and beverage"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_HEALTHCARE_INNOVATION",
-      "canonical_taxonomy": "Healthcare",
-      "name": "Healthcare Innovation",
-      "parent_id": null,
-      "level": 2,
-      "status": "active",
       "aliases": [
         "innovative drugs",
         "CRO healthcare"
       ],
+      "aliases_en": [
+        "innovative drugs",
+        "CRO healthcare"
+      ],
+      "aliases_zh": [
+        "innovative drugs",
+        "CRO healthcare"
+      ],
+      "canonical_name_en": "Healthcare Innovation",
+      "canonical_name_zh": "医疗创新",
+      "canonical_taxonomy": "Healthcare",
+      "canonical_taxonomy_en": "Healthcare",
+      "canonical_taxonomy_zh": "医疗健康",
+      "definition_en": "Healthcare Innovation",
+      "definition_zh": "医疗创新",
+      "display_name": "医疗创新",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2021-01-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-14",
+      "level": 2,
+      "name": "Healthcare Innovation",
+      "narrative_id": "N_HEALTHCARE_INNOVATION",
+      "parent_id": null,
       "related_terms": [
         "医药生物",
         "创新药",
@@ -209,23 +733,73 @@
         "泰格医药",
         "艾力斯"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "医药生物",
+        "创新药",
+        "医疗服务",
+        "CRO",
+        "恒瑞医药",
+        "药明康德",
+        "康龙化成",
+        "凯莱英",
+        "海思科",
+        "百利天恒",
+        "科伦药业",
+        "信立泰",
+        "泰格医药",
+        "艾力斯"
+      ],
+      "related_terms_zh": [
+        "医药生物",
+        "创新药",
+        "医疗服务",
+        "CRO",
+        "恒瑞医药",
+        "药明康德",
+        "康龙化成",
+        "凯莱英",
+        "海思科",
+        "百利天恒",
+        "科伦药业",
+        "信立泰",
+        "泰格医药",
+        "艾力斯"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_NEW_ENERGY_EQUIPMENT",
-      "canonical_taxonomy": "New Energy",
-      "name": "New Energy Equipment",
-      "parent_id": null,
-      "level": 2,
-      "status": "active",
       "aliases": [
         "新能源设备",
         "battery and solar equipment"
       ],
+      "aliases_en": [
+        "新能源设备",
+        "battery and solar equipment"
+      ],
+      "aliases_zh": [
+        "新能源设备",
+        "battery and solar equipment"
+      ],
+      "canonical_name_en": "New Energy Equipment",
+      "canonical_name_zh": "新能源设备",
+      "canonical_taxonomy": "New Energy",
+      "canonical_taxonomy_en": "New Energy",
+      "canonical_taxonomy_zh": "新能源",
+      "definition_en": "New Energy Equipment",
+      "definition_zh": "新能源设备",
+      "display_name": "新能源设备",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2021-01-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-14",
+      "level": 2,
+      "name": "New Energy Equipment",
+      "narrative_id": "N_NEW_ENERGY_EQUIPMENT",
+      "parent_id": null,
       "related_terms": [
         "电力设备",
         "新能源",
@@ -241,23 +815,71 @@
         "福斯特",
         "大金重工"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "电力设备",
+        "新能源",
+        "电池",
+        "光伏",
+        "储能",
+        "宁德时代",
+        "阳光电源",
+        "思源电气",
+        "科达利",
+        "璞泰来",
+        "金风科技",
+        "福斯特",
+        "大金重工"
+      ],
+      "related_terms_zh": [
+        "电力设备",
+        "新能源",
+        "电池",
+        "光伏",
+        "储能",
+        "宁德时代",
+        "阳光电源",
+        "思源电气",
+        "科达利",
+        "璞泰来",
+        "金风科技",
+        "福斯特",
+        "大金重工"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_DEFENSE_AEROSPACE",
-      "canonical_taxonomy": "Defense",
-      "name": "Defense Aerospace",
-      "parent_id": null,
-      "level": 2,
-      "status": "active",
       "aliases": [
         "军工",
         "defense aerospace"
       ],
+      "aliases_en": [
+        "军工",
+        "defense aerospace"
+      ],
+      "aliases_zh": [
+        "军工",
+        "defense aerospace"
+      ],
+      "canonical_name_en": "Defense Aerospace",
+      "canonical_name_zh": "国防航天",
+      "canonical_taxonomy": "Defense",
+      "canonical_taxonomy_en": "Defense",
+      "canonical_taxonomy_zh": "国防军工",
+      "definition_en": "Defense Aerospace",
+      "definition_zh": "国防航天",
+      "display_name": "国防航天",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2021-01-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-14",
+      "level": 2,
+      "name": "Defense Aerospace",
+      "narrative_id": "N_DEFENSE_AEROSPACE",
+      "parent_id": null,
       "related_terms": [
         "国防军工",
         "军工",
@@ -274,23 +896,73 @@
         "航宇科技",
         "中航沈飞"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "国防军工",
+        "军工",
+        "航空",
+        "航发",
+        "睿创微纳",
+        "航发动力",
+        "中航西飞",
+        "中国动力",
+        "长川科技",
+        "应流股份",
+        "北化股份",
+        "航材股份",
+        "航宇科技",
+        "中航沈飞"
+      ],
+      "related_terms_zh": [
+        "国防军工",
+        "军工",
+        "航空",
+        "航发",
+        "睿创微纳",
+        "航发动力",
+        "中航西飞",
+        "中国动力",
+        "长川科技",
+        "应流股份",
+        "北化股份",
+        "航材股份",
+        "航宇科技",
+        "中航沈飞"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_REAL_ESTATE_STABILIZATION",
-      "canonical_taxonomy": "Real Estate",
-      "name": "Real Estate Stabilization",
-      "parent_id": null,
-      "level": 2,
-      "status": "active",
       "aliases": [
         "地产链修复",
         "property stabilization"
       ],
+      "aliases_en": [
+        "地产链修复",
+        "property stabilization"
+      ],
+      "aliases_zh": [
+        "地产链修复",
+        "property stabilization"
+      ],
+      "canonical_name_en": "Real Estate Stabilization",
+      "canonical_name_zh": "房地产企稳",
+      "canonical_taxonomy": "Real Estate",
+      "canonical_taxonomy_en": "Real Estate",
+      "canonical_taxonomy_zh": "房地产",
+      "definition_en": "Real Estate Stabilization",
+      "definition_zh": "房地产企稳",
+      "display_name": "房地产企稳",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2021-01-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-14",
+      "level": 2,
+      "name": "Real Estate Stabilization",
+      "narrative_id": "N_REAL_ESTATE_STABILIZATION",
+      "parent_id": null,
       "related_terms": [
         "房地产",
         "建筑材料",
@@ -310,24 +982,82 @@
         "三棵树",
         "金地集团"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "房地产",
+        "建筑材料",
+        "建筑装饰",
+        "地产",
+        "保利发展",
+        "招商蛇口",
+        "华发股份",
+        "中国建筑",
+        "东方雨虹",
+        "家居",
+        "家具",
+        "陶瓷",
+        "索菲亚",
+        "顾家家居",
+        "蒙娜丽莎",
+        "三棵树",
+        "金地集团"
+      ],
+      "related_terms_zh": [
+        "房地产",
+        "建筑材料",
+        "建筑装饰",
+        "地产",
+        "保利发展",
+        "招商蛇口",
+        "华发股份",
+        "中国建筑",
+        "东方雨虹",
+        "家居",
+        "家具",
+        "陶瓷",
+        "索菲亚",
+        "顾家家居",
+        "蒙娜丽莎",
+        "三棵树",
+        "金地集团"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2021-01-01",
-      "last_updated_at": "2026-05-14"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "narrative_id": "N_HK_TECH_PLATFORMS",
-      "canonical_taxonomy": "China Technology",
-      "name": "Hong Kong Tech Platforms",
-      "parent_id": null,
-      "level": 2,
-      "status": "active",
       "aliases": [
         "Hong Kong tech",
         "China internet platforms",
         "Hang Seng Tech"
       ],
+      "aliases_en": [
+        "Hong Kong tech",
+        "China internet platforms",
+        "Hang Seng Tech"
+      ],
+      "aliases_zh": [
+        "Hong Kong tech",
+        "China internet platforms",
+        "Hang Seng Tech"
+      ],
+      "canonical_name_en": "Hong Kong Tech Platforms",
+      "canonical_name_zh": "港股科技平台",
+      "canonical_taxonomy": "China Technology",
+      "canonical_taxonomy_en": "China Technology",
+      "canonical_taxonomy_zh": "港股科技",
+      "definition_en": "Hong Kong Tech Platforms",
+      "definition_zh": "港股科技平台",
+      "display_name": "港股科技平台",
+      "exclusion_criteria_zh": [],
+      "first_seen_at": "2021-02-01",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [],
+      "last_updated_at": "2026-05-15",
+      "level": 2,
+      "name": "Hong Kong Tech Platforms",
+      "narrative_id": "N_HK_TECH_PLATFORMS",
+      "parent_id": null,
       "related_terms": [
         "港股科技",
         "恒生科技",
@@ -344,103 +1074,264 @@
         "中芯国际",
         "比亚迪股份"
       ],
-      "human_review_status": "approved",
-      "reviewed_by": "seed-curation",
+      "related_terms_en": [
+        "港股科技",
+        "恒生科技",
+        "互联网平台",
+        "平台经济",
+        "腾讯控股",
+        "阿里巴巴",
+        "美团",
+        "小米集团",
+        "京东集团",
+        "快手",
+        "百度集团",
+        "网易",
+        "中芯国际",
+        "比亚迪股份"
+      ],
+      "related_terms_zh": [
+        "港股科技",
+        "恒生科技",
+        "互联网平台",
+        "平台经济",
+        "腾讯控股",
+        "阿里巴巴",
+        "美团",
+        "小米集团",
+        "京东集团",
+        "快手",
+        "百度集团",
+        "网易",
+        "中芯国际",
+        "比亚迪股份"
+      ],
+      "representative_stocks": [],
       "reviewed_at": "2026-05-15",
-      "first_seen_at": "2021-02-01",
-      "last_updated_at": "2026-05-15"
-    }
-  ],
-  "candidate_narratives": [
-    {
-      "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
-      "name": "Consumer Electronics Globalization",
-      "canonical_taxonomy": "Technology Hardware",
-      "status": "candidate",
-      "source": "mapping_exclusion_review",
-      "triggering_stock_codes": [
-        "688036"
-      ],
-      "related_exclusion_ids": [
-        "EX_SEMI_688036"
-      ],
-      "aliases": [
-        "consumer electronics exports",
-        "device globalization"
-      ],
-      "related_terms": [
-        "消费电子",
-        "终端设备",
-        "海外手机"
-      ],
-      "rationale": "Transsion is a device and overseas-market exposure candidate, not a semiconductor capex exposure.",
-      "human_review_status": "candidate",
-      "reviewed_by": null,
-      "reviewed_at": null,
-      "first_seen_at": "2026-05-14",
-      "last_updated_at": "2026-05-14"
+      "reviewed_by": "seed-curation",
+      "status": "active"
     },
     {
-      "candidate_narrative_id": "C_DOMESTIC_DATABASE_INFRASTRUCTURE",
-      "name": "Domestic Database Infrastructure",
-      "canonical_taxonomy": "Enterprise Software",
-      "status": "candidate",
-      "source": "mapping_exclusion_review",
-      "triggering_stock_codes": [
-        "688692"
-      ],
-      "related_exclusion_ids": [
-        "EX_SEMI_688692"
-      ],
       "aliases": [
-        "domestic database software",
-        "xinchuang database"
+        "通信设备",
+        "连接器件",
+        "通信设备与连接器件",
+        "射频连接器"
       ],
+      "aliases_en": [],
+      "aliases_zh": [
+        "通信设备",
+        "连接器件",
+        "通信设备与连接器件",
+        "射频连接器"
+      ],
+      "canonical_name_en": "通信设备与连接器件",
+      "canonical_name_zh": "通信设备与连接器件",
+      "canonical_taxonomy": "通信",
+      "canonical_taxonomy_en": "通信",
+      "canonical_taxonomy_zh": "通信",
+      "definition_en": "通信设备与连接器件 represents a recurring communication infrastructure theme spanning equipment vendors and connector component suppliers.",
+      "definition_zh": "通信设备与连接器件是围绕通信主设备、连接器件、射频与终端连接能力形成的市场主题，覆盖通信设备商与连接器件供应商，不等同于单一光模块或单一公司事件。",
+      "display_name": "通信设备与连接器件",
+      "exclusion_criteria_zh": [
+        "不能仅凭单一行业标签或单日行情波动就提升为正式主题。",
+        "不能将纯消费电子公司在缺乏通信主业证据时强行纳入该主题。"
+      ],
+      "first_seen_at": "2026-03-31",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [
+        "核心持仓需要同时覆盖通信设备商或连接器件公司中的至少两类代表标的。",
+        "支持证据应来自财报、业务表述或稳定业务标签，而不是一次性市场噪音。"
+      ],
+      "last_updated_at": "2026-05-16",
+      "level": 2,
+      "name": "通信设备与连接器件",
+      "narrative_id": "N_COMMUNICATION_EQUIPMENT",
+      "parent_id": null,
       "related_terms": [
-        "数据库",
-        "基础软件",
-        "信创"
+        "通信设备",
+        "连接器",
+        "射频器件",
+        "基站",
+        "终端连接",
+        "中兴通讯",
+        "信维通信"
       ],
-      "rationale": "Dameng Data is a domestic database and infrastructure-software exposure candidate, not a semiconductor capex exposure.",
-      "human_review_status": "candidate",
-      "reviewed_by": null,
-      "reviewed_at": null,
-      "first_seen_at": "2026-05-14",
-      "last_updated_at": "2026-05-14"
+      "related_terms_en": [],
+      "related_terms_zh": [
+        "通信设备",
+        "连接器",
+        "射频器件",
+        "基站",
+        "终端连接",
+        "中兴通讯",
+        "信维通信"
+      ],
+      "representative_stocks": [
+        "000063",
+        "300136"
+      ],
+      "reviewed_at": "2026-05-16",
+      "reviewed_by": "codex-review",
+      "status": "active"
     },
     {
-      "candidate_narrative_id": "C_COMMUNICATION_POWER_INFRASTRUCTURE",
-      "name": "Communication And Power Infrastructure",
-      "canonical_taxonomy": "Infrastructure Equipment",
-      "status": "candidate",
-      "source": "mapping_exclusion_review",
-      "triggering_stock_codes": [
+      "aliases": [
+        "光通信",
+        "光通信产业链",
+        "光纤通信",
+        "光通信设备"
+      ],
+      "aliases_en": [],
+      "aliases_zh": [
+        "光通信",
+        "光通信产业链",
+        "光纤通信",
+        "光通信设备"
+      ],
+      "canonical_name_en": "光通信",
+      "canonical_name_zh": "光通信",
+      "canonical_taxonomy": "通信",
+      "canonical_taxonomy_en": "通信",
+      "canonical_taxonomy_zh": "通信",
+      "definition_en": "光通信 refers to a recurring market theme inferred from 通信 holdings, centered on 光通信. Current candidate support comes from holdings such as 光迅科技, 亨通光电, 烽火通信.",
+      "definition_zh": "光通信是一个基于通信持仓抽象出的候选主题，当前由中天科技、亨通光电、光迅科技等持仓及光通信相关证据共同触发。",
+      "display_name": "光通信",
+      "exclusion_criteria_zh": [
+        "不能仅凭单一通信行业标签就提升为正式主题。",
+        "不能仅凭一次性公告、单日行情或单条估值快照就提升为正式主题。"
+      ],
+      "first_seen_at": "2026-03-31",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [
+        "相关证据反复出现“光通信”线索。",
+        "核心触发持仓包括中天科技、亨通光电、光迅科技。"
+      ],
+      "last_updated_at": "2026-05-15",
+      "level": 2,
+      "name": "光通信",
+      "narrative_id": "N_OPTICAL_COMMUNICATION",
+      "parent_id": null,
+      "promoted_from_candidate_id": "C_AUTO_3D71C39000",
+      "promotion_action_id": "approve_515880_optical_communication_20260515",
+      "related_terms": [
+        "光通信",
+        "光模块",
+        "光纤光缆",
+        "光器件",
+        "通信设备",
+        "光网络",
+        "光迅科技",
+        "亨通光电",
+        "烽火通信",
+        "中天科技"
+      ],
+      "related_terms_en": [
+        "光通信"
+      ],
+      "related_terms_zh": [
+        "光通信",
+        "光模块",
+        "光纤光缆",
+        "光器件",
+        "通信设备",
+        "光网络",
+        "光迅科技",
+        "亨通光电",
+        "烽火通信",
+        "中天科技"
+      ],
+      "representative_stocks": [
+        "002281",
+        "600487",
+        "600498",
         "600522"
       ],
-      "related_exclusion_ids": [
-        "EX_SEMI_600522"
-      ],
+      "reviewed_at": "2026-05-15T23:59:00+08:00",
+      "reviewed_by": "codex-review",
+      "status": "active"
+    },
+    {
       "aliases": [
-        "communication infrastructure",
-        "power cable infrastructure"
+        "光模块",
+        "光模块产业链",
+        "光通信模块",
+        "光收发模块"
       ],
+      "aliases_en": [],
+      "aliases_zh": [
+        "光模块",
+        "光模块产业链",
+        "光通信模块",
+        "光收发模块"
+      ],
+      "canonical_name_en": "光模块",
+      "canonical_name_zh": "光模块",
+      "canonical_taxonomy": "通信",
+      "canonical_taxonomy_en": "通信",
+      "canonical_taxonomy_zh": "通信",
+      "definition_en": "光模块 refers to a recurring market theme inferred from 通信 holdings, centered on 光模块. Current candidate support comes from holdings such as 中际旭创, 天孚通信, 新易盛.",
+      "definition_zh": "光模块是一个基于通信持仓抽象出的候选主题，当前由中际旭创、天孚通信、新易盛等持仓及光模块相关证据共同触发。",
+      "display_name": "光模块",
+      "exclusion_criteria_zh": [
+        "不能仅凭单一通信行业标签就提升为正式主题。",
+        "不能仅凭一次性公告、单日行情或单条估值快照就提升为正式主题。"
+      ],
+      "first_seen_at": "2026-03-31",
+      "human_review_status": "approved",
+      "inclusion_criteria_zh": [
+        "相关证据反复出现“光模块”线索。",
+        "核心触发持仓包括中际旭创、天孚通信、新易盛。"
+      ],
+      "last_updated_at": "2026-05-15",
+      "level": 2,
+      "name": "光模块产业链",
+      "narrative_id": "N_OPTICAL_MODULE_CHAIN",
+      "parent_id": null,
+      "promoted_from_candidate_id": "C_AUTO_649720149F",
+      "promotion_action_id": "approve_515880_optical_module_20260515",
       "related_terms": [
-        "通信",
-        "电力电缆",
-        "海缆"
+        "光模块",
+        "光通信",
+        "光器件",
+        "数据中心",
+        "AI算力",
+        "800G",
+        "1.6T",
+        "中际旭创",
+        "天孚通信",
+        "新易盛"
       ],
-      "rationale": "Zhongtian Technology is a communication and power-cable infrastructure exposure candidate, not a semiconductor capex exposure.",
-      "human_review_status": "candidate",
-      "reviewed_by": null,
-      "reviewed_at": null,
-      "first_seen_at": "2026-05-14",
-      "last_updated_at": "2026-05-14"
+      "related_terms_en": [
+        "光模块"
+      ],
+      "related_terms_zh": [
+        "光模块",
+        "光通信",
+        "光器件",
+        "数据中心",
+        "AI算力",
+        "800G",
+        "1.6T",
+        "中际旭创",
+        "天孚通信",
+        "新易盛"
+      ],
+      "representative_stocks": [
+        "300308",
+        "300394",
+        "300502"
+      ],
+      "reviewed_at": "2026-05-15T23:59:30+08:00",
+      "reviewed_by": "codex-review",
+      "status": "active"
     }
   ],
   "review_metadata": {
+    "review_note": "Seeded reviewed store for V1 provider validation and future web approval workflows.",
     "review_schema_version": "review-metadata-v1",
-    "reviewed_by": "seed-curation",
     "reviewed_at": "2026-05-15",
-    "review_note": "Seeded reviewed store for V1 provider validation and future web approval workflows."
-  }
+    "reviewed_by": "seed-curation"
+  },
+  "version": "registry-v1"
 }

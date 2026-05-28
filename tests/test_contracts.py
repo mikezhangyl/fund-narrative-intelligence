@@ -159,7 +159,9 @@ def test_valuation_snapshot_validation_rejects_wrong_provider_name():
     with pytest.raises(ProviderContractError) as exc:
         validate_valuation_snapshot_payload(payload)
 
-    assert "provider_name must be quote-derived-valuation" in str(exc.value)
+    assert "quote_derived_context must use provider_name quote-derived-valuation" in str(
+        exc.value
+    )
 
 
 def test_valuation_snapshot_validation_rejects_missing_row_provenance():

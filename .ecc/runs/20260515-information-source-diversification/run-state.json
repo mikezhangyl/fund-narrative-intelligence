@@ -1,0 +1,48 @@
+{
+  "task_run_id": "20260515-information-source-diversification",
+  "task_state": "passed",
+  "review_cycle": 0,
+  "branch": "codex/hk-market-and-sina-news",
+  "worktree": "main",
+  "base_commit": "4d4c20f",
+  "head_commit": "pending-commit",
+  "merge_base": "4d4c20f",
+  "quality_reviewed_commit": null,
+  "reviewed_snapshot_type": null,
+  "working_tree_dirty": true,
+  "task_type": "documentation",
+  "task_agent_required": false,
+  "quality_agent_required": false,
+  "final_decision": "ready_for_review",
+  "review_outcome": "Recorded the next domestic-market strategy as source-first intelligence expansion: prefer independent information sources over wrapper count, disclose uncertainty as partial/conflicting/low-confidence instead of defaulting to mock, and reserve large-model usage for semantic judgment after structured source fetching. Synced the plan, project memory, ADRs, provider inventory Markdown, and browser-facing HTML inventory.",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "ready_for_quality",
+  "verification": {
+    "documentation_review": "updated plan, project context, provider inventory markdown/html, and ADR",
+    "automated_tests": "not run; documentation-only slice"
+  },
+  "decisions": [
+    {
+      "id": "ISD-001",
+      "date": "2026-05-15",
+      "decision": "Prefer independent source diversification over adding multiple wrappers around the same upstream websites.",
+      "rationale": "Narrative intelligence quality depends more on independent evidence and cross-checking than on raw provider count."
+    },
+    {
+      "id": "ISD-002",
+      "date": "2026-05-15",
+      "decision": "Treat mock-backed intelligence as a deterministic last-resort safety net rather than the desired fallback path for future domestic source-expansion slices.",
+      "rationale": "For uncertain real information, explicit partial/conflicting disclosure is more honest and more useful than silently returning to mock analysis."
+    },
+    {
+      "id": "ISD-003",
+      "date": "2026-05-15",
+      "decision": "Reserve large-model usage for semantic judgment tasks after structured source fetching completes.",
+      "rationale": "LLMs are better used for event clustering, narrative classification, and conflict resolution than for raw fact retrieval or numeric fabrication."
+    }
+  ]
+}

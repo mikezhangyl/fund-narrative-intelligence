@@ -1,0 +1,24 @@
+{
+  "checks": [
+    {
+      "command": "uv run pytest",
+      "status": "passed",
+      "summary": "429 passed, 1 skipped"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "passed",
+      "summary": "All checks passed"
+    },
+    {
+      "command": "uv run python -m compileall -q src tests scripts",
+      "status": "passed",
+      "summary": "No compile errors"
+    },
+    {
+      "command": "uv run coverage report",
+      "status": "passed",
+      "summary": "Total coverage 82%"
+    }
+  ]
+}

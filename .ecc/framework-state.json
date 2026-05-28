@@ -4,13 +4,32 @@
   "project": "fund-narrative-intelligence",
   "mode": "full_scaffold_progressive_activation",
   "default_skills": [
-    "project-bootstrap",
+    "project-bootstrap"
+  ],
+  "library_skills": [
     "ecc-task-subagent-workflow",
     "memory-governance"
   ],
-  "current_phase": "single_fund_real_demo",
-  "latest_run": "20260515-single-fund-demo",
+  "current_phase": "harness_token_budget_optimization",
+  "latest_run": "20260521-token-budget-harness",
   "qa_mode": "optional_library",
   "automation_ready": false,
-  "next_step": "review the 161725 demo output, then decide the next real-fund/product display slice"
+  "next_step": "use summary-first context loading before the next implementation slice",
+  "context_policy": {
+    "startup_profile": "token_light",
+    "default_context_files": [
+      ".ecc/framework-state.json",
+      "docs/memory/operating-rules.md",
+      "docs/memory/current-brief.md",
+      "docs/memory/architecture-decisions.index.md",
+      "docs/exec-plans/active/index.md"
+    ],
+    "on_demand_context_files": [
+      "docs/memory/project-context.md",
+      "docs/memory/architecture-decisions.md",
+      "docs/exec-plans/active/<plan>.md",
+      ".ecc/runs/<task-run-id>/"
+    ],
+    "context_loader": "python scripts/context_brief.py --max-words 900"
+  }
 }

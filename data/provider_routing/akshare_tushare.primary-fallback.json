@@ -1,0 +1,20 @@
+{
+  "financial_metrics": {
+    "primary": "tushare",
+    "fallback": "eastmoney"
+  },
+  "valuation_snapshots": {
+    "primary": "tushare",
+    "fallback": "eastmoney"
+  },
+  "market_quotes": {
+    "primary": "akshare",
+    "fallback": "eastmoney"
+  },
+  "announcements": {
+    "primary": "cninfo"
+  },
+  "news_evidence": {
+    "primary": "multi-source-news"
+  }
+}

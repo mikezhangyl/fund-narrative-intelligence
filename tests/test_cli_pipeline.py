@@ -129,7 +129,7 @@ def test_cli_generates_required_v1_artifacts(tmp_path):
     assert "mock://fixtures/fund_000001.json" in html
     assert "Interpretation" in markdown
     assert "Interpretation" in html
-    assert "AI Infrastructure" in markdown
+    assert "人工智能基础设施" in markdown
 
 
 def test_artifact_contracts_reject_source_table_identity_mismatch(tmp_path):
@@ -622,6 +622,43 @@ def test_cli_eastmoney_valuation_source_does_not_require_market_quotes(
     assert captured["valuation_snapshot_source"] == "eastmoney"
 
 
+def test_cli_provider_valuation_source_passes_option_to_pipeline(
+    tmp_path,
+    monkeypatch,
+):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "source_table": tmp_path / "source_table.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--include-valuation-snapshots",
+            "--valuation-source",
+            "provider",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["include_valuation_snapshots"] is True
+    assert captured["valuation_snapshot_source"] == "provider"
+
+
 def test_cli_include_valuation_snapshots_passes_option_to_pipeline(
     tmp_path,
     monkeypatch,
@@ -732,6 +769,180 @@ def test_cli_include_financial_metrics_passes_option_to_pipeline(
 
     assert exit_code == 0
     assert captured["include_financial_metrics"] is True
+
+
+def test_cli_provider_route_passes_routing_to_pipeline(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "source_table": tmp_path / "source_table.json",
+            "signal_trace": tmp_path / "signal_trace.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--include-market-quotes",
+            "--include-valuation-snapshots",
+            "--valuation-source",
+            "provider",
+            "--include-financial-metrics",
+            "--provider-route",
+            "financial_metrics=tushare:eastmoney",
+            "--provider-route",
+            "valuation_snapshots=tushare:eastmoney",
+            "--provider-route",
+            "market_quotes=akshare:eastmoney",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["provider_routing"] == {
+        "financial_metrics": {
+            "primary": "tushare",
+            "fallback": "eastmoney",
+        },
+        "valuation_snapshots": {
+            "primary": "tushare",
+            "fallback": "eastmoney",
+        },
+        "market_quotes": {
+            "primary": "akshare",
+            "fallback": "eastmoney",
+        },
+    }
+
+
+def test_cli_provider_routing_config_passes_routing_to_pipeline(tmp_path, monkeypatch):
+    captured = {}
+    routing_path = tmp_path / "provider-routing.json"
+    routing_path.write_text(
+        json.dumps(
+            {
+                "financial_metrics": {
+                    "primary": "tushare",
+                    "fallback": "eastmoney",
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "source_table": tmp_path / "source_table.json",
+            "signal_trace": tmp_path / "signal_trace.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--include-financial-metrics",
+            "--provider-routing-config",
+            str(routing_path),
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["provider_routing"] == {
+        "financial_metrics": {
+            "primary": "tushare",
+            "fallback": "eastmoney",
+        }
+    }
+
+
+def test_cli_provider_route_overrides_routing_config(tmp_path, monkeypatch):
+    captured = {}
+    routing_path = tmp_path / "provider-routing.json"
+    routing_path.write_text(
+        json.dumps(
+            {
+                "financial_metrics": {
+                    "primary": "eastmoney",
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    def fake_run_pipeline(**kwargs):
+        captured.update(kwargs)
+        return {
+            "raw": tmp_path / "raw.json",
+            "scoring": tmp_path / "scoring.json",
+            "review_queue": tmp_path / "review_queue.json",
+            "source_table": tmp_path / "source_table.json",
+            "signal_trace": tmp_path / "signal_trace.json",
+            "manifest": tmp_path / "manifest.json",
+            "markdown": tmp_path / "report.md",
+            "html": tmp_path / "report.html",
+        }
+
+    monkeypatch.setattr(main_module, "run_pipeline", fake_run_pipeline)
+
+    exit_code = main_module.main(
+        [
+            "--fund-code",
+            "161725",
+            "--include-financial-metrics",
+            "--provider-routing-config",
+            str(routing_path),
+            "--provider-route",
+            "financial_metrics=tushare:eastmoney",
+            "--output-dir",
+            str(tmp_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["provider_routing"] == {
+        "financial_metrics": {
+            "primary": "tushare",
+            "fallback": "eastmoney",
+        }
+    }
+
+
+def test_cli_provider_route_rejects_invalid_spec(capsys):
+    with pytest.raises(SystemExit) as exc:
+        main_module.main(
+            [
+                "--fund-code",
+                "161725",
+                "--provider-route",
+                "financial_metrics",
+            ]
+        )
+
+    captured = capsys.readouterr()
+    assert exc.value.code == 2
+    assert "provider route must use layer=primary[:fallback]" in captured.err
 
 
 def test_cli_base_intelligence_mode_passes_option_to_pipeline(tmp_path, monkeypatch):
@@ -2305,7 +2516,7 @@ def test_pipeline_surfaces_broad_industry_precision_flags(tmp_path, monkeypatch)
             "weight": 0.1,
             "mapping_method": "registry_term_rule",
             "narrative_ids": ["N_SEMI_CAPEX"],
-            "narratives": ["Semiconductor Capex Cycle"],
+            "narratives": ["半导体资本开支周期"],
             "confidence_before": 0.52,
             "confidence_after": 0.48,
             "recommended_action": "curation_review",
@@ -2359,28 +2570,37 @@ def test_pipeline_excludes_known_bad_mapping_candidates(tmp_path, monkeypatch):
     assert raw["mapping_coverage"]["coverage_ratio"] == 0
     assert raw["candidate_narrative_registry_version"] == "registry-v1"
     assert raw["candidate_narratives"] == scoring["candidate_narratives"]
-    assert raw["candidate_narratives"] == [
-        {
-            "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
-            "name": "Consumer Electronics Globalization",
-            "canonical_taxonomy": "Technology Hardware",
-            "status": "candidate",
-            "source": "mapping_exclusion_review",
-            "triggering_stock_codes": ["688036"],
-            "related_exclusion_ids": ["EX_SEMI_688036"],
-            "aliases": ["consumer electronics exports", "device globalization"],
-            "related_terms": ["消费电子", "终端设备", "海外手机"],
-            "rationale": (
-                "Transsion is a device and overseas-market exposure candidate, "
-                "not a semiconductor capex exposure."
-            ),
-            "human_review_status": "candidate",
-            "reviewed_by": None,
-            "reviewed_at": None,
-            "first_seen_at": "2026-05-14",
-            "last_updated_at": "2026-05-14",
-        }
-    ]
+    assert len(raw["candidate_narratives"]) == 1
+    assert raw["candidate_narratives"][0] == {
+        "candidate_narrative_id": "C_CONSUMER_ELECTRONICS_GLOBALIZATION",
+        "name": "Consumer Electronics Globalization",
+        "canonical_name_zh": "消费电子全球化",
+        "canonical_name_en": "Consumer Electronics Globalization",
+        "display_name": "消费电子全球化",
+        "canonical_taxonomy": "Technology Hardware",
+        "canonical_taxonomy_zh": "消费电子",
+        "canonical_taxonomy_en": "Technology Hardware",
+        "status": "candidate",
+        "source": "mapping_exclusion_review",
+        "triggering_stock_codes": ["688036"],
+        "related_exclusion_ids": ["EX_SEMI_688036"],
+        "aliases": ["consumer electronics exports", "device globalization"],
+        "aliases_zh": ["consumer electronics exports", "device globalization"],
+        "aliases_en": ["consumer electronics exports", "device globalization"],
+        "related_terms": ["消费电子", "终端设备", "海外手机"],
+        "related_terms_zh": ["消费电子", "终端设备", "海外手机"],
+        "related_terms_en": ["消费电子", "终端设备", "海外手机"],
+        "rationale": (
+            "Transsion is a device and overseas-market exposure candidate, "
+            "not a semiconductor capex exposure."
+        ),
+        "human_review_status": "candidate",
+        "reviewed_by": None,
+        "reviewed_at": None,
+        "first_seen_at": "2026-05-14",
+        "last_updated_at": "2026-05-14",
+        "why_not_company_event_zh": "",
+    }
     assert raw["candidate_review_queue"] == scoring["candidate_review_queue"]
     assert artifacts["review_queue"].name == "fund_320007_review_queue.json"
     assert review_queue["metadata"] == scoring["metadata"]
@@ -2424,7 +2644,7 @@ def test_pipeline_excludes_known_bad_mapping_candidates(tmp_path, monkeypatch):
             "industry": "电子",
             "weight": 0.06,
             "narrative_id": "N_SEMI_CAPEX",
-            "narrative_name": "Semiconductor Capex Cycle",
+            "narrative_name": "半导体资本开支周期",
             "method": "registry_term_rule",
             "matched_terms": ["电子"],
             "reason": (
@@ -2436,7 +2656,7 @@ def test_pipeline_excludes_known_bad_mapping_candidates(tmp_path, monkeypatch):
     ]
     assert "Excluded Mapping Candidates" in markdown
     assert "Candidate Narratives For Review" in markdown
-    assert "Consumer Electronics Globalization" in markdown
+    assert "消费电子全球化" in markdown
     assert "传音控股" in markdown
     assert "candidate_narrative_review" in html
     assert '<section class="candidate-narratives">' in html

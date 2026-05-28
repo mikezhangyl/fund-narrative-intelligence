@@ -93,8 +93,6 @@ def test_render_single_fund_demo_html_localizes_hong_kong_tech_narrative():
     assert "Hong Kong Tech Platforms" in html
     assert "分化" in html
     assert "diverging" in html
-
-
 def test_radar_svg_labels_have_viewbox_padding():
     viewbox_width = 520
     min_padding = 8

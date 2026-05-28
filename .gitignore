@@ -4,6 +4,8 @@
 .env
 .env.*
 !.env.example
+.local.env
+.local.env.*
 
 .venv/
 *.egg-info/
@@ -21,6 +23,8 @@ coverage/
 .coverage
 .coverage.*
 outputs/
+data/cache/
+data/logs/
 playwright-report/
 test-results/
 

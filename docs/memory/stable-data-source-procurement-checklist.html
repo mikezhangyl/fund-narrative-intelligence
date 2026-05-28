@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>稳定数据源采购与询价清单</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --paper: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #dbe3ef;
+      --accent: #0f172a;
+      --soft: #eef2f7;
+      --highlight: #dbeafe;
+      --warn: #fff7ed;
+      --warn-border: #fdba74;
+      --ok: #ecfdf5;
+      --ok-border: #86efac;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f5f7fb 0%, #eef4ff 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.65;
+    }
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 36px 20px 72px;
+    }
+    .paper {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+    }
+    h1, h2, h3 {
+      color: var(--accent);
+      line-height: 1.25;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+    }
+    h2 {
+      margin: 36px 0 14px;
+      font-size: 24px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+    h3 {
+      margin: 24px 0 10px;
+      font-size: 18px;
+    }
+    p, li, td, th {
+      font-size: 15px;
+    }
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+    }
+    .badges {
+      margin: 0 0 22px;
+    }
+    .badge {
+      display: inline-block;
+      margin: 0 8px 8px 0;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--soft);
+      color: #334155;
+      font-size: 13px;
+    }
+    .callout {
+      margin: 16px 0 22px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--warn-border);
+      background: var(--warn);
+    }
+    .callout.ok {
+      border-color: var(--ok-border);
+      background: var(--ok);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 22px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: var(--soft);
+    }
+    ul, ol {
+      padding-left: 22px;
+    }
+    li {
+      margin: 6px 0;
+    }
+    code {
+      background: #f3f4f6;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.95em;
+    }
+    a {
+      color: #1d4ed8;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <article class="paper">
+      <h1>稳定数据源采购与询价清单</h1>
+      <p class="subtitle">面向 fund-narrative-intelligence 当前 A 股 / 国内基金优先路线，聚焦“稳定、正式、可持续”的数据来源，而不是继续依赖高波动网页接口。</p>
+      <div class="badges">
+        <span class="badge">中文</span>
+        <span class="badge">采购导向</span>
+        <span class="badge">A 股优先</span>
+        <span class="badge">基金研究优先</span>
+        <span class="badge">更新时间：2026-05-15</span>
+      </div>
+
+      <div class="callout">
+        <strong>当前判断</strong><br />
+        东方财富体系里，真正值得询价的是 <strong>Choice 数据</strong>，因为这是官方正式的数据服务面。<br />
+        天天基金当前公开可见的官方接口，主要是 <strong>小程序开放接口</strong>，更像业务集成能力，不像面向研究型 pipeline 的通用数据服务。
+      </div>
+
+      <h2>1. 我们现在要解决什么</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>数据层</th>
+            <th>当前主要问题</th>
+            <th>为什么需要正式源</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>holdings</code></td>
+            <td>当前依赖 Eastmoney 公开接口，稳定性和契约性有限</td>
+            <td>基金持仓是整条链路的入口，源不稳会拖垮后续所有层</td>
+          </tr>
+          <tr>
+            <td><code>market_quotes</code></td>
+            <td>Eastmoney 行情接口出现远端断连，当前大量回退到 Yahoo</td>
+            <td>需要更稳定的 A 股行情主源，避免回退成为常态</td>
+          </tr>
+          <tr>
+            <td><code>valuation_snapshots</code></td>
+            <td>当前主要靠 Eastmoney 或 quote-derived</td>
+            <td>如果要提高结构化可信度，需要正式估值/行情衍生数据</td>
+          </tr>
+          <tr>
+            <td><code>financial_metrics</code></td>
+            <td>当前主要靠 Eastmoney F10 类页面接口</td>
+            <td>需要更稳定的财务指标源，避免页面改版风险</td>
+          </tr>
+          <tr>
+            <td><code>announcements</code></td>
+            <td>CNINFO 已较稳定，但仍需确认是否需要统一商业源</td>
+            <td>如果商业源能补公告元数据、全文、历史覆盖，可提升一致性</td>
+          </tr>
+          <tr>
+            <td><code>fund data</code></td>
+            <td>基金净值、估算、基本信息、持仓等仍较分散</td>
+            <td>基金是我们的研究对象，基金层正式数据值得优先确认</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. 官方渠道现状</h2>
+      <h3>2.1 东方财富 / Choice</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>项</th>
+            <th>结论</th>
+            <th>官方依据</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>是否存在正式数据服务</td>
+            <td>存在</td>
+            <td><a href="https://choice.eastmoney.com/product/datacenter" target="_blank" rel="noreferrer">Choice 数据服务</a></td>
+          </tr>
+          <tr>
+            <td>覆盖范围</td>
+            <td>官方写明覆盖股票、基金、公告、财务数据、宏观、行业、港股、美股等</td>
+            <td><a href="https://choice.eastmoney.com/product/datacenter" target="_blank" rel="noreferrer">Choice 数据服务</a></td>
+          </tr>
+          <tr>
+            <td>交付方式</td>
+            <td>官方写明支持多种数据传输方式，并支持数据库格式</td>
+            <td><a href="https://choice.eastmoney.com/product/datacenter" target="_blank" rel="noreferrer">Choice 数据服务</a>、<a href="https://choice.eastmoney.com/FileDownLoad/CFTG20221115.pdf" target="_blank" rel="noreferrer">Choice 金融终端使用指南</a></td>
+          </tr>
+          <tr>
+            <td>是否公开价格</td>
+            <td>未查到官网公开标价，当前看是销售询价模式</td>
+            <td><a href="https://choice.eastmoney.com/Product/ChoiceApp/" target="_blank" rel="noreferrer">Choice 产品页</a></td>
+          </tr>
+          <tr>
+            <td>联系方式</td>
+            <td><code>400-620-1818</code> / <code>choiceinfo@eastmoney.com</code></td>
+            <td><a href="https://choice.eastmoney.com/product/datacenter" target="_blank" rel="noreferrer">Choice 数据服务</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>2.2 天天基金</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>项</th>
+            <th>结论</th>
+            <th>官方依据</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>是否存在官方开放接口</td>
+            <td>存在，但公开可见的是小程序开放接口</td>
+            <td><a href="https://developers.1234567.com.cn/mp/dev/api/interface.html" target="_blank" rel="noreferrer">天天基金小程序公共接口</a></td>
+          </tr>
+          <tr>
+            <td>公开接口形态</td>
+            <td>需要 <code>Token</code>、<code>AppId</code>、<code>OpenId</code>，明显偏业务集成接口</td>
+            <td><a href="https://developers.1234567.com.cn/mp/dev/api/interface.html" target="_blank" rel="noreferrer">天天基金小程序公共接口</a></td>
+          </tr>
+          <tr>
+            <td>当前公开能力</td>
+            <td>更像自选、订阅、用户操作类接口，而不是研究型数据 API</td>
+            <td><a href="https://developers.1234567.com.cn/mp/dev/api/interface.html" target="_blank" rel="noreferrer">天天基金小程序公共接口</a></td>
+          </tr>
+          <tr>
+            <td>是否查到公开研究数据套餐</td>
+            <td>暂未查到明确公开页面</td>
+            <td>基于当前官方公开资料判断</td>
+          </tr>
+          <tr>
+            <td>联系方式</td>
+            <td><code>95021</code> / <code>vip@1234567.com.cn</code></td>
+            <td><a href="https://help.1234567.com.cn/aboutus/connect.html" target="_blank" rel="noreferrer">联系我们</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout ok">
+        <strong>采购优先级建议</strong><br />
+        如果只问一个方向，先问 <strong>Choice</strong>。<br />
+        因为目前能确认的正式、机构化、数据服务导向的产品是 Choice；天天基金公开可见的接口面更像业务开放平台，不像研究数据产品。
+      </div>
+
+      <h2>3. 对 Choice 的询价清单</h2>
+      <p>下面这份问题单，建议直接发给 Choice 销售或数据服务团队。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>问题</th>
+            <th>为什么要问</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>是否提供程序化接口，而不只是终端？支持什么接入方式？</td>
+            <td>我们需要接进 Python pipeline，不是人工看终端</td>
+          </tr>
+          <tr>
+            <td>基金持仓数据是否可程序化获取？支持历史持仓、季报持仓、Top holdings 吗？</td>
+            <td>对应 <code>holdings</code> 主层</td>
+          </tr>
+          <tr>
+            <td>A 股日线/准实时行情是否可程序化获取？稳定 SLA 如何？</td>
+            <td>对应 <code>market_quotes</code>，这是当前最痛点</td>
+          </tr>
+          <tr>
+            <td>估值指标是否覆盖 PE TTM、PB、总市值、流通市值、换手率等？</td>
+            <td>对应 <code>valuation_snapshots</code></td>
+          </tr>
+          <tr>
+            <td>财务指标是否覆盖营收同比、净利润同比、ROE、毛利率、现金流等？</td>
+            <td>对应 <code>financial_metrics</code></td>
+          </tr>
+          <tr>
+            <td>公告数据是否包含公告元数据、正文链接、PDF、历史回溯？</td>
+            <td>对应 <code>announcements</code> / <code>announcement_evidence</code></td>
+          </tr>
+          <tr>
+            <td>基金净值、净值估算、基金基本信息、基金规模、基金经理数据是否可拿？</td>
+            <td>基金是研究对象，不只是持仓入口</td>
+          </tr>
+          <tr>
+            <td>新闻或研报是否有正式数据服务？是否能合法用于内部研究系统？</td>
+            <td>对应后续 <code>news_evidence</code> 扩展</td>
+          </tr>
+          <tr>
+            <td>价格模式是什么：按终端、按账号、按接口、按并发、按字段还是按年包？</td>
+            <td>需要评估成本结构</td>
+          </tr>
+          <tr>
+            <td>是否有试用、沙箱、样例文档、字段字典？</td>
+            <td>避免先采购再踩集成坑</td>
+          </tr>
+          <tr>
+            <td>是否允许内部研究系统落地缓存、归档、衍生分析？授权边界是什么？</td>
+            <td>涉及合规和长期可运营性</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>4. 对天天基金的确认清单</h2>
+      <p>这里不是默认采购，而是先确认它到底有没有研究型数据合作面。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>问题</th>
+            <th>为什么要问</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>除了小程序开放接口，是否有面向机构/研究系统的正式数据接口？</td>
+            <td>这是最关键的判断问题</td>
+          </tr>
+          <tr>
+            <td>是否提供基金持仓、基金净值、基金基本信息、历史变更的 API？</td>
+            <td>这是我们最可能从天天基金获益的层</td>
+          </tr>
+          <tr>
+            <td>是否提供基金估算、规模、基金经理、费率、申赎状态等结构化字段？</td>
+            <td>有助于基金侧画像增强</td>
+          </tr>
+          <tr>
+            <td>是否提供商业合作接口文档、字段字典、稳定性说明？</td>
+            <td>公开小程序接口不等于研究级接口</td>
+          </tr>
+          <tr>
+            <td>价格模式是什么？是否有企业合作或研究数据授权？</td>
+            <td>需要确认是不是可采购产品</td>
+          </tr>
+          <tr>
+            <td>如果没有研究级 API，是否至少能确认哪些网页/接口可长期稳定访问？</td>
+            <td>即便不能买，也要知道它能否作为低风险公开源</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>5. 按我们系统六层需求的询价映射</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>系统层</th>
+            <th>优先问 Choice</th>
+            <th>再问天天基金</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>holdings</code></td>
+            <td>是</td>
+            <td>是</td>
+            <td>基金持仓是天天基金最值得确认的方向之一</td>
+          </tr>
+          <tr>
+            <td><code>market_quotes</code></td>
+            <td>是</td>
+            <td>低优先</td>
+            <td>行情主源更像 Choice 的能力边界</td>
+          </tr>
+          <tr>
+            <td><code>valuation_snapshots</code></td>
+            <td>是</td>
+            <td>低优先</td>
+            <td>估值通常仍更偏证券数据服务</td>
+          </tr>
+          <tr>
+            <td><code>financial_metrics</code></td>
+            <td>是</td>
+            <td>低优先</td>
+            <td>财务指标大概率还是 Choice 更合适</td>
+          </tr>
+          <tr>
+            <td><code>announcements</code></td>
+            <td>是</td>
+            <td>否</td>
+            <td>公告层目前还是 CNINFO/证券数据服务更自然</td>
+          </tr>
+          <tr>
+            <td><code>fund meta</code></td>
+            <td>是</td>
+            <td>是</td>
+            <td>基金基础信息可能两边都值得问</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>6. 我们的采购判断标准</h2>
+      <ol>
+        <li>是否是正式商业产品，而不是灰色网页接口。</li>
+        <li>是否支持程序化接入，而不只是人工终端。</li>
+        <li>是否覆盖我们最痛的三层：<code>holdings</code>、<code>market_quotes</code>、<code>financial_metrics</code>。</li>
+        <li>是否给字段字典、样例、授权边界、SLA 或稳定性说明。</li>
+        <li>价格是否能接受，且成本结构适合长期运行，而不是只适合单人终端使用。</li>
+      </ol>
+
+      <h2>7. 当前最务实的结论</h2>
+      <ul>
+        <li>如果你现在就要找“稳定主源候选”，优先联系 <strong>Choice</strong>。</li>
+        <li>天天基金要问，但要先确认它到底有没有“研究型/机构型数据接口”，不要默认它一定有。</li>
+        <li>在正式源到位之前，当前 Eastmoney 网页接口仍然只能算过渡方案，不适合当长期稳定底座。</li>
+      </ul>
+
+      <h2>8. 官方链接汇总</h2>
+      <ul>
+        <li><a href="https://choice.eastmoney.com/product/datacenter" target="_blank" rel="noreferrer">Choice 数据服务</a></li>
+        <li><a href="https://choice.eastmoney.com/Product/ChoiceApp/" target="_blank" rel="noreferrer">Choice 产品页</a></li>
+        <li><a href="https://choice.eastmoney.com/FileDownLoad/CFTG20221115.pdf" target="_blank" rel="noreferrer">Choice 金融终端使用指南</a></li>
+        <li><a href="https://developers.1234567.com.cn/mp/dev/api/interface.html" target="_blank" rel="noreferrer">天天基金小程序公共接口</a></li>
+        <li><a href="https://help.1234567.com.cn/aboutus/connect.html" target="_blank" rel="noreferrer">天天基金联系我们</a></li>
+        <li><a href="https://www.1234567.com.cn/" target="_blank" rel="noreferrer">天天基金官网</a></li>
+      </ul>
+
+      <p class="meta">说明：本清单基于 2026-05-15 可访问的官方公开页面整理。当前未查到 Choice 官方公开定价页，因此价格部分应视为“需销售询价确认”。</p>
+    </article>
+  </div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Live Tushare/AkShare throttling and schema stability require credentialed runtime validation.",
+    "Existing .local.env token loading is reused but secret values were not read into artifacts or output.",
+    "Live validation smoke found AkShare concept sector endpoint unavailable due an upstream EastMoney connection/proxy disconnect; this is recorded at endpoint level while other AkShare checks can still pass.",
+    "Low-volume live probe found AkShare stock_zh_a_hist, fund_etf_hist_em, and stock_board_concept_name_em unavailable through their EastMoney push upstreams in the current network; classify these as high connection/anti-bot risk until repeated over multiple windows.",
+    "Temporary AkShare 1.18.63 isolated probe recovered stock_board_concept_name_em once but not consistently; stock_zh_a_hist and fund_etf_hist_em remained unavailable.",
+    "Project environment is now upgraded to AkShare 1.18.63; current-window live probe still shows EastMoney push-backed AkShare endpoints unstable.",
+    "Repeat-window diagnostics classify current endpoints as 6 primary, 1 fallback, and 3 disabled; this is a current-window operational status, not a permanent provider verdict."
+  ]
+}

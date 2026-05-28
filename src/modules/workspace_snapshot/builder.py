@@ -95,10 +95,15 @@ def _workspace_snapshot_payload(
             "secondary": scoring.get("secondary_narratives", []),
             "mapping_coverage": scoring.get("mapping_coverage", {}),
             "candidate_narratives": scoring.get("candidate_narratives", []),
+            "generated_candidate_narratives": scoring.get(
+                "generated_candidate_narratives", []
+            ),
             "excluded_mapping_candidates": scoring.get(
                 "excluded_mapping_candidates", []
             ),
             "unmapped_holdings": scoring.get("unmapped_holdings", []),
+            "diagnostics": scoring.get("diagnostics", {}),
+            "narrative_evidence": scoring.get("narrative_evidence", {}),
         },
         "fund": raw.get("fund", {}),
         "reports": {

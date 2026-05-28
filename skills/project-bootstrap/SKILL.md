@@ -11,9 +11,17 @@ Use this skill at project start and when context is unclear.
 
 1. `.ecc/framework-state.json`
 2. `AGENTS.md`
-3. `docs/exec-plans/active/index.md`
-4. `docs/memory/project-context.md`
-5. `docs/memory/architecture-decisions.md`
+3. `docs/memory/current-brief.md`
+4. `docs/memory/architecture-decisions.index.md`
+5. `docs/exec-plans/active/index.md`
+
+For a compact generated startup view, run:
+
+```bash
+python scripts/context_brief.py --max-words 900
+```
+
+Do not read full `project-context.md`, full `architecture-decisions.md`, all active plans, or all run directories during bootstrap unless the task needs that specific history.
 
 ## Bootstrap Loop
 
@@ -21,7 +29,7 @@ Use this skill at project start and when context is unclear.
 2. Create or update an execution plan under `docs/exec-plans/active/`.
 3. Decide whether work qualifies for `ecc-task-subagent-workflow`.
 4. Create `.ecc/runs/<task-run-id>/` for complex work.
-5. Keep durable decisions in `docs/memory/`.
+5. Keep durable decisions in `docs/memory/` and update startup indexes only when future sessions need the fact by default.
 6. Keep run-specific facts in `.ecc/runs/<task-run-id>/`.
 
 ## Defaults
@@ -30,4 +38,3 @@ Use this skill at project start and when context is unclear.
 - Do not start sub-agents before task boundaries are clear.
 - Do not create a worktree for small planning or documentation edits.
 - Prefer full scaffold with progressive activation.
-

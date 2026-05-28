@@ -1,10 +1,24 @@
 from __future__ import annotations
 
+import math
 from html import escape
 from pathlib import Path
 from typing import Any
 
+from src.modules.narrative_intelligence.model import (
+    candidate_display_name,
+    candidate_taxonomy_display,
+)
+
 DISCLAIMER = "本报告仅用于基金重仓叙事分析，不构成投资建议，也不构成买入、卖出或持有建议。"
+
+_RADAR_DIMENSIONS = [
+    ("earnings_score", "盈利验证", "Earnings"),
+    ("capital_score", "资金强化", "Capital"),
+    ("valuation_risk_score", "估值风险", "Valuation Risk"),
+    ("momentum_score", "叙事动量", "Momentum"),
+    ("counter_evidence_risk_score", "反向证据风险", "Counter-Evidence Risk"),
+]
 
 
 def write_reports(scoring_payload: dict[str, Any], output_dir: Path) -> dict[str, Path]:
@@ -59,6 +73,14 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
             *_render_excluded_mapping_candidate_lines(scoring_payload),
             "",
             *_render_candidate_narrative_lines(scoring_payload),
+            "",
+            *_render_mapping_proposal_lines(scoring_payload),
+            "",
+            *_render_candidate_generation_issue_lines(scoring_payload),
+            "",
+            *_render_emerging_narrative_lines(scoring_payload),
+            "",
+            *_render_narrative_evidence_summary_lines(scoring_payload),
             "",
             *_render_announcement_lines(scoring_payload),
             "",
@@ -140,6 +162,19 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
     .data-source-notice {{ background: #fff7ed; border: 1px solid #fed7aa; padding: 16px; }}
     .data-source-notice p {{ margin: 8px 0; }}
     .disclaimer {{ border-left: 4px solid #111827; padding-left: 14px; }}
+    .radar-layout {{ display: grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 20px; align-items: center; margin: 16px 0; }}
+    .radar-chart svg {{ display: block; width: 100%; height: auto; }}
+    .radar-grid {{ fill: none; stroke: #d1d5db; stroke-width: 1; }}
+    .radar-axis {{ stroke: #cbd5e1; stroke-width: 1; }}
+    .radar-area {{ fill: rgba(29, 78, 216, 0.18); stroke: #1d4ed8; stroke-width: 2; }}
+    .radar-point {{ fill: #1d4ed8; stroke: #fff; stroke-width: 1.5; }}
+    .radar-label {{ fill: #111827; font-size: 12px; font-weight: 600; }}
+    .radar-score {{ fill: #6b7280; font-size: 11px; }}
+    .radar-note {{ color: #4b5563; margin: 0 0 12px; }}
+    .axis-list {{ display: grid; gap: 8px; }}
+    .axis-item {{ display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed #e5e7eb; padding-bottom: 6px; }}
+    .axis-value {{ color: #1d4ed8; font-weight: 700; }}
+    @media (max-width: 900px) {{ .radar-layout {{ grid-template-columns: 1fr; }} }}
   </style>
 </head>
 <body>
@@ -173,6 +208,14 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
   {_render_excluded_mapping_candidates_html(scoring_payload)}
 
   {_render_candidate_narratives_html(scoring_payload)}
+
+  {_render_mapping_proposals_html(scoring_payload)}
+
+  {_render_candidate_generation_issues_html(scoring_payload)}
+
+  {_render_emerging_narratives_html(scoring_payload)}
+
+  {_render_narrative_evidence_summary_html(scoring_payload)}
 
   {_render_announcements_html(scoring_payload)}
 
@@ -316,12 +359,22 @@ def _layer_display_name(layer: dict[str, Any]) -> str:
     return str(layer.get("display_name") or layer.get("layer") or "unknown")
 
 
+def _narrative_title(narrative: dict[str, Any]) -> str:
+    return str(
+        narrative.get("display_name")
+        or narrative.get("canonical_name_zh")
+        or narrative.get("name")
+        or narrative.get("narrative_id")
+        or "Unknown Narrative"
+    )
+
+
 def _render_narrative_markdown(narrative: dict[str, Any]) -> str:
     state = narrative["state"]
     dimensions = state["dimensions"]
     interpretation = narrative.get("interpretation", {})
     lines = [
-        f"### {narrative['name']}",
+        f"### {_narrative_title(narrative)}",
         "",
         f"- Narrative ID: `{narrative['narrative_id']}`",
         f"- Exposure: {narrative['normalized_exposure']:.1%} of mapped narrative exposure",
@@ -471,18 +524,181 @@ def _render_candidate_narrative_lines(
     lines = [
         "## Candidate Narratives For Review",
         "",
-        "| Candidate | Taxonomy | Status | Triggering Stocks | Related Exclusions | Rationale |",
-        "| --- | --- | --- | --- | --- | --- |",
+        "| Candidate | Taxonomy | Status | Triggering Stocks | Related Exclusions | Definition | Citations | Rationale |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for candidate in candidates:
+        citation_count = len(candidate.get("representative_citations", []))
         lines.append(
             "| "
-            f"{candidate.get('name') or candidate.get('candidate_narrative_id') or '-'} | "
-            f"{candidate.get('canonical_taxonomy') or '-'} | "
+            f"{candidate_display_name(candidate, candidate.get('candidate_narrative_id') or '-')} | "
+            f"{candidate_taxonomy_display(candidate, '-')} | "
             f"{candidate.get('human_review_status') or candidate.get('status') or '-'} | "
             f"{', '.join(candidate.get('triggering_stock_codes', [])) or '-'} | "
             f"{', '.join(candidate.get('related_exclusion_ids', [])) or '-'} | "
+            f"{candidate.get('definition_zh') or candidate.get('definition') or '-'} | "
+            f"{citation_count} | "
             f"{candidate.get('rationale') or '-'} |"
+        )
+    return lines
+
+
+def _render_mapping_proposal_lines(scoring_payload: dict[str, Any]) -> list[str]:
+    payload = scoring_payload.get("mapping_proposals") or {}
+    proposals = payload.get("items") or []
+    if not proposals:
+        return []
+
+    lines = [
+        "## Candidate Mapping Proposals",
+        "",
+        "| Stock | Candidate | Confidence | Source Items | Rationale |",
+        "| --- | --- | ---: | ---: | --- |",
+    ]
+    for proposal in proposals:
+        lines.append(
+            "| "
+            f"{proposal.get('stock_code') or '-'} {proposal.get('stock_name') or ''} | "
+            f"{proposal.get('candidate_name') or proposal.get('candidate_narrative_id') or '-'} | "
+            f"{_format_number_metric(proposal.get('confidence'))} | "
+            f"{len(proposal.get('supporting_source_item_ids', []))} | "
+            f"{proposal.get('rationale') or '-'} |"
+        )
+    return lines
+
+
+def _render_candidate_generation_issue_lines(scoring_payload: dict[str, Any]) -> list[str]:
+    failures = scoring_payload.get("candidate_generation_failures") or []
+    if not failures:
+        return []
+
+    lines = [
+        "## Narrative Generation Issues",
+        "",
+        "Some candidate seeds could not be curated by the configured external model after retries. These failures are shown explicitly and are not replaced with deterministic fallback output.",
+        "",
+        "| Seed | Provider | Model | Attempts | Stocks | Reason |",
+        "| --- | --- | --- | ---: | --- | --- |",
+    ]
+    for failure in failures:
+        lines.append(
+            "| "
+            f"{failure.get('seed_id') or '-'} | "
+            f"{failure.get('provider_name') or '-'} | "
+            f"{failure.get('model') or '-'} | "
+            f"{failure.get('attempt_count') or 0} | "
+            f"{', '.join(failure.get('triggering_stock_codes', [])) or '-'} | "
+            f"{failure.get('reason') or '-'} |"
+        )
+    return lines
+
+
+def _render_emerging_narrative_lines(scoring_payload: dict[str, Any]) -> list[str]:
+    candidates = scoring_payload.get("generated_candidate_narratives", [])
+    fund_tags = [
+        tag
+        for tag in scoring_payload.get("fund_exposure_tags", [])
+        if not (tag.get("linked_narrative_ids") or [])
+    ]
+    if not candidates and not fund_tags:
+        return []
+
+    lines = [
+        "## Emerging Narrative Signals",
+        "",
+        "These are preview-only signals derived from cross-holding tags and generated candidates. They do not yet change active scoring.",
+        "",
+    ]
+    if candidates:
+        lines.extend(
+            [
+                "### Generated Candidates",
+                "",
+                "| Candidate | Taxonomy | Triggering Stocks | Confidence | Why Not Company Event |",
+                "| --- | --- | --- | ---: | --- |",
+            ]
+        )
+        for candidate in candidates:
+            lines.append(
+                "| "
+                f"{candidate_display_name(candidate, candidate.get('candidate_narrative_id') or '-')} | "
+                f"{candidate_taxonomy_display(candidate, '-')} | "
+                f"{', '.join(candidate.get('triggering_stock_codes', [])) or '-'} | "
+                f"{_format_number_metric(candidate.get('confidence'))} | "
+                f"{candidate.get('why_not_company_event_zh') or '-'} |"
+            )
+    if fund_tags:
+        lines.extend(
+            [
+                "",
+                "### Unlinked Fund Exposure Tags",
+                "",
+                "| Tag | Exposure | Stocks | Confidence |",
+                "| --- | ---: | --- | ---: |",
+            ]
+        )
+        for tag in fund_tags:
+            lines.append(
+                "| "
+                f"{tag.get('tag_name_zh') or tag.get('tag_name_en') or '-'} | "
+                f"{tag.get('normalized_exposure', 0):.1%} | "
+                f"{', '.join(tag.get('stock_codes', [])) or '-'} | "
+                f"{_format_number_metric(tag.get('confidence'))} |"
+            )
+    return lines
+
+
+def _render_candidate_generation_issues_html(scoring_payload: dict[str, Any]) -> str:
+    failures = scoring_payload.get("candidate_generation_failures") or []
+    if not failures:
+        return ""
+
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(str(failure.get('seed_id') or '-'))}</td>"
+        f"<td>{escape(str(failure.get('provider_name') or '-'))}</td>"
+        f"<td>{escape(str(failure.get('model') or '-'))}</td>"
+        f"<td>{escape(str(failure.get('attempt_count') or 0))}</td>"
+        f"<td>{escape(', '.join(failure.get('triggering_stock_codes', [])) or '-')}</td>"
+        f"<td>{escape(str(failure.get('reason') or '-'))}</td>"
+        "</tr>"
+        for failure in failures
+    )
+    return (
+        "<section class=\"candidate-generation-issues\">"
+        "<h2>Narrative Generation Issues</h2>"
+        "<p>Some candidate seeds could not be curated by the configured external model after retries. "
+        "These failures are shown explicitly and are not replaced with deterministic fallback output.</p>"
+        "<table><thead><tr><th>Seed</th><th>Provider</th><th>Model</th><th>Attempts</th><th>Stocks</th><th>Reason</th></tr></thead>"
+        f"<tbody>{rows}</tbody></table>"
+        "</section>"
+    )
+
+
+def _render_narrative_evidence_summary_lines(
+    scoring_payload: dict[str, Any],
+) -> list[str]:
+    payload = scoring_payload.get("narrative_evidence") or {}
+    items = payload.get("items") or []
+    if not items:
+        return []
+
+    lines = [
+        "## Narrative Evidence Summary",
+        "",
+        "| Narrative | Evidence | Positive | Negative | Mixed | Status | Latest |",
+        "| --- | ---: | ---: | ---: | ---: | --- | --- |",
+    ]
+    for item in items:
+        lines.append(
+            "| "
+            f"{item.get('name') or item.get('narrative_id') or '-'} | "
+            f"{item.get('evidence_count') or 0} | "
+            f"{item.get('positive_count') or 0} | "
+            f"{item.get('negative_count') or 0} | "
+            f"{item.get('mixed_count') or 0} | "
+            f"{item.get('support_status') or '-'} | "
+            f"{item.get('latest_event_date') or '-'} |"
         )
     return lines
 
@@ -573,7 +789,7 @@ def _render_news_evidence_lines(scoring_payload: dict[str, Any]) -> list[str]:
         "## News Evidence",
         "",
         f"- Query coverage: {_format_news_query_coverage(scoring_payload)}",
-        "- Limitation: V1 classifies RSS titles/snippets only; article bodies are not parsed.",
+        "- Limitation: V1 classifies headline or RSS snippet text only; article bodies are not parsed.",
         "",
         "| Title | Narrative | Sentiment | Confidence | Date | Provider | Source | Reason |",
         "| --- | --- | --- | ---: | --- | --- | --- | --- |",
@@ -650,6 +866,7 @@ def _render_announcement_evidence_lines(
 def _render_narrative_html(narrative: dict[str, Any]) -> str:
     state = narrative["state"]
     interpretation = narrative.get("interpretation", {})
+    radar_chart = _render_radar_chart_html(state)
     dimension_rows = "\n".join(
         "<tr>"
         f"<td>{escape(name)}</td>"
@@ -660,7 +877,7 @@ def _render_narrative_html(narrative: dict[str, Any]) -> str:
     )
     return f"""
 <article class="narrative">
-  <h3>{escape(narrative['name'])}</h3>
+  <h3>{escape(_narrative_title(narrative))}</h3>
   <p class="narrative-meta">Narrative ID: {escape(narrative['narrative_id'])} | Exposure: {narrative['normalized_exposure']:.1%}</p>
   <p>Lifecycle stage: <strong>{escape(state['stage'])}</strong> | Sustainability score: {state['sustainability_score']} | Confidence: {state['confidence']:.2f}</p>
   <div class="interpretation">
@@ -671,12 +888,118 @@ def _render_narrative_html(narrative: dict[str, Any]) -> str:
       <li>{escape(interpretation.get('confidence_note', 'No confidence note available.'))}</li>
     </ul>
   </div>
+  {radar_chart}
   <table>
     <thead><tr><th>Dimension</th><th>Score</th><th>Confidence</th></tr></thead>
     <tbody>{dimension_rows}</tbody>
   </table>
 </article>
 """
+
+
+def _render_radar_chart_html(state: dict[str, Any]) -> str:
+    dimensions = state.get("dimensions")
+    if not isinstance(dimensions, dict) or not dimensions:
+        return ""
+    scores = [_radar_dimension_score(dimensions, key) for key, _, _ in _RADAR_DIMENSIONS]
+    axis_items = "\n".join(
+        (
+            '<div class="axis-item">'
+            f"<span>{escape(label_zh)} / {escape(label_en)}</span>"
+            f'<span class="axis-value">{score:.0f}</span>'
+            "</div>"
+        )
+        for (_, label_zh, label_en), score in zip(_RADAR_DIMENSIONS, scores, strict=True)
+    )
+    return f"""
+  <section class="narrative-radar">
+    <h4>五维雷达图 / Five-Dimension Radar</h4>
+    <div class="radar-layout">
+      <div class="radar-chart">{_radar_svg(scores)}</div>
+      <div>
+        <p class="radar-note">雷达图展示评分模型的五个原始维度。估值风险和反向证据风险是风险轴，分数越高代表风险越强，不代表更好。</p>
+        <div class="axis-list">{axis_items}</div>
+      </div>
+    </div>
+  </section>
+"""
+
+
+def _radar_svg(scores: list[float]) -> str:
+    center_x = 165.0
+    center_y = 145.0
+    radius = 88.0
+    grid_polygons = []
+    for fraction in [0.25, 0.5, 0.75, 1.0]:
+        points = _radar_points([100.0 * fraction] * len(scores), center_x, center_y, radius)
+        grid_polygons.append(f'<polygon class="radar-grid" points="{_radar_points_attr(points)}" />')
+    axes = []
+    labels = []
+    for index, (_, label_zh, _) in enumerate(_RADAR_DIMENSIONS):
+        angle = _radar_angle(index, len(_RADAR_DIMENSIONS))
+        end_x = center_x + radius * math.cos(angle)
+        end_y = center_y + radius * math.sin(angle)
+        axes.append(
+            f'<line class="radar-axis" x1="{center_x:.1f}" y1="{center_y:.1f}" x2="{end_x:.1f}" y2="{end_y:.1f}" />'
+        )
+        label_x = center_x + (radius + 28.0) * math.cos(angle)
+        label_y = center_y + (radius + 28.0) * math.sin(angle)
+        anchor = "middle"
+        if label_x > center_x + 10:
+            anchor = "start"
+        elif label_x < center_x - 10:
+            anchor = "end"
+        labels.append(
+            f'<text class="radar-label" x="{label_x:.1f}" y="{label_y:.1f}" text-anchor="{anchor}">{escape(label_zh)}'
+            f'<tspan class="radar-score" x="{label_x:.1f}" dy="14">{scores[index]:.0f}</tspan></text>'
+        )
+    value_points = _radar_points(scores, center_x, center_y, radius)
+    points = "".join(
+        f'<circle class="radar-point" cx="{x:.1f}" cy="{y:.1f}" r="3.5" />'
+        for x, y in value_points
+    )
+    return (
+        '<svg viewBox="0 0 330 290" role="img" aria-label="五维雷达图">'
+        f"{''.join(grid_polygons)}"
+        f"{''.join(axes)}"
+        f'<polygon class="radar-area" points="{_radar_points_attr(value_points)}" />'
+        f"{points}"
+        f"{''.join(labels)}"
+        "</svg>"
+    )
+
+
+def _radar_points(
+    scores: list[float],
+    center_x: float,
+    center_y: float,
+    radius: float,
+) -> list[tuple[float, float]]:
+    return [
+        (
+            center_x + radius * (max(0.0, min(100.0, score)) / 100.0) * math.cos(_radar_angle(index, len(scores))),
+            center_y + radius * (max(0.0, min(100.0, score)) / 100.0) * math.sin(_radar_angle(index, len(scores))),
+        )
+        for index, score in enumerate(scores)
+    ]
+
+
+def _radar_angle(index: int, total: int) -> float:
+    return -math.pi / 2 + (2 * math.pi * index / total)
+
+
+def _radar_points_attr(points: list[tuple[float, float]]) -> str:
+    return " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+
+
+def _radar_dimension_score(dimensions: dict[str, Any], key: str) -> float:
+    value = dimensions.get(key)
+    if not isinstance(value, dict):
+        return 0.0
+    score = value.get("score")
+    if not isinstance(score, int | float):
+        return 0.0
+    return float(score)
 
 
 def _render_evidence_html(evidence_items: list[dict[str, Any]]) -> str:
@@ -804,11 +1127,13 @@ def _render_candidate_narratives_html(scoring_payload: dict[str, Any]) -> str:
         return ""
     rows = "\n".join(
         "<tr>"
-        f"<td>{escape(str(candidate.get('name') or candidate.get('candidate_narrative_id') or '-'))}</td>"
-        f"<td>{escape(str(candidate.get('canonical_taxonomy') or '-'))}</td>"
+        f"<td>{escape(candidate_display_name(candidate, candidate.get('candidate_narrative_id') or '-'))}</td>"
+        f"<td>{escape(candidate_taxonomy_display(candidate, '-'))}</td>"
         f"<td>{escape(str(candidate.get('human_review_status') or candidate.get('status') or '-'))}</td>"
         f"<td>{escape(', '.join(candidate.get('triggering_stock_codes', [])) or '-')}</td>"
         f"<td>{escape(', '.join(candidate.get('related_exclusion_ids', [])) or '-')}</td>"
+        f"<td>{escape(str(candidate.get('definition_zh') or candidate.get('definition') or '-'))}</td>"
+        f"<td>{len(candidate.get('representative_citations', []))}</td>"
         f"<td>{escape(str(candidate.get('rationale') or '-'))}</td>"
         "</tr>"
         for candidate in candidates
@@ -818,7 +1143,122 @@ def _render_candidate_narratives_html(scoring_payload: dict[str, Any]) -> str:
     <h2>Candidate Narratives For Review</h2>
     <p>These candidate narratives are review objects only. V1 does not use them for scoring until they are promoted into the active registry.</p>
     <table>
-      <thead><tr><th>Candidate</th><th>Taxonomy</th><th>Status</th><th>Triggering Stocks</th><th>Related Exclusions</th><th>Rationale</th></tr></thead>
+      <thead><tr><th>Candidate</th><th>Taxonomy</th><th>Status</th><th>Triggering Stocks</th><th>Related Exclusions</th><th>Definition</th><th>Citations</th><th>Rationale</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+"""
+
+
+def _render_mapping_proposals_html(scoring_payload: dict[str, Any]) -> str:
+    payload = scoring_payload.get("mapping_proposals") or {}
+    proposals = payload.get("items") or []
+    if not proposals:
+        return ""
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(str(proposal.get('stock_code') or '-'))} {escape(str(proposal.get('stock_name') or ''))}</td>"
+        f"<td>{escape(str(proposal.get('candidate_name') or proposal.get('candidate_narrative_id') or '-'))}</td>"
+        f"<td>{escape(_format_number_metric(proposal.get('confidence')))}</td>"
+        f"<td>{len(proposal.get('supporting_source_item_ids', []))}</td>"
+        f"<td>{escape(str(proposal.get('rationale') or '-'))}</td>"
+        "</tr>"
+        for proposal in proposals
+    )
+    return f"""
+  <section class="mapping-proposals">
+    <h2>Candidate Mapping Proposals</h2>
+    <p>These proposals remain review-time suggestions and do not enter active scoring until promoted.</p>
+    <table>
+      <thead><tr><th>Stock</th><th>Candidate</th><th>Confidence</th><th>Source Items</th><th>Rationale</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+"""
+
+
+def _render_emerging_narratives_html(scoring_payload: dict[str, Any]) -> str:
+    candidates = scoring_payload.get("generated_candidate_narratives", [])
+    fund_tags = [
+        tag
+        for tag in scoring_payload.get("fund_exposure_tags", [])
+        if not (tag.get("linked_narrative_ids") or [])
+    ]
+    if not candidates and not fund_tags:
+        return ""
+    candidate_rows = ""
+    if candidates:
+        candidate_rows = "\n".join(
+            "<tr>"
+            f"<td>{escape(candidate_display_name(candidate, candidate.get('candidate_narrative_id') or '-'))}</td>"
+            f"<td>{escape(candidate_taxonomy_display(candidate, '-'))}</td>"
+            f"<td>{escape(', '.join(candidate.get('triggering_stock_codes', [])) or '-')}</td>"
+            f"<td>{escape(_format_number_metric(candidate.get('confidence')))}</td>"
+            f"<td>{escape(str(candidate.get('why_not_company_event_zh') or '-'))}</td>"
+            "</tr>"
+            for candidate in candidates
+        )
+        candidate_html = f"""
+    <h3>Generated Candidates</h3>
+    <table>
+      <thead><tr><th>Candidate</th><th>Taxonomy</th><th>Triggering Stocks</th><th>Confidence</th><th>Why Not Company Event</th></tr></thead>
+      <tbody>{candidate_rows}</tbody>
+    </table>
+"""
+    else:
+        candidate_html = ""
+    if fund_tags:
+        tag_rows = "\n".join(
+            "<tr>"
+            f"<td>{escape(str(tag.get('tag_name_zh') or tag.get('tag_name_en') or '-'))}</td>"
+            f"<td>{tag.get('normalized_exposure', 0):.1%}</td>"
+            f"<td>{escape(', '.join(tag.get('stock_codes', [])) or '-')}</td>"
+            f"<td>{escape(_format_number_metric(tag.get('confidence')))}</td>"
+            "</tr>"
+            for tag in fund_tags
+        )
+        tag_html = f"""
+    <h3>Unlinked Fund Exposure Tags</h3>
+    <table>
+      <thead><tr><th>Tag</th><th>Exposure</th><th>Stocks</th><th>Confidence</th></tr></thead>
+      <tbody>{tag_rows}</tbody>
+    </table>
+"""
+    else:
+        tag_html = ""
+    return f"""
+  <section class="emerging-narratives">
+    <h2>Emerging Narrative Signals</h2>
+    <p>These are preview-only signals derived from cross-holding tags and generated candidates. They do not yet change active scoring.</p>
+    {candidate_html}
+    {tag_html}
+  </section>
+"""
+
+
+def _render_narrative_evidence_summary_html(scoring_payload: dict[str, Any]) -> str:
+    payload = scoring_payload.get("narrative_evidence") or {}
+    items = payload.get("items") or []
+    if not items:
+        return ""
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{escape(str(item.get('name') or item.get('narrative_id') or '-'))}</td>"
+        f"<td>{item.get('evidence_count') or 0}</td>"
+        f"<td>{item.get('positive_count') or 0}</td>"
+        f"<td>{item.get('negative_count') or 0}</td>"
+        f"<td>{item.get('mixed_count') or 0}</td>"
+        f"<td>{escape(str(item.get('support_status') or '-'))}</td>"
+        f"<td>{escape(str(item.get('latest_event_date') or '-'))}</td>"
+        "</tr>"
+        for item in items
+    )
+    return f"""
+  <section class="narrative-evidence-summary">
+    <h2>Narrative Evidence Summary</h2>
+    <p>This summarizes whether each active narrative is corroborated, conflicting, limited, or missing evidence.</p>
+    <table>
+      <thead><tr><th>Narrative</th><th>Evidence</th><th>Positive</th><th>Negative</th><th>Mixed</th><th>Status</th><th>Latest</th></tr></thead>
       <tbody>{rows}</tbody>
     </table>
   </section>
@@ -932,7 +1372,7 @@ def _render_news_evidence_html(scoring_payload: dict[str, Any]) -> str:
   <section class="news-evidence">
     <h2>News Evidence</h2>
     <p>Query coverage: {escape(_format_news_query_coverage(scoring_payload))}</p>
-    <p>Limitation: V1 classifies RSS titles/snippets only; article bodies are not parsed.</p>
+    <p>Limitation: V1 classifies headline or RSS snippet text only; article bodies are not parsed.</p>
     <table>
       <thead><tr><th>Title</th><th>Narrative</th><th>Sentiment</th><th>Confidence</th><th>Date</th><th>Provider</th><th>Source</th><th>Reason</th></tr></thead>
       <tbody>{rows}</tbody>

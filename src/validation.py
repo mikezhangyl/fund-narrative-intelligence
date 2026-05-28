@@ -384,18 +384,6 @@ def validate_valuation_snapshot_payload(payload: dict[str, Any]) -> None:
     )
     if payload["version"] != "valuation-snapshot-v1":
         raise ProviderContractError("valuation snapshots version is unsupported")
-    if payload["provider_name"] not in {"quote-derived-valuation", "eastmoney-valuation"}:
-        raise ProviderContractError(
-            "valuation snapshots provider_name must be quote-derived-valuation or eastmoney-valuation"
-        )
-    expected_versions = {
-        "quote-derived-valuation": "quote-derived-valuation-v1",
-        "eastmoney-valuation": "eastmoney-valuation-v1",
-    }
-    if payload["provider_version"] != expected_versions[payload["provider_name"]]:
-        raise ProviderContractError(
-            "valuation snapshots provider_version must match provider_name"
-        )
     if payload["valuation_basis"] not in {
         "quote_derived_context",
         "provider_valuation_metrics",
@@ -409,6 +397,15 @@ def validate_valuation_snapshot_payload(payload: dict[str, Any]) -> None:
         if not isinstance(payload[field], str) or not payload[field]:
             raise ProviderContractError(
                 f"valuation snapshots {field} must be a non-empty string"
+            )
+    if payload["valuation_basis"] == "quote_derived_context":
+        if payload["provider_name"] != "quote-derived-valuation":
+            raise ProviderContractError(
+                "valuation snapshots quote_derived_context must use provider_name quote-derived-valuation"
+            )
+        if payload["provider_version"] != "quote-derived-valuation-v1":
+            raise ProviderContractError(
+                "valuation snapshots quote_derived_context must use provider_version quote-derived-valuation-v1"
             )
     if not isinstance(payload["valuations"], list):
         raise ProviderContractError("valuation snapshots valuations must be a list")

@@ -33,6 +33,84 @@ Run the live Eastmoney smoke set:
 python -m src.main --run-real-smoke
 ```
 
+Inspect the market-data capability registry:
+
+```bash
+python scripts/report_data_capabilities.py --format markdown
+```
+
+The registry in `config/data_capabilities.yaml` records which datasets each
+analysis needs, whether the platform can acquire them reliably, the current
+primary/fallback source, local-gateway readiness, and known acquisition gaps.
+
+Inspect the current market-data runtime wiring:
+
+```bash
+python scripts/report_market_data_runtime.py --format markdown
+```
+
+This is a read-only check for cache/log paths, provider pacing/retry settings,
+redacted token presence, and whether Tushare currently points to the official
+API or a local gateway URL.
+
+Run a controlled breadth scan against the consolidated market-data source:
+
+```bash
+python scripts/run_breadth_scan.py --end-date 2026-05-22 --lookback-trading-days 60
+```
+
+By default this scans a small fixed symbol universe. Use `--symbols`,
+`--symbols-file`, or explicit `--use-stock-metadata` when increasing scope.
+
+Run controlled V0 stress probes:
+
+```bash
+python scripts/run_market_data_stress.py --batch-size 2
+```
+
+This records historical scan, incremental daily update, and sector rotation
+probe metrics without expanding to the full A-share universe unless requested.
+
+Build the consolidated V0 reliability report:
+
+```bash
+python scripts/build_market_data_reliability_report.py --format markdown
+```
+
+This combines capability readiness, runtime wiring, live validation, and
+controlled stress evidence into one report.
+
+Validate a local gateway implementation against the project contract:
+
+```bash
+python scripts/validate_market_data_gateway_contract.py --base-url http://localhost:8700
+```
+
+The default mode validates the normalized REST contract under
+`/api/v1/market-data`. The current gateway-compatible Tushare facade can be
+checked separately:
+
+```bash
+python scripts/validate_market_data_gateway_contract.py \
+  --base-url http://localhost:8700 \
+  --mode tushare-facade
+```
+
+Use `--mode all` when the gateway supports both surfaces and should be checked
+as a single acceptance run.
+
+The contract lives in `config/market_data_gateway_contract.yaml` and covers
+Tushare, AkShare, EastMoney, and gateway-owned datasets such as `cyq_chips`.
+
+Run the partial-safe sector scan:
+
+```bash
+python scripts/run_sector_scan.py --trade-date 2026-05-22
+```
+
+Sector endpoint failures are recorded in the output instead of aborting the
+whole scan.
+
 Run the strict live Eastmoney holdings acceptance path:
 
 ```bash
@@ -95,6 +173,33 @@ Run the strict live market quote acceptance path:
 ```bash
 python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_quotes_161725
 ```
+
+Run the routed provider fallback acceptance path:
+
+```bash
+python scripts/validate_provider_routing_acceptance.py --output-dir outputs/provider_routing_161725
+```
+
+This runs Eastmoney holdings plus routed `market_quotes`, `valuation_snapshots`,
+and `financial_metrics` using the sample
+`data/provider_routing/akshare_tushare.primary-fallback.json` configuration.
+It forces the `AKShare` and `Tushare` primaries into an unavailable state for
+this run, so the script deterministically validates fallback to Eastmoney or
+Yahoo and verifies the recorded fallback events in generated artifacts.
+
+Run the strict Tushare primary-success acceptance path:
+
+```bash
+python scripts/validate_tushare_primary_acceptance.py --output-dir outputs/tushare_primary_161725
+```
+
+This requires `TUSHARE_TOKEN`, read from `.local.env` first and then from the
+process environment. Tushare requests default to `https://api.tushare.pro`;
+set `TUSHARE_API_URL` to point the same request contract at a local data
+gateway when that service is ready. It rejects any `valuation_snapshots` or
+`financial_metrics` layer fallback away from Tushare, so it acts as the
+happy-path gate once paid Tushare access is configured while still tolerating
+partial row-level degradation inside the selected Tushare provider.
 
 Run the strict combined live enriched acceptance path:
 
@@ -235,6 +340,35 @@ python scripts/validate_market_quotes_acceptance.py --output-dir outputs/market_
 The strict command rejects missing quote rows, missing derived quote signals,
 mock quote layers, and reports that do not disclose the mixed real
 holdings/quotes plus Mock fixture foundation.
+
+For routed provider fallback acceptance, run:
+
+```bash
+python scripts/validate_provider_routing_acceptance.py --output-dir outputs/provider_routing_161725
+```
+
+This command validates the sample `AKShare -> Eastmoney` and
+`Tushare -> Eastmoney` routing configuration end to end. It requires fallback
+events for `market_quotes`, `valuation_snapshots`, and `financial_metrics`, and
+it checks that the final artifacts still preserve provider provenance and
+disclosure. The script deliberately forces the primary routed providers into an
+unavailable state so the fallback contract stays stable even when local tokens
+or optional libraries are installed.
+
+For strict Tushare primary acceptance, run:
+
+```bash
+python scripts/validate_tushare_primary_acceptance.py --output-dir outputs/tushare_primary_161725
+```
+
+This command requires `TUSHARE_TOKEN`, read from `.local.env` first and then
+from the process environment. Tushare requests default to
+`https://api.tushare.pro`; set `TUSHARE_API_URL` to switch the same provider
+calls to a local gateway later. It validates the future happy path where
+`valuation_snapshots` and `financial_metrics` stay on Tushare with no
+layer-level fallback away from Tushare. Partial row-level degradation inside
+the selected Tushare provider is still allowed as long as routing does not fall
+back to another provider.
 
 For the combined live enriched path, run:
 
