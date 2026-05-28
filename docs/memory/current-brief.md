@@ -66,6 +66,8 @@ FNI now has the first narrative-service consumer contract at `config/narrative_s
 
 FNI prepared the first narrative-service implementation request at `docs/product/narrative-service-implementation-request-2026-05-28.md` and the conformance probe at `scripts/run_narrative_service_conformance_probe.py`. Without `NARRATIVE_SERVICE_URL`, the probe reports `not_configured`; once a service exists, it checks every endpoint declared in `config/narrative_service_contract.yaml` for the required normalized envelope. The next FNI slice is an HTTP `NarrativeServiceProvider` with service-first/local-fallback routing.
 
+FNI now has first HTTP narrative-service consumption in `src/providers/narrative_service.py`: `NarrativeServiceProvider` validates normalized envelopes, `FallbackNarrativeDataProvider` records `NARRATIVE_SERVICE_FALLBACK` when service calls fail, and `build_narrative_data_provider` selects service-first mode when `NARRATIVE_SERVICE_URL` is configured. `scripts/run_fund_holding_exposure_report.py` uses that provider-neutral builder for default reviewed narrative inputs. The next slice should carry provider diagnostics into report JSON/HTML so users can see whether narrative data came from the service or local fallback.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

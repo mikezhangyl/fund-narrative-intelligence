@@ -19,7 +19,7 @@ from src.providers.intelligence import (  # noqa: E402
     ReviewedStockNarrativeMappingProvider,
 )
 from src.providers.narrative_service import (  # noqa: E402
-    LocalNarrativePrototypeProvider,
+    build_narrative_data_provider,
 )
 from src.scanners.fund_holding_exposure_report import (  # noqa: E402
     FundHoldingExposureConfig,
@@ -107,7 +107,7 @@ def load_intelligence_context(
     stock_mapping_mode: str,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     if registry_mode == "reviewed" and stock_mapping_mode == "reviewed":
-        return LocalNarrativePrototypeProvider().get_report_inputs()
+        return build_narrative_data_provider().get_report_inputs()
     registry_provider = (
         ReviewedNarrativeRegistryProvider()
         if registry_mode == "reviewed"

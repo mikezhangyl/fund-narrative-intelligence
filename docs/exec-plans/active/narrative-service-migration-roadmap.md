@@ -126,6 +126,8 @@ Implemented surface:
 
 Wire FNI reports to prefer the narrative service when configured.
 
+Status: first HTTP provider slice implemented on 2026-05-28.
+
 Likely deliverables:
 
 - `NarrativeServiceProvider`;
@@ -139,6 +141,17 @@ Acceptance:
 - FNI fund exposure reports can run from narrative service data;
 - fallback to local prototype is explicit and disclosed;
 - failed service calls do not silently downgrade trusted status.
+
+Implemented surface:
+
+- `NarrativeServiceProvider` reads the configured service over HTTP and
+  validates the normalized envelope;
+- `FallbackNarrativeDataProvider` uses service-first/local-fallback routing and
+  records a `NARRATIVE_SERVICE_FALLBACK` warning on service failure;
+- `build_narrative_data_provider` selects service-first mode when
+  `NARRATIVE_SERVICE_URL` is configured;
+- `scripts/run_fund_holding_exposure_report.py` uses the provider-neutral
+  builder for default reviewed narrative inputs.
 
 ## Phase 4: Durable Store Migration
 
@@ -184,11 +197,10 @@ Do not do in this lane yet:
 
 ## Next Recommended Slice
 
-Implement Phase 3 FNI service consumption:
+Implement the next Phase 3 reporting disclosure slice:
 
-1. Add an HTTP `NarrativeServiceProvider` behind the same provider-neutral
-   interface as `LocalNarrativePrototypeProvider`.
-2. Select service-first mode when `NARRATIVE_SERVICE_URL` is configured.
-3. Preserve explicit fallback diagnostics when local prototype files are used.
-4. Update one report path to disclose `narrative_service`, `local_prototype`,
-   or `not_configured` as the narrative fetch mode.
+1. Carry provider snapshot diagnostics into fund exposure reports.
+2. Render narrative fetch mode as `narrative_service`, `local_prototype`, or
+   service-failed fallback in JSON/HTML.
+3. Add a dry-run smoke with a fake HTTP service fixture.
+4. Keep trusted status unchanged when service fallback occurs.

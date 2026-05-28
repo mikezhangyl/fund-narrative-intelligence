@@ -55,7 +55,9 @@ future service should own registry lifecycle, stock mapping lifecycle, evidence
 packs, candidate intake, trust audits, review queues, and trusted promotion.
 The first FNI consumer contract is recorded in
 `config/narrative_service_contract.yaml`, with local fallback implemented by
-`src/providers/narrative_service.py`.
+`src/providers/narrative_service.py`. When `NARRATIVE_SERVICE_URL` is
+configured, FNI can now use `NarrativeServiceProvider` in service-first mode
+with explicit local fallback through `FallbackNarrativeDataProvider`.
 
 The first engineering acceptance command is:
 

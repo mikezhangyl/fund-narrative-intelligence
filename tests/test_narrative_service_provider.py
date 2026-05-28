@@ -7,7 +7,12 @@ from src.config import (
     DEFAULT_REVIEWED_STOCK_MAPPINGS_PATH,
     PROJECT_ROOT,
 )
-from src.providers.narrative_service import LocalNarrativePrototypeProvider
+from src.providers.narrative_service import (
+    FallbackNarrativeDataProvider,
+    LocalNarrativePrototypeProvider,
+    NarrativeServiceProvider,
+    build_narrative_data_provider,
+)
 
 
 def test_local_narrative_prototype_provider_returns_contract_snapshot():
@@ -63,7 +68,11 @@ def test_local_narrative_prototype_provider_can_expose_legacy_report_inputs():
     assert all(mapping["stock_code"] for mapping in mappings)
 
 
-def test_fund_holding_exposure_loader_uses_local_prototype_for_reviewed_inputs():
+def test_fund_holding_exposure_loader_uses_local_prototype_for_reviewed_inputs(
+    monkeypatch,
+):
+    monkeypatch.delenv("NARRATIVE_SERVICE_URL", raising=False)
+
     registry, mappings = load_intelligence_context(
         registry_mode="reviewed",
         stock_mapping_mode="reviewed",
@@ -112,3 +121,88 @@ def test_narrative_service_contract_declares_required_surfaces():
         "review_queue_items",
     ]
     assert "trusted_stock_mappings" in payload["trust_policy"]["automatic_ingestion_must_not_create"]
+
+
+def test_narrative_service_provider_fetches_report_inputs(monkeypatch):
+    requested: list[tuple[str, str]] = []
+
+    def fake_request_json(*, method, url, payload, timeout_seconds):
+        del payload
+        del timeout_seconds
+        requested.append((method, url))
+        if url.endswith("/registry"):
+            data = {
+                "version": "registry-v1",
+                "narratives": [{"narrative_id": "N_AI", "name": "AI"}],
+                "candidate_narratives": [],
+                "trust_metadata": {"trust_status": "trusted_validated"},
+            }
+        elif url.endswith("/mappings"):
+            data = {
+                "mappings": [
+                    {
+                        "stock_code": "000001",
+                        "narrative_id": "N_AI",
+                        "confidence": 0.8,
+                    }
+                ]
+            }
+        else:
+            data = {}
+        return {
+            "status": "available",
+            "source": "narrative_service",
+            "provider": "fake-service",
+            "provider_version": "fake-v1",
+            "data": data,
+            "warnings": [],
+            "trust_metadata": {"trust_status": "trusted_validated"},
+        }
+
+    monkeypatch.setattr(
+        "src.providers.narrative_service._request_json",
+        fake_request_json,
+    )
+
+    provider = NarrativeServiceProvider(base_url="http://127.0.0.1:9999")
+    registry, mappings = provider.get_report_inputs()
+
+    assert registry["version"] == "registry-v1"
+    assert mappings == [
+        {"stock_code": "000001", "narrative_id": "N_AI", "confidence": 0.8}
+    ]
+    assert ("GET", "http://127.0.0.1:9999/api/v1/narratives/registry") in requested
+    assert ("GET", "http://127.0.0.1:9999/api/v1/narratives/mappings") in requested
+
+
+def test_build_narrative_data_provider_uses_service_first_when_configured(monkeypatch):
+    monkeypatch.setenv("NARRATIVE_SERVICE_URL", "http://127.0.0.1:9999")
+
+    provider = build_narrative_data_provider()
+
+    assert isinstance(provider, FallbackNarrativeDataProvider)
+    assert isinstance(provider.primary, NarrativeServiceProvider)
+    assert provider.primary.base_url == "http://127.0.0.1:9999"
+
+
+def test_fallback_narrative_provider_discloses_service_failure(monkeypatch):
+    monkeypatch.delenv("NARRATIVE_SERVICE_URL", raising=False)
+
+    class BrokenProvider:
+        def get_snapshot(self):
+            raise RuntimeError("service unavailable")
+
+        def get_report_inputs(self):
+            raise RuntimeError("service unavailable")
+
+    provider = FallbackNarrativeDataProvider(
+        primary=BrokenProvider(),
+        fallback=LocalNarrativePrototypeProvider(),
+    )
+
+    snapshot = provider.get_snapshot()
+
+    assert snapshot["source"] == "local_prototype"
+    assert snapshot["diagnostics"]["service_ready"] is False
+    assert snapshot["warnings"][0]["code"] == "NARRATIVE_SERVICE_FALLBACK"
+    assert "service unavailable" in snapshot["warnings"][0]["message"]
