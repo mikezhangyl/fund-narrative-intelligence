@@ -28,11 +28,12 @@ def test_required_get_endpoints_return_normalized_envelopes(tmp_path):
         candidates = _get_json(f"{base_url}/api/v1/narratives/candidates")
         audit = _get_json(f"{base_url}/api/v1/narratives/trust-audits/latest")
         queue = _get_json(f"{base_url}/api/v1/narratives/review-queue")
+        ops = _get_json(f"{base_url}/api/v1/narratives/ops/summary")
     finally:
         server.shutdown()
         thread.join(timeout=2)
 
-    for envelope in (registry, mappings, evidence, candidates, audit, queue):
+    for envelope in (registry, mappings, evidence, candidates, audit, queue, ops):
         assert set(envelope) >= {
             "status",
             "source",
@@ -52,6 +53,37 @@ def test_required_get_endpoints_return_normalized_envelopes(tmp_path):
     assert candidates["data"]["candidate_narratives"][0]["candidate_narrative_id"] == "C_SEED"
     assert audit["data"]["result"] == "blocked"
     assert queue["data"]["items"][0]["item_type"] == "candidate_narrative"
+    assert ops["data"]["summary"]["candidate_narrative_count"] == 1
+    assert ops["data"]["summary"]["stock_mapping_count"] == 1
+    assert ops["data"]["review_queue_summary"]["pending_review"] == 1
+
+
+def test_ops_summary_reflects_review_queue_changes(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        before = _get_json(f"{base_url}/api/v1/narratives/ops/summary")
+        _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Ready for summary.",
+            },
+        )
+        after = _get_json(f"{base_url}/api/v1/narratives/ops/summary")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert before["data"]["summary"]["review_action_count"] == 0
+    assert before["data"]["review_queue_summary"]["pending_review"] == 1
+    assert after["data"]["summary"]["review_action_count"] == 1
+    assert after["data"]["review_queue_summary"]["ready_for_trust_audit"] == 1
+    assert after["data"]["trust_audit"]["result"] == "blocked"
 
 
 def test_health_endpoint_is_lightweight(tmp_path):

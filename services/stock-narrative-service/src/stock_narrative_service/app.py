@@ -54,6 +54,7 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
             "/api/v1/narratives/trust-audits/latest": (
                 self.server.store.trust_audit_latest
             ),
+            "/api/v1/narratives/ops/summary": self.server.store.ops_summary,
             "/api/v1/narratives/review-actions": self.server.store.review_actions,
         }
         if path == "/api/v1/narratives/review-queue":

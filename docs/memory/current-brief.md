@@ -84,6 +84,8 @@ The Narrative Service also exposes `POST /api/v1/narratives/promotion/preflight`
 
 The Narrative Service review queue is now stateful. `GET /api/v1/narratives/review-queue` includes latest review action, missing preflight gates, recommended next action, status summary, and optional `?status=` filtering for `pending_review`, `ready_for_trust_audit`, `approved_blocked_by_evidence`, `rejected`, and `deferred`.
 
+The Narrative Service exposes `GET /api/v1/narratives/ops/summary` as a read-only operational snapshot with narrative/mapping/candidate/evidence/review-action counts, trust statuses, review queue summary, and latest trust-audit state.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

@@ -37,6 +37,9 @@ endpoints:
     path: /api/v1/narratives/trust-audits/latest
     purpose: Return latest registry and mapping trust audit result.
   - method: GET
+    path: /api/v1/narratives/ops/summary
+    purpose: Return service-level counts, trust statuses, review queue summary, and latest trust-audit state.
+  - method: GET
     path: /api/v1/narratives/review-queue
     purpose: Return human review queue items with latest review action, promotion preflight state, status summary, and optional status filtering.
     optional_query:

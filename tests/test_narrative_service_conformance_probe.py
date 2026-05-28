@@ -79,6 +79,7 @@ def test_narrative_service_conformance_probe_checks_contract_endpoints(
         "POST /api/v1/narratives/intake/events",
         "GET /api/v1/narratives/evidence-packs",
         "GET /api/v1/narratives/trust-audits/latest",
+        "GET /api/v1/narratives/ops/summary",
         "GET /api/v1/narratives/review-queue",
         "GET /api/v1/narratives/review-actions",
         "POST /api/v1/narratives/review-actions",

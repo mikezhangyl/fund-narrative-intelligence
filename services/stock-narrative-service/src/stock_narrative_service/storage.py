@@ -98,6 +98,38 @@ class NarrativeStore:
             "generated_at": _now(),
         }
 
+    def ops_summary(self) -> dict[str, Any]:
+        registry = self.registry()
+        mappings = self.mappings()
+        evidence = self.evidence_packs()
+        candidates = self.candidates()
+        review_queue = self.review_queue()
+        review_actions = self.review_actions()
+        trust_audit = self.trust_audit_latest()
+        return {
+            "version": "narrative-service-ops-summary-v0",
+            "generated_at": _now(),
+            "summary": {
+                "narrative_count": len(_list(registry.get("narratives"))),
+                "candidate_narrative_count": len(
+                    _list(candidates.get("candidate_narratives"))
+                ),
+                "stock_mapping_count": len(_list(mappings.get("mappings"))),
+                "evidence_pack_count": len(_list(evidence.get("packs"))),
+                "review_action_count": len(_list(review_actions.get("items"))),
+            },
+            "trust_status": {
+                "registry": _trust_status(registry),
+                "mappings": _trust_status(mappings),
+                "evidence_packs": str(evidence.get("trust_status") or "unspecified"),
+            },
+            "review_queue_summary": review_queue["summary"],
+            "trust_audit": {
+                "result": trust_audit["result"],
+                "blocking_scopes": trust_audit["blocking_scopes"],
+            },
+        }
+
     def ingest_events(self, payload: dict[str, Any]) -> dict[str, Any]:
         events = _list(payload.get("events"))
         dry_run = bool(payload.get("dry_run"))

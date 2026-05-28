@@ -40,7 +40,8 @@ First slice scope:
 - local JSON-backed seed data from FNI prototype files;
 - candidate-only intake;
 - stateful review queue with optional status filtering;
-- review action ledger, promotion preflight, and trust audit surfaces.
+- review action ledger, promotion preflight, ops summary, and trust audit
+  surfaces.
 
 Non-goals:
 

@@ -95,6 +95,7 @@ POST /api/v1/narratives/intake/events
 GET  /api/v1/narratives/candidates
 GET  /api/v1/narratives/evidence-packs
 GET  /api/v1/narratives/trust-audits/latest
+GET  /api/v1/narratives/ops/summary
 GET  /api/v1/narratives/review-queue
 GET  /api/v1/narratives/review-actions
 POST /api/v1/narratives/review-actions
@@ -117,6 +118,10 @@ data
 warnings
 trust_metadata
 ```
+
+`GET /api/v1/narratives/ops/summary` returns service-level counts, current
+trust statuses, review queue summary, and latest trust-audit result. It is an
+operational snapshot, not a promotion or mutation endpoint.
 
 ## Trust Rules
 
