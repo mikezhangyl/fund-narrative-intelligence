@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from copy import deepcopy
 from datetime import UTC, datetime
@@ -8,6 +7,13 @@ from pathlib import Path
 from typing import Any
 
 from stock_narrative_service.config import ServiceConfig
+from stock_narrative_service.identity import (
+    candidate_mapping_identity,
+    candidate_narrative_identity,
+    evidence_pack_identity,
+    review_action_identity,
+    source_event_identity,
+)
 
 INTAKE_LEDGER_VERSION = "service-intake-events-v1"
 REVIEW_ACTION_LEDGER_VERSION = "narrative-review-actions-v1"
@@ -24,7 +30,8 @@ class NarrativeStore:
         return _load_object(self.config.mappings_path, label="mappings")
 
     def evidence_packs(self) -> dict[str, Any]:
-        return _load_object(self.config.evidence_packs_path, label="evidence packs")
+        payload = _load_object(self.config.evidence_packs_path, label="evidence packs")
+        return _evidence_packs_with_identity(payload)
 
     def seed_events(self) -> dict[str, Any]:
         return _load_object(self.config.candidate_events_path, label="candidate events")
@@ -193,21 +200,41 @@ class NarrativeStore:
             raise ValueError(f"Unknown candidate_narrative_id: {candidate_id}")
         actions = self.review_actions()
         existing_actions = _list(actions.get("items"))
+        idempotency_key = str(payload.get("idempotency_key") or "").strip()
+        review_action_id, identity_metadata = review_action_identity(
+            candidate_narrative_id=candidate_id,
+            action=action,
+            reviewed_by=reviewed_by,
+            review_note=review_note,
+            reviewed_at="",
+            idempotency_key=idempotency_key,
+        )
+        if idempotency_key:
+            existing = _review_action_by_id(existing_actions, review_action_id)
+            if existing is not None:
+                return {"decision": {**existing, "idempotent_replay": True}}
         reviewed_at = _now()
+        if not idempotency_key:
+            review_action_id, identity_metadata = review_action_identity(
+                candidate_narrative_id=candidate_id,
+                action=action,
+                reviewed_by=reviewed_by,
+                review_note=review_note,
+                reviewed_at=reviewed_at,
+            )
         decision = {
             "schema_version": "review-action-ledger-record-v1",
             "ledger_record_type": "review_action",
             "ledger_sequence": len(existing_actions) + 1,
             "recorded_at": reviewed_at,
-            "review_action_id": _stable_id(
-                "RA",
-                [candidate_id, action, reviewed_by, review_note, reviewed_at],
-            ),
+            "review_action_id": review_action_id,
             "candidate_narrative_id": candidate_id,
             "action": action,
             "reviewed_by": reviewed_by,
             "reviewed_at": reviewed_at,
             "review_note": review_note,
+            "idempotency_key": idempotency_key,
+            "identity_metadata": identity_metadata,
             "source_metadata": _mapping(payload.get("source_metadata")),
             "trust_status_after_action": "candidate_untrusted",
             "promotion_effect": "none",
@@ -275,6 +302,16 @@ def _latest_actions_by_candidate(payload: dict[str, Any]) -> dict[str, dict[str,
         if candidate_id:
             latest[candidate_id] = item
     return latest
+
+
+def _review_action_by_id(
+    actions: list[dict[str, Any]],
+    review_action_id: str,
+) -> dict[str, Any] | None:
+    for item in actions:
+        if str(item.get("review_action_id") or "") == review_action_id:
+            return item
+    return None
 
 
 def _promotion_gates(
@@ -386,9 +423,11 @@ def _normalize_event(
     *,
     ledger_sequence: int | None = None,
 ) -> dict[str, Any]:
+    event_id, identity_metadata = source_event_identity(event)
     normalized = {
         **dict(event),
-        "event_id": str(event.get("event_id") or _stable_id("EVT", [event])),
+        "event_id": event_id,
+        "identity_metadata": identity_metadata,
         "source_type": str(event.get("source_type") or "unknown"),
         "event_time": str(event.get("event_time") or _now()),
         "source_metadata": _mapping(event.get("source_metadata")),
@@ -413,11 +452,7 @@ def _candidates_from_events(events: list[dict[str, Any]]) -> list[dict[str, Any]
             name = str(candidate.get("name") or candidate.get("narrative_name") or "")
             if not name:
                 continue
-            candidate_id = str(
-                candidate.get("candidate_narrative_id")
-                or candidate.get("narrative_id")
-                or _stable_id("C_INTAKE", [name])
-            )
+            candidate_id, identity_metadata = candidate_narrative_identity(candidate)
             candidates[candidate_id] = {
                 "candidate_narrative_id": candidate_id,
                 "name": name,
@@ -425,6 +460,7 @@ def _candidates_from_events(events: list[dict[str, Any]]) -> list[dict[str, Any]
                 "confidence": _float(candidate.get("confidence")),
                 "human_review_status": "candidate",
                 "trust_status": "candidate_untrusted",
+                "identity_metadata": identity_metadata,
                 "source_event_ids": sorted(
                     {
                         *candidates.get(candidate_id, {}).get("source_event_ids", []),
@@ -442,11 +478,32 @@ def _trust_status(payload: dict[str, Any]) -> str:
     return str(payload.get("trust_status") or "unspecified")
 
 
-def _stable_id(prefix: str, parts: list[Any]) -> str:
-    digest = hashlib.sha256(
-        json.dumps(parts, ensure_ascii=False, sort_keys=True).encode("utf-8")
-    ).hexdigest()[:10].upper()
-    return f"{prefix}_{digest}"
+def _evidence_packs_with_identity(payload: dict[str, Any]) -> dict[str, Any]:
+    packs = []
+    for pack in _list(payload.get("packs")):
+        stock_code = str(pack.get("stock_code") or "")
+        mappings = []
+        for mapping in _list(pack.get("proposed_mappings")):
+            narrative_id = str(mapping.get("narrative_id") or "")
+            evidence_pack_id, evidence_identity = evidence_pack_identity(
+                stock_code,
+                narrative_id,
+            )
+            candidate_mapping_id, mapping_identity = candidate_mapping_identity(
+                stock_code,
+                narrative_id,
+            )
+            mappings.append(
+                {
+                    **mapping,
+                    "evidence_pack_id": evidence_pack_id,
+                    "candidate_mapping_id": candidate_mapping_id,
+                    "identity_metadata": mapping_identity,
+                    "evidence_pack_identity_metadata": evidence_identity,
+                }
+            )
+        packs.append({**pack, "proposed_mappings": mappings})
+    return {**payload, "packs": packs}
 
 
 def _load_object(path: Path, *, label: str) -> dict[str, Any]:

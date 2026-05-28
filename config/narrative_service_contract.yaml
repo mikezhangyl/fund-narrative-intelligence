@@ -192,3 +192,46 @@ storage_policy:
     threshold: multiple reviewers, concurrent writes, or ledger queries that need transactional indexes
     http_contract_change_allowed: false
     invariant: Storage adapters may change, but HTTP endpoints, envelopes, trust states, and append-only record semantics must remain stable.
+
+identity_policy:
+  explicit_id_rule: preserve_non_empty_external_ids
+  deterministic_fallbacks:
+    source_event_id:
+      prefix: EVT
+      fields:
+        - source_type
+        - event_time
+        - source_url
+        - title
+        - summary
+    candidate_narrative_id:
+      prefix: C_INTAKE
+      fields:
+        - name
+        - canonical_taxonomy
+    evidence_pack_id:
+      prefix: EPACK
+      fields:
+        - stock_code
+        - narrative_id
+    candidate_mapping_id:
+      prefix: CMAP
+      fields:
+        - stock_code
+        - narrative_id
+    promotion_decision_id:
+      prefix: PD
+      fields:
+        - candidate_narrative_id
+        - target_narrative_id
+        - review_action_id
+  review_action_id:
+    prefix: RA
+    no_idempotency_key_rule: each accepted action appends a new ledger record keyed by candidate, action, reviewer, note, and reviewed_at
+    idempotency_key_rule: same candidate, action, reviewer, and idempotency_key returns the existing decision
+  duplicate_detection:
+    source_event: same deterministic source event id may replay into the ledger but must collapse to one candidate read model
+    candidate: same candidate_narrative_id collapses to one candidate read model with merged source_event_ids
+  unknown_id_semantics:
+    candidate_narrative_id: reject_without_ledger_write
+    evidence_pack_id: return_missing_envelope_without_mutation

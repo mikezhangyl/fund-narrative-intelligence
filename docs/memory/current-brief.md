@@ -84,6 +84,8 @@ The Narrative Service contract now declares an explicit `api_policy`: v1 lives u
 
 The Narrative Service ledger policy is append-only JSON for the current slice: candidate intake uses `service-intake-events-v1`, review actions use `narrative-review-actions-v1`, promotion decisions are reserved for a separate future ledger, and any SQLite/Postgres migration must keep the HTTP contract and append-only semantics stable.
 
+Narrative Service identity rules now preserve explicit IDs and otherwise derive deterministic IDs: `EVT_*` for source events, `C_INTAKE_*` for intake candidates, `EPACK_*` for stock+narrative evidence packs, `CMAP_*` for candidate mappings, `RA_*` for review actions, and reserved `PD_*` for future promotion decisions. Review actions with the same candidate/action/reviewer/idempotency key replay the existing decision without appending a duplicate ledger record.
+
 The in-repo Narrative Service now records human review actions through `POST /api/v1/narratives/review-actions` and exposes them through `GET /api/v1/narratives/review-actions`. Actions support `approve`, `reject`, and `defer`, are persisted in a local JSON ledger, and remain explicitly non-promotional: candidates stay `candidate_untrusted` until a separate trusted promotion workflow exists.
 
 The Narrative Service also exposes `POST /api/v1/narratives/promotion/preflight`. It checks candidate source evidence, rationale, exclusion criteria, and service-ledger approval, then returns `blocked` or `ready_for_trust_audit`. It is intentionally non-mutating and cannot create trusted records.

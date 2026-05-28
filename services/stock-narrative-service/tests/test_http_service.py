@@ -316,6 +316,131 @@ def test_duplicate_intake_replays_append_events_but_dedupes_candidate_reads(tmp_
     assert duplicate_candidates[0]["source_event_ids"] == ["EVT_DUPLICATE"]
 
 
+def test_intake_fallback_identity_is_stable_for_links_and_duplicate_reads(tmp_path):
+    config = _write_seed_files(tmp_path)
+    event = {
+        "source_type": "manual",
+        "event_time": "2026-05-28T10:00:00+08:00",
+        "title": "稳定候选身份",
+        "source_url": "manual://stable-identity",
+        "candidate_narratives": [
+            {
+                "name": "稳定候选身份",
+                "canonical_taxonomy": "身份测试",
+                "confidence": 0.7,
+            }
+        ],
+    }
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        first = _post_json(
+            f"{base_url}/api/v1/narratives/intake/events",
+            {"events": [event]},
+        )
+        second = _post_json(
+            f"{base_url}/api/v1/narratives/intake/events",
+            {"events": [event]},
+        )
+        candidates = _get_json(f"{base_url}/api/v1/narratives/candidates")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    first_candidate = first["data"]["candidate_narratives"][0]
+    second_candidate = second["data"]["candidate_narratives"][0]
+    matching_candidates = [
+        item
+        for item in candidates["data"]["candidate_narratives"]
+        if item["candidate_narrative_id"] == first_candidate["candidate_narrative_id"]
+    ]
+    ledger = json.loads(config.intake_ledger_path.read_text(encoding="utf-8"))
+
+    assert first_candidate["candidate_narrative_id"].startswith("C_INTAKE_")
+    assert first_candidate["candidate_narrative_id"] == second_candidate[
+        "candidate_narrative_id"
+    ]
+    assert first_candidate["identity_metadata"] == {
+        "id_source": "deterministic_fallback",
+        "id_fields": ["name", "canonical_taxonomy"],
+    }
+    assert [event["event_id"] for event in ledger["events"]] == [
+        first_candidate["source_event_ids"][0],
+        first_candidate["source_event_ids"][0],
+    ]
+    assert len(matching_candidates) == 1
+    assert matching_candidates[0]["source_event_ids"] == [
+        first_candidate["source_event_ids"][0]
+    ]
+
+
+def test_review_action_idempotency_key_replays_without_append(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        payload = {
+            "candidate_narrative_id": "C_SEED",
+            "action": "approve",
+            "reviewed_by": "test-reviewer",
+            "review_note": "Idempotent approval.",
+            "idempotency_key": "IDEMPOTENT_APPROVE_1",
+        }
+        first = _post_json(f"{base_url}/api/v1/narratives/review-actions", payload)
+        second = _post_json(f"{base_url}/api/v1/narratives/review-actions", payload)
+        actions = _get_json(f"{base_url}/api/v1/narratives/review-actions")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert first["data"]["decision"]["review_action_id"] == second["data"]["decision"][
+        "review_action_id"
+    ]
+    assert first["data"]["decision"]["idempotency_key"] == "IDEMPOTENT_APPROVE_1"
+    assert second["data"]["decision"]["idempotent_replay"] is True
+    assert len(actions["data"]["items"]) == 1
+    assert actions["data"]["items"][0]["ledger_sequence"] == 1
+
+
+def test_evidence_packs_expose_stable_pack_and_mapping_ids(tmp_path):
+    config = _write_seed_files(tmp_path)
+    evidence = json.loads(config.evidence_packs_path.read_text(encoding="utf-8"))
+    evidence["packs"] = [
+        {
+            "stock_code": "600519",
+            "stock_name": "贵州茅台",
+            "proposed_mappings": [
+                {
+                    "narrative_id": "N_BAIJIU",
+                    "narrative_name": "白酒",
+                    "trust_status": "candidate_untrusted",
+                    "mapping_rationale": "身份测试映射。",
+                    "evidence_items": [],
+                }
+            ],
+        }
+    ]
+    config.evidence_packs_path.write_text(json.dumps(evidence), encoding="utf-8")
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/evidence-packs")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    mapping = response["data"]["packs"][0]["proposed_mappings"][0]
+    assert mapping["evidence_pack_id"].startswith("EPACK_")
+    assert mapping["candidate_mapping_id"].startswith("CMAP_")
+    assert mapping["identity_metadata"] == {
+        "id_source": "deterministic_fallback",
+        "id_fields": ["stock_code", "narrative_id"],
+    }
+
+
 def test_review_queue_reflects_latest_review_action_and_preflight_state(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)

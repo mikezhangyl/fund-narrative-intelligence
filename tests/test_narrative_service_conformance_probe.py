@@ -149,6 +149,35 @@ def test_narrative_service_contract_declares_append_only_ledger_policy():
     assert policy["migration"]["http_contract_change_allowed"] is False
 
 
+def test_narrative_service_contract_declares_identity_policy():
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    policy = contract["identity_policy"]
+
+    assert policy["explicit_id_rule"] == "preserve_non_empty_external_ids"
+    assert policy["deterministic_fallbacks"]["candidate_narrative_id"]["prefix"] == (
+        "C_INTAKE"
+    )
+    assert policy["deterministic_fallbacks"]["source_event_id"]["prefix"] == "EVT"
+    assert policy["deterministic_fallbacks"]["evidence_pack_id"]["fields"] == [
+        "stock_code",
+        "narrative_id",
+    ]
+    assert policy["deterministic_fallbacks"]["candidate_mapping_id"]["prefix"] == (
+        "CMAP"
+    )
+    assert policy["review_action_id"]["idempotency_key_rule"] == (
+        "same candidate, action, reviewer, and idempotency_key returns the existing decision"
+    )
+    assert policy["unknown_id_semantics"]["candidate_narrative_id"] == (
+        "reject_without_ledger_write"
+    )
+
+
 def test_fni_report_entrypoints_do_not_import_narrative_service_internals():
     report_paths = [
         PROJECT_ROOT / "src" / "scanners" / "fund_holding_exposure_report.py",

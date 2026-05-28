@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Candidate and evidence detail endpoints are still pending in MIK-34 and MIK-35.",
+    "Promotion decision IDs are reserved but not yet persisted.",
+    "Explicit legacy IDs are preserved even when they do not follow the new deterministic prefix scheme."
+  ]
+}

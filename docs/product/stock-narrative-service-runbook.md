@@ -179,6 +179,25 @@ queries, or indexed ledger lookups are needed. That migration must not change th
 HTTP contract: endpoint names, envelopes, trust states, append-only semantics,
 and non-promotion invariants remain stable while only the storage adapter changes.
 
+## Identity Rules
+
+Explicit non-empty IDs from trusted inputs are preserved. When an input lacks an
+ID, the service derives a deterministic hash ID from stable business fields:
+
+- source events: `EVT_*` from source type, event time, source URL, title, and
+  summary;
+- candidate narratives: `C_INTAKE_*` from candidate name and canonical taxonomy;
+- evidence packs: `EPACK_*` from stock code and narrative id;
+- candidate mappings: `CMAP_*` from stock code and narrative id;
+- future promotion decisions: `PD_*` from candidate id, target narrative id, and
+  review action id.
+
+Review actions use `RA_*`. Without an `idempotency_key`, every accepted action is
+a new append-only ledger record. With an `idempotency_key`, the same candidate,
+action, reviewer, and key returns the existing decision instead of appending a
+duplicate record. Unknown candidate ids must fail before writing a review-action
+ledger record.
+
 ## Troubleshooting
 
 If conformance fails:
