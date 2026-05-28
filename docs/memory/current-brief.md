@@ -50,6 +50,8 @@ FNI now has a Can-Do fund holding exposure report at `scripts/run_fund_holding_e
 
 FNI now also has a Can-Do multi-fund exposure comparison report at `scripts/run_fund_exposure_comparison_report.py`. It compares gateway-backed fund holdings, concentration, holding overlap, common narrative exposure, and differentiating narrative exposure across multiple funds. Live output on 2026-05-28 for `161725,515880,512760`: `outputs/fund_exposure_comparison/2026-05-28-live-gateway/`; status is `partial` because stock-sector membership timed out through structured gateway degradation, but holdings/concentration/narrative differences are usable.
 
+FNI now has a Can-Do fund narrative exposure matrix report at `scripts/run_fund_narrative_exposure_matrix_report.py`. It renders a fund-by-narrative matrix plus high-homogeneity fund pairs, narrative coverage, differentiating narratives, and data gaps. Live output on 2026-05-28 for `161725,515880,512760`: `outputs/fund_narrative_exposure_matrix/2026-05-28-live-gateway/`; status is `partial`, with 5 narrative columns, 0 high-homogeneity pairs, and structured stock-sector membership degradation.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

@@ -180,6 +180,14 @@ probe output:
   differences with `partial` status because stock-sector membership timed out
   through structured gateway degradation. Output:
   `outputs/fund_exposure_comparison/2026-05-28-live-gateway/`.
+- FNI has a Can-Do fund narrative exposure matrix report:
+  `scripts/run_fund_narrative_exposure_matrix_report.py`. It renders a
+  fund-by-narrative exposure matrix, high-homogeneity fund pairs, narrative
+  coverage, differentiating narratives, and data gaps. A live run on 2026-05-28
+  for `161725,515880,512760` produced 5 narrative columns, 0 high-homogeneity
+  pairs, 5 differentiating narratives, and `partial` status due to structured
+  stock-sector membership degradation. Output:
+  `outputs/fund_narrative_exposure_matrix/2026-05-28-live-gateway/`.
 - Daily market structure report HTML is Chinese, includes metric/source
   hover details where practical, deterministic title-level news deduplication,
   and explicit connected-interface data-gap diagnostics.

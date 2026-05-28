@@ -484,6 +484,7 @@ datasets:
       - narrative_sector_mapping
       - stock_explainability_context
       - fund_exposure_comparison_report
+      - fund_narrative_exposure_matrix_report
     notes:
       - "Gateway endpoint implemented on 2026-05-27 with a persistent reverse-index cache. Current local smoke can return structured degraded payloads when EastMoney/AkShare public upstreams are unreachable, so keep this as unstable until repeated rows are observed."
       - "FNI live probes can bound reverse-index expansion with `--sector-universe-limit`; use `0` for seed-only Can-Do checks and raise it only when upstream stability is acceptable."
@@ -524,6 +525,7 @@ datasets:
       - fund_gateway_foundation
       - fund_report_source_foundation
       - fund_exposure_comparison_report
+      - fund_narrative_exposure_matrix_report
     notes:
       - "Gateway endpoint accepted on 2026-05-27 at `/api/v1/market-data/funds/profile`; live conformance passed against `161725` and returned normalized profile rows."
       - "Repeatable FNI smoke entry: `scripts/run_fund_profile_holdings_probe.py --fund-code 161725 --limit 10`."
@@ -566,6 +568,7 @@ datasets:
       - holding_sector_exposure
       - narrative_exposure_aggregation
       - fund_exposure_comparison_report
+      - fund_narrative_exposure_matrix_report
     notes:
       - "Gateway endpoint accepted on 2026-05-27 at `/api/v1/market-data/funds/holdings`; live conformance passed and a `provider_mode=gateway` report for `161725` returned 10 fresh holdings with no FNI degradation events."
       - "Repeatable FNI smoke entry: `scripts/run_fund_profile_holdings_probe.py --fund-code 161725 --limit 10`."
@@ -869,6 +872,25 @@ analysis_capabilities:
       - "Implemented as `scripts/run_fund_exposure_comparison_report.py`. It reuses the single-fund exposure report per fund and keeps comparison output usable when stock-sector membership is degraded."
       - "Live 2026-05-28 run for 161725, 515880, and 512760 returned partial status with usable holdings/concentration/narrative differences and stock-sector membership timeout diagnostics."
       - "This is a Can-Do comparison layer, not a trading signal or prediction."
+
+  fund_narrative_exposure_matrix_report:
+    description: Build a portfolio-level fund-by-narrative exposure matrix and highlight fund homogeneity, narrative coverage, and differentiating exposures.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - fund_profile
+      - fund_holdings
+      - stock_sector_membership
+    output_metrics:
+      - fund_count
+      - narrative_count
+      - high_homogeneity_pair_count
+      - differentiating_narrative_count
+      - data_gap_count
+    notes:
+      - "Implemented as `scripts/run_fund_narrative_exposure_matrix_report.py`. It reuses the multi-fund comparison stack and renders a fund-by-narrative matrix for portfolio-level inspection."
+      - "Live 2026-05-28 run for 161725, 515880, and 512760 returned partial status with 5 narrative columns, 0 high-homogeneity pairs, 5 differentiating narratives, and structured stock-sector membership degradation."
+      - "This is a Can-Do portfolio inspection layer, not a trading signal or prediction."
 
   benchmark_context:
     description: Daily report context from index daily bars and ETF daily bars.
