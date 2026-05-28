@@ -54,6 +54,8 @@ FNI now has a Can-Do fund narrative exposure matrix report at `scripts/run_fund_
 
 Narrative governance note: the current reviewed narrative registry and reviewed stock-to-narrative mapping store are explicitly marked `trust_status=untrusted_experimental`. In this project, `reviewed` means the local seed files passed syntax/audit metadata checks and limited approval steps; it does not mean the source chain, mapping logic, or validation criteria are rigorous enough to treat the narratives as trusted production knowledge. Reports should disclose this trust status and use narrative exposure only for observation/audit until a dedicated source-and-logic audit promotes the stores.
 
+FNI now has a first narrative mapping methodology document at `docs/product/narrative-mapping-methodology-v0.md` and a trust audit script at `scripts/run_narrative_mapping_trust_audit.py`. The audit intentionally blocks the current reviewed stores from `trusted_validated`: live output on 2026-05-28 showed 56/56 mappings missing formal source evidence and rationale, 15/15 narratives missing complete evidence chains, and 12/15 narratives missing exclusion criteria. Output: `outputs/narrative_mapping_trust_audit/2026-05-28-reviewed-store/`.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

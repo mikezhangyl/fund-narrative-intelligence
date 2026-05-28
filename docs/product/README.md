@@ -6,6 +6,7 @@ This directory contains product and architecture source documents for Fund Narra
 
 - [Fund Narrative Intelligence System](./fund-narrative-intelligence-system.html)
 - [V1 Implementation Spec](./v1-implementation-spec.md)
+- [Narrative Mapping Methodology v0](./narrative-mapping-methodology-v0.md)
 
 ## Current Product Definition
 
@@ -16,6 +17,15 @@ The first implementation loop is:
 `Fund -> Holdings -> Stock Mapping -> Narrative Aggregation -> Signal-backed Narrative State -> Evidence Report`
 
 The system must not present output as investment advice or produce buy/sell signals.
+
+Current narrative registry and stock-to-narrative mapping stores are local seed
+knowledge, not trusted production knowledge. They are explicitly marked
+`trust_status=untrusted_experimental` until a source-and-logic audit proves the
+methodology and source chain. The runnable audit entry point is:
+
+```bash
+python scripts/run_narrative_mapping_trust_audit.py
+```
 
 The first engineering acceptance command is:
 
