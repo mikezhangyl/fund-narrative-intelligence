@@ -50,6 +50,62 @@ api_policy:
       warning_required: true
       meaning: Service is reachable but one or more backing stores or checks are incomplete.
 
+observability_policy:
+  current_status: minimal_diagnostics_no_heavy_infra
+  diagnostics_schema:
+    version: narrative-operational-diagnostics-v1
+    required_fields:
+      - schema_version
+      - provider_source
+      - status_summary
+      - queue_summary
+      - audit_status
+      - product_data_gaps
+      - system_failures
+    provider_source_fields:
+      - source
+      - provider
+      - provider_version
+      - data_fetch_mode
+      - fallback_source
+    status_summary_fields:
+      - status
+      - warning_count
+      - product_data_gap_count
+      - system_failure_count
+  snapshot_surfaces:
+    endpoints:
+      - /api/v1/narratives/ops/summary
+      - /api/v1/narratives/trust-audits/latest
+      - /api/v1/narratives/review-queue
+    reports:
+      - fund_holding_exposure
+      - fund_exposure_comparison
+      - fund_narrative_exposure_matrix
+  warning_semantics:
+    product_data_gap: Product/business data is incomplete, but the service runtime is healthy.
+    system_failure: Service runtime, configured store, provider call, or response parsing failed.
+    invalid_request: Caller supplied invalid payload or query parameters.
+  failure_classification:
+    product_data_gap: business data missing while service/runtime remains healthy
+    system_failure: service/runtime/provider operation failed or returned invalid data
+  structured_log_shape:
+    format: json_lines_future
+    fields:
+      - timestamp
+      - level
+      - event
+      - request_id
+      - source
+      - provider
+      - status
+      - classification
+      - warning_codes
+  forbidden_infrastructure:
+    - proxy_rotation
+    - browser_automation
+    - anti_detect_runtime
+
 endpoints:
   - method: GET
     path: /api/v1/narratives/registry

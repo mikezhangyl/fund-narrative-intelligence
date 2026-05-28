@@ -137,6 +137,20 @@ warnings
 trust_metadata
 ```
 
+Most narrative envelopes also include optional `diagnostics` using
+`narrative-operational-diagnostics-v1`. The diagnostics object is intentionally
+lightweight and does not require tracing, metrics backends, proxies, browser
+automation, or anti-detect infrastructure. It separates:
+
+- `product_data_gaps`: business data is incomplete while the service/runtime is
+  healthy;
+- `system_failures`: a service/runtime/provider operation failed or returned
+  invalid data;
+- `status_summary`: status, warning count, product data gap count, and system
+  failure count;
+- `provider_source`: source, provider, provider version, fetch mode, and
+  fallback source.
+
 Versioning is additive under `/api/v1/narratives`: new endpoints and optional
 fields may be added without breaking existing conformance probes. Existing
 required envelope fields must not be removed or renamed inside v1.
@@ -152,7 +166,9 @@ Error semantics:
 
 `GET /api/v1/narratives/ops/summary` returns service-level counts, current
 trust statuses, review queue summary, and latest trust-audit result. It is an
-operational snapshot, not a promotion or mutation endpoint.
+operational snapshot, not a promotion or mutation endpoint. The endpoint's
+`data.diagnostics` is the canonical service operational snapshot for developer
+handoffs and CI-style acceptance checks.
 
 ## Provider-Aware Intake
 

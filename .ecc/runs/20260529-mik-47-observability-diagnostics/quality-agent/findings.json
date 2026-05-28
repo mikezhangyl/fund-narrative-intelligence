@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "MIK-47 defines and implements the service diagnostics model. MIK-37 remains the dedicated slice for expanding report JSON/HTML market-data source disclosure across the three fund reports."
+  ]
+}

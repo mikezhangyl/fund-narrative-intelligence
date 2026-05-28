@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from stock_narrative_service.config import ServiceConfig
+from stock_narrative_service.diagnostics import operational_diagnostics
 from stock_narrative_service.identity import (
     candidate_mapping_identity,
     candidate_narrative_identity,
@@ -214,18 +215,19 @@ class NarrativeStore:
         review_queue = self.review_queue()
         review_actions = self.review_actions()
         trust_audit = self.trust_audit_latest()
+        summary = {
+            "narrative_count": len(_list(registry.get("narratives"))),
+            "candidate_narrative_count": len(
+                _list(candidates.get("candidate_narratives"))
+            ),
+            "stock_mapping_count": len(_list(mappings.get("mappings"))),
+            "evidence_pack_count": len(_list(evidence.get("packs"))),
+            "review_action_count": len(_list(review_actions.get("items"))),
+        }
         return {
             "version": "narrative-service-ops-summary-v0",
             "generated_at": _now(),
-            "summary": {
-                "narrative_count": len(_list(registry.get("narratives"))),
-                "candidate_narrative_count": len(
-                    _list(candidates.get("candidate_narratives"))
-                ),
-                "stock_mapping_count": len(_list(mappings.get("mappings"))),
-                "evidence_pack_count": len(_list(evidence.get("packs"))),
-                "review_action_count": len(_list(review_actions.get("items"))),
-            },
+            "summary": summary,
             "trust_status": {
                 "registry": _trust_status(registry),
                 "mappings": _trust_status(mappings),
@@ -236,6 +238,13 @@ class NarrativeStore:
                 "result": trust_audit["result"],
                 "blocking_scopes": trust_audit["blocking_scopes"],
             },
+            "diagnostics": operational_diagnostics(
+                config=self.config,
+                status="available",
+                queue_summary=review_queue["summary"],
+                audit_status=str(trust_audit["result"]),
+                product_data_gaps=_product_data_gaps(summary),
+            ),
         }
 
     def ingest_events(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -846,6 +855,40 @@ def _queue_summary(items: list[dict[str, Any]]) -> dict[str, int]:
         status = str(item.get("status") or "")
         summary[status] = summary.get(status, 0) + 1
     return summary
+
+
+def _product_data_gaps(summary: dict[str, int]) -> list[dict[str, str]]:
+    gap_definitions = [
+        (
+            "narrative_count",
+            "NARRATIVES_EMPTY",
+            "No narratives are currently available.",
+            "narratives",
+        ),
+        (
+            "stock_mapping_count",
+            "STOCK_MAPPINGS_EMPTY",
+            "No stock mappings are currently available.",
+            "stock_mappings",
+        ),
+        (
+            "evidence_pack_count",
+            "EVIDENCE_PACKS_EMPTY",
+            "No evidence packs are currently available.",
+            "evidence_packs",
+        ),
+        (
+            "candidate_narrative_count",
+            "CANDIDATE_NARRATIVES_EMPTY",
+            "No candidate narratives are currently available.",
+            "candidate_narratives",
+        ),
+    ]
+    return [
+        {"code": code, "message": message, "scope": scope}
+        for field, code, message, scope in gap_definitions
+        if summary.get(field, 0) == 0
+    ]
 
 
 def _gate(gate_id: str, passed: bool, message: str) -> dict[str, str]:

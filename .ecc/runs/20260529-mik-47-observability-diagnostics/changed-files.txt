@@ -1,0 +1,8 @@
+config/narrative_service_contract.yaml
+docs/memory/current-brief.md
+docs/product/stock-narrative-service-runbook.md
+services/stock-narrative-service/src/stock_narrative_service/app.py
+services/stock-narrative-service/src/stock_narrative_service/diagnostics.py
+services/stock-narrative-service/src/stock_narrative_service/storage.py
+services/stock-narrative-service/tests/test_http_service.py
+tests/test_narrative_service_conformance_probe.py

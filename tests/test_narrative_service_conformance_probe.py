@@ -302,6 +302,60 @@ def test_narrative_service_contract_declares_promotion_transaction_boundary():
     ]
 
 
+def test_narrative_service_contract_declares_observability_policy():
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    policy = contract["observability_policy"]
+
+    assert policy["current_status"] == "minimal_diagnostics_no_heavy_infra"
+    assert policy["diagnostics_schema"]["version"] == (
+        "narrative-operational-diagnostics-v1"
+    )
+    assert policy["diagnostics_schema"]["required_fields"] == [
+        "schema_version",
+        "provider_source",
+        "status_summary",
+        "queue_summary",
+        "audit_status",
+        "product_data_gaps",
+        "system_failures",
+    ]
+    assert "/api/v1/narratives/ops/summary" in policy["snapshot_surfaces"][
+        "endpoints"
+    ]
+    assert policy["snapshot_surfaces"]["reports"] == [
+        "fund_holding_exposure",
+        "fund_exposure_comparison",
+        "fund_narrative_exposure_matrix",
+    ]
+    assert policy["failure_classification"]["product_data_gap"] == (
+        "business data missing while service/runtime remains healthy"
+    )
+    assert policy["failure_classification"]["system_failure"] == (
+        "service/runtime/provider operation failed or returned invalid data"
+    )
+    assert policy["structured_log_shape"]["fields"] == [
+        "timestamp",
+        "level",
+        "event",
+        "request_id",
+        "source",
+        "provider",
+        "status",
+        "classification",
+        "warning_codes",
+    ]
+    assert policy["forbidden_infrastructure"] == [
+        "proxy_rotation",
+        "browser_automation",
+        "anti_detect_runtime",
+    ]
+
+
 def test_narrative_service_contract_declares_candidate_detail_endpoint():
     contract = yaml.safe_load(
         (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(

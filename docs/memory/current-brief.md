@@ -104,7 +104,7 @@ The Narrative Service also exposes `POST /api/v1/narratives/promotion/preflight`
 
 The Narrative Service review queue is now stateful. `GET /api/v1/narratives/review-queue` includes latest review action, missing preflight gates, recommended next action, status summary, and optional `?status=` filtering for `pending_review`, `ready_for_trust_audit`, `approved_blocked_by_evidence`, `rejected`, and `deferred`.
 
-The Narrative Service exposes `GET /api/v1/narratives/ops/summary` as a read-only operational snapshot with narrative/mapping/candidate/evidence/review-action counts, trust statuses, review queue summary, and latest trust-audit state.
+The Narrative Service exposes `GET /api/v1/narratives/ops/summary` as a read-only operational snapshot with narrative/mapping/candidate/evidence/review-action counts, trust statuses, review queue summary, latest trust-audit state, and `narrative-operational-diagnostics-v1`. Diagnostics separate product data gaps from system failures and disclose provider source, JSON-ledger fetch mode, fallback source, warning counts, queue summary, and audit status. Runtime failures return structured warnings with classification and degraded envelopes; no proxy/browser/anti-detect infrastructure is part of the observability model.
 
 ## Default Context Budget
 

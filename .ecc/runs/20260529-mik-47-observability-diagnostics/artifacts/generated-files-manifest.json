@@ -1,0 +1,14 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "verification",
+      "path": ".ecc/runs/20260529-mik-47-observability-diagnostics/verification.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "MIK-47 red/green and acceptance verification commands.",
+      "checksum_sha256": "8fd77bb4ef10fd08a9845081504f1027d9f1dc4c4023c8013c900da6def0794a",
+      "size_bytes": 1530,
+      "mtime_epoch": 1779993078
+    }
+  ]
+}

@@ -87,6 +87,81 @@ def test_ops_summary_reflects_review_queue_changes(tmp_path):
     assert after["data"]["trust_audit"]["result"] == "blocked"
 
 
+def test_ops_summary_includes_operational_diagnostics(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/ops/summary")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    diagnostics = response["data"]["diagnostics"]
+
+    assert diagnostics["schema_version"] == "narrative-operational-diagnostics-v1"
+    assert diagnostics["provider_source"] == {
+        "source": "narrative_service",
+        "provider": "stock-narrative-service",
+        "provider_version": "v0",
+        "data_fetch_mode": "json_file_ledgers_v1",
+        "fallback_source": "local_prototype",
+    }
+    assert diagnostics["status_summary"]["status"] == "available_with_data_gaps"
+    assert diagnostics["status_summary"]["product_data_gap_count"] == 1
+    assert diagnostics["status_summary"]["system_failure_count"] == 0
+    assert diagnostics["status_summary"]["warning_count"] == 0
+    assert diagnostics["product_data_gaps"] == [
+        {
+            "code": "EVIDENCE_PACKS_EMPTY",
+            "message": "No evidence packs are currently available.",
+            "scope": "evidence_packs",
+        }
+    ]
+    assert diagnostics["system_failures"] == []
+    assert diagnostics["queue_summary"] == response["data"]["review_queue_summary"]
+    assert diagnostics["audit_status"] == response["data"]["trust_audit"]["result"]
+
+
+def test_runtime_failure_returns_classified_diagnostics_warning(tmp_path):
+    config = _write_seed_files(tmp_path)
+    config = ServiceConfig(
+        registry_path=tmp_path / "missing-registry.json",
+        mappings_path=config.mappings_path,
+        evidence_packs_path=config.evidence_packs_path,
+        candidate_events_path=config.candidate_events_path,
+        intake_ledger_path=config.intake_ledger_path,
+        review_actions_path=config.review_actions_path,
+        promotion_decisions_path=config.promotion_decisions_path,
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json_error(f"{base_url}/api/v1/narratives/registry")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "degraded"
+    assert response["warnings"] == [
+        {
+            "code": "SERVICE_ERROR",
+            "message": response["data"]["error"]["message"],
+            "classification": "system_failure",
+        }
+    ]
+    assert response["diagnostics"]["status_summary"] == {
+        "status": "degraded",
+        "warning_count": 1,
+        "product_data_gap_count": 0,
+        "system_failure_count": 1,
+    }
+    assert response["diagnostics"]["system_failures"][0]["code"] == "SERVICE_ERROR"
+    assert response["diagnostics"]["product_data_gaps"] == []
+
+
 def test_health_endpoint_is_lightweight(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -1326,6 +1401,14 @@ def _start(server):
 def _get_json(url: str):
     with urlopen(url, timeout=2) as response:  # noqa: S310
         return json.loads(response.read().decode("utf-8"))
+
+
+def _get_json_error(url: str):
+    try:
+        _get_json(url)
+    except HTTPError as exc:
+        return json.loads(exc.read().decode("utf-8"))
+    raise AssertionError("expected HTTP error")
 
 
 def _post_json(url: str, payload: dict):

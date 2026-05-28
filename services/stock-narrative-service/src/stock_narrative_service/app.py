@@ -7,6 +7,10 @@ from typing import Any
 from urllib.parse import parse_qs, unquote, urlparse
 
 from stock_narrative_service.config import ServiceConfig
+from stock_narrative_service.diagnostics import (
+    operational_diagnostics,
+    warning_payload,
+)
 from stock_narrative_service.storage import NarrativeStore, PromotionGateError
 
 
@@ -254,7 +258,17 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 config=self.server.config,
                 status="degraded",
                 data={"error": {"code": code, "message": message}},
-                warnings=[{"code": code, "message": message}],
+                warnings=[
+                    warning_payload(
+                        code=code,
+                        message=message,
+                        classification=(
+                            "system_failure"
+                            if code == "SERVICE_ERROR"
+                            else "invalid_request"
+                        ),
+                    )
+                ],
             ),
         )
 
@@ -274,7 +288,13 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                     **data,
                     "error": {"code": code, "message": message},
                 },
-                warnings=[{"code": code, "message": message}],
+                warnings=[
+                    warning_payload(
+                        code=code,
+                        message=message,
+                        classification="product_data_gap",
+                    )
+                ],
                 trust_status="candidate_untrusted",
             ),
         )
@@ -293,7 +313,13 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                     "promotion_effect": "none",
                     "error": {"code": code, "message": message},
                 },
-                warnings=[{"code": code, "message": message}],
+                warnings=[
+                    warning_payload(
+                        code=code,
+                        message=message,
+                        classification="product_data_gap",
+                    )
+                ],
                 trust_status="candidate_untrusted",
             ),
         )
@@ -322,6 +348,11 @@ def _envelope(
         "provider_version": config.provider_version,
         "data": data,
         "warnings": warnings or [],
+        "diagnostics": operational_diagnostics(
+            config=config,
+            status=status,
+            warnings=warnings or [],
+        ),
         "trust_metadata": {
             "trust_status": trust_status or _trust_status(data),
             "trust_note": (
