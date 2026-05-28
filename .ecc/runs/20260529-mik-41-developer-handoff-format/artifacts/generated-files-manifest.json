@@ -1,0 +1,14 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "verification",
+      "path": ".ecc/runs/20260529-mik-41-developer-handoff-format/verification.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "MIK-41 developer handoff format verification.",
+      "checksum_sha256": "ceffe6b45243784aef55be4d8497c444865ddeb39d3cffc8c6395e75371d0f93",
+      "size_bytes": 580,
+      "mtime_epoch": 1779994005
+    }
+  ]
+}

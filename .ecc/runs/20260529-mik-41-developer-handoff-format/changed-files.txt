@@ -1,0 +1,3 @@
+docs/memory/current-brief.md
+docs/product/developer-ready-linear-handoff-format.md
+tests/test_developer_handoff_format.py

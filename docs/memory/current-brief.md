@@ -108,6 +108,8 @@ The Narrative Service exposes `GET /api/v1/narratives/ops/summary` as a read-onl
 
 The deterministic Narrative Service CI gate is `uv run python scripts/validate_stock_narrative_service_acceptance.py`. It starts the in-repo service on an ephemeral port, checks every endpoint declared in `config/narrative_service_contract.yaml`, runs provider smoke for both `narrative_service` and local fallback (`NARRATIVE_SERVICE_FALLBACK`), and generates a service-backed fund report. It requires no live gateway credentials, writes ignored artifacts under `outputs/stock_narrative_service_acceptance/`, and is wired into `.github/workflows/ci.yml`.
 
+Future Linear implementation issues should follow `docs/product/developer-ready-linear-handoff-format.md`: include product intent, scope, non-goals, architecture constraints, dependencies, acceptance criteria, and verification commands; pick the next highest-priority Todo issue in milestone order; and close completed slices with checkpoint commit details plus verification evidence in the Linear comment.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.
