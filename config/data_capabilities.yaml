@@ -1,5 +1,5 @@
 version: data-capabilities-v1
-updated_at: "2026-05-27"
+updated_at: "2026-05-28"
 purpose: >
   Market-data capability ledger for deciding which datasets each analysis needs,
   whether the platform can acquire them reliably, and what must move into the
@@ -483,6 +483,7 @@ datasets:
       - holding_sector_exposure
       - narrative_sector_mapping
       - stock_explainability_context
+      - fund_exposure_comparison_report
     notes:
       - "Gateway endpoint implemented on 2026-05-27 with a persistent reverse-index cache. Current local smoke can return structured degraded payloads when EastMoney/AkShare public upstreams are unreachable, so keep this as unstable until repeated rows are observed."
       - "FNI live probes can bound reverse-index expansion with `--sector-universe-limit`; use `0` for seed-only Can-Do checks and raise it only when upstream stability is acceptable."
@@ -522,6 +523,7 @@ datasets:
     analysis_use_cases:
       - fund_gateway_foundation
       - fund_report_source_foundation
+      - fund_exposure_comparison_report
     notes:
       - "Gateway endpoint accepted on 2026-05-27 at `/api/v1/market-data/funds/profile`; live conformance passed against `161725` and returned normalized profile rows."
       - "Repeatable FNI smoke entry: `scripts/run_fund_profile_holdings_probe.py --fund-code 161725 --limit 10`."
@@ -563,6 +565,7 @@ datasets:
       - fund_gateway_foundation
       - holding_sector_exposure
       - narrative_exposure_aggregation
+      - fund_exposure_comparison_report
     notes:
       - "Gateway endpoint accepted on 2026-05-27 at `/api/v1/market-data/funds/holdings`; live conformance passed and a `provider_mode=gateway` report for `161725` returned 10 fresh holdings with no FNI degradation events."
       - "Repeatable FNI smoke entry: `scripts/run_fund_profile_holdings_probe.py --fund-code 161725 --limit 10`."
@@ -847,6 +850,25 @@ analysis_capabilities:
     notes:
       - "Implemented as `scripts/run_fund_holding_exposure_report.py`. It keeps industry and narrative exposure available even when stock-sector membership returns a structured degraded result."
       - "This is a Can-Do explanation layer, not a trading signal or prediction."
+
+  fund_exposure_comparison_report:
+    description: Compare multiple funds by gateway holdings, concentration, holding overlap, and local narrative exposure.
+    complexity: medium
+    implementation_status: prototype
+    required_datasets:
+      - fund_profile
+      - fund_holdings
+      - stock_sector_membership
+    output_metrics:
+      - fund_count
+      - holding_overlap_pair_count
+      - common_narrative_count
+      - differentiating_narrative_count
+      - concentration_metrics
+    notes:
+      - "Implemented as `scripts/run_fund_exposure_comparison_report.py`. It reuses the single-fund exposure report per fund and keeps comparison output usable when stock-sector membership is degraded."
+      - "Live 2026-05-28 run for 161725, 515880, and 512760 returned partial status with usable holdings/concentration/narrative differences and stock-sector membership timeout diagnostics."
+      - "This is a Can-Do comparison layer, not a trading signal or prediction."
 
   benchmark_context:
     description: Daily report context from index daily bars and ETF daily bars.

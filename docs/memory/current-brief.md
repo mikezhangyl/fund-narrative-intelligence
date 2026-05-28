@@ -48,6 +48,8 @@ Latest accepted gateway breakthrough: fund profile and fund holdings. Gateway ar
 
 FNI now has a Can-Do fund holding exposure report at `scripts/run_fund_holding_exposure_report.py`. It starts from a fund code, pulls gateway profile/holdings, aggregates holding-row industry exposure, links holdings to local reviewed narrative mappings, and attempts stock-sector membership for sector/concept exposure. Live 161725 output on 2026-05-28: `outputs/fund_holding_exposure/2026-05-28-live-gateway/`; status is `partial` because stock-sector membership still degraded/missing, but holdings, industry exposure, and `N_BAIJIU_CONSUMPTION` narrative exposure are usable.
 
+FNI now also has a Can-Do multi-fund exposure comparison report at `scripts/run_fund_exposure_comparison_report.py`. It compares gateway-backed fund holdings, concentration, holding overlap, common narrative exposure, and differentiating narrative exposure across multiple funds. Live output on 2026-05-28 for `161725,515880,512760`: `outputs/fund_exposure_comparison/2026-05-28-live-gateway/`; status is `partial` because stock-sector membership timed out through structured gateway degradation, but holdings/concentration/narrative differences are usable.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

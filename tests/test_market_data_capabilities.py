@@ -67,6 +67,7 @@ def test_data_capability_registry_reports_analysis_readiness_with_warnings():
     holding_sector = registry.analysis_readiness("holding_sector_exposure")
     fund_gateway = registry.analysis_readiness("fund_gateway_foundation")
     fund_exposure = registry.analysis_readiness("fund_holding_exposure_report")
+    fund_comparison = registry.analysis_readiness("fund_exposure_comparison_report")
 
     assert breadth["can_run"] is True
     assert breadth["blockers"] == []
@@ -81,6 +82,8 @@ def test_data_capability_registry_reports_analysis_readiness_with_warnings():
     assert fund_gateway["blockers"] == []
     assert fund_exposure["can_run"] is True
     assert "unstable_dataset:stock_sector_membership" in fund_exposure["warnings"]
+    assert fund_comparison["can_run"] is True
+    assert "unstable_dataset:stock_sector_membership" in fund_comparison["warnings"]
 
 
 def test_data_capability_registry_rejects_unknown_required_dataset(tmp_path: Path):

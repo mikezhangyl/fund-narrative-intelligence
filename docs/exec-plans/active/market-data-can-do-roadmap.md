@@ -172,6 +172,14 @@ probe output:
   exposure (`N_BAIJIU_CONSUMPTION`), and a partial status because
   stock-sector membership still returned a degraded/missing result. Output:
   `outputs/fund_holding_exposure/2026-05-28-live-gateway/`.
+- FNI has a Can-Do multi-fund exposure comparison report:
+  `scripts/run_fund_exposure_comparison_report.py`. It compares gateway-backed
+  fund holdings, concentration, holding overlap, common narrative exposure, and
+  differentiating narrative exposure across multiple funds. A live run on
+  2026-05-28 for `161725,515880,512760` produced usable holdings and narrative
+  differences with `partial` status because stock-sector membership timed out
+  through structured gateway degradation. Output:
+  `outputs/fund_exposure_comparison/2026-05-28-live-gateway/`.
 - Daily market structure report HTML is Chinese, includes metric/source
   hover details where practical, deterministic title-level news deduplication,
   and explicit connected-interface data-gap diagnostics.
