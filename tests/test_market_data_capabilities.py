@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from scripts.report_data_capabilities import build_report
+from scripts.report_data_capabilities import build_inventory_report, build_report
 from src.market_data.capabilities import (
     DataCapabilityRegistry,
     load_data_capability_registry,
@@ -168,3 +168,57 @@ def test_data_capability_report_builds_markdown_and_json():
     )
     assert payload["summary"]["dataset_count"] == len(registry.datasets)
     assert payload["datasets"]["a_share_daily_bars"]["primary_source"]["provider"] == "tushare"
+
+
+def test_data_capability_inventory_groups_datasets_and_status_labels():
+    registry = load_data_capability_registry()
+
+    inventory = build_inventory_report(registry)
+
+    group_ids = {group["group_id"] for group in inventory["inventory_groups"]}
+    assert {
+        "daily_bars",
+        "fund_holdings",
+        "sectors",
+        "flows",
+        "structure_mapping",
+        "news",
+        "cyq",
+        "narrative_service",
+    }.issubset(group_ids)
+    assert set(inventory["status_labels"]) == {"can_do", "unstable", "blocked", "future"}
+
+    rows_by_id = {row["dataset_id"]: row for row in inventory["dataset_rows"]}
+    daily_bars = rows_by_id["a_share_daily_bars"]
+    assert daily_bars["group_id"] == "daily_bars"
+    assert daily_bars["fni_consumer_status"] == "available"
+    assert daily_bars["source_provider"] == "tushare"
+    assert daily_bars["last_smoke_status"]
+    assert daily_bars["degradation_behavior"]
+    assert daily_bars["trust_stability_label"] == "can_do"
+
+    assert rows_by_id["etf_spot_ranking"]["group_id"] == "daily_bars"
+    assert all(row["group_id"] != "other" for row in inventory["dataset_rows"])
+
+    stock_membership = rows_by_id["stock_sector_membership"]
+    assert stock_membership["group_id"] == "sectors"
+    assert stock_membership["trust_stability_label"] == "unstable"
+    assert "degraded" in stock_membership["degradation_behavior"].lower()
+
+    narrative = rows_by_id["narrative_service"]
+    assert narrative["group_id"] == "narrative_service"
+    assert narrative["source_provider"] == "narrative-service"
+    assert narrative["trust_stability_label"] == "can_do"
+
+
+def test_data_capability_report_builds_html_summary():
+    registry = load_data_capability_registry()
+
+    html = build_report(registry, output_format="html")
+
+    assert "<!doctype html>" in html
+    assert 'lang="zh-CN"' in html
+    assert "数据能力清单" in html
+    assert "Can-Do" in html
+    assert "unstable" in html
+    assert "narrative_service" in html

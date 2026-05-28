@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Last-smoke status is registry-derived; live gateway probes were not run in this slice.",
+    "The generated HTML was inspected as source/output text, not through a browser screenshot workflow."
+  ]
+}

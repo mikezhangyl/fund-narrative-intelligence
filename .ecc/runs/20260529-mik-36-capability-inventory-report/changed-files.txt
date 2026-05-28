@@ -1,0 +1,11 @@
+scripts/report_data_capabilities.py
+tests/test_market_data_capabilities.py
+docs/product/README.md
+docs/memory/current-brief.md
+.ecc/runs/20260529-mik-36-capability-inventory-report/task-brief.md
+.ecc/runs/20260529-mik-36-capability-inventory-report/task-handoff.md
+.ecc/runs/20260529-mik-36-capability-inventory-report/changed-files.txt
+.ecc/runs/20260529-mik-36-capability-inventory-report/artifacts/generated-files-manifest.json
+.ecc/runs/20260529-mik-36-capability-inventory-report/quality-agent/findings.json
+.ecc/runs/20260529-mik-36-capability-inventory-report/quality-agent/review-state.json
+.ecc/runs/20260529-mik-36-capability-inventory-report/run-state.json

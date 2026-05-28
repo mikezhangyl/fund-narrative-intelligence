@@ -1,0 +1,34 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "inventory_json",
+      "path": "outputs/data_capabilities/2026-05-29-inventory.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable grouped market-data capability inventory.",
+      "checksum_sha256": "decdbef78db39d63598b5a736e276c48d898e7b7b80a689ab0e5648c175f0477",
+      "mtime_epoch": 1779987889,
+      "size_bytes": 99818
+    },
+    {
+      "type": "inventory_markdown",
+      "path": "outputs/data_capabilities/2026-05-29-inventory.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Auxiliary Markdown market-data capability inventory.",
+      "checksum_sha256": "cb475ee98cf3d81c7a0a4f7481e85b2aee6def9f0e504c33442c20b11f98aa9e",
+      "mtime_epoch": 1779987889,
+      "size_bytes": 10762
+    },
+    {
+      "type": "inventory_html",
+      "path": "outputs/data_capabilities/2026-05-29-inventory.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese reader-facing market-data capability inventory.",
+      "checksum_sha256": "c39f5ad4d0088a93fe5dcf7f02bf0e1ffca07ac63ec49323dbe10aee9a2d6466",
+      "mtime_epoch": 1779987889,
+      "size_bytes": 13088
+    }
+  ]
+}

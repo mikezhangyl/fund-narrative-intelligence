@@ -137,3 +137,13 @@ and financial metrics to be visible in reports:
 ```bash
 python scripts/validate_reviewed_mapping_enriched_acceptance.py --output-dir outputs/reviewed_mapping_enriched_161725
 ```
+
+The market-data capability inventory entry point is:
+
+```bash
+python scripts/report_data_capabilities.py --format html --output outputs/data_capabilities/latest.html
+```
+
+The same command supports `--format json` for machine-readable inventory and
+`--format markdown` for auxiliary text output. The HTML output is the canonical
+reader-facing surface for this inventory report.
