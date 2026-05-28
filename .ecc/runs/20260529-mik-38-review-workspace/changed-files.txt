@@ -1,0 +1,11 @@
+docs/memory/current-brief.md
+docs/product/stock-narrative-service-runbook.md
+scripts/run_narrative_review_workspace.py
+tests/test_narrative_review_workspace.py
+.ecc/runs/20260529-mik-38-review-workspace/run-state.json
+.ecc/runs/20260529-mik-38-review-workspace/task-brief.md
+.ecc/runs/20260529-mik-38-review-workspace/task-handoff.md
+.ecc/runs/20260529-mik-38-review-workspace/changed-files.txt
+.ecc/runs/20260529-mik-38-review-workspace/artifacts/generated-files-manifest.json
+.ecc/runs/20260529-mik-38-review-workspace/quality-agent/findings.json
+.ecc/runs/20260529-mik-38-review-workspace/quality-agent/review-state.json

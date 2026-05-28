@@ -90,6 +90,8 @@ Narrative Service now exposes `GET /api/v1/narratives/candidates/{candidate_narr
 
 Narrative Service now exposes evidence pack detail through `GET /api/v1/narratives/evidence-packs/{evidence_pack_id}` and query lookup `GET /api/v1/narratives/evidence-packs/detail?stock_code=...&narrative_id=...`. The detail read model includes mapping rationale, exclusion rationale, confidence components, normalized evidence item source fields, supported claim types, and `promotion_effect=none`; missing packs return a `status=missing` envelope without writes.
 
+The review workspace entry point is `uv run python scripts/run_narrative_review_workspace.py --service-url <base-url> --output-dir <dir>`. It writes JSON and Chinese HTML grouped by review status, links candidate detail/evidence detail endpoints, shows preflight missing gates, and can optionally submit `approve`, `reject`, or `defer` actions through `POST /api/v1/narratives/review-actions` before rendering.
+
 The in-repo Narrative Service now records human review actions through `POST /api/v1/narratives/review-actions` and exposes them through `GET /api/v1/narratives/review-actions`. Actions support `approve`, `reject`, and `defer`, are persisted in a local JSON ledger, and remain explicitly non-promotional: candidates stay `candidate_untrusted` until a separate trusted promotion workflow exists.
 
 The Narrative Service also exposes `POST /api/v1/narratives/promotion/preflight`. It checks candidate source evidence, rationale, exclusion criteria, and service-ledger approval, then returns `blocked` or `ready_for_trust_audit`. It is intentionally non-mutating and cannot create trusted records.

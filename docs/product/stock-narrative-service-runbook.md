@@ -214,6 +214,33 @@ action, reviewer, and key returns the existing decision instead of appending a
 duplicate record. Unknown candidate ids must fail before writing a review-action
 ledger record.
 
+## Review Workspace
+
+Generate a local reviewer workspace from a running service:
+
+```bash
+uv run python scripts/run_narrative_review_workspace.py \
+  --service-url http://127.0.0.1:8800 \
+  --output-dir outputs/narrative_review_workspace/latest
+```
+
+The command writes `narrative_review_workspace.json` and
+`narrative_review_workspace.html`. The HTML groups candidates by review status,
+links to candidate detail and evidence detail endpoints, shows missing preflight
+gates, and lists the supported review actions.
+
+To record an action through the service endpoint before rendering the workspace:
+
+```bash
+uv run python scripts/run_narrative_review_workspace.py \
+  --service-url http://127.0.0.1:8800 \
+  --action approve \
+  --candidate-id C_AUTO_3D71C39000 \
+  --reviewed-by reviewer-id \
+  --review-note "Reviewed source evidence and gates." \
+  --idempotency-key review-C_AUTO_3D71C39000-approve
+```
+
 ## Troubleshooting
 
 If conformance fails:

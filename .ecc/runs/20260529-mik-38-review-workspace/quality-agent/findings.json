@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "The workspace is a generated CLI/HTML artifact, not a persistent web application.",
+    "Live detail links require the Narrative Service to still be running.",
+    "Provider/source metadata surfacing depends on future intake enrichment in MIK-40."
+  ]
+}

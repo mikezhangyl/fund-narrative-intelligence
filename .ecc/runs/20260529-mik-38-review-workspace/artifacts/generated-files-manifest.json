@@ -1,0 +1,24 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "review_workspace_json",
+      "path": "outputs/narrative_review_workspace/2026-05-28T1744Z/narrative_review_workspace.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated review workspace JSON from a local Narrative Service.",
+      "checksum_sha256": "dc43fb4ea614e53b06775edca818dfabde1a646875d049de7fb09c5f7c9d7dcd",
+      "mtime_epoch": 1779990370,
+      "size_bytes": 3882
+    },
+    {
+      "type": "review_workspace_html",
+      "path": "outputs/narrative_review_workspace/2026-05-28T1744Z/narrative_review_workspace.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated Chinese HTML review workspace from a local Narrative Service.",
+      "checksum_sha256": "48814674865695794650c7f8313eaf51513f22ecac56da62af1f220a6ec9760c",
+      "mtime_epoch": 1779990370,
+      "size_bytes": 3346
+    }
+  ]
+}
