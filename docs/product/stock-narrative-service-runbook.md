@@ -1,0 +1,151 @@
+# Stock Narrative Service Runbook
+
+Last updated: 2026-05-29
+
+## Role
+
+`stock-narrative-service` is an in-repo HTTP subservice under:
+
+```text
+services/stock-narrative-service/
+```
+
+It is a monorepo subservice, not an FNI internal module. FNI must consume it
+through `NARRATIVE_SERVICE_URL`.
+
+## Start
+
+From the FNI repo root:
+
+```bash
+uv run python scripts/run_stock_narrative_service.py --port 8800
+```
+
+Optional custom paths:
+
+```bash
+uv run python scripts/run_stock_narrative_service.py \
+  --port 8800 \
+  --registry-path data/registry/narrative_registry.reviewed.json \
+  --mappings-path data/registry/stock_narrative_mappings.reviewed.json \
+  --evidence-packs-path data/registry/mapping_evidence_packs.v0.json \
+  --candidate-events-path data/fixtures/candidate_narrative_events.v1.json
+```
+
+## Health Check
+
+```bash
+curl http://127.0.0.1:8800/api/health
+```
+
+Expected:
+
+```json
+{
+  "provider_version": "v0",
+  "service": "stock-narrative-service",
+  "status": "ok"
+}
+```
+
+## Full Acceptance
+
+The preferred local acceptance command starts the service on an ephemeral port,
+runs FNI conformance, runs FNI provider smoke, and generates a deterministic
+FNI fund holding exposure report with `narrative_source=narrative_service`.
+
+```bash
+uv run python scripts/validate_stock_narrative_service_acceptance.py
+```
+
+Expected summary:
+
+```text
+status=completed
+conformance_status=completed
+provider_smoke_status=completed
+provider_smoke_source=narrative_service
+report_status=completed
+report_narrative_source=narrative_service
+```
+
+## Manual FNI Checks
+
+When the service is already running:
+
+```bash
+NARRATIVE_SERVICE_URL=http://127.0.0.1:8800 \
+uv run python scripts/run_narrative_service_conformance_probe.py
+
+NARRATIVE_SERVICE_URL=http://127.0.0.1:8800 \
+uv run python scripts/run_narrative_service_provider_smoke.py
+```
+
+## Endpoint Contract
+
+Required endpoints:
+
+```text
+GET  /api/health
+GET  /api/v1/narratives/registry
+GET  /api/v1/narratives/mappings
+POST /api/v1/narratives/intake/events
+GET  /api/v1/narratives/candidates
+GET  /api/v1/narratives/evidence-packs
+GET  /api/v1/narratives/trust-audits/latest
+GET  /api/v1/narratives/review-queue
+```
+
+Every narrative endpoint must return:
+
+```text
+status
+source
+provider
+provider_version
+data
+warnings
+trust_metadata
+```
+
+## Trust Rules
+
+The service must preserve current trust state:
+
+- registry and stock mappings remain `untrusted_experimental`;
+- evidence packs remain `candidate_untrusted`;
+- intake-created rows remain candidates;
+- intake must not create `trusted_validated` rows.
+
+## Troubleshooting
+
+If conformance fails:
+
+- check `/api/health`;
+- confirm the service URL matches `NARRATIVE_SERVICE_URL`;
+- confirm every narrative endpoint returns the normalized envelope;
+- inspect `warnings` and `data.error` fields in the response.
+
+If provider smoke falls back to `local_prototype`:
+
+- the service was unreachable or returned invalid envelopes;
+- check the provider smoke JSON warning code for `NARRATIVE_SERVICE_FALLBACK`;
+- rerun conformance before debugging report code.
+
+If a live FNI fund report fails while `narrative_source=narrative_service`:
+
+- check fund profile and holdings provider failures first;
+- this usually means market-data gateway/provider failure, not narrative service
+  failure.
+
+## Non-Goals
+
+Do not add these to the first service lane:
+
+- AI narrative discovery;
+- social scraping;
+- browser automation;
+- production review UI;
+- trusted automatic promotion;
+- complex database architecture.
+

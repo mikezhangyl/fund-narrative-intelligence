@@ -11,6 +11,7 @@ This directory contains product and architecture source documents for Fund Narra
 - [Narrative Service Implementation Request](./narrative-service-implementation-request-2026-05-28.md)
 - [Narrative Store Migration Checklist](./narrative-store-migration-checklist.md)
 - [Stock Narrative Service Bootstrap Prompt](./stock-narrative-service-bootstrap-prompt.md)
+- [Stock Narrative Service Runbook](./stock-narrative-service-runbook.md)
 
 ## Current Product Definition
 

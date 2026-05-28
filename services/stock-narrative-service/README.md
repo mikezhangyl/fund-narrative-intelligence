@@ -7,6 +7,10 @@ and trust audit state.
 It is intentionally exposed as an HTTP service. FNI should consume it through
 `NARRATIVE_SERVICE_URL`; FNI should not import service internals.
 
+Runbook:
+
+- `docs/product/stock-narrative-service-runbook.md`
+
 ## Run
 
 From the FNI repo root:
