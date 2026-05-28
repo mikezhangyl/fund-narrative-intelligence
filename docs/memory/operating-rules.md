@@ -71,6 +71,12 @@ The assistant cannot create or switch chats directly. Instead, it should explici
 
 ## Finish
 
+After a feature slice has passed verification and before starting a different
+feature slice, check `git status` and create a checkpoint commit for the
+completed work unless the user explicitly asks to leave it uncommitted. "Keep
+going" means continue with the next task after the appropriate checkpoint, not
+skip git/ECC finish discipline.
+
 Before closing a branch or worktree, record:
 
 - final commit
