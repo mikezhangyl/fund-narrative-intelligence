@@ -18,6 +18,8 @@ uv run python scripts/run_stock_narrative_service.py --port 8800
 Then validate from FNI:
 
 ```bash
+uv run python scripts/validate_stock_narrative_service_acceptance.py
+
 NARRATIVE_SERVICE_URL=http://127.0.0.1:8800 \
 uv run python scripts/run_narrative_service_conformance_probe.py
 
@@ -30,6 +32,7 @@ uv run python scripts/run_narrative_service_provider_smoke.py
 First slice scope:
 
 - normalized narrative HTTP endpoints;
+- lightweight `/api/health`;
 - local JSON-backed seed data from FNI prototype files;
 - candidate-only intake;
 - review queue and trust audit surfaces.

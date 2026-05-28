@@ -79,6 +79,12 @@ The in-repo Narrative Service can be started with:
 uv run python scripts/run_stock_narrative_service.py --port 8800
 ```
 
+The full local acceptance entry point is:
+
+```bash
+uv run python scripts/validate_stock_narrative_service_acceptance.py
+```
+
 Migration preparation is tracked in
 `docs/product/narrative-store-migration-checklist.md`. Until the independent
 service passes conformance, provider smoke, and at least one service-backed FNI

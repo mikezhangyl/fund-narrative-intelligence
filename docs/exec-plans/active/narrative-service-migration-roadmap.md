@@ -190,7 +190,14 @@ Implemented subservice surface:
 - `services/stock-narrative-service/src/stock_narrative_service/app.py`
 - `services/stock-narrative-service/src/stock_narrative_service/storage.py`
 - `scripts/run_stock_narrative_service.py`
+- `scripts/validate_stock_narrative_service_acceptance.py`
 - `services/stock-narrative-service/tests/test_http_service.py`
+
+Acceptance command:
+
+```bash
+uv run python scripts/validate_stock_narrative_service_acceptance.py
+```
 
 ## Non-Goals
 

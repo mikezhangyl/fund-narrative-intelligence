@@ -32,6 +32,16 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
     server: NarrativeHTTPServer
 
     def do_GET(self) -> None:  # noqa: N802
+        if self.path == "/api/health":
+            self._send_json(
+                HTTPStatus.OK,
+                {
+                    "status": "ok",
+                    "service": self.server.config.provider_name,
+                    "provider_version": self.server.config.provider_version,
+                },
+            )
+            return
         routes = {
             "/api/v1/narratives/registry": self.server.store.registry,
             "/api/v1/narratives/mappings": self.server.store.mappings,
@@ -146,4 +156,3 @@ def _trust_status(data: dict[str, Any]) -> str:
     if isinstance(data.get("trust_status"), str):
         return str(data["trust_status"])
     return "untrusted_experimental"
-

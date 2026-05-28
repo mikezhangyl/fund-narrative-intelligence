@@ -76,6 +76,8 @@ Narrative store migration preparation is documented at `docs/product/narrative-s
 
 The Narrative Service now exists as an in-repo subservice under `services/stock-narrative-service/` and can be started with `uv run python scripts/run_stock_narrative_service.py --port 8800`. It remains an HTTP boundary: FNI should use `NARRATIVE_SERVICE_URL`, not Python imports, for production/report consumption.
 
+The in-repo Narrative Service acceptance command is `uv run python scripts/validate_stock_narrative_service_acceptance.py`. It starts the subservice on a local ephemeral port, runs FNI conformance, runs FNI provider smoke, and generates a deterministic FNI fund holding exposure report with `narrative_source=narrative_service` without depending on live market gateway availability.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

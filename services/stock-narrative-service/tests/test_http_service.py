@@ -54,6 +54,24 @@ def test_required_get_endpoints_return_normalized_envelopes(tmp_path):
     assert queue["data"]["items"][0]["item_type"] == "candidate_narrative"
 
 
+def test_health_endpoint_is_lightweight(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        health = _get_json(f"{base_url}/api/health")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert health == {
+        "status": "ok",
+        "service": "stock-narrative-service",
+        "provider_version": "v0",
+    }
+
+
 def test_intake_events_create_only_candidate_review_items(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -204,4 +222,3 @@ def _post_json(url: str, payload: dict):
     )
     with urlopen(request, timeout=2) as response:  # noqa: S310
         return json.loads(response.read().decode("utf-8"))
-
