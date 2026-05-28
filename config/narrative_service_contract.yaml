@@ -1,0 +1,67 @@
+version: narrative-service-contract-v1
+ownership:
+  consumer_owner: fni
+  service_owner: narrative-service
+  boundary_doc: docs/product/narrative-service-boundary.md
+
+runtime:
+  env_var: NARRATIVE_SERVICE_URL
+  default_mode: local_prototype
+  response_envelope:
+    required_fields:
+      - status
+      - source
+      - provider
+      - provider_version
+      - data
+      - warnings
+      - trust_metadata
+
+endpoints:
+  - method: GET
+    path: /api/v1/narratives/registry
+    purpose: Return active and candidate narrative registry snapshot.
+  - method: GET
+    path: /api/v1/narratives/mappings
+    purpose: Return stock-to-narrative mapping snapshot.
+  - method: POST
+    path: /api/v1/narratives/intake/events
+    purpose: Accept source events that can create review-only candidate outputs.
+  - method: GET
+    path: /api/v1/narratives/candidates
+    purpose: Return candidate narratives and candidate stock mappings.
+  - method: GET
+    path: /api/v1/narratives/evidence-packs
+    purpose: Return mapping evidence packs and source citation chains.
+  - method: GET
+    path: /api/v1/narratives/trust-audits/latest
+    purpose: Return latest registry and mapping trust audit result.
+  - method: GET
+    path: /api/v1/narratives/review-queue
+    purpose: Return human review queue items.
+
+fallback:
+  local_prototype:
+    registry_path: data/registry/narrative_registry.reviewed.json
+    mappings_path: data/registry/stock_narrative_mappings.reviewed.json
+    evidence_packs_path: data/registry/mapping_evidence_packs.v0.json
+    candidate_events_path: data/fixtures/candidate_narrative_events.v1.json
+    disclosure: Local FNI prototype fallback. Not authoritative service storage.
+
+trust_policy:
+  automatic_ingestion_may_create:
+    - candidate_narratives
+    - candidate_stock_mappings
+    - candidate_evidence_packs
+    - review_queue_items
+  automatic_ingestion_must_not_create:
+    - trusted_narratives
+    - trusted_stock_mappings
+    - silently_promoted_reviewed_records
+  trusted_promotion_requires:
+    - human_review
+    - source_evidence
+    - mapping_rationale
+    - exclusion_criteria
+    - trust_audit
+

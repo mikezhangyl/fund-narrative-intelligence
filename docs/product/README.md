@@ -52,6 +52,9 @@ Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence
 packs, candidate intake, trust audits, review queues, and trusted promotion.
+The first FNI consumer contract is recorded in
+`config/narrative_service_contract.yaml`, with local fallback implemented by
+`src/providers/narrative_service.py`.
 
 The first engineering acceptance command is:
 

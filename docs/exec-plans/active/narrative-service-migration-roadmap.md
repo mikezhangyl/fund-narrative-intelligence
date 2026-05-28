@@ -59,6 +59,8 @@ Acceptance:
 
 Define the contract FNI expects from the future service.
 
+Status: implemented on 2026-05-28 for the local prototype provider slice.
+
 Likely deliverables:
 
 - `config/narrative_service_contract.yaml`;
@@ -73,6 +75,17 @@ Acceptance:
   business truth;
 - reports can disclose whether narrative data came from service, local fallback,
   or mock/prototype storage.
+
+Implemented surface:
+
+- `config/narrative_service_contract.yaml` records ownership, endpoint
+  expectations, local fallback paths, and trust policy;
+- `src/providers/narrative_service.py` exposes `NarrativeDataProvider` and
+  `LocalNarrativePrototypeProvider`;
+- `scripts/run_fund_holding_exposure_report.py` uses the local prototype
+  provider for default `reviewed` registry and mapping inputs;
+- `tests/test_narrative_service_provider.py` validates snapshot shape,
+  provenance, defensive copying, contract YAML, and report-loader integration.
 
 ## Phase 2: Service Project Implementation Request
 
@@ -159,12 +172,12 @@ Do not do in this lane yet:
 
 ## Next Recommended Slice
 
-Implement Phase 1 in FNI:
+Implement Phase 2 request preparation:
 
-1. Add a provider-neutral narrative data interface.
-2. Add a local prototype provider that reads the existing registry, mapping,
-   evidence-pack, and intake artifacts.
-3. Add a contract YAML describing the service endpoint expectations.
-4. Update one report path to consume the provider interface without changing
-   report output semantics.
-
+1. Generate a narrative-service implementation request document for the future
+   service repo.
+2. Specify normalized envelopes for registry, mappings, evidence packs, trust
+   audit, intake, and review queue.
+3. Add an FNI conformance probe skeleton that can hit `NARRATIVE_SERVICE_URL`
+   once the service exists.
+4. Keep local prototype fallback active until the service passes conformance.

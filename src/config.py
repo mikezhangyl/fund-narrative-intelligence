@@ -9,6 +9,10 @@ DEFAULT_REVIEWED_REGISTRY_PATH = REGISTRY_DIR / "narrative_registry.reviewed.jso
 DEFAULT_REVIEWED_STOCK_MAPPINGS_PATH = (
     REGISTRY_DIR / "stock_narrative_mappings.reviewed.json"
 )
+DEFAULT_MAPPING_EVIDENCE_PACKS_PATH = REGISTRY_DIR / "mapping_evidence_packs.v0.json"
+DEFAULT_CANDIDATE_NARRATIVE_EVENTS_PATH = (
+    FIXTURE_DIR / "candidate_narrative_events.v1.json"
+)
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs"
 
 VERSION_DEFAULTS = {
