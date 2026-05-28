@@ -1,0 +1,10 @@
+{
+  "review_outcome": "passed",
+  "findings": [],
+  "residual_risks": [
+    {
+      "severity": "low",
+      "summary": "The promotion commit endpoint is covered by local JSON-store tests; concurrent multi-reviewer semantics still require the future SQLite/Postgres migration threshold already documented in storage policy."
+    }
+  ]
+}

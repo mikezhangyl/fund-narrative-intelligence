@@ -4,6 +4,7 @@ import json
 import sys
 import threading
 from pathlib import Path
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 SERVICE_ROOT = Path(__file__).resolve().parents[1]
@@ -1034,6 +1035,132 @@ def test_intake_review_and_preflight_cannot_create_trusted_records(tmp_path):
     assert not config.promotion_decisions_path.exists()
 
 
+def test_promotion_commit_reports_missing_gates_without_writes(tmp_path):
+    config = _write_seed_files(tmp_path)
+    source_snapshots = {
+        config.registry_path: config.registry_path.read_text(encoding="utf-8"),
+        config.mappings_path: config.mappings_path.read_text(encoding="utf-8"),
+        config.evidence_packs_path: config.evidence_packs_path.read_text(
+            encoding="utf-8"
+        ),
+    }
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        error = _post_json_error(
+            f"{base_url}/api/v1/narratives/promotion/commit",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "target_narrative_id": "N_ROBOTICS",
+                "review_action_id": "RA_MISSING",
+                "trust_audit_id": "TA_MISSING",
+                "promoted_by": "test-promoter",
+                "promotion_note": "Should fail missing gates.",
+                "target_stock_codes": ["600519"],
+            },
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert error["status"] == "failed"
+    assert error["data"]["error"]["code"] == "PROMOTION_GATES_MISSING"
+    assert set(error["data"]["missing_gates"]) == {
+        "service_review_approval",
+        "trust_audit_pass",
+    }
+    assert error["data"]["promotion_effect"] == "none"
+    for path, before_text in source_snapshots.items():
+        assert path.read_text(encoding="utf-8") == before_text
+    assert not config.promotion_decisions_path.exists()
+
+
+def test_promotion_commit_atomically_writes_trusted_records_and_decision(tmp_path):
+    config = _write_seed_files(tmp_path)
+    _write_detail_evidence_pack(config)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        approval = _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Ready for trusted promotion.",
+            },
+        )
+        preflight = _post_json(
+            f"{base_url}/api/v1/narratives/promotion/preflight",
+            {"candidate_narrative_id": "C_SEED"},
+        )
+        response = _post_json(
+            f"{base_url}/api/v1/narratives/promotion/commit",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "target_narrative_id": "N_ROBOTICS_TRUSTED",
+                "review_action_id": approval["data"]["decision"]["review_action_id"],
+                "trust_audit_id": "TA_PASS_ROBOTICS",
+                "trust_audit_result": "passed",
+                "promoted_by": "test-promoter",
+                "promotion_note": "All explicit gates passed.",
+                "target_stock_codes": ["600519"],
+                "source_metadata": {"source": "promotion-workflow-test"},
+            },
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    registry = json.loads(config.registry_path.read_text(encoding="utf-8"))
+    mappings = json.loads(config.mappings_path.read_text(encoding="utf-8"))
+    evidence = json.loads(config.evidence_packs_path.read_text(encoding="utf-8"))
+    decisions = json.loads(config.promotion_decisions_path.read_text(encoding="utf-8"))
+    decision = response["data"]["decision"]
+
+    assert preflight["data"]["result"] == "ready_for_trust_audit"
+    assert response["status"] == "available"
+    assert response["trust_metadata"]["trust_status"] == "trusted_validated"
+    assert decision["promotion_decision_id"].startswith("PD_")
+    assert decision["ledger_record_type"] == "promotion_decision"
+    assert decision["candidate_narrative_id"] == "C_SEED"
+    assert decision["target_narrative_id"] == "N_ROBOTICS_TRUSTED"
+    assert decision["trust_status_before"] == "candidate_untrusted"
+    assert decision["trust_status_after"] == "trusted_validated"
+    assert decision["promotion_effect"] == "trusted_validated"
+    assert decision["atomic_write_set"] == [
+        "trusted_registry_record",
+        "trusted_stock_mapping_record",
+        "trusted_evidence_pack_record",
+        "promotion_decision_ledger_record",
+    ]
+    trusted_narrative = next(
+        item
+        for item in registry["narratives"]
+        if item["narrative_id"] == "N_ROBOTICS_TRUSTED"
+    )
+    trusted_mapping = next(
+        item
+        for item in mappings["mappings"]
+        if item["narrative_id"] == "N_ROBOTICS_TRUSTED"
+    )
+    trusted_pack = next(pack for pack in evidence["packs"] if pack["stock_code"] == "600519")
+    evidence_mappings = {
+        item["narrative_id"]: item for item in trusted_pack["proposed_mappings"]
+    }
+    assert trusted_narrative["trust_status"] == "trusted_validated"
+    assert trusted_mapping["trust_status"] == "trusted_validated"
+    assert trusted_mapping["source_trust_status"] == "trusted_validated"
+    assert set(evidence_mappings) == {"N_BAIJIU", "N_ROBOTICS_TRUSTED"}
+    assert evidence_mappings["N_ROBOTICS_TRUSTED"]["trust_status"] == (
+        "trusted_validated"
+    )
+    assert decisions["version"] == "narrative-promotion-decisions-v1"
+    assert decisions["items"] == [decision]
+
+
 def test_promotion_preflight_rejects_unknown_candidate(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -1210,3 +1337,11 @@ def _post_json(url: str, payload: dict):
     )
     with urlopen(request, timeout=2) as response:  # noqa: S310
         return json.loads(response.read().decode("utf-8"))
+
+
+def _post_json_error(url: str, payload: dict):
+    try:
+        _post_json(url, payload)
+    except HTTPError as exc:
+        return json.loads(exc.read().decode("utf-8"))
+    raise AssertionError("expected HTTP error")

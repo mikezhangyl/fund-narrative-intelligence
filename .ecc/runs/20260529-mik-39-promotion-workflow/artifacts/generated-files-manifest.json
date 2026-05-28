@@ -1,0 +1,44 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "stock_narrative_service_acceptance_conformance_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T182003+0000/conformance/narrative_service_conformance_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Final MIK-39 acceptance conformance report from a temporary local Narrative Service.",
+      "checksum_sha256": "e0f25d400be7b17d1a2ddd82b3b1a198df96378c5c770b5023083e51db31ae7e",
+      "mtime_epoch": 1779992403,
+      "size_bytes": 3280
+    },
+    {
+      "type": "stock_narrative_service_acceptance_provider_smoke_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T182003+0000/provider_smoke/narrative_service_provider_smoke.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Provider smoke output proving FNI consumed narrative data from the local Narrative Service.",
+      "checksum_sha256": "76e1c90500fbfb195c21ee2a1fe2fe0ffcca7120ffc172ab51cd43a72666c09a",
+      "mtime_epoch": 1779992403,
+      "size_bytes": 641
+    },
+    {
+      "type": "stock_narrative_service_acceptance_report_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T182003+0000/fund_holding_exposure_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated fund holding exposure JSON after trusted promotion workflow changes.",
+      "checksum_sha256": "806938b1ddc6edc06c12a1eb5c4382336d38e0054a4bf7a8963270405ec8656e",
+      "mtime_epoch": 1779992403,
+      "size_bytes": 4989
+    },
+    {
+      "type": "stock_narrative_service_acceptance_report_html",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T182003+0000/fund_holding_exposure_report.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated Chinese HTML fund holding exposure report after trusted promotion workflow changes.",
+      "checksum_sha256": "4a0b4fe8765ab5d0988149469945d10f97dcccfb860b2d61ccf72041f726feab",
+      "mtime_epoch": 1779992403,
+      "size_bytes": 4512
+    }
+  ]
+}

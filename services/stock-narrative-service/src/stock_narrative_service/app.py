@@ -7,7 +7,7 @@ from typing import Any
 from urllib.parse import parse_qs, unquote, urlparse
 
 from stock_narrative_service.config import ServiceConfig
-from stock_narrative_service.storage import NarrativeStore
+from stock_narrative_service.storage import NarrativeStore, PromotionGateError
 
 
 class NarrativeHTTPServer(HTTPServer):
@@ -148,6 +148,29 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
         self._send_json(HTTPStatus.OK, _envelope(config=self.server.config, data=data))
 
     def do_POST(self) -> None:  # noqa: N802
+        if self.path == "/api/v1/narratives/promotion/commit":
+            try:
+                payload = self._read_json()
+                data = self.server.store.commit_promotion(payload)
+            except PromotionGateError as exc:
+                self._send_promotion_gate_error(exc)
+                return
+            except Exception as exc:
+                self._send_error(
+                    HTTPStatus.BAD_REQUEST,
+                    "INVALID_PROMOTION_COMMIT",
+                    str(exc),
+                )
+                return
+            self._send_json(
+                HTTPStatus.OK,
+                _envelope(
+                    config=self.server.config,
+                    data=data,
+                    trust_status="trusted_validated",
+                ),
+            )
+            return
         if self.path == "/api/v1/narratives/promotion/preflight":
             try:
                 payload = self._read_json()
@@ -249,6 +272,25 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 status="missing",
                 data={
                     **data,
+                    "error": {"code": code, "message": message},
+                },
+                warnings=[{"code": code, "message": message}],
+                trust_status="candidate_untrusted",
+            ),
+        )
+
+    def _send_promotion_gate_error(self, exc: PromotionGateError) -> None:
+        code = "PROMOTION_GATES_MISSING"
+        message = str(exc)
+        self._send_json(
+            HTTPStatus.BAD_REQUEST,
+            _envelope(
+                config=self.server.config,
+                status="failed",
+                data={
+                    "candidate_narrative_id": exc.candidate_id,
+                    "missing_gates": exc.missing_gates,
+                    "promotion_effect": "none",
                     "error": {"code": code, "message": message},
                 },
                 warnings=[{"code": code, "message": message}],

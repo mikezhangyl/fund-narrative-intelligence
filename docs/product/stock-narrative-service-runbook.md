@@ -104,6 +104,7 @@ GET  /api/v1/narratives/review-queue
 GET  /api/v1/narratives/review-actions
 POST /api/v1/narratives/review-actions
 POST /api/v1/narratives/promotion/preflight
+POST /api/v1/narratives/promotion/commit
 ```
 
 `GET /api/v1/narratives/review-queue` supports optional `?status=` filtering.
@@ -214,8 +215,8 @@ The reserved promotion command surface is:
 POST /api/v1/narratives/promotion/commit
 ```
 
-It is not enabled in the current slice. When implemented, it is the only legal
-write boundary for `candidate_untrusted -> trusted_validated` and must require:
+It is the only legal write boundary for `candidate_untrusted ->
+trusted_validated` and requires:
 
 - candidate id and target narrative id;
 - review action id with latest action `approve`;
@@ -233,7 +234,7 @@ The transaction write set is all-or-none:
 
 Partial writes are forbidden. Failed promotion commands must write no records.
 Retry semantics must be idempotent only after a successful decision exists.
-Promotion decisions use the reserved `narrative-promotion-decisions-v1` ledger
+Promotion decisions use the append-only `narrative-promotion-decisions-v1` ledger
 and `PD_*` immutable decision ids.
 
 ## Trust Rules

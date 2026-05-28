@@ -268,9 +268,9 @@ def test_narrative_service_contract_declares_promotion_transaction_boundary():
     boundary = contract["promotion_transaction_boundary"]
 
     assert boundary["command_surface"] == {
-        "mode": "reserved_http_endpoint",
+        "mode": "http_endpoint",
         "endpoint": "/api/v1/narratives/promotion/commit",
-        "current_status": "reserved_until_trusted_promotion_workflow",
+        "current_status": "enabled_explicit_gate_commit",
     }
     assert boundary["command_required_fields"] == [
         "candidate_narrative_id",

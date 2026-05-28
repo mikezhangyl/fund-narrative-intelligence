@@ -1,0 +1,10 @@
+{
+  "reviewed_snapshot_type": "working_tree",
+  "reviewed_commit": null,
+  "review_outcome": "passed",
+  "reviewer": "parent-self-review",
+  "notes": [
+    "Reviewed gate validation, failure payloads, decision identity, all-or-none JSON transaction writes, rollback snapshots, and trusted record disclosure fields.",
+    "No critical or high findings."
+  ]
+}

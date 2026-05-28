@@ -11,6 +11,7 @@ from stock_narrative_service.identity import (
     candidate_mapping_identity,
     candidate_narrative_identity,
     evidence_pack_identity,
+    promotion_decision_identity,
     review_action_identity,
     source_event_identity,
     stable_id,
@@ -31,6 +32,19 @@ SOURCE_MODE_BY_SOURCE_TYPE = {
     "manual": "manual_research_note",
     "social_future": "reserved_future_connector",
 }
+PROMOTION_ATOMIC_WRITE_SET = [
+    "trusted_registry_record",
+    "trusted_stock_mapping_record",
+    "trusted_evidence_pack_record",
+    "promotion_decision_ledger_record",
+]
+
+
+class PromotionGateError(ValueError):
+    def __init__(self, *, candidate_id: str, missing_gates: list[str]):
+        self.candidate_id = candidate_id
+        self.missing_gates = missing_gates
+        super().__init__(f"Promotion gates missing: {', '.join(missing_gates)}")
 
 
 class NarrativeStore:
@@ -363,6 +377,116 @@ class NarrativeStore:
             "trust_status_after_preflight": "candidate_untrusted",
         }
 
+    def commit_promotion(self, payload: dict[str, Any]) -> dict[str, Any]:
+        candidate_id = str(payload.get("candidate_narrative_id") or "").strip()
+        target_narrative_id = str(payload.get("target_narrative_id") or "").strip()
+        review_action_id = str(payload.get("review_action_id") or "").strip()
+        trust_audit_id = str(payload.get("trust_audit_id") or "").strip()
+        trust_audit_result = str(payload.get("trust_audit_result") or "").strip()
+        promoted_by = str(payload.get("promoted_by") or "").strip()
+        promotion_note = str(payload.get("promotion_note") or "").strip()
+        target_stock_codes = _strings(payload.get("target_stock_codes"))
+        if not candidate_id:
+            raise ValueError("candidate_narrative_id is required")
+        if not target_narrative_id:
+            raise ValueError("target_narrative_id is required")
+        if not review_action_id:
+            raise ValueError("review_action_id is required")
+        if not trust_audit_id:
+            raise ValueError("trust_audit_id is required")
+        if not promoted_by:
+            raise ValueError("promoted_by is required")
+        if not promotion_note:
+            raise ValueError("promotion_note is required")
+        if not target_stock_codes:
+            raise ValueError("target_stock_codes must contain at least one stock code")
+        candidate = _candidate_by_id(self.candidates(), candidate_id)
+        if candidate is None:
+            raise ValueError(f"Unknown candidate_narrative_id: {candidate_id}")
+        latest_action = _latest_actions_by_candidate(self.review_actions()).get(
+            candidate_id,
+            {},
+        )
+        missing_gates = _promotion_commit_missing_gates(
+            candidate=candidate,
+            latest_action=latest_action,
+            review_action_id=review_action_id,
+            trust_audit_result=trust_audit_result,
+        )
+        if missing_gates:
+            raise PromotionGateError(
+                candidate_id=candidate_id,
+                missing_gates=missing_gates,
+            )
+        decisions = self.promotion_decisions()
+        existing_decisions = _list(decisions.get("items"))
+        promotion_decision_id, identity_metadata = promotion_decision_identity(
+            candidate_narrative_id=candidate_id,
+            target_narrative_id=target_narrative_id,
+            review_action_id=review_action_id,
+        )
+        existing_decision = _promotion_decision_by_id(
+            existing_decisions,
+            promotion_decision_id,
+        )
+        if existing_decision is not None:
+            return {"decision": {**existing_decision, "idempotent_replay": True}}
+        promoted_at = _now()
+        decision = {
+            "schema_version": "promotion-decision-ledger-record-v1",
+            "ledger_record_type": "promotion_decision",
+            "ledger_sequence": len(existing_decisions) + 1,
+            "recorded_at": promoted_at,
+            "promotion_decision_id": promotion_decision_id,
+            "candidate_narrative_id": candidate_id,
+            "target_narrative_id": target_narrative_id,
+            "review_action_id": review_action_id,
+            "trust_audit_id": trust_audit_id,
+            "trust_audit_result": trust_audit_result,
+            "promoted_by": promoted_by,
+            "promoted_at": promoted_at,
+            "promotion_note": promotion_note,
+            "identity_metadata": identity_metadata,
+            "source_metadata": _mapping(payload.get("source_metadata")),
+            "trust_status_before": "candidate_untrusted",
+            "trust_status_after": "trusted_validated",
+            "promotion_effect": "trusted_validated",
+            "atomic_write_set": [*PROMOTION_ATOMIC_WRITE_SET],
+            "rollback_plan": "restore_pre_transaction_json_snapshots",
+            "target_stock_codes": target_stock_codes,
+        }
+        registry = _registry_with_promotion(
+            self.registry(),
+            candidate=candidate,
+            decision=decision,
+        )
+        mappings = _mappings_with_promotion(
+            self.mappings(),
+            candidate=candidate,
+            decision=decision,
+        )
+        evidence = _evidence_with_promotion(
+            _load_object(self.config.evidence_packs_path, label="evidence packs"),
+            candidate=candidate,
+            decision=decision,
+        )
+        decisions = {
+            **decisions,
+            "version": PROMOTION_DECISION_LEDGER_VERSION,
+            "items": [*existing_decisions, decision],
+        }
+        _write_promotion_transaction(
+            registry_path=self.config.registry_path,
+            registry=registry,
+            mappings_path=self.config.mappings_path,
+            mappings=mappings,
+            evidence_packs_path=self.config.evidence_packs_path,
+            evidence=evidence,
+            promotion_decisions_path=self.config.promotion_decisions_path,
+            decisions=decisions,
+        )
+        return {"decision": decision}
+
 
 def _all_events(store: NarrativeStore) -> list[dict[str, Any]]:
     return [
@@ -449,6 +573,223 @@ def _promotion_gates(
             "Candidate needs an approve action in the service review ledger.",
         ),
     ]
+
+
+def _promotion_commit_missing_gates(
+    *,
+    candidate: dict[str, Any],
+    latest_action: dict[str, Any],
+    review_action_id: str,
+    trust_audit_result: str,
+) -> list[str]:
+    missing = [
+        gate["gate_id"]
+        for gate in _promotion_gates(candidate=candidate, latest_action=latest_action)
+        if gate["status"] != "passed"
+    ]
+    if str(latest_action.get("review_action_id") or "") != review_action_id:
+        missing = [*missing, "service_review_approval"]
+    if trust_audit_result != "passed":
+        missing = [*missing, "trust_audit_pass"]
+    return sorted(set(missing))
+
+
+def _promotion_decision_by_id(
+    decisions: list[dict[str, Any]],
+    promotion_decision_id: str,
+) -> dict[str, Any] | None:
+    for item in decisions:
+        if str(item.get("promotion_decision_id") or "") == promotion_decision_id:
+            return item
+    return None
+
+
+def _registry_with_promotion(
+    registry: dict[str, Any],
+    *,
+    candidate: dict[str, Any],
+    decision: dict[str, Any],
+) -> dict[str, Any]:
+    target_narrative_id = str(decision["target_narrative_id"])
+    promoted_record = {
+        "narrative_id": target_narrative_id,
+        "name": str(candidate.get("name") or target_narrative_id),
+        "trust_status": "trusted_validated",
+        "source_candidate_narrative_id": str(decision["candidate_narrative_id"]),
+        "promotion_decision_id": str(decision["promotion_decision_id"]),
+        "review_action_id": str(decision["review_action_id"]),
+        "trusted_at": str(decision["promoted_at"]),
+    }
+    existing = [
+        item
+        for item in _list(registry.get("narratives"))
+        if str(item.get("narrative_id") or "") != target_narrative_id
+    ]
+    return {**registry, "narratives": [*existing, promoted_record]}
+
+
+def _mappings_with_promotion(
+    mappings: dict[str, Any],
+    *,
+    candidate: dict[str, Any],
+    decision: dict[str, Any],
+) -> dict[str, Any]:
+    target_narrative_id = str(decision["target_narrative_id"])
+    target_stock_codes = _strings(decision.get("target_stock_codes"))
+    existing = [
+        item
+        for item in _list(mappings.get("mappings"))
+        if (
+            str(item.get("narrative_id") or "") != target_narrative_id
+            or str(item.get("stock_code") or "") not in set(target_stock_codes)
+        )
+    ]
+    promoted = [
+        {
+            "stock_code": stock_code,
+            "narrative_id": target_narrative_id,
+            "narrative_name": str(candidate.get("name") or target_narrative_id),
+            "confidence": _float(candidate.get("confidence")),
+            "method": "trusted_promotion",
+            "trust_status": "trusted_validated",
+            "source_trust_status": "trusted_validated",
+            "source_candidate_narrative_id": str(decision["candidate_narrative_id"]),
+            "promotion_decision_id": str(decision["promotion_decision_id"]),
+            "review_action_id": str(decision["review_action_id"]),
+        }
+        for stock_code in target_stock_codes
+    ]
+    return {**mappings, "mappings": [*existing, *promoted]}
+
+
+def _evidence_with_promotion(
+    evidence: dict[str, Any],
+    *,
+    candidate: dict[str, Any],
+    decision: dict[str, Any],
+) -> dict[str, Any]:
+    target_narrative_id = str(decision["target_narrative_id"])
+    target_stock_codes = _strings(decision.get("target_stock_codes"))
+    remaining_stock_codes = set(target_stock_codes)
+    packs = []
+    for pack in _list(evidence.get("packs")):
+        stock_code = str(pack.get("stock_code") or "")
+        if stock_code not in remaining_stock_codes:
+            packs.append(pack)
+            continue
+        remaining_stock_codes.remove(stock_code)
+        existing_mappings = [
+            item
+            for item in _list(pack.get("proposed_mappings"))
+            if str(item.get("narrative_id") or "") != target_narrative_id
+        ]
+        packs.append(
+            {
+                **pack,
+                "proposed_mappings": [
+                    *existing_mappings,
+                    _promotion_evidence_mapping(
+                        candidate=candidate,
+                        decision=decision,
+                    ),
+                ],
+            }
+        )
+    for stock_code in sorted(remaining_stock_codes):
+        packs.append(
+            {
+                "stock_code": stock_code,
+                "stock_name": "",
+                "trust_status": "trusted_validated",
+                "proposed_mappings": [
+                    _promotion_evidence_mapping(
+                        candidate=candidate,
+                        decision=decision,
+                    )
+                ],
+            }
+        )
+    return {**evidence, "packs": packs}
+
+
+def _promotion_evidence_mapping(
+    *,
+    candidate: dict[str, Any],
+    decision: dict[str, Any],
+) -> dict[str, Any]:
+    target_narrative_id = str(decision["target_narrative_id"])
+    return {
+        "narrative_id": target_narrative_id,
+        "narrative_name": str(candidate.get("name") or target_narrative_id),
+        "trust_status": "trusted_validated",
+        "mapping_rationale": str(candidate.get("rationale") or ""),
+        "exclusion_rationale": _strings(candidate.get("exclusion_criteria"))
+        or _strings(candidate.get("exclusion_criteria_zh")),
+        "confidence_components": {
+            "candidate_confidence": _float(candidate.get("confidence")),
+        },
+        "evidence_items": _promotion_evidence_items(candidate),
+        "source_candidate_narrative_id": str(decision["candidate_narrative_id"]),
+        "promotion_decision_id": str(decision["promotion_decision_id"]),
+    }
+
+
+def _promotion_evidence_items(candidate: dict[str, Any]) -> list[dict[str, Any]]:
+    citation_ids = _strings(candidate.get("representative_citation_ids"))
+    citations = _list(candidate.get("representative_citations"))
+    if citations:
+        return citations
+    return [
+        {
+            "source_name": citation_id,
+            "source_url": "",
+            "source_type": "candidate_citation",
+            "evidence_summary": f"Candidate citation {citation_id}",
+            "supports": ["source_evidence"],
+        }
+        for citation_id in citation_ids
+    ]
+
+
+def _write_promotion_transaction(
+    *,
+    registry_path: Path,
+    registry: dict[str, Any],
+    mappings_path: Path,
+    mappings: dict[str, Any],
+    evidence_packs_path: Path,
+    evidence: dict[str, Any],
+    promotion_decisions_path: Path,
+    decisions: dict[str, Any],
+) -> None:
+    paths = [
+        registry_path,
+        mappings_path,
+        evidence_packs_path,
+        promotion_decisions_path,
+    ]
+    snapshots = {
+        path: path.read_text(encoding="utf-8") if path.exists() else None
+        for path in paths
+    }
+    try:
+        _write_object(registry_path, registry)
+        _write_object(mappings_path, mappings)
+        _write_object(evidence_packs_path, evidence)
+        _write_object(promotion_decisions_path, decisions)
+    except Exception:
+        _restore_snapshots(snapshots)
+        raise
+
+
+def _restore_snapshots(snapshots: dict[Path, str | None]) -> None:
+    for path, text in snapshots.items():
+        if text is None:
+            if path.exists():
+                path.unlink()
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
 
 
 def _review_queue_item(
