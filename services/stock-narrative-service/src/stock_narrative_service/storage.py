@@ -53,26 +53,26 @@ class NarrativeStore:
             )
         }
 
-    def review_queue(self) -> dict[str, Any]:
+    def review_queue(self, *, status: str = "") -> dict[str, Any]:
         candidates = self.candidates()["candidate_narratives"]
         latest_actions = _latest_actions_by_candidate(self.review_actions())
+        items = [
+            _review_queue_item(
+                candidate=candidate,
+                latest_action=latest_actions.get(
+                    candidate["candidate_narrative_id"],
+                    {},
+                ),
+            )
+            for candidate in candidates
+        ]
+        if status:
+            items = [item for item in items if item["status"] == status]
         return {
             "version": "narrative-review-queue-v0",
-            "items": [
-                {
-                    "review_item_id": f"IRQ_{candidate['candidate_narrative_id']}",
-                    "item_type": "candidate_narrative",
-                    "payload_ref": candidate["candidate_narrative_id"],
-                    "status": "pending_review",
-                    "recommended_action": "human_review_required",
-                    "trust_status": "candidate_untrusted",
-                    "latest_review_action": latest_actions.get(
-                        candidate["candidate_narrative_id"],
-                        {},
-                    ),
-                }
-                for candidate in candidates
-            ],
+            "filter": {"status": status},
+            "summary": _queue_summary(items),
+            "items": items,
         }
 
     def trust_audit_latest(self) -> dict[str, Any]:
@@ -257,6 +257,62 @@ def _promotion_gates(
             "Candidate needs an approve action in the service review ledger.",
         ),
     ]
+
+
+def _review_queue_item(
+    *,
+    candidate: dict[str, Any],
+    latest_action: dict[str, Any],
+) -> dict[str, Any]:
+    candidate_id = str(candidate["candidate_narrative_id"])
+    gates = _promotion_gates(candidate=candidate, latest_action=latest_action)
+    missing_gates = [gate["gate_id"] for gate in gates if gate["status"] != "passed"]
+    status, recommended_action = _review_status(
+        latest_action=latest_action,
+        missing_gates=missing_gates,
+    )
+    return {
+        "review_item_id": f"IRQ_{candidate_id}",
+        "item_type": "candidate_narrative",
+        "payload_ref": candidate_id,
+        "status": status,
+        "recommended_action": recommended_action,
+        "trust_status": "candidate_untrusted",
+        "preflight_result": "blocked" if missing_gates else "ready_for_trust_audit",
+        "missing_gates": missing_gates,
+        "latest_review_action": latest_action,
+    }
+
+
+def _review_status(
+    *,
+    latest_action: dict[str, Any],
+    missing_gates: list[str],
+) -> tuple[str, str]:
+    action = str(latest_action.get("action") or "")
+    if action == "reject":
+        return "rejected", "no_action"
+    if action == "defer":
+        return "deferred", "revisit_later"
+    if action == "approve":
+        if missing_gates:
+            return "approved_blocked_by_evidence", "complete_missing_gates"
+        return "ready_for_trust_audit", "run_trust_audit"
+    return "pending_review", "human_review_required"
+
+
+def _queue_summary(items: list[dict[str, Any]]) -> dict[str, int]:
+    summary = {
+        "pending_review": 0,
+        "ready_for_trust_audit": 0,
+        "approved_blocked_by_evidence": 0,
+        "rejected": 0,
+        "deferred": 0,
+    }
+    for item in items:
+        status = str(item.get("status") or "")
+        summary[status] = summary.get(status, 0) + 1
+    return summary
 
 
 def _gate(gate_id: str, passed: bool, message: str) -> dict[str, str]:

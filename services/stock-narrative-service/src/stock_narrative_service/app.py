@@ -4,6 +4,7 @@ import json
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 from stock_narrative_service.config import ServiceConfig
 from stock_narrative_service.storage import NarrativeStore
@@ -32,7 +33,10 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
     server: NarrativeHTTPServer
 
     def do_GET(self) -> None:  # noqa: N802
-        if self.path == "/api/health":
+        parsed = urlparse(self.path)
+        path = parsed.path
+        query = parse_qs(parsed.query)
+        if path == "/api/health":
             self._send_json(
                 HTTPStatus.OK,
                 {
@@ -50,10 +54,14 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
             "/api/v1/narratives/trust-audits/latest": (
                 self.server.store.trust_audit_latest
             ),
-            "/api/v1/narratives/review-queue": self.server.store.review_queue,
             "/api/v1/narratives/review-actions": self.server.store.review_actions,
         }
-        handler = routes.get(self.path)
+        if path == "/api/v1/narratives/review-queue":
+            handler = lambda: self.server.store.review_queue(  # noqa: E731
+                status=_first_query_value(query, "status")
+            )
+        else:
+            handler = routes.get(path)
         if handler is None:
             self._send_error(HTTPStatus.NOT_FOUND, "ROUTE_NOT_FOUND", "Unknown route.")
             return
@@ -197,3 +205,8 @@ def _trust_status(data: dict[str, Any]) -> str:
     if isinstance(data.get("trust_status"), str):
         return str(data["trust_status"])
     return "untrusted_experimental"
+
+
+def _first_query_value(query: dict[str, list[str]], key: str) -> str:
+    values = query.get(key, [])
+    return str(values[0]).strip() if values else ""

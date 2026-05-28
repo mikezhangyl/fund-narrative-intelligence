@@ -38,7 +38,14 @@ endpoints:
     purpose: Return latest registry and mapping trust audit result.
   - method: GET
     path: /api/v1/narratives/review-queue
-    purpose: Return human review queue items.
+    purpose: Return human review queue items with latest review action, promotion preflight state, status summary, and optional status filtering.
+    optional_query:
+      status:
+        - pending_review
+        - ready_for_trust_audit
+        - approved_blocked_by_evidence
+        - rejected
+        - deferred
   - method: GET
     path: /api/v1/narratives/review-actions
     purpose: Return persisted human review actions.

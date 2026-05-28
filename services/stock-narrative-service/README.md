@@ -39,8 +39,8 @@ First slice scope:
 - lightweight `/api/health`;
 - local JSON-backed seed data from FNI prototype files;
 - candidate-only intake;
-- review queue, review action ledger, promotion preflight, and trust audit
-  surfaces.
+- stateful review queue with optional status filtering;
+- review action ledger, promotion preflight, and trust audit surfaces.
 
 Non-goals:
 

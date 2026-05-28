@@ -152,6 +152,74 @@ def test_review_actions_are_persisted_without_trusted_promotion(tmp_path):
     assert "trusted_validated" not in json.dumps(actions, ensure_ascii=False)
 
 
+def test_review_queue_reflects_latest_review_action_and_preflight_state(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        pending = _get_json(f"{base_url}/api/v1/narratives/review-queue")
+        _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Ready for trust audit.",
+            },
+        )
+        ready = _get_json(f"{base_url}/api/v1/narratives/review-queue")
+        filtered = _get_json(
+            f"{base_url}/api/v1/narratives/review-queue?status=ready_for_trust_audit"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert pending["data"]["items"][0]["status"] == "pending_review"
+    assert pending["data"]["items"][0]["recommended_action"] == (
+        "human_review_required"
+    )
+    assert pending["data"]["summary"]["pending_review"] == 1
+    assert ready["data"]["items"][0]["status"] == "ready_for_trust_audit"
+    assert ready["data"]["items"][0]["recommended_action"] == "run_trust_audit"
+    assert ready["data"]["items"][0]["preflight_result"] == "ready_for_trust_audit"
+    assert ready["data"]["summary"]["ready_for_trust_audit"] == 1
+    assert filtered["data"]["filter"]["status"] == "ready_for_trust_audit"
+    assert len(filtered["data"]["items"]) == 1
+
+
+def test_review_queue_can_filter_rejected_items(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "reject",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Not a durable narrative.",
+            },
+        )
+        rejected = _get_json(
+            f"{base_url}/api/v1/narratives/review-queue?status=rejected"
+        )
+        pending = _get_json(
+            f"{base_url}/api/v1/narratives/review-queue?status=pending_review"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert rejected["data"]["items"][0]["status"] == "rejected"
+    assert rejected["data"]["items"][0]["recommended_action"] == "no_action"
+    assert rejected["data"]["summary"]["rejected"] == 1
+    assert pending["data"]["items"] == []
+
+
 def test_review_action_rejects_unknown_candidate(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)

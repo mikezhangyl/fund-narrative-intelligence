@@ -101,6 +101,11 @@ POST /api/v1/narratives/review-actions
 POST /api/v1/narratives/promotion/preflight
 ```
 
+`GET /api/v1/narratives/review-queue` supports optional `?status=` filtering.
+Current queue statuses are `pending_review`, `ready_for_trust_audit`,
+`approved_blocked_by_evidence`, `rejected`, and `deferred`. Queue rows include
+latest review action, missing preflight gates, and recommended next action.
+
 Every narrative endpoint must return:
 
 ```text
