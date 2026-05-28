@@ -1,0 +1,130 @@
+{
+  "version": "mapping-evidence-pack-v0",
+  "trust_status": "candidate_untrusted",
+  "methodology": "docs/product/narrative-mapping-methodology-v0.md",
+  "packs": [
+    {
+      "stock_code": "600519",
+      "stock_name": "贵州茅台",
+      "proposed_mappings": [
+        {
+          "narrative_id": "N_BAIJIU_CONSUMPTION",
+          "narrative_name": "高端白酒消费",
+          "trust_status": "candidate_untrusted",
+          "mapping_rationale": "贵州茅台的核心产品、品牌资产和消费场景与高端白酒消费叙事直接相关。当前证据支持作为样板候选映射，但仍需人工复核证据页码、收入结构和排除条件后才能进入 trusted_validated。",
+          "exclusion_rationale": [
+            "不应仅归入一般食品饮料，因为核心业务和品牌溢价集中在白酒。",
+            "不应归入短期消费复苏交易，除非另有时效性证据证明。"
+          ],
+          "confidence_components": {
+            "business_relevance": 0.95,
+            "evidence_quality": 0.82,
+            "specificity": 0.9,
+            "durability": 0.88,
+            "recency": 0.78
+          },
+          "evidence_items": [
+            {
+              "source_name": "贵州茅台 2025 年年度报告",
+              "source_url": "https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-17/600519_20260417_9QS4.pdf",
+              "source_type": "annual_report",
+              "evidence_date": "2026-04-17",
+              "evidence_summary": "Annual report describes Moutai's brand, baijiu product base, market resilience, and sauce-aroma product structure.",
+              "supports": ["business_relevance", "durability", "recency"]
+            },
+            {
+              "source_name": "贵州茅台 2025 ESG report",
+              "source_url": "https://www.moutai.com.cn/mtjt/attachDir/2025/04/2025040220450113320.pdf",
+              "source_type": "company_report",
+              "evidence_date": "2025-04",
+              "evidence_summary": "Company profile states that Kweichow Moutai is mainly engaged in production and sales of Moutai baijiu and Moutai series baijiu.",
+              "supports": ["business_relevance", "specificity"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stock_code": "000063",
+      "stock_name": "中兴通讯",
+      "proposed_mappings": [
+        {
+          "narrative_id": "N_COMMUNICATION_EQUIPMENT",
+          "narrative_name": "通信设备与连接器件",
+          "trust_status": "candidate_untrusted",
+          "mapping_rationale": "中兴通讯的公开报告和公司定位显示其核心业务围绕信息与通信技术解决方案、网络连接和智能算力设备，适合作为通信设备叙事候选映射。",
+          "exclusion_rationale": [
+            "不自动等同于光模块，因为光模块是更窄的上游/器件链条叙事。",
+            "不自动等同于 AI 基础设施，除非证据明确指向算力服务器、数据中心或 AI 网络基础设施收入暴露。"
+          ],
+          "confidence_components": {
+            "business_relevance": 0.86,
+            "evidence_quality": 0.78,
+            "specificity": 0.76,
+            "durability": 0.82,
+            "recency": 0.8
+          },
+          "evidence_items": [
+            {
+              "source_name": "ZTE 2025 Annual Report",
+              "source_url": "https://www.zte.com.cn/content/dam/zte-site/res-www-zte-com-cn/mediares/zte/investor/en_annual_report/ed69aa49a203a68ee8345323c1da2470.pdf",
+              "source_type": "annual_report",
+              "evidence_date": "2026-03",
+              "evidence_summary": "Annual report identifies ZTE Corporation, stock code 000063, and presents the company as a communications technology business.",
+              "supports": ["business_relevance", "recency"]
+            },
+            {
+              "source_name": "中兴通讯 2025 年年度报告",
+              "source_url": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=11985610&stockid=000063",
+              "source_type": "annual_report_mirror",
+              "evidence_date": "2026-03",
+              "evidence_summary": "Annual report text refers to the company's continued path toward network connection and intelligent computing leadership.",
+              "supports": ["business_relevance", "durability"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stock_code": "300308",
+      "stock_name": "中际旭创",
+      "proposed_mappings": [
+        {
+          "narrative_id": "N_OPTICAL_MODULE_CHAIN",
+          "narrative_name": "光模块",
+          "trust_status": "candidate_untrusted",
+          "mapping_rationale": "中际旭创公开定期报告反复出现光模块、光通信模块、AOC/LRO 等产品线索，适合作为光模块叙事候选映射。",
+          "exclusion_rationale": [
+            "不应只归入泛通信设备，因为其叙事特异性集中在光模块和光通信器件。",
+            "不自动归入 AI 基础设施，除非证据明确说明 AI 数据中心需求对收入或产品结构的贡献。"
+          ],
+          "confidence_components": {
+            "business_relevance": 0.92,
+            "evidence_quality": 0.76,
+            "specificity": 0.88,
+            "durability": 0.78,
+            "recency": 0.72
+          },
+          "evidence_items": [
+            {
+              "source_name": "中际旭创 2024 年半年度报告",
+              "source_url": "https://static.cninfo.com.cn/finalpage/2024-08-26/1220965278.PDF",
+              "source_type": "semiannual_report",
+              "evidence_date": "2024-08-26",
+              "evidence_summary": "Semiannual report includes optical module product context and discusses LRO transceivers or AOC products.",
+              "supports": ["business_relevance", "specificity"]
+            },
+            {
+              "source_name": "巨潮资讯网 300308 disclosure page",
+              "source_url": "https://www.cninfo.com.cn/new/disclosure/stock?orgId=9900022016&stockCode=300308",
+              "source_type": "exchange_disclosure_index",
+              "evidence_date": "ongoing",
+              "evidence_summary": "CNINFO is the SZSE statutory disclosure platform and provides the disclosure index for 300308.",
+              "supports": ["evidence_quality", "recency"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

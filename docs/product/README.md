@@ -27,6 +27,15 @@ methodology and source chain. The runnable audit entry point is:
 python scripts/run_narrative_mapping_trust_audit.py
 ```
 
+The first candidate evidence-pack entry point is:
+
+```bash
+python scripts/run_mapping_evidence_pack_report.py --symbols 600519,000063,300308
+```
+
+Evidence packs are review inputs only. They must remain `candidate_untrusted`
+until a human review and methodology audit promotes them.
+
 The first engineering acceptance command is:
 
 ```bash

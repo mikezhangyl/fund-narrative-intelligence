@@ -56,6 +56,8 @@ Narrative governance note: the current reviewed narrative registry and reviewed 
 
 FNI now has a first narrative mapping methodology document at `docs/product/narrative-mapping-methodology-v0.md` and a trust audit script at `scripts/run_narrative_mapping_trust_audit.py`. The audit intentionally blocks the current reviewed stores from `trusted_validated`: live output on 2026-05-28 showed 56/56 mappings missing formal source evidence and rationale, 15/15 narratives missing complete evidence chains, and 12/15 narratives missing exclusion criteria. Output: `outputs/narrative_mapping_trust_audit/2026-05-28-reviewed-store/`.
 
+FNI now has a first Mapping Evidence Pack v0 seed file at `data/registry/mapping_evidence_packs.v0.json` and report CLI at `scripts/run_mapping_evidence_pack_report.py`. The first three candidate packs are `600519 -> N_BAIJIU_CONSUMPTION`, `000063 -> N_COMMUNICATION_EQUIPMENT`, and `300308 -> N_OPTICAL_MODULE_CHAIN`; all remain `candidate_untrusted` and are review inputs only. Live output: `outputs/mapping_evidence_pack/2026-05-28-seed3/`.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.
