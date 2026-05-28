@@ -32,6 +32,12 @@ class NarrativeStore:
             return {"version": "service-intake-events-v1", "events": []}
         return _load_object(path, label="intake ledger")
 
+    def review_actions(self) -> dict[str, Any]:
+        path = self.config.review_actions_path
+        if not path.exists():
+            return {"version": "narrative-review-actions-v0", "items": []}
+        return _load_object(path, label="review actions")
+
     def candidates(self) -> dict[str, Any]:
         registry_candidates = _list(self.registry().get("candidate_narratives"))
         intake_candidates = _candidates_from_events(_all_events(self))
@@ -49,6 +55,7 @@ class NarrativeStore:
 
     def review_queue(self) -> dict[str, Any]:
         candidates = self.candidates()["candidate_narratives"]
+        latest_actions = _latest_actions_by_candidate(self.review_actions())
         return {
             "version": "narrative-review-queue-v0",
             "items": [
@@ -59,6 +66,10 @@ class NarrativeStore:
                     "status": "pending_review",
                     "recommended_action": "human_review_required",
                     "trust_status": "candidate_untrusted",
+                    "latest_review_action": latest_actions.get(
+                        candidate["candidate_narrative_id"],
+                        {},
+                    ),
                 }
                 for candidate in candidates
             ],
@@ -113,12 +124,63 @@ class NarrativeStore:
             ],
         }
 
+    def apply_review_action(self, payload: dict[str, Any]) -> dict[str, Any]:
+        candidate_id = str(payload.get("candidate_narrative_id") or "").strip()
+        action = str(payload.get("action") or "").strip()
+        reviewed_by = str(payload.get("reviewed_by") or "").strip()
+        review_note = str(payload.get("review_note") or "").strip()
+        if not candidate_id:
+            raise ValueError("candidate_narrative_id is required")
+        if action not in {"approve", "reject", "defer"}:
+            raise ValueError("action must be approve, reject, or defer")
+        if not reviewed_by:
+            raise ValueError("reviewed_by is required")
+        if not review_note:
+            raise ValueError("review_note is required")
+        candidate_ids = {
+            str(candidate.get("candidate_narrative_id") or "")
+            for candidate in self.candidates()["candidate_narratives"]
+        }
+        if candidate_id not in candidate_ids:
+            raise ValueError(f"Unknown candidate_narrative_id: {candidate_id}")
+        reviewed_at = _now()
+        decision = {
+            "review_action_id": _stable_id(
+                "RA",
+                [candidate_id, action, reviewed_by, review_note, reviewed_at],
+            ),
+            "candidate_narrative_id": candidate_id,
+            "action": action,
+            "reviewed_by": reviewed_by,
+            "reviewed_at": reviewed_at,
+            "review_note": review_note,
+            "trust_status_after_action": "candidate_untrusted",
+            "promotion_effect": "none",
+            "promotion_note": (
+                "Review action is recorded only. Trusted promotion requires "
+                "separate source, rationale, exclusion, and trust audit gates."
+            ),
+        }
+        actions = self.review_actions()
+        actions["items"] = [*_list(actions.get("items")), decision]
+        _write_object(self.config.review_actions_path, actions)
+        return {"decision": decision}
+
 
 def _all_events(store: NarrativeStore) -> list[dict[str, Any]]:
     return [
         *_list(store.seed_events().get("events")),
         *_list(store.intake_ledger().get("events")),
     ]
+
+
+def _latest_actions_by_candidate(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    latest: dict[str, dict[str, Any]] = {}
+    for item in _list(payload.get("items")):
+        candidate_id = str(item.get("candidate_narrative_id") or "")
+        if candidate_id:
+            latest[candidate_id] = item
+    return latest
 
 
 def _normalize_event(event: dict[str, Any]) -> dict[str, Any]:
@@ -203,4 +265,3 @@ def _float(value: Any) -> float:
 
 def _now() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat()
-

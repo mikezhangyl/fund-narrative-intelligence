@@ -22,6 +22,6 @@ class ServiceConfig:
     intake_ledger_path: Path = (
         SERVICE_ROOT / "data" / "runtime" / "candidate_intake_events.json"
     )
+    review_actions_path: Path = SERVICE_ROOT / "data" / "runtime" / "review_actions.json"
     provider_name: str = "stock-narrative-service"
     provider_version: str = "v0"
-

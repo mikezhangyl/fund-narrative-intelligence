@@ -114,12 +114,15 @@ def test_narrative_service_contract_declares_required_surfaces():
         "GET /api/v1/narratives/evidence-packs",
         "GET /api/v1/narratives/trust-audits/latest",
         "GET /api/v1/narratives/review-queue",
+        "GET /api/v1/narratives/review-actions",
+        "POST /api/v1/narratives/review-actions",
     }
     assert payload["trust_policy"]["automatic_ingestion_may_create"] == [
         "candidate_narratives",
         "candidate_stock_mappings",
         "candidate_evidence_packs",
         "review_queue_items",
+        "review_action_records",
     ]
     assert "trusted_stock_mappings" in payload["trust_policy"]["automatic_ingestion_must_not_create"]
 

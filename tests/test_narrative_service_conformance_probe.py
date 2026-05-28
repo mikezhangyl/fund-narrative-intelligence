@@ -32,9 +32,15 @@ def test_narrative_service_conformance_probe_checks_contract_endpoints(
     requested: list[tuple[str, str]] = []
 
     def fake_request_json(*, method, url, payload, timeout_seconds):
-        del payload
         del timeout_seconds
         requested.append((method, url))
+        if url.endswith("/review-actions") and method == "POST":
+            assert payload == {
+                "candidate_narrative_id": "C_AUTO_3D71C39000",
+                "action": "defer",
+                "reviewed_by": "conformance-probe",
+                "review_note": "Contract smoke only; no trusted promotion.",
+            }
         return {
             "status": "available",
             "source": "narrative_service",
@@ -72,8 +78,9 @@ def test_narrative_service_conformance_probe_checks_contract_endpoints(
         "GET /api/v1/narratives/evidence-packs",
         "GET /api/v1/narratives/trust-audits/latest",
         "GET /api/v1/narratives/review-queue",
+        "GET /api/v1/narratives/review-actions",
+        "POST /api/v1/narratives/review-actions",
     }
     assert all(result["status"] == "passed" for result in endpoint_results)
     assert requested
     assert requested[0][1].startswith("http://127.0.0.1:9999/api/v1/narratives/")
-

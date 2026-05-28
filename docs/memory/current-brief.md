@@ -1,6 +1,6 @@
 # Current Brief
 
-Last updated: 2026-05-28
+Last updated: 2026-05-29
 
 ## Purpose
 
@@ -77,6 +77,8 @@ Narrative store migration preparation is documented at `docs/product/narrative-s
 The Narrative Service now exists as an in-repo subservice under `services/stock-narrative-service/` and can be started with `uv run python scripts/run_stock_narrative_service.py --port 8800`. It remains an HTTP boundary: FNI should use `NARRATIVE_SERVICE_URL`, not Python imports, for production/report consumption.
 
 The in-repo Narrative Service acceptance command is `uv run python scripts/validate_stock_narrative_service_acceptance.py`. It starts the subservice on a local ephemeral port, runs FNI conformance, runs FNI provider smoke, and generates a deterministic FNI fund holding exposure report with `narrative_source=narrative_service` without depending on live market gateway availability.
+
+The in-repo Narrative Service now records human review actions through `POST /api/v1/narratives/review-actions` and exposes them through `GET /api/v1/narratives/review-actions`. Actions support `approve`, `reject`, and `defer`, are persisted in a local JSON ledger, and remain explicitly non-promotional: candidates stay `candidate_untrusted` until a separate trusted promotion workflow exists.
 
 ## Default Context Budget
 

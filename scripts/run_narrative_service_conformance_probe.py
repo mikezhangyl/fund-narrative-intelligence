@@ -143,7 +143,7 @@ def _probe_endpoint(
         payload = _request_json(
             method=method,
             url=url,
-            payload=_request_payload(method),
+            payload=_request_payload(endpoint=endpoint, method=method),
             timeout_seconds=timeout_seconds,
         )
         missing_fields = [
@@ -202,9 +202,12 @@ def _request_json(
     return response_payload
 
 
-def _request_payload(method: str) -> dict[str, Any] | None:
+def _request_payload(*, endpoint: dict[str, Any], method: str) -> dict[str, Any] | None:
     if method != "POST":
         return None
+    payload = endpoint.get("conformance_payload")
+    if isinstance(payload, dict):
+        return payload
     return {"dry_run": True, "events": []}
 
 

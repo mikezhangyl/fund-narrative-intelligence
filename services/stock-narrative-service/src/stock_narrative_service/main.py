@@ -16,6 +16,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--evidence-packs-path", type=Path)
     parser.add_argument("--candidate-events-path", type=Path)
     parser.add_argument("--intake-ledger-path", type=Path)
+    parser.add_argument("--review-actions-path", type=Path)
     return parser
 
 
@@ -41,9 +42,9 @@ def _config_from_args(args: argparse.Namespace) -> ServiceConfig:
         evidence_packs_path=args.evidence_packs_path or defaults.evidence_packs_path,
         candidate_events_path=args.candidate_events_path or defaults.candidate_events_path,
         intake_ledger_path=args.intake_ledger_path or defaults.intake_ledger_path,
+        review_actions_path=args.review_actions_path or defaults.review_actions_path,
     )
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

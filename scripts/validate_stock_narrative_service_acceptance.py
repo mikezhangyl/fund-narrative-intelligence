@@ -45,7 +45,8 @@ def main(argv: list[str] | None = None) -> int:
     output_dir = args.output_dir or _default_output_dir()
     output_dir.mkdir(parents=True, exist_ok=True)
     config = ServiceConfig(
-        intake_ledger_path=output_dir / "runtime" / "candidate_intake_events.json"
+        intake_ledger_path=output_dir / "runtime" / "candidate_intake_events.json",
+        review_actions_path=output_dir / "runtime" / "review_actions.json",
     )
     server = create_server((args.host, args.port), config=config)
     thread = threading.Thread(target=server.serve_forever, daemon=True)

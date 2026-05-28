@@ -39,6 +39,17 @@ endpoints:
   - method: GET
     path: /api/v1/narratives/review-queue
     purpose: Return human review queue items.
+  - method: GET
+    path: /api/v1/narratives/review-actions
+    purpose: Return persisted human review actions.
+  - method: POST
+    path: /api/v1/narratives/review-actions
+    purpose: Record approve, reject, or defer decisions without trusted promotion.
+    conformance_payload:
+      candidate_narrative_id: C_AUTO_3D71C39000
+      action: defer
+      reviewed_by: conformance-probe
+      review_note: Contract smoke only; no trusted promotion.
 
 fallback:
   local_prototype:
@@ -54,6 +65,7 @@ trust_policy:
     - candidate_stock_mappings
     - candidate_evidence_packs
     - review_queue_items
+    - review_action_records
   automatic_ingestion_must_not_create:
     - trusted_narratives
     - trusted_stock_mappings
@@ -64,4 +76,3 @@ trust_policy:
     - mapping_rationale
     - exclusion_criteria
     - trust_audit
-

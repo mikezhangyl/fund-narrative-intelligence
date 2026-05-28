@@ -117,6 +117,66 @@ def test_intake_events_create_only_candidate_review_items(tmp_path):
     )
 
 
+def test_review_actions_are_persisted_without_trusted_promotion(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Looks structurally valid, but not trusted.",
+            },
+        )
+        actions = _get_json(f"{base_url}/api/v1/narratives/review-actions")
+        candidates = _get_json(f"{base_url}/api/v1/narratives/candidates")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "available"
+    assert response["trust_metadata"]["trust_status"] == "candidate_untrusted"
+    assert response["data"]["decision"]["action"] == "approve"
+    assert response["data"]["decision"]["promotion_effect"] == "none"
+    assert actions["data"]["items"][0]["candidate_narrative_id"] == "C_SEED"
+    assert actions["data"]["items"][0]["action"] == "approve"
+    assert candidates["data"]["candidate_narratives"][0]["human_review_status"] == "candidate"
+    assert candidates["data"]["candidate_narratives"][0]["trust_status"] == (
+        "candidate_untrusted"
+    )
+    assert "trusted_validated" not in json.dumps(response, ensure_ascii=False)
+    assert "trusted_validated" not in json.dumps(actions, ensure_ascii=False)
+
+
+def test_review_action_rejects_unknown_candidate(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        try:
+            _post_json(
+                f"{base_url}/api/v1/narratives/review-actions",
+                {
+                    "candidate_narrative_id": "C_UNKNOWN",
+                    "action": "reject",
+                    "reviewed_by": "test-reviewer",
+                    "review_note": "unknown candidate",
+                },
+            )
+        except Exception as exc:
+            assert "HTTP Error 400" in str(exc)
+        else:
+            raise AssertionError("expected 400 for unknown candidate")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+
 def test_unknown_route_returns_error_envelope(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -140,6 +200,7 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
     evidence_path = tmp_path / "evidence.json"
     events_path = tmp_path / "events.json"
     intake_ledger_path = tmp_path / "runtime" / "intake_events.json"
+    review_actions_path = tmp_path / "runtime" / "review_actions.json"
     registry_path.write_text(
         json.dumps(
             {
@@ -199,6 +260,7 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
         evidence_packs_path=evidence_path,
         candidate_events_path=events_path,
         intake_ledger_path=intake_ledger_path,
+        review_actions_path=review_actions_path,
     )
 
 

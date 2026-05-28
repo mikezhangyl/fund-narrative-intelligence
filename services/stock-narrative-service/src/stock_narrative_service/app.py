@@ -51,6 +51,7 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 self.server.store.trust_audit_latest
             ),
             "/api/v1/narratives/review-queue": self.server.store.review_queue,
+            "/api/v1/narratives/review-actions": self.server.store.review_actions,
         }
         handler = routes.get(self.path)
         if handler is None:
@@ -68,6 +69,26 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
         self._send_json(HTTPStatus.OK, _envelope(config=self.server.config, data=data))
 
     def do_POST(self) -> None:  # noqa: N802
+        if self.path == "/api/v1/narratives/review-actions":
+            try:
+                payload = self._read_json()
+                data = self.server.store.apply_review_action(payload)
+            except Exception as exc:
+                self._send_error(
+                    HTTPStatus.BAD_REQUEST,
+                    "INVALID_REVIEW_ACTION",
+                    str(exc),
+                )
+                return
+            self._send_json(
+                HTTPStatus.OK,
+                _envelope(
+                    config=self.server.config,
+                    data=data,
+                    trust_status="candidate_untrusted",
+                ),
+            )
+            return
         if self.path != "/api/v1/narratives/intake/events":
             self._send_error(HTTPStatus.NOT_FOUND, "ROUTE_NOT_FOUND", "Unknown route.")
             return

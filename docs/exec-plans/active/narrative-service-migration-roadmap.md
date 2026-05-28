@@ -103,9 +103,10 @@ Requested service capabilities:
 - evidence-pack endpoint;
 - trust-audit endpoint;
 - review-queue endpoint;
+- review-action ledger endpoint;
 - stable envelope with `status`, `provider`, `source`, `warnings`, and
   `trust_metadata`;
-- no automatic trusted promotion from raw ingestion.
+- no automatic trusted promotion from raw ingestion or review actions.
 
 Acceptance:
 
