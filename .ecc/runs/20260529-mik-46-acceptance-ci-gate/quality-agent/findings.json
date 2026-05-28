@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Live gateway/provider checks are intentionally not part of the deterministic CI gate; they should run only when credentials and external access are configured."
+  ]
+}

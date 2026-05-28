@@ -54,8 +54,9 @@ Expected:
 ## Full Acceptance
 
 The preferred local acceptance command starts the service on an ephemeral port,
-runs FNI conformance, runs FNI provider smoke, and generates a deterministic
-FNI fund holding exposure report with `narrative_source=narrative_service`.
+runs FNI conformance, runs FNI provider smoke, runs an unreachable-service
+fallback smoke, and generates a deterministic FNI fund holding exposure report
+with `narrative_source=narrative_service`.
 
 ```bash
 uv run python scripts/validate_stock_narrative_service_acceptance.py
@@ -68,9 +69,32 @@ status=completed
 conformance_status=completed
 provider_smoke_status=completed
 provider_smoke_source=narrative_service
+fallback_smoke_status=completed
+fallback_smoke_source=local_prototype
 report_status=completed
 report_narrative_source=narrative_service
 ```
+
+This is the deterministic CI gate for the service contract. It requires no live
+gateway credentials and writes generated artifacts under
+`outputs/stock_narrative_service_acceptance/`, which stays out of source
+control. Per-slice mandatory checks are:
+
+- contract endpoint conformance for every endpoint declared in
+  `config/narrative_service_contract.yaml`;
+- provider smoke in service-first mode;
+- provider smoke in local fallback mode with `NARRATIVE_SERVICE_FALLBACK`;
+- service-backed fund report source disclosure.
+
+Full-release validation also runs:
+
+```bash
+uv run pytest -q
+uv run python scripts/validate_stock_narrative_service_acceptance.py
+```
+
+Live gateway/provider checks are optional release checks and should only run
+when credentials and external service access are intentionally configured.
 
 ## Manual FNI Checks
 

@@ -67,17 +67,31 @@ def main(argv: list[str] | None = None) -> int:
 def _run_acceptance(*, base_url: str, output_dir: Path) -> dict[str, Any]:
     conformance_dir = output_dir / "conformance"
     provider_smoke_dir = output_dir / "provider_smoke"
+    provider_fallback_smoke_dir = output_dir / "provider_fallback_smoke"
     conformance_exit = run_narrative_service_conformance_probe.main(
         ["--base-url", base_url, "--output-dir", str(conformance_dir)]
     )
     provider_smoke_exit = run_narrative_service_provider_smoke.main(
         ["--base-url", base_url, "--output-dir", str(provider_smoke_dir)]
     )
+    fallback_smoke_exit = run_narrative_service_provider_smoke.main(
+        [
+            "--base-url",
+            "http://127.0.0.1:9",
+            "--timeout-seconds",
+            "0.1",
+            "--output-dir",
+            str(provider_fallback_smoke_dir),
+        ]
+    )
     conformance = _read_result(
         conformance_dir / "narrative_service_conformance_report.json"
     )
     provider_smoke = _read_result(
         provider_smoke_dir / "narrative_service_provider_smoke.json"
+    )
+    fallback_smoke = _read_result(
+        provider_fallback_smoke_dir / "narrative_service_provider_smoke.json"
     )
     report = _build_service_backed_report(base_url=base_url)
     _write_report(output_dir=output_dir, report=report)
@@ -87,14 +101,24 @@ def _run_acceptance(*, base_url: str, output_dir: Path) -> dict[str, Any]:
         "status": _status(
             conformance_exit=conformance_exit,
             provider_smoke_exit=provider_smoke_exit,
+            fallback_smoke_exit=fallback_smoke_exit,
             conformance=conformance,
             provider_smoke=provider_smoke,
+            fallback_smoke=fallback_smoke,
             report=report,
         ),
         "base_url": base_url,
+        "ci_gate": _ci_gate(),
         "conformance_status": str(conformance.get("status") or ""),
         "provider_smoke_status": str(provider_smoke.get("status") or ""),
         "provider_smoke_source": str(provider_smoke.get("source") or ""),
+        "fallback_smoke_status": str(fallback_smoke.get("status") or ""),
+        "fallback_smoke_source": str(fallback_smoke.get("source") or ""),
+        "fallback_smoke_warning_codes": [
+            str(code)
+            for code in fallback_smoke.get("warning_codes", [])
+            if str(code)
+        ],
         "report_status": str(report.get("status") or ""),
         "report_narrative_source": str(
             _mapping(report.get("narrative_source")).get("source") or ""
@@ -105,6 +129,9 @@ def _run_acceptance(*, base_url: str, output_dir: Path) -> dict[str, Any]:
             ),
             "provider_smoke": str(
                 provider_smoke_dir / "narrative_service_provider_smoke.json"
+            ),
+            "provider_fallback_smoke": str(
+                provider_fallback_smoke_dir / "narrative_service_provider_smoke.json"
             ),
             "report_json": str(output_dir / "fund_holding_exposure_report.json"),
             "report_html": str(output_dir / "fund_holding_exposure_report.html"),
@@ -207,22 +234,50 @@ def _status(
     *,
     conformance_exit: int,
     provider_smoke_exit: int,
+    fallback_smoke_exit: int,
     conformance: dict[str, Any],
     provider_smoke: dict[str, Any],
+    fallback_smoke: dict[str, Any],
     report: dict[str, Any],
 ) -> str:
     if (
         conformance_exit == 0
         and provider_smoke_exit == 0
+        and fallback_smoke_exit == 0
         and conformance.get("status") == "completed"
         and provider_smoke.get("status") == "completed"
         and provider_smoke.get("source") == "narrative_service"
+        and fallback_smoke.get("status") == "completed"
+        and fallback_smoke.get("source") == "local_prototype"
+        and "NARRATIVE_SERVICE_FALLBACK" in fallback_smoke.get("warning_codes", [])
         and report.get("status") in {"completed", "partial"}
         and _mapping(report.get("narrative_source")).get("source")
         == "narrative_service"
     ):
         return "completed"
     return "failed"
+
+
+def _ci_gate() -> dict[str, Any]:
+    return {
+        "mode": "deterministic_local",
+        "requires_live_credentials": False,
+        "mandatory_slice_checks": [
+            "contract_endpoint_conformance",
+            "provider_smoke_service_first",
+            "provider_smoke_local_fallback",
+            "service_backed_report_source_disclosure",
+        ],
+        "full_release_checks": [
+            "uv run pytest -q",
+            "uv run python scripts/validate_stock_narrative_service_acceptance.py",
+            "live_gateway_provider_checks_when_credentials_exist",
+        ],
+        "output_policy": {
+            "default_root": "outputs/stock_narrative_service_acceptance/",
+            "source_control": "generated_outputs_ignored",
+        },
+    }
 
 
 def _read_result(path: Path) -> dict[str, Any]:

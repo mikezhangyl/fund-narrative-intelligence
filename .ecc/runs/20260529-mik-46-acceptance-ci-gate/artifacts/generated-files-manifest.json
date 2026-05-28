@@ -1,0 +1,14 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "verification",
+      "path": ".ecc/runs/20260529-mik-46-acceptance-ci-gate/verification.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "MIK-46 red/green, CI gate, acceptance, and full pytest verification.",
+      "checksum_sha256": "a49fdbbfceb89258da2ef2c87a15b0e264e454d7afd90ae8767327530aea98cc",
+      "size_bytes": 1456,
+      "mtime_epoch": 1779993425
+    }
+  ]
+}

@@ -73,8 +73,20 @@ def test_narrative_service_conformance_probe_checks_contract_endpoints(
         )
     )
     endpoint_results = payload["result"]["endpoint_results"]
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    contract_endpoints = {
+        endpoint["method"] + " " + endpoint["path"]
+        for endpoint in contract["endpoints"]
+    }
     assert exit_code == 0
     assert payload["result"]["status"] == "completed"
+    assert {
+        result["method"] + " " + result["path"] for result in endpoint_results
+    } == contract_endpoints
     assert {
         result["method"] + " " + result["path"] for result in endpoint_results
     } >= {

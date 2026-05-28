@@ -106,6 +106,8 @@ The Narrative Service review queue is now stateful. `GET /api/v1/narratives/revi
 
 The Narrative Service exposes `GET /api/v1/narratives/ops/summary` as a read-only operational snapshot with narrative/mapping/candidate/evidence/review-action counts, trust statuses, review queue summary, latest trust-audit state, and `narrative-operational-diagnostics-v1`. Diagnostics separate product data gaps from system failures and disclose provider source, JSON-ledger fetch mode, fallback source, warning counts, queue summary, and audit status. Runtime failures return structured warnings with classification and degraded envelopes; no proxy/browser/anti-detect infrastructure is part of the observability model.
 
+The deterministic Narrative Service CI gate is `uv run python scripts/validate_stock_narrative_service_acceptance.py`. It starts the in-repo service on an ephemeral port, checks every endpoint declared in `config/narrative_service_contract.yaml`, runs provider smoke for both `narrative_service` and local fallback (`NARRATIVE_SERVICE_FALLBACK`), and generates a service-backed fund report. It requires no live gateway credentials, writes ignored artifacts under `outputs/stock_narrative_service_acceptance/`, and is wired into `.github/workflows/ci.yml`.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

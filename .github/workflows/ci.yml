@@ -30,6 +30,9 @@ jobs:
       - name: Run V1 acceptance
         run: python scripts/validate_v1_acceptance.py
 
+      - name: Run Stock Narrative Service contract gate
+        run: python scripts/validate_stock_narrative_service_acceptance.py
+
       - name: Run tests with coverage
         run: python -m coverage run -m pytest -q
 

@@ -11,6 +11,7 @@ def test_github_actions_ci_runs_standard_quality_gates():
     assert "python -m pip install -e \".[dev]\"" in workflow
     assert "python -m ruff check ." in workflow
     assert "python scripts/validate_v1_acceptance.py" in workflow
+    assert "python scripts/validate_stock_narrative_service_acceptance.py" in workflow
     assert "python -m coverage run -m pytest -q" in workflow
     assert "python -m coverage report" in workflow
     assert "python -m compileall -q src tests scripts" in workflow

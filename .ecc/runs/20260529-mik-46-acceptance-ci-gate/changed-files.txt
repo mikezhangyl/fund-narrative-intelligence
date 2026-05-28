@@ -1,0 +1,7 @@
+.github/workflows/ci.yml
+docs/memory/current-brief.md
+docs/product/stock-narrative-service-runbook.md
+scripts/validate_stock_narrative_service_acceptance.py
+tests/test_ci_workflow.py
+tests/test_narrative_service_conformance_probe.py
+tests/test_stock_narrative_service_acceptance.py
