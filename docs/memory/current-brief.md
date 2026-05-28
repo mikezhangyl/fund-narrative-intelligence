@@ -58,6 +58,8 @@ FNI now has a first narrative mapping methodology document at `docs/product/narr
 
 FNI now has a first Mapping Evidence Pack v0 seed file at `data/registry/mapping_evidence_packs.v0.json` and report CLI at `scripts/run_mapping_evidence_pack_report.py`. The first three candidate packs are `600519 -> N_BAIJIU_CONSUMPTION`, `000063 -> N_COMMUNICATION_EQUIPMENT`, and `300308 -> N_OPTICAL_MODULE_CHAIN`; all remain `candidate_untrusted` and are review inputs only. Live output: `outputs/mapping_evidence_pack/2026-05-28-seed3/`.
 
+FNI now has Candidate Narrative Intake v0 at `scripts/run_candidate_narrative_intake.py`, backed by sample events in `data/fixtures/candidate_narrative_events.v1.json`. Intake supports future `news`, `announcement`, `social`, and `manual` event sources, emits only `candidate_untrusted` candidate narratives / stock mappings / review queue items, and never mutates reviewed or trusted stores automatically. Sample output on 2026-05-28 created one new candidate narrative (`机器人执行器`), one existing narrative evidence reinforcement (`N_BAIJIU_CONSUMPTION`), and four candidate mapping review items: `outputs/candidate_narrative_intake/2026-05-28-sample-events/`.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

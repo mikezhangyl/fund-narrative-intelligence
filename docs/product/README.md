@@ -36,6 +36,17 @@ python scripts/run_mapping_evidence_pack_report.py --symbols 600519,000063,30030
 Evidence packs are review inputs only. They must remain `candidate_untrusted`
 until a human review and methodology audit promotes them.
 
+The candidate narrative intake entry point is:
+
+```bash
+python scripts/run_candidate_narrative_intake.py
+```
+
+Intake accepts event-style records from future `news`, `announcement`,
+`social`, and `manual` sources. It only emits candidate narratives, candidate
+stock mappings, and review-queue items; it must not mutate the reviewed or
+trusted stores automatically.
+
 The first engineering acceptance command is:
 
 ```bash

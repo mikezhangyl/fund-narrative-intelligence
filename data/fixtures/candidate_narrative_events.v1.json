@@ -1,0 +1,89 @@
+{
+  "version": "candidate-narrative-events-v1",
+  "events": [
+    {
+      "event_id": "EVT_MANUAL_ROBOT_ACTUATOR_20260528",
+      "source_type": "manual",
+      "event_time": "2026-05-28T09:30:00+08:00",
+      "title": "机器人执行器产业链样例事件",
+      "summary": "用于验证候选叙事接入口的本地样例：多只机器人执行器相关股票被同时提及。",
+      "source_name": "manual-research-note",
+      "source_url": "manual://research/robot-actuator-20260528",
+      "mentioned_stocks": [
+        {
+          "stock_code": "300024",
+          "stock_name": "机器人"
+        },
+        {
+          "stock_code": "688017",
+          "stock_name": "绿的谐波"
+        }
+      ],
+      "keywords": [
+        "机器人",
+        "执行器",
+        "减速器"
+      ],
+      "candidate_narratives": [
+        {
+          "name": "机器人执行器",
+          "canonical_taxonomy": "机器人",
+          "confidence": 0.64
+        }
+      ]
+    },
+    {
+      "event_id": "EVT_NEWS_BAIJIU_CHANNEL_20260528",
+      "source_type": "news",
+      "event_time": "2026-05-28T10:10:00+08:00",
+      "title": "白酒龙头渠道调研更新",
+      "summary": "样例新闻事件：高端白酒渠道库存和价格受到关注，用于给已有白酒消费叙事补强证据。",
+      "source_name": "tushare-news-brief-sample",
+      "source_url": "sample://tushare-news/baijiu-channel-20260528",
+      "mentioned_stocks": [
+        {
+          "stock_code": "600519",
+          "stock_name": "贵州茅台"
+        }
+      ],
+      "keywords": [
+        "白酒",
+        "渠道",
+        "消费"
+      ],
+      "candidate_narratives": [
+        {
+          "narrative_id": "N_BAIJIU_CONSUMPTION",
+          "name": "高端白酒消费",
+          "confidence": 0.72
+        }
+      ]
+    },
+    {
+      "event_id": "EVT_SOCIAL_ROBOT_ACTUATOR_20260528",
+      "source_type": "social",
+      "event_time": "2026-05-28T11:00:00+08:00",
+      "title": "机器人执行器讨论升温",
+      "summary": "样例社媒事件：执行器和减速器关键词重复出现，只能作为候选证据，不能直接写入可信库。",
+      "source_name": "social-sample",
+      "source_url": "social://sample/robot-actuator-20260528",
+      "mentioned_stocks": [
+        {
+          "stock_code": "300024",
+          "stock_name": "机器人"
+        }
+      ],
+      "keywords": [
+        "机器人",
+        "执行器"
+      ],
+      "candidate_narratives": [
+        {
+          "name": "机器人执行器",
+          "canonical_taxonomy": "机器人",
+          "confidence": 0.58
+        }
+      ]
+    }
+  ]
+}
