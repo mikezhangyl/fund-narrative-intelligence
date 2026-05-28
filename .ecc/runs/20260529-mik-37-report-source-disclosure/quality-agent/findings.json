@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Market data source disclosure is inferred from report rows and provider events; future providers can improve precision by exposing provider_name and data_fetch_mode."
+  ]
+}

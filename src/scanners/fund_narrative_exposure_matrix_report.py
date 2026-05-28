@@ -11,6 +11,11 @@ from src.scanners.fund_exposure_comparison_report import (
     FundExposureComparisonConfig,
     execute_fund_exposure_comparison_report,
 )
+from src.scanners.report_source_disclosure import (
+    source_fallback_zh,
+    source_status_zh,
+    source_warning_summary_zh,
+)
 
 
 @dataclass(frozen=True)
@@ -75,6 +80,7 @@ def execute_fund_narrative_exposure_matrix_report(
             "narrative_source": _narrative_source(comparison),
         },
         "narrative_source": _mapping(comparison.get("narrative_source")),
+        "market_data_source": _mapping(comparison.get("market_data_source")),
         "narrative_columns": narrative_columns,
         "fund_rows": fund_rows,
         "narrative_coverage_rows": _narrative_coverage_rows(fund_rows, narrative_columns),
@@ -112,6 +118,7 @@ def render_html_report(report: dict[str, Any]) -> str:
             _html_kv("报告状态", _status_label(str(report.get("status", "")))),
             _html_kv("生成时间", report.get("generated_at", "")),
             _html_narrative_source_notice(report.get("narrative_source")),
+            _html_market_data_source_notice(report.get("market_data_source")),
             "<p>本报告用于观察一组基金的叙事暴露重合、同质化与差异化，不构成投资建议、交易策略或涨跌预测。</p>",
             "</section>",
             "<section>",
@@ -430,14 +437,25 @@ def _html_metric(label: str, value: Any) -> str:
 
 
 def _html_narrative_source_notice(value: Any) -> str:
+    return _html_source_notice("叙事数据来源", value)
+
+
+def _html_market_data_source_notice(value: Any) -> str:
+    return _html_source_notice("市场数据来源", value)
+
+
+def _html_source_notice(title: str, value: Any) -> str:
     source = _mapping(value)
     return "\n".join(
         [
             '<div class="source-notice">',
-            "<h2>叙事数据来源</h2>",
+            f"<h2>{_html_text(title)}</h2>",
             _html_kv("来源", source.get("source", "unspecified")),
             _html_kv("Provider", source.get("provider", "")),
             _html_kv("告警数", source.get("warning_count", 0)),
+            _html_kv("降级状态", source_status_zh(source)),
+            _html_kv("回退来源", source_fallback_zh(source)),
+            _html_kv("告警说明", source_warning_summary_zh(source)),
             "</div>",
         ]
     )

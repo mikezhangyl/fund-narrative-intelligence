@@ -10,6 +10,12 @@ from src.scanners.fund_holding_exposure_report import (
     FundHoldingExposureConfig,
     execute_fund_holding_exposure_report,
 )
+from src.scanners.report_source_disclosure import (
+    aggregate_market_data_sources,
+    source_fallback_zh,
+    source_status_zh,
+    source_warning_summary_zh,
+)
 
 
 @dataclass(frozen=True)
@@ -60,6 +66,9 @@ def execute_fund_exposure_comparison_report(
     )
     differentiating_narratives = _differentiating_narrative_exposures(fund_reports)
     status = _status(fund_reports)
+    market_data_source = aggregate_market_data_sources(
+        [_mapping(report.get("market_data_source")) for report in fund_reports]
+    )
     return {
         "version": "fund-exposure-comparison-v1",
         "generated_at": _utc_now(),
@@ -76,6 +85,7 @@ def execute_fund_exposure_comparison_report(
             "narrative_source": _narrative_source(fund_reports),
         },
         "narrative_source": _first_narrative_source(fund_reports),
+        "market_data_source": market_data_source,
         "funds": funds,
         "holding_overlap_pairs": overlap_pairs,
         "common_narrative_exposures": common_narratives,
@@ -110,6 +120,7 @@ def render_html_report(report: dict[str, Any]) -> str:
             _html_kv("报告状态", _status_label(str(report.get("status", "")))),
             _html_kv("生成时间", report.get("generated_at", "")),
             _html_narrative_source_notice(report.get("narrative_source")),
+            _html_market_data_source_notice(report.get("market_data_source")),
             "<p>本报告用于横向观察基金持仓、行业与叙事暴露差异，不构成投资建议、交易策略或涨跌预测。</p>",
             "</section>",
             "<section>",
@@ -424,14 +435,25 @@ def _html_metric(label: str, value: Any) -> str:
 
 
 def _html_narrative_source_notice(value: Any) -> str:
+    return _html_source_notice("叙事数据来源", value)
+
+
+def _html_market_data_source_notice(value: Any) -> str:
+    return _html_source_notice("市场数据来源", value)
+
+
+def _html_source_notice(title: str, value: Any) -> str:
     source = _mapping(value)
     return "\n".join(
         [
             '<div class="source-notice">',
-            "<h2>叙事数据来源</h2>",
+            f"<h2>{_html_text(title)}</h2>",
             _html_kv("来源", source.get("source", "unspecified")),
             _html_kv("Provider", source.get("provider", "")),
             _html_kv("告警数", source.get("warning_count", 0)),
+            _html_kv("降级状态", source_status_zh(source)),
+            _html_kv("回退来源", source_fallback_zh(source)),
+            _html_kv("告警说明", source_warning_summary_zh(source)),
             "</div>",
         ]
     )

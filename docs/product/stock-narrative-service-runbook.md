@@ -96,6 +96,15 @@ uv run python scripts/validate_stock_narrative_service_acceptance.py
 Live gateway/provider checks are optional release checks and should only run
 when credentials and external service access are intentionally configured.
 
+## Report Source Disclosure
+
+Fund holding exposure, multi-fund exposure comparison, and fund narrative
+exposure matrix reports expose both `narrative_source` and `market_data_source`
+in JSON. Their Chinese HTML reader surfaces show source/provider, fetch mode,
+warning count, degradation status, fallback source, and warning summaries.
+Fallbacks must be visible; a report must not silently downgrade from
+`narrative_service` to `local_prototype` or from gateway data to fixture data.
+
 ## Manual FNI Checks
 
 When the service is already running:

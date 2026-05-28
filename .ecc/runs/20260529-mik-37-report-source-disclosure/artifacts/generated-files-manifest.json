@@ -1,0 +1,14 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "verification",
+      "path": ".ecc/runs/20260529-mik-37-report-source-disclosure/verification.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "MIK-37 report source disclosure verification.",
+      "checksum_sha256": "1f19b9760362c91c76fcfff61653696a9c09fc0d588f9e21df09995e916e2b4b",
+      "size_bytes": 1485,
+      "mtime_epoch": 1779993796
+    }
+  ]
+}

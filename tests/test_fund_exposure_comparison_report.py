@@ -132,6 +132,32 @@ def test_render_fund_exposure_comparison_html_contains_key_sections():
     assert "不构成投资建议" in html
 
 
+def test_fund_exposure_comparison_report_discloses_market_data_source():
+    report = execute_fund_exposure_comparison_report(
+        data_source=FakeFundComparisonSource(),
+        config=FundExposureComparisonConfig(fund_codes=("161725", "515880"), limit=10),
+        narrative_registry=NARRATIVE_REGISTRY,
+        stock_narrative_mappings=STOCK_MAPPINGS,
+        narrative_source={
+            "source": "narrative_service",
+            "provider": "stock-narrative-service",
+            "provider_version": "v0",
+            "data_fetch_mode": "narrative_service",
+            "warnings": [],
+        },
+    )
+
+    html = render_html_report(report)
+
+    assert report["narrative_source"]["source"] == "narrative_service"
+    assert report["market_data_source"]["status"] == "available"
+    assert report["market_data_source"]["source_names"] == ["gateway"]
+    assert report["market_data_source"]["warning_count"] == 0
+    assert "市场数据来源" in html
+    assert "gateway" in html
+    assert "无告警" in html
+
+
 def test_run_fund_exposure_comparison_report_writes_json_and_html(monkeypatch, tmp_path):
     monkeypatch.setattr(
         run_fund_exposure_comparison_report,

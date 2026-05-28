@@ -6,6 +6,12 @@ from datetime import UTC, datetime
 from html import escape
 from typing import Any
 
+from src.scanners.report_source_disclosure import (
+    market_data_source_payload,
+    source_fallback_zh,
+    source_status_zh,
+    source_warning_summary_zh,
+)
 from src.scanners.trust_state_disclosure import trust_state_display_zh
 
 
@@ -38,6 +44,11 @@ def execute_fund_holding_exposure_report(
     industry_exposures = _industry_exposures(holdings)
     sector_exposures = _sector_exposures(holdings, membership_rows)
     narrative_source_payload = _narrative_source_payload(narrative_source)
+    market_source_payload = market_data_source_payload(
+        data_source=data_source,
+        row_groups=[profile_rows, holding_rows, membership_rows],
+        failures=failures,
+    )
     narrative_exposures = _narrative_exposures(
         holdings=holdings,
         narrative_registry=narrative_registry,
@@ -77,6 +88,7 @@ def execute_fund_holding_exposure_report(
             "data_gap_count": len(data_gaps),
         },
         "narrative_source": narrative_source_payload,
+        "market_data_source": market_source_payload,
         "holdings": holdings,
         "industry_exposures": industry_exposures,
         "sector_exposures": sector_exposures,
@@ -121,6 +133,7 @@ def render_html_report(report: dict[str, Any]) -> str:
             _html_kv("生成时间", report.get("generated_at", "")),
             _html_trust_notice(report.get("intelligence_trust")),
             _html_narrative_source_notice(report.get("narrative_source")),
+            _html_market_data_source_notice(report.get("market_data_source")),
             "<p>本报告用于观察基金持仓的行业、板块与叙事暴露，不构成投资建议、交易策略或涨跌预测。</p>",
             "</section>",
             "<section>",
@@ -750,15 +763,26 @@ def _html_trust_notice(value: Any) -> str:
 
 
 def _html_narrative_source_notice(value: Any) -> str:
+    return _html_source_notice("叙事数据来源", value)
+
+
+def _html_market_data_source_notice(value: Any) -> str:
+    return _html_source_notice("市场数据来源", value)
+
+
+def _html_source_notice(title: str, value: Any) -> str:
     source = _mapping(value)
     return "\n".join(
         [
             '<div class="source-notice">',
-            "<h2>叙事数据来源</h2>",
+            f"<h2>{_html_text(title)}</h2>",
             _html_kv("来源", source.get("source", "unspecified")),
             _html_kv("Provider", source.get("provider", "")),
             _html_kv("模式", source.get("data_fetch_mode", "")),
             _html_kv("告警数", source.get("warning_count", 0)),
+            _html_kv("降级状态", source_status_zh(source)),
+            _html_kv("回退来源", source_fallback_zh(source)),
+            _html_kv("告警说明", source_warning_summary_zh(source)),
             "</div>",
         ]
     )

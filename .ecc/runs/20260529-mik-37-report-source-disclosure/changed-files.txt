@@ -1,0 +1,9 @@
+docs/memory/current-brief.md
+docs/product/stock-narrative-service-runbook.md
+src/scanners/fund_exposure_comparison_report.py
+src/scanners/fund_holding_exposure_report.py
+src/scanners/fund_narrative_exposure_matrix_report.py
+src/scanners/report_source_disclosure.py
+tests/test_fund_exposure_comparison_report.py
+tests/test_fund_holding_exposure_report.py
+tests/test_fund_narrative_exposure_matrix_report.py

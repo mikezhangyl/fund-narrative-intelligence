@@ -187,6 +187,45 @@ def test_execute_fund_holding_exposure_report_includes_narrative_source_diagnost
     assert report["summary"]["narrative_source"] == "local_prototype"
 
 
+def test_fund_holding_exposure_report_discloses_sources_and_degradation_in_html():
+    report = execute_fund_holding_exposure_report(
+        data_source=FakeFundExposureSource(),
+        config=FundHoldingExposureConfig(fund_code="161725"),
+        narrative_registry=NARRATIVE_REGISTRY,
+        stock_narrative_mappings=STOCK_MAPPINGS,
+        narrative_source={
+            "source": "local_prototype",
+            "provider": "local-narrative-prototype-provider",
+            "provider_version": "local-narrative-prototype-v1",
+            "data_fetch_mode": "local_fallback",
+            "warnings": [
+                {
+                    "code": "LOCAL_PROTOTYPE_FALLBACK",
+                    "message": "Narrative Service unavailable.",
+                }
+            ],
+            "diagnostics": {
+                "status_summary": {"status": "degraded"},
+                "provider_source": {"fallback_source": "local_prototype"},
+            },
+        },
+    )
+
+    html = render_html_report(report)
+
+    assert report["market_data_source"]["status"] == "degraded"
+    assert report["market_data_source"]["source_names"] == ["eastmoney", "tushare"]
+    assert report["market_data_source"]["warning_count"] == 1
+    assert "市场数据来源" in html
+    assert "叙事数据来源" in html
+    assert "降级状态" in html
+    assert "有告警或降级" in html
+    assert "回退来源" in html
+    assert "local_prototype" in html
+    assert "LOCAL_PROTOTYPE_FALLBACK" in html
+    assert "cache_hit" in html
+
+
 def test_execute_fund_holding_exposure_report_keeps_partial_result_on_membership_failure():
     report = execute_fund_holding_exposure_report(
         data_source=MembershipFailureSource(),
