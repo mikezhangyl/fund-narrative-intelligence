@@ -116,6 +116,7 @@ def test_narrative_service_contract_declares_required_surfaces():
         "GET /api/v1/narratives/review-queue",
         "GET /api/v1/narratives/review-actions",
         "POST /api/v1/narratives/review-actions",
+        "POST /api/v1/narratives/promotion/preflight",
     }
     assert payload["trust_policy"]["automatic_ingestion_may_create"] == [
         "candidate_narratives",
@@ -125,6 +126,9 @@ def test_narrative_service_contract_declares_required_surfaces():
         "review_action_records",
     ]
     assert "trusted_stock_mappings" in payload["trust_policy"]["automatic_ingestion_must_not_create"]
+    assert "trusted_records_from_preflight" in (
+        payload["trust_policy"]["automatic_ingestion_must_not_create"]
+    )
 
 
 def test_narrative_service_provider_fetches_report_inputs(monkeypatch):

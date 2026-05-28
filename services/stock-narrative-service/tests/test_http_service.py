@@ -177,6 +177,66 @@ def test_review_action_rejects_unknown_candidate(tmp_path):
         thread.join(timeout=2)
 
 
+def test_promotion_preflight_blocks_until_review_action_exists(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        blocked = _post_json(
+            f"{base_url}/api/v1/narratives/promotion/preflight",
+            {"candidate_narrative_id": "C_SEED"},
+        )
+        _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Approved for audit preflight.",
+            },
+        )
+        ready = _post_json(
+            f"{base_url}/api/v1/narratives/promotion/preflight",
+            {"candidate_narrative_id": "C_SEED"},
+        )
+        candidates = _get_json(f"{base_url}/api/v1/narratives/candidates")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert blocked["data"]["result"] == "blocked"
+    assert "service_review_approval" in blocked["data"]["missing_gates"]
+    assert blocked["data"]["promotion_effect"] == "none"
+    assert ready["data"]["result"] == "ready_for_trust_audit"
+    assert ready["data"]["missing_gates"] == []
+    assert ready["data"]["promotion_effect"] == "none"
+    assert candidates["data"]["candidate_narratives"][0]["trust_status"] == (
+        "candidate_untrusted"
+    )
+    assert "trusted_validated" not in json.dumps(ready, ensure_ascii=False)
+
+
+def test_promotion_preflight_rejects_unknown_candidate(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        try:
+            _post_json(
+                f"{base_url}/api/v1/narratives/promotion/preflight",
+                {"candidate_narrative_id": "C_UNKNOWN"},
+            )
+        except Exception as exc:
+            assert "HTTP Error 400" in str(exc)
+        else:
+            raise AssertionError("expected 400 for unknown candidate")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+
 def test_unknown_route_returns_error_envelope(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -214,6 +274,9 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
                     {
                         "candidate_narrative_id": "C_SEED",
                         "name": "机器人执行器",
+                        "rationale": "Seed candidate has repeatable source support.",
+                        "representative_citation_ids": ["SRC_1", "SRC_2"],
+                        "exclusion_criteria": ["Do not promote from one stock only."],
                         "human_review_status": "candidate",
                         "trust_status": "candidate_untrusted",
                     }

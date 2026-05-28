@@ -2,7 +2,7 @@
 
 `stock-narrative-service` is a monorepo subservice for narrative registry,
 stock-to-narrative mappings, evidence packs, candidate intake, review queue,
-review action ledger, and trust audit state.
+review action ledger, promotion preflight, and trust audit state.
 
 It is intentionally exposed as an HTTP service. FNI should consume it through
 `NARRATIVE_SERVICE_URL`; FNI should not import service internals.
@@ -39,7 +39,8 @@ First slice scope:
 - lightweight `/api/health`;
 - local JSON-backed seed data from FNI prototype files;
 - candidate-only intake;
-- review queue, review action ledger, and trust audit surfaces.
+- review queue, review action ledger, promotion preflight, and trust audit
+  surfaces.
 
 Non-goals:
 
@@ -48,4 +49,5 @@ Non-goals:
 - browser automation;
 - production review UI;
 - automatic trusted promotion from review actions;
+- automatic trusted promotion from preflight;
 - complex database architecture.

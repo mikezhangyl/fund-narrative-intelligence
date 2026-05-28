@@ -50,6 +50,11 @@ endpoints:
       action: defer
       reviewed_by: conformance-probe
       review_note: Contract smoke only; no trusted promotion.
+  - method: POST
+    path: /api/v1/narratives/promotion/preflight
+    purpose: Check whether a candidate has enough review and evidence gates for a separate trust audit.
+    conformance_payload:
+      candidate_narrative_id: C_AUTO_3D71C39000
 
 fallback:
   local_prototype:
@@ -70,6 +75,7 @@ trust_policy:
     - trusted_narratives
     - trusted_stock_mappings
     - silently_promoted_reviewed_records
+    - trusted_records_from_preflight
   trusted_promotion_requires:
     - human_review
     - source_evidence

@@ -69,6 +69,26 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
         self._send_json(HTTPStatus.OK, _envelope(config=self.server.config, data=data))
 
     def do_POST(self) -> None:  # noqa: N802
+        if self.path == "/api/v1/narratives/promotion/preflight":
+            try:
+                payload = self._read_json()
+                data = self.server.store.promotion_preflight(payload)
+            except Exception as exc:
+                self._send_error(
+                    HTTPStatus.BAD_REQUEST,
+                    "INVALID_PROMOTION_PREFLIGHT",
+                    str(exc),
+                )
+                return
+            self._send_json(
+                HTTPStatus.OK,
+                _envelope(
+                    config=self.server.config,
+                    data=data,
+                    trust_status="candidate_untrusted",
+                ),
+            )
+            return
         if self.path == "/api/v1/narratives/review-actions":
             try:
                 payload = self._read_json()

@@ -166,12 +166,48 @@ class NarrativeStore:
         _write_object(self.config.review_actions_path, actions)
         return {"decision": decision}
 
+    def promotion_preflight(self, payload: dict[str, Any]) -> dict[str, Any]:
+        candidate_id = str(payload.get("candidate_narrative_id") or "").strip()
+        if not candidate_id:
+            raise ValueError("candidate_narrative_id is required")
+        candidate = _candidate_by_id(self.candidates(), candidate_id)
+        if candidate is None:
+            raise ValueError(f"Unknown candidate_narrative_id: {candidate_id}")
+        latest_action = _latest_actions_by_candidate(self.review_actions()).get(
+            candidate_id,
+            {},
+        )
+        gates = _promotion_gates(candidate=candidate, latest_action=latest_action)
+        missing_gates = [
+            gate["gate_id"] for gate in gates if gate["status"] != "passed"
+        ]
+        return {
+            "version": "narrative-promotion-preflight-v0",
+            "candidate_narrative_id": candidate_id,
+            "result": "blocked" if missing_gates else "ready_for_trust_audit",
+            "missing_gates": missing_gates,
+            "gates": gates,
+            "latest_review_action": latest_action,
+            "promotion_effect": "none",
+            "trust_status_after_preflight": "candidate_untrusted",
+        }
+
 
 def _all_events(store: NarrativeStore) -> list[dict[str, Any]]:
     return [
         *_list(store.seed_events().get("events")),
         *_list(store.intake_ledger().get("events")),
     ]
+
+
+def _candidate_by_id(
+    payload: dict[str, Any],
+    candidate_id: str,
+) -> dict[str, Any] | None:
+    for candidate in _list(payload.get("candidate_narratives")):
+        if str(candidate.get("candidate_narrative_id") or "") == candidate_id:
+            return candidate
+    return None
 
 
 def _latest_actions_by_candidate(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -181,6 +217,54 @@ def _latest_actions_by_candidate(payload: dict[str, Any]) -> dict[str, dict[str,
         if candidate_id:
             latest[candidate_id] = item
     return latest
+
+
+def _promotion_gates(
+    *,
+    candidate: dict[str, Any],
+    latest_action: dict[str, Any],
+) -> list[dict[str, Any]]:
+    return [
+        _gate(
+            "source_evidence",
+            bool(
+                _list(candidate.get("representative_citations"))
+                or _list(candidate.get("representative_citation_ids"))
+                or _list(
+                    _mapping(candidate.get("derivation")).get(
+                        "supporting_source_item_ids",
+                    )
+                )
+            ),
+            "Candidate needs representative citations or source item links.",
+        ),
+        _gate(
+            "mapping_rationale",
+            bool(str(candidate.get("rationale") or "").strip()),
+            "Candidate needs explicit narrative rationale.",
+        ),
+        _gate(
+            "exclusion_criteria",
+            bool(
+                _list(candidate.get("exclusion_criteria"))
+                or _list(candidate.get("exclusion_criteria_zh"))
+            ),
+            "Candidate needs exclusion criteria before trust audit.",
+        ),
+        _gate(
+            "service_review_approval",
+            str(latest_action.get("action") or "") == "approve",
+            "Candidate needs an approve action in the service review ledger.",
+        ),
+    ]
+
+
+def _gate(gate_id: str, passed: bool, message: str) -> dict[str, str]:
+    return {
+        "gate_id": gate_id,
+        "status": "passed" if passed else "missing",
+        "message": message,
+    }
 
 
 def _normalize_event(event: dict[str, Any]) -> dict[str, Any]:
@@ -255,6 +339,10 @@ def _write_object(path: Path, payload: dict[str, Any]) -> None:
 
 def _list(value: Any) -> list[dict[str, Any]]:
     return value if isinstance(value, list) else []
+
+
+def _mapping(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
 
 
 def _float(value: Any) -> float:

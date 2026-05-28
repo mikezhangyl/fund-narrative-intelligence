@@ -41,6 +41,8 @@ def test_narrative_service_conformance_probe_checks_contract_endpoints(
                 "reviewed_by": "conformance-probe",
                 "review_note": "Contract smoke only; no trusted promotion.",
             }
+        if url.endswith("/promotion/preflight") and method == "POST":
+            assert payload == {"candidate_narrative_id": "C_AUTO_3D71C39000"}
         return {
             "status": "available",
             "source": "narrative_service",
@@ -80,6 +82,7 @@ def test_narrative_service_conformance_probe_checks_contract_endpoints(
         "GET /api/v1/narratives/review-queue",
         "GET /api/v1/narratives/review-actions",
         "POST /api/v1/narratives/review-actions",
+        "POST /api/v1/narratives/promotion/preflight",
     }
     assert all(result["status"] == "passed" for result in endpoint_results)
     assert requested

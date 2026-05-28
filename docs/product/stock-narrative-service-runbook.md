@@ -98,6 +98,7 @@ GET  /api/v1/narratives/trust-audits/latest
 GET  /api/v1/narratives/review-queue
 GET  /api/v1/narratives/review-actions
 POST /api/v1/narratives/review-actions
+POST /api/v1/narratives/promotion/preflight
 ```
 
 Every narrative endpoint must return:
@@ -123,7 +124,9 @@ The service must preserve current trust state:
 - review actions may record `approve`, `reject`, or `defer`, but they are
   ledger decisions only;
 - review actions must not promote candidates into trusted registry or mapping
-  records.
+  records;
+- promotion preflight may return `ready_for_trust_audit`, but it must not write
+  trusted records or mutate registry/mapping stores.
 
 ## Troubleshooting
 

@@ -104,9 +104,11 @@ Requested service capabilities:
 - trust-audit endpoint;
 - review-queue endpoint;
 - review-action ledger endpoint;
+- promotion preflight endpoint;
 - stable envelope with `status`, `provider`, `source`, `warnings`, and
   `trust_metadata`;
-- no automatic trusted promotion from raw ingestion or review actions.
+- no automatic trusted promotion from raw ingestion, review actions, or
+  preflight.
 
 Acceptance:
 
