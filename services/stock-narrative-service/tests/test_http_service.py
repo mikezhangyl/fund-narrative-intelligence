@@ -441,6 +441,86 @@ def test_evidence_packs_expose_stable_pack_and_mapping_ids(tmp_path):
     }
 
 
+def test_candidate_detail_returns_review_history_preflight_and_evidence_refs(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "defer",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Need one more look.",
+            },
+        )
+        latest_action = _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "test-reviewer",
+                "review_note": "Ready for detail preflight.",
+            },
+        )
+        detail = _get_json(f"{base_url}/api/v1/narratives/candidates/C_SEED")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert detail["status"] == "available"
+    assert detail["trust_metadata"]["trust_status"] == "candidate_untrusted"
+    payload = detail["data"]
+    assert payload["version"] == "candidate-narrative-detail-v1"
+    assert payload["candidate_narrative_id"] == "C_SEED"
+    assert payload["candidate"]["name"] == "机器人执行器"
+    assert payload["trust_status"] == "candidate_untrusted"
+    assert payload["latest_review_action"]["review_action_id"] == latest_action[
+        "data"
+    ]["decision"]["review_action_id"]
+    assert [item["action"] for item in payload["review_history"]] == [
+        "defer",
+        "approve",
+    ]
+    assert payload["promotion_preflight"]["result"] == "ready_for_trust_audit"
+    assert payload["missing_gates"] == []
+    assert payload["recommended_action"] == "run_trust_audit"
+    assert payload["source_evidence_refs"]["representative_citation_ids"] == [
+        "SRC_1",
+        "SRC_2",
+    ]
+
+
+def test_candidate_detail_unknown_returns_missing_envelope_without_mutation(tmp_path):
+    config = _write_seed_files(tmp_path)
+    source_snapshots = {
+        config.registry_path: config.registry_path.read_text(encoding="utf-8"),
+        config.mappings_path: config.mappings_path.read_text(encoding="utf-8"),
+        config.evidence_packs_path: config.evidence_packs_path.read_text(
+            encoding="utf-8"
+        ),
+    }
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/candidates/C_UNKNOWN")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "missing"
+    assert response["data"]["candidate_narrative_id"] == "C_UNKNOWN"
+    assert response["data"]["error"]["code"] == "CANDIDATE_NOT_FOUND"
+    assert response["warnings"][0]["code"] == "CANDIDATE_NOT_FOUND"
+    assert not config.review_actions_path.exists()
+    assert not config.intake_ledger_path.exists()
+    for path, before_text in source_snapshots.items():
+        assert path.read_text(encoding="utf-8") == before_text
+
+
 def test_review_queue_reflects_latest_review_action_and_preflight_state(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)

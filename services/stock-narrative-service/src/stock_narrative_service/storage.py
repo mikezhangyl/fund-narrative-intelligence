@@ -63,6 +63,45 @@ class NarrativeStore:
             )
         }
 
+    def candidate_detail(self, candidate_id: str) -> dict[str, Any] | None:
+        candidate_id = str(candidate_id or "").strip()
+        candidate = _candidate_by_id(self.candidates(), candidate_id)
+        if candidate is None:
+            return None
+        review_history = _review_actions_for_candidate(
+            self.review_actions(),
+            candidate_id,
+        )
+        latest_action = review_history[-1] if review_history else {}
+        gates = _promotion_gates(candidate=candidate, latest_action=latest_action)
+        missing_gates = [
+            gate["gate_id"] for gate in gates if gate["status"] != "passed"
+        ]
+        status, recommended_action = _review_status(
+            latest_action=latest_action,
+            missing_gates=missing_gates,
+        )
+        return {
+            "version": "candidate-narrative-detail-v1",
+            "candidate_narrative_id": candidate_id,
+            "candidate": candidate,
+            "trust_status": str(candidate.get("trust_status") or "candidate_untrusted"),
+            "latest_review_action": latest_action,
+            "review_history": review_history,
+            "promotion_preflight": {
+                "result": "blocked" if missing_gates else "ready_for_trust_audit",
+                "missing_gates": missing_gates,
+                "gates": gates,
+                "latest_review_action": latest_action,
+                "promotion_effect": "none",
+                "trust_status_after_preflight": "candidate_untrusted",
+            },
+            "missing_gates": missing_gates,
+            "review_status": status,
+            "recommended_action": recommended_action,
+            "source_evidence_refs": _source_evidence_refs(candidate),
+        }
+
     def review_queue(self, *, status: str = "") -> dict[str, Any]:
         candidates = self.candidates()["candidate_narratives"]
         latest_actions = _latest_actions_by_candidate(self.review_actions())
@@ -304,6 +343,17 @@ def _latest_actions_by_candidate(payload: dict[str, Any]) -> dict[str, dict[str,
     return latest
 
 
+def _review_actions_for_candidate(
+    payload: dict[str, Any],
+    candidate_id: str,
+) -> list[dict[str, Any]]:
+    return [
+        item
+        for item in _list(payload.get("items"))
+        if str(item.get("candidate_narrative_id") or "") == candidate_id
+    ]
+
+
 def _review_action_by_id(
     actions: list[dict[str, Any]],
     review_action_id: str,
@@ -506,6 +556,20 @@ def _evidence_packs_with_identity(payload: dict[str, Any]) -> dict[str, Any]:
     return {**payload, "packs": packs}
 
 
+def _source_evidence_refs(candidate: dict[str, Any]) -> dict[str, Any]:
+    derivation = _mapping(candidate.get("derivation"))
+    return {
+        "source_event_ids": _strings(candidate.get("source_event_ids")),
+        "representative_citation_ids": _strings(
+            candidate.get("representative_citation_ids")
+        ),
+        "representative_citations": _list(candidate.get("representative_citations")),
+        "supporting_source_item_ids": _strings(
+            derivation.get("supporting_source_item_ids")
+        ),
+    }
+
+
 def _load_object(path: Path, *, label: str) -> dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(f"Missing {label}: {path}")
@@ -539,6 +603,10 @@ def _event_list(value: Any) -> list[dict[str, Any]]:
 
 def _mapping(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
+
+
+def _strings(value: Any) -> list[str]:
+    return [str(item) for item in value] if isinstance(value, list) else []
 
 
 def _float(value: Any) -> float:

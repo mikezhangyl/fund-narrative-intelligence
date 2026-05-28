@@ -93,6 +93,7 @@ GET  /api/v1/narratives/registry
 GET  /api/v1/narratives/mappings
 POST /api/v1/narratives/intake/events
 GET  /api/v1/narratives/candidates
+GET  /api/v1/narratives/candidates/{candidate_narrative_id}
 GET  /api/v1/narratives/evidence-packs
 GET  /api/v1/narratives/trust-audits/latest
 GET  /api/v1/narratives/ops/summary
@@ -106,6 +107,13 @@ POST /api/v1/narratives/promotion/preflight
 Current queue statuses are `pending_review`, `ready_for_trust_audit`,
 `approved_blocked_by_evidence`, `rejected`, and `deferred`. Queue rows include
 latest review action, missing preflight gates, and recommended next action.
+
+`GET /api/v1/narratives/candidates/{candidate_narrative_id}` returns one
+candidate read model with candidate metadata, trust status, full review history,
+latest review action, promotion preflight gates, missing gates, recommended next
+action, and source evidence references. Unknown candidate ids return a
+`status=missing` envelope with `CANDIDATE_NOT_FOUND`; they must not write review,
+intake, registry, mapping, or evidence files.
 
 Every narrative endpoint must return:
 

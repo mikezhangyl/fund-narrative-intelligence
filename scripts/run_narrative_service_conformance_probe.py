@@ -137,8 +137,9 @@ def _probe_endpoint(
     timeout_seconds: float,
 ) -> dict[str, Any]:
     method = str(endpoint.get("method") or "GET").upper()
-    path = str(endpoint.get("path") or "")
-    url = urljoin(f"{base_url}/", path.lstrip("/"))
+    contract_path = str(endpoint.get("path") or "")
+    request_path = str(endpoint.get("conformance_path") or contract_path)
+    url = urljoin(f"{base_url}/", request_path.lstrip("/"))
     try:
         payload = _request_json(
             method=method,
@@ -154,14 +155,14 @@ def _probe_endpoint(
         if missing_fields:
             return {
                 "method": method,
-                "path": path,
+                "path": contract_path,
                 "url": url,
                 "status": "failed",
                 "reason": f"missing envelope fields: {', '.join(missing_fields)}",
             }
         return {
             "method": method,
-            "path": path,
+            "path": contract_path,
             "url": url,
             "status": "passed",
             "reason": "",
@@ -169,7 +170,7 @@ def _probe_endpoint(
     except Exception as exc:
         return {
             "method": method,
-            "path": path,
+            "path": contract_path,
             "url": url,
             "status": "failed",
             "reason": str(exc),

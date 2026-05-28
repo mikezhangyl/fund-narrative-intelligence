@@ -178,6 +178,26 @@ def test_narrative_service_contract_declares_identity_policy():
     )
 
 
+def test_narrative_service_contract_declares_candidate_detail_endpoint():
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    endpoint = next(
+        item
+        for item in contract["endpoints"]
+        if item["path"] == "/api/v1/narratives/candidates/{candidate_narrative_id}"
+    )
+
+    assert endpoint["method"] == "GET"
+    assert endpoint["conformance_path"] == (
+        "/api/v1/narratives/candidates/C_AUTO_3D71C39000"
+    )
+    assert endpoint["missing_id_behavior"] == "missing_envelope"
+
+
 def test_fni_report_entrypoints_do_not_import_narrative_service_internals():
     report_paths = [
         PROJECT_ROOT / "src" / "scanners" / "fund_holding_exposure_report.py",

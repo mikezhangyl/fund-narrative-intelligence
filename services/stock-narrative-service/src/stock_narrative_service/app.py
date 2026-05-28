@@ -4,7 +4,7 @@ import json
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from stock_narrative_service.config import ServiceConfig
 from stock_narrative_service.storage import NarrativeStore
@@ -44,6 +44,36 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                     "service": self.server.config.provider_name,
                     "provider_version": self.server.config.provider_version,
                 },
+            )
+            return
+        candidate_detail_prefix = "/api/v1/narratives/candidates/"
+        if path.startswith(candidate_detail_prefix):
+            candidate_id = unquote(path.removeprefix(candidate_detail_prefix)).strip()
+            data = self.server.store.candidate_detail(candidate_id)
+            if data is None:
+                code = "CANDIDATE_NOT_FOUND"
+                message = f"Candidate narrative not found: {candidate_id}"
+                self._send_json(
+                    HTTPStatus.OK,
+                    _envelope(
+                        config=self.server.config,
+                        status="missing",
+                        data={
+                            "candidate_narrative_id": candidate_id,
+                            "error": {"code": code, "message": message},
+                        },
+                        warnings=[{"code": code, "message": message}],
+                        trust_status="candidate_untrusted",
+                    ),
+                )
+                return
+            self._send_json(
+                HTTPStatus.OK,
+                _envelope(
+                    config=self.server.config,
+                    data=data,
+                    trust_status="candidate_untrusted",
+                ),
             )
             return
         routes = {

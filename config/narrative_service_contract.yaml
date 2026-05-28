@@ -64,6 +64,11 @@ endpoints:
     path: /api/v1/narratives/candidates
     purpose: Return candidate narratives and candidate stock mappings.
   - method: GET
+    path: /api/v1/narratives/candidates/{candidate_narrative_id}
+    conformance_path: /api/v1/narratives/candidates/C_AUTO_3D71C39000
+    purpose: Return one candidate narrative detail with review history, preflight gates, recommended action, and source evidence references.
+    missing_id_behavior: missing_envelope
+  - method: GET
     path: /api/v1/narratives/evidence-packs
     purpose: Return mapping evidence packs and source citation chains.
   - method: GET
