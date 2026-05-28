@@ -149,6 +149,216 @@ def test_intake_events_create_only_candidate_review_items(tmp_path):
     )
 
 
+def test_intake_records_provider_aware_supported_source_types(tmp_path):
+    config = _write_seed_files(tmp_path)
+    events = [
+        {
+            "event_id": "EVT_NEWS",
+            "source_type": "news",
+            "event_time": "2026-05-28T10:00:00+08:00",
+            "title": "News-driven robotics signal",
+            "source_url": "gateway://news/robotics",
+            "provider": "gateway_news_briefs",
+            "provider_version": "2026-05",
+            "permission_status": "licensed",
+            "degradation_state": "available",
+            "candidate_narratives": [
+                {
+                    "candidate_narrative_id": "C_NEWS",
+                    "name": "Robotics news signal",
+                    "canonical_taxonomy": "robotics",
+                    "confidence": 0.61,
+                }
+            ],
+        },
+        {
+            "event_id": "EVT_ANNOUNCEMENT",
+            "source_type": "announcement",
+            "event_time": "2026-05-28T10:01:00+08:00",
+            "title": "Announcement-driven robotics signal",
+            "source_url": "gateway://announcements/robotics",
+            "source_metadata": {
+                "provider": "tushare_announcements",
+                "provider_version": "2026-05",
+                "permission_status": "licensed",
+                "degradation_state": "available",
+            },
+            "candidate_narratives": [
+                {
+                    "candidate_narrative_id": "C_ANNOUNCEMENT",
+                    "name": "Robotics announcement signal",
+                    "canonical_taxonomy": "robotics",
+                    "confidence": 0.62,
+                }
+            ],
+        },
+        {
+            "event_id": "EVT_MANUAL",
+            "source_type": "manual",
+            "event_time": "2026-05-28T10:02:00+08:00",
+            "title": "Manual robotics signal",
+            "source_url": "manual://robotics",
+            "provider": "manual_research_note",
+            "provider_version": "v1",
+            "permission_status": "internal_review",
+            "degradation_state": "available",
+            "candidate_narratives": [
+                {
+                    "candidate_narrative_id": "C_MANUAL",
+                    "name": "Manual robotics signal",
+                    "canonical_taxonomy": "robotics",
+                    "confidence": 0.63,
+                }
+            ],
+        },
+        {
+            "event_id": "EVT_SOCIAL_FUTURE",
+            "source_type": "social_future",
+            "event_time": "2026-05-28T10:03:00+08:00",
+            "title": "Reserved social signal",
+            "source_url": "social-future://robotics",
+            "provider": "reserved_social_connector",
+            "provider_version": "reserved",
+            "permission_status": "not_enabled",
+            "degradation_state": "reserved",
+            "candidate_narratives": [
+                {
+                    "candidate_narrative_id": "C_SOCIAL_FUTURE",
+                    "name": "Reserved social robotics signal",
+                    "canonical_taxonomy": "robotics",
+                    "confidence": 0.41,
+                }
+            ],
+        },
+    ]
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _post_json(
+            f"{base_url}/api/v1/narratives/intake/events",
+            {"events": events},
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    ledger = json.loads(config.intake_ledger_path.read_text(encoding="utf-8"))
+    created = response["data"]["candidate_narratives"]
+    records_by_type = {record["source_type"]: record for record in ledger["events"]}
+
+    assert response["status"] == "available"
+    assert response["trust_metadata"]["trust_status"] == "candidate_untrusted"
+    assert {item["candidate_narrative_id"] for item in created} == {
+        "C_NEWS",
+        "C_ANNOUNCEMENT",
+        "C_MANUAL",
+        "C_SOCIAL_FUTURE",
+    }
+    assert {item["trust_status"] for item in created} == {"candidate_untrusted"}
+    assert set(records_by_type) == {
+        "news",
+        "announcement",
+        "manual",
+        "social_future",
+    }
+    assert records_by_type["news"]["source_metadata"]["provider"] == (
+        "gateway_news_briefs"
+    )
+    assert records_by_type["announcement"]["source_metadata"]["provider"] == (
+        "tushare_announcements"
+    )
+    for record in ledger["events"]:
+        assert record["promotion_effect"] == "none"
+        assert set(record["source_metadata"]) >= {
+            "provider",
+            "provider_version",
+            "permission_status",
+            "degradation_state",
+            "provider_preference",
+            "source_mode",
+        }
+    assert records_by_type["news"]["source_metadata"]["provider_preference"][:2] == [
+        "gateway_news_briefs",
+        "tushare_news",
+    ]
+    assert records_by_type["announcement"]["source_metadata"][
+        "provider_preference"
+    ][:2] == ["gateway_announcements", "tushare_announcements"]
+    assert "trusted_validated" not in json.dumps(response, ensure_ascii=False)
+
+
+def test_intake_reinforces_existing_narrative_without_trusted_promotion(tmp_path):
+    config = _write_seed_files(tmp_path)
+    source_snapshots = {
+        config.registry_path: config.registry_path.read_text(encoding="utf-8"),
+        config.mappings_path: config.mappings_path.read_text(encoding="utf-8"),
+        config.evidence_packs_path: config.evidence_packs_path.read_text(
+            encoding="utf-8"
+        ),
+    }
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _post_json(
+            f"{base_url}/api/v1/narratives/intake/events",
+            {
+                "events": [
+                    {
+                        "event_id": "EVT_NEWS_REINFORCEMENT",
+                        "source_type": "news",
+                        "event_time": "2026-05-28T10:00:00+08:00",
+                        "title": "Baijiu channel news",
+                        "source_url": "gateway://news/baijiu-channel",
+                        "provider": "gateway_news_briefs",
+                        "provider_version": "2026-05",
+                        "permission_status": "licensed",
+                        "degradation_state": "available",
+                        "reinforces_narrative_ids": ["N_BAIJIU"],
+                        "supported_claim_types": [
+                            "business_relevance",
+                            "near_term_catalyst",
+                        ],
+                    }
+                ]
+            },
+        )
+        candidates = _get_json(f"{base_url}/api/v1/narratives/candidates")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    reinforcement = response["data"]["evidence_reinforcements"][0]
+    assert response["trust_metadata"]["trust_status"] == "candidate_untrusted"
+    assert response["data"]["candidate_narratives"] == []
+    assert reinforcement["narrative_id"] == "N_BAIJIU"
+    assert reinforcement["source_event_id"] == "EVT_NEWS_REINFORCEMENT"
+    assert reinforcement["trust_status"] == "candidate_untrusted"
+    assert reinforcement["promotion_effect"] == "none"
+    assert reinforcement["source_metadata"]["provider"] == "gateway_news_briefs"
+    assert reinforcement["source_metadata"]["permission_status"] == "licensed"
+    assert reinforcement["source_metadata"]["degradation_state"] == "available"
+    assert reinforcement["supported_claim_types"] == [
+        "business_relevance",
+        "near_term_catalyst",
+    ]
+    assert "trusted_validated" not in json.dumps(response, ensure_ascii=False)
+    assert candidates["data"]["candidate_narratives"] == [
+        {
+            "candidate_narrative_id": "C_SEED",
+            "name": "机器人执行器",
+            "rationale": "Seed candidate has repeatable source support.",
+            "representative_citation_ids": ["SRC_1", "SRC_2"],
+            "exclusion_criteria": ["Do not promote from one stock only."],
+            "human_review_status": "candidate",
+            "trust_status": "candidate_untrusted",
+        }
+    ]
+    for path, before_text in source_snapshots.items():
+        assert path.read_text(encoding="utf-8") == before_text
+
+
 def test_review_actions_are_persisted_without_trusted_promotion(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -308,10 +518,11 @@ def test_duplicate_intake_replays_append_events_but_dedupes_candidate_reads(tmp_
     assert {item["ledger_record_type"] for item in ledger["events"]} == {
         "candidate_intake_event"
     }
-    assert ledger["events"][0]["source_metadata"] == {
-        "provider": "manual",
-        "permission": "internal_review",
-    }
+    assert ledger["events"][0]["source_metadata"]["provider"] == "manual"
+    assert ledger["events"][0]["source_metadata"]["permission"] == "internal_review"
+    assert ledger["events"][0]["source_metadata"]["permission_status"] == (
+        "internal_review"
+    )
     assert len(duplicate_candidates) == 1
     assert duplicate_candidates[0]["source_event_ids"] == ["EVT_DUPLICATE"]
 

@@ -1,0 +1,10 @@
+{
+  "reviewed_snapshot_type": "working_tree",
+  "reviewed_commit": null,
+  "review_outcome": "passed",
+  "reviewer": "parent-self-review",
+  "notes": [
+    "Reviewed provider/source metadata normalization, non-promotion invariant, append-only ledger write path, and contract/test updates.",
+    "No critical or high findings."
+  ]
+}

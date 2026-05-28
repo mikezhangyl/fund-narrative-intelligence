@@ -137,6 +137,39 @@ trust_policy:
     - exclusion_criteria
     - trust_audit
 
+intake_policy:
+  supported_source_types:
+    - news
+    - announcement
+    - manual
+    - social_future
+  provider_preference:
+    news:
+      - gateway_news_briefs
+      - tushare_news
+      - public_news_websites_after_permission_review
+    announcement:
+      - gateway_announcements
+      - tushare_announcements
+      - public_announcement_pages_after_permission_review
+    manual:
+      - manual_research_note
+    social_future:
+      - reserved_social_connector
+  crawler_policy:
+    public_news_websites: fallback_only_after_permission_review
+    rule: gateway or Tushare structured feeds must be tried before web crawling.
+  required_source_metadata_fields:
+    - provider
+    - provider_version
+    - permission_status
+    - degradation_state
+  outputs:
+    candidate_items_trust_status: candidate_untrusted
+    reinforcement_trust_status: candidate_untrusted
+    reinforcement_promotion_effect: none
+    trusted_promotion_allowed: false
+
 storage_policy:
   current_store: json_file_ledgers_v1
   append_only_ledgers:

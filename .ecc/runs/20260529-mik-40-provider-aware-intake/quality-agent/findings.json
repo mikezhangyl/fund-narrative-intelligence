@@ -1,0 +1,10 @@
+{
+  "review_outcome": "passed",
+  "findings": [],
+  "residual_risks": [
+    {
+      "severity": "low",
+      "summary": "Evidence reinforcements are returned from intake and preserved in the event ledger, but there is no dedicated reinforcement query endpoint yet."
+    }
+  ]
+}

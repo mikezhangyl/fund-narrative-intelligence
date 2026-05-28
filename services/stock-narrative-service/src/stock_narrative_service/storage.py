@@ -13,10 +13,23 @@ from stock_narrative_service.identity import (
     evidence_pack_identity,
     review_action_identity,
     source_event_identity,
+    stable_id,
 )
 
 INTAKE_LEDGER_VERSION = "service-intake-events-v1"
 REVIEW_ACTION_LEDGER_VERSION = "narrative-review-actions-v1"
+PROVIDER_PREFERENCE_BY_SOURCE_TYPE = {
+    "news": ["gateway_news_briefs", "tushare_news"],
+    "announcement": ["gateway_announcements", "tushare_announcements"],
+    "manual": ["manual_research_note"],
+    "social_future": ["reserved_social_connector"],
+}
+SOURCE_MODE_BY_SOURCE_TYPE = {
+    "news": "gateway_or_tushare_preferred",
+    "announcement": "gateway_or_tushare_preferred",
+    "manual": "manual_research_note",
+    "social_future": "reserved_future_connector",
+}
 
 
 class NarrativeStore:
@@ -226,10 +239,12 @@ class NarrativeStore:
         else:
             normalized = [_normalize_event(event) for event in events]
         candidates = _candidates_from_events(normalized)
+        reinforcements = _evidence_reinforcements_from_events(normalized)
         return {
             "ingested_event_count": len(normalized),
             "dry_run": dry_run,
             "candidate_narratives": candidates,
+            "evidence_reinforcements": reinforcements,
             "review_queue_items": [
                 {
                     "review_item_id": f"IRQ_{candidate['candidate_narrative_id']}",
@@ -498,14 +513,17 @@ def _normalize_event(
     *,
     ledger_sequence: int | None = None,
 ) -> dict[str, Any]:
-    event_id, identity_metadata = source_event_identity(event)
+    source_type = _normalize_source_type(event.get("source_type"))
+    event_id, identity_metadata = source_event_identity(
+        {**dict(event), "source_type": source_type}
+    )
     normalized = {
         **dict(event),
         "event_id": event_id,
         "identity_metadata": identity_metadata,
-        "source_type": str(event.get("source_type") or "unknown"),
+        "source_type": source_type,
         "event_time": str(event.get("event_time") or _now()),
-        "source_metadata": _mapping(event.get("source_metadata")),
+        "source_metadata": _source_metadata(event, source_type),
         "candidate_narratives": _list(event.get("candidate_narratives")),
     }
     if ledger_sequence is None:
@@ -544,6 +562,87 @@ def _candidates_from_events(events: list[dict[str, Any]]) -> list[dict[str, Any]
                 ),
             }
     return sorted(candidates.values(), key=lambda item: item["candidate_narrative_id"])
+
+
+def _evidence_reinforcements_from_events(
+    events: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    reinforcements = []
+    for event in events:
+        source_event_id = str(event.get("event_id") or "")
+        for narrative_id in _strings(event.get("reinforces_narrative_ids")):
+            if not narrative_id:
+                continue
+            reinforcements.append(
+                {
+                    "evidence_reinforcement_id": stable_id(
+                        "ERF",
+                        [source_event_id, narrative_id],
+                    ),
+                    "source_event_id": source_event_id,
+                    "narrative_id": narrative_id,
+                    "trust_status": "candidate_untrusted",
+                    "promotion_effect": "none",
+                    "source_metadata": _mapping(event.get("source_metadata")),
+                    "supported_claim_types": _strings(
+                        event.get("supported_claim_types")
+                    )
+                    or _strings(event.get("supports")),
+                    "evidence_summary": str(
+                        event.get("summary") or event.get("title") or ""
+                    ),
+                }
+            )
+    return reinforcements
+
+
+def _normalize_source_type(value: Any) -> str:
+    source_type = str(value or "manual").strip()
+    if source_type == "social":
+        return "social_future"
+    return source_type or "manual"
+
+
+def _source_metadata(event: dict[str, Any], source_type: str) -> dict[str, Any]:
+    metadata = dict(_mapping(event.get("source_metadata")))
+    for key in (
+        "provider",
+        "provider_version",
+        "permission_status",
+        "degradation_state",
+        "source_name",
+        "source_url",
+    ):
+        value = event.get(key)
+        if value not in (None, ""):
+            metadata[key] = str(value)
+    if "permission_status" not in metadata and metadata.get("permission"):
+        metadata["permission_status"] = str(metadata["permission"])
+    provider_preference = _provider_preference(source_type, metadata)
+    metadata.setdefault("provider", provider_preference[0])
+    metadata.setdefault("provider_version", "unknown")
+    metadata.setdefault("permission_status", "not_declared")
+    metadata.setdefault("degradation_state", "unknown")
+    metadata.setdefault("source_url", str(event.get("source_url") or ""))
+    metadata.setdefault("source_name", str(event.get("source_name") or ""))
+    metadata["source_type"] = source_type
+    metadata["provider_preference"] = provider_preference
+    metadata["source_mode"] = SOURCE_MODE_BY_SOURCE_TYPE.get(
+        source_type,
+        "unsupported_source_type_recorded_without_promotion",
+    )
+    return metadata
+
+
+def _provider_preference(
+    source_type: str,
+    metadata: dict[str, Any],
+) -> list[str]:
+    configured = PROVIDER_PREFERENCE_BY_SOURCE_TYPE.get(source_type)
+    if configured:
+        return [*configured]
+    provider = str(metadata.get("provider") or "unknown_provider")
+    return [provider]
 
 
 def _trust_status(payload: dict[str, Any]) -> str:

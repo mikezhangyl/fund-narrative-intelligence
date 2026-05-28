@@ -178,6 +178,42 @@ def test_narrative_service_contract_declares_identity_policy():
     )
 
 
+def test_narrative_service_contract_declares_provider_aware_intake_policy():
+    contract = yaml.safe_load(
+        (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    policy = contract["intake_policy"]
+
+    assert policy["supported_source_types"] == [
+        "news",
+        "announcement",
+        "manual",
+        "social_future",
+    ]
+    assert policy["provider_preference"]["news"][:2] == [
+        "gateway_news_briefs",
+        "tushare_news",
+    ]
+    assert policy["provider_preference"]["announcement"][:2] == [
+        "gateway_announcements",
+        "tushare_announcements",
+    ]
+    assert policy["crawler_policy"]["public_news_websites"] == (
+        "fallback_only_after_permission_review"
+    )
+    assert policy["outputs"]["candidate_items_trust_status"] == "candidate_untrusted"
+    assert policy["outputs"]["reinforcement_promotion_effect"] == "none"
+    assert policy["required_source_metadata_fields"] == [
+        "provider",
+        "provider_version",
+        "permission_status",
+        "degradation_state",
+    ]
+
+
 def test_narrative_service_contract_declares_candidate_detail_endpoint():
     contract = yaml.safe_load(
         (PROJECT_ROOT / "config" / "narrative_service_contract.yaml").read_text(

@@ -152,6 +152,32 @@ Error semantics:
 trust statuses, review queue summary, and latest trust-audit result. It is an
 operational snapshot, not a promotion or mutation endpoint.
 
+## Provider-Aware Intake
+
+`POST /api/v1/narratives/intake/events` accepts structured event sources with
+these source types:
+
+- `news`
+- `announcement`
+- `manual`
+- `social_future`
+
+For `news` and `announcement`, gateway-owned or Tushare-backed structured feeds
+are preferred before any public website crawling. Public news or announcement
+website crawling is fallback-only after permission review. Every accepted intake
+record normalizes provider/source metadata, including `provider`,
+`provider_version`, `permission_status`, and `degradation_state`.
+
+Intake can return two review-only outputs:
+
+- `candidate_narratives`, always with `trust_status=candidate_untrusted`;
+- `evidence_reinforcements`, for events that reinforce existing narrative ids,
+  always with `trust_status=candidate_untrusted` and `promotion_effect=none`.
+
+Neither output promotes registry narratives, stock mappings, evidence packs, or
+trusted stores. Existing narrative reinforcement is source evidence for human
+review and later gates only.
+
 ## Trust Rules
 
 The service must preserve current trust state:

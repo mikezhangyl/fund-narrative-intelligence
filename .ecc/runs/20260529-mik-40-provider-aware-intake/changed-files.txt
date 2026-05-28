@@ -1,0 +1,13 @@
+config/narrative_service_contract.yaml
+docs/memory/current-brief.md
+docs/product/stock-narrative-service-runbook.md
+services/stock-narrative-service/src/stock_narrative_service/storage.py
+services/stock-narrative-service/tests/test_http_service.py
+tests/test_narrative_service_conformance_probe.py
+.ecc/runs/20260529-mik-40-provider-aware-intake/artifacts/generated-files-manifest.json
+.ecc/runs/20260529-mik-40-provider-aware-intake/changed-files.txt
+.ecc/runs/20260529-mik-40-provider-aware-intake/quality-agent/findings.json
+.ecc/runs/20260529-mik-40-provider-aware-intake/quality-agent/review-state.json
+.ecc/runs/20260529-mik-40-provider-aware-intake/run-state.json
+.ecc/runs/20260529-mik-40-provider-aware-intake/task-brief.md
+.ecc/runs/20260529-mik-40-provider-aware-intake/task-handoff.md

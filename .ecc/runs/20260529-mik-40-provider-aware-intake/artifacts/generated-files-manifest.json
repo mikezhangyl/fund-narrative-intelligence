@@ -1,0 +1,44 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "stock_narrative_service_acceptance_conformance_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T175649+0000/conformance/narrative_service_conformance_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Final MIK-40 acceptance conformance report from a temporary local Narrative Service.",
+      "checksum_sha256": "0381e6746888492d7eaf622fdd619ec53581bdf9efd67fe958ef78edf3002b3c",
+      "mtime_epoch": 1779991009,
+      "size_bytes": 3280
+    },
+    {
+      "type": "stock_narrative_service_acceptance_provider_smoke_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T175649+0000/provider_smoke/narrative_service_provider_smoke.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Provider smoke output proving FNI consumed narrative data from the local Narrative Service.",
+      "checksum_sha256": "4c62df27a909beaca818c0c2430a652229e0ba4bac5a83fa0bd002193f7ea6a2",
+      "mtime_epoch": 1779991009,
+      "size_bytes": 641
+    },
+    {
+      "type": "stock_narrative_service_acceptance_report_json",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T175649+0000/fund_holding_exposure_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated fund holding exposure JSON using narrative_source=narrative_service.",
+      "checksum_sha256": "9dd6e6c13ecc20949b11cfcea8f758c98c1432c1587b8d97e0c2fa613dc113fb",
+      "mtime_epoch": 1779991009,
+      "size_bytes": 4820
+    },
+    {
+      "type": "stock_narrative_service_acceptance_report_html",
+      "path": "outputs/stock_narrative_service_acceptance/2026-05-28T175649+0000/fund_holding_exposure_report.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Generated Chinese HTML fund holding exposure report using narrative_source=narrative_service.",
+      "checksum_sha256": "eefa2b63bd685da9ab7798123fb69fa9b919da32e6b91aebe36bc8f69aea8be7",
+      "mtime_epoch": 1779991009,
+      "size_bytes": 4348
+    }
+  ]
+}
