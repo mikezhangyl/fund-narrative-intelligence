@@ -205,3 +205,82 @@ contracts or report semantics.
 Use this document as the canonical PM/Architect feedback artifact for this
 acceptance cycle. Linear comments should point to this document rather than
 duplicating detailed review text.
+
+## Re-Review Update - 2026-05-29
+
+Reviewed commit: `74230a8 fix: bootstrap narrative review workspace cli`
+
+Updated decision: accepted for merge.
+
+The blocking `MIK-51` defect has been fixed. The original acceptance feedback
+above is preserved as historical review context; this section records the
+follow-up PM/Architect decision.
+
+### MIK-51 Verification
+
+Direct script invocation from the repository root no longer fails at import
+time:
+
+```bash
+uv run python scripts/run_narrative_review_workspace.py \
+  --output-dir outputs/narrative_review_workspace/pm_arch_reaccept_no_service
+```
+
+Observed result:
+
+```text
+--service-url or NARRATIVE_SERVICE_URL is required
+```
+
+This is the expected argument-level validation behavior.
+
+Workspace generation now works without `PYTHONPATH=.` when a local Narrative
+Service is running:
+
+```bash
+uv run python scripts/run_stock_narrative_service.py --port 8892
+
+uv run python scripts/run_narrative_review_workspace.py \
+  --service-url http://127.0.0.1:8892 \
+  --output-dir outputs/narrative_review_workspace/pm_arch_reaccept_fixed
+```
+
+Observed result:
+
+```text
+candidate_count=4
+action_status=not_submitted
+```
+
+### Re-Review Verification Commands
+
+```bash
+uv run pytest tests/test_narrative_review_workspace.py -q
+uv run ruff check scripts/run_narrative_review_workspace.py tests/test_narrative_review_workspace.py
+uv run python scripts/validate_stock_narrative_service_acceptance.py
+uv run python -m compileall -q src tests scripts services/stock-narrative-service/src services/stock-narrative-service/tests
+git diff --check main...HEAD
+uv run ruff check .
+uv run pytest -q
+```
+
+Observed result:
+
+```text
+tests/test_narrative_review_workspace.py: 4 passed
+Narrative Service acceptance: completed, endpoint_count=13
+Full test suite: 520 passed, 1 skipped
+ruff: passed
+compileall: passed
+diff check: passed
+```
+
+### Final PM/Architect Decision
+
+`codex/linear-fni-develop` is accepted for merge from the PM/Architect
+perspective.
+
+Remaining caveat: live gateway/provider checks were not part of this deterministic
+re-review. This is acceptable for the current branch because the acceptance
+harness explicitly separates deterministic local contract checks from live
+provider checks.
