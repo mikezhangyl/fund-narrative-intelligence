@@ -112,6 +112,8 @@ Future Linear implementation issues should follow `docs/product/developer-ready-
 
 Default product planning workflow now uses Linear as the durable tracker: when the user raises a new product direction, scenario, or capability idea, first act as PM to create product requirements/user stories/non-goals/acceptance criteria, then act as Architect to add service boundaries/data ownership/API contracts/schema implications/dependencies/verification gates, then create or update Linear milestones/issues/dependency relations and a canonical linked planning document. Developer chats should implement from Linear issues and linked docs, not raw chat memory; PM/Architect acceptance feedback should be written into docs first and referenced from Linear.
 
+Round 4 planning is open in Linear under milestone `M10 - Productized Narrative Operations`. PM parent is `MIK-86`; Architect parent is `MIK-87`. The canonical handoff is `docs/product/round-4-productized-narrative-operations-plan-2026-05-30.md` and Linear document `Round 4 Productized Narrative Operations Plan`. Recommended first developer slice is `MIK-93 + MIK-88` to establish live validation taxonomy and credential-safe smoke before Radar UI, scheduling, or durable-store migration work.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.
