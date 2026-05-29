@@ -26,7 +26,7 @@ Execute in dependency order:
 
 1. Done - `MIK-93` + `MIK-88`: live validation taxonomy and credential-safe smoke
    surface.
-2. `MIK-94` + `MIK-89`: Narrative Radar UI contract and service UI surface.
+2. Done locally, pending Linear closeout - `MIK-94` + `MIK-89`: Narrative Radar UI contract and service UI surface.
 3. `MIK-97` + `MIK-92`: review/promotion state machine and complete reviewer
    workflow.
 4. `MIK-95` + `MIK-90`: scheduling job model and operational run ledger.
@@ -72,6 +72,33 @@ For every slice:
   `docs/product/round4-live-provider-credential-smoke-2026-05-30.html` with
   auxiliary Markdown at
   `docs/product/round4-live-provider-credential-smoke-2026-05-30.md`.
+
+### MIK-94 + MIK-89 - Narrative Radar UI Contract And Service UI Surface
+
+- TDD red:
+  targeted HTTP tests failed on missing
+  `/api/v1/narratives/radar/ui-contract` and `/narratives/radar` routes.
+- TDD green:
+  targeted UI contract and HTML route tests passed with 4 tests.
+- Service endpoints:
+  `GET /api/v1/narratives/radar/ui-contract` and
+  `GET /narratives/radar`.
+- Boundary:
+  UI owns rendering, filters, interactions, and drill-down navigation; Narrative
+  Service API remains score authority; UI/FNI score recalculation is forbidden.
+- Browser verification:
+  screenshot at
+  `.ecc/runs/20260530-round4-productized-ops/artifacts/screenshots/round4-radar-ui.png`;
+  accessibility snapshot at
+  `.ecc/runs/20260530-round4-productized-ops/artifacts/reports/round4-radar-ui-snapshot.md`.
+- Static checks:
+  `uv run ruff check services/stock-narrative-service/src/stock_narrative_service services/stock-narrative-service/tests/test_http_service.py`.
+- Compile:
+  `uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests`.
+- Product note:
+  `docs/product/round4-narrative-radar-ui-surface-2026-05-30.html` with
+  auxiliary Markdown at
+  `docs/product/round4-narrative-radar-ui-surface-2026-05-30.md`.
 
 ## Final Acceptance Gates
 

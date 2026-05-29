@@ -1,0 +1,30 @@
+- main [ref=e2] [box=142,0,1228,780]:
+  - generic [ref=e3] [box=166,24,1180,77]:
+    - generic [ref=e4] [box=166,24,913,60]:
+      - heading "Narrative Radar" [level=1] [ref=e5] [box=166,24,913,33]
+      - paragraph [ref=e6] [box=166,65,913,19]: Service-owned bubble surface backed by Narrative Service radar data.
+    - generic [ref=e7] [box=1095,54,251,30]:
+      - text: "score recalculation: none"
+      - text: "generated: 2026-05-29T16:30:25+00:00"
+  - region "Narrative Radar bubble map" [ref=e8] [box=166,123,1180,522]:
+    - generic [ref=e9] [box=191,618,151,14]: trend acceleration
+    - generic [ref=e10] [box=1161,142,162,14]: market confirmation
+    - link "高端白酒消费 heat_score market_confirmation_score candidate_untrusted" [ref=e11] [cursor=pointer] [box=261,472,120,120]:
+      - /url: /api/v1/narratives/radar/evidence?narrative_id=N_BAIJIU_CONSUMPTION
+      - strong [ref=e12] [box=278,489,86,36]: 高端白酒消费
+      - generic [ref=e13] [box=278,531,86,14]: heat_score
+      - generic [ref=e14] [box=278,551,86,14]: market_confirmation_score
+      - generic [ref=e15] [box=278,571,86,14]: candidate_untrusted
+  - generic [ref=e16] [box=166,663,1180,93]:
+    - generic [ref=e17] [box=166,663,286,93]:
+      - heading "Size" [level=2] [ref=e18] [box=181,678,256,17]
+      - code [ref=e19] [box=181,704,88,19]: heat_score
+    - generic [ref=e20] [box=464,663,286,93]:
+      - heading "Color" [level=2] [ref=e21] [box=479,678,256,17]
+      - code [ref=e22] [box=479,704,120,19]: momentum_state
+    - generic [ref=e23] [box=762,663,286,93]:
+      - heading "Position" [level=2] [ref=e24] [box=777,678,256,17]
+      - code [ref=e25] [box=777,704,216,38]: x=trend_acceleration / y=market_confirmation_score
+    - generic [ref=e26] [box=1060,663,286,93]:
+      - heading "Trust Marker" [level=2] [ref=e27] [box=1075,678,256,17]
+      - code [ref=e28] [box=1075,704,104,19]: trust_status

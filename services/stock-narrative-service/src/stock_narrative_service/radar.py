@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime, timedelta
+from html import escape
 from pathlib import Path
 from typing import Any
 
@@ -37,6 +38,8 @@ def radar_contract(config: ServiceConfig) -> dict[str, Any]:
             "/api/v1/narratives/radar/bubbles",
             "/api/v1/narratives/radar/evidence",
             "/api/v1/narratives/radar/preview",
+            "/api/v1/narratives/radar/ui-contract",
+            "/narratives/radar",
         ],
         "response_envelope": {
             "status": "available|degraded|missing|failed",
@@ -84,7 +87,106 @@ def radar_contract(config: ServiceConfig) -> dict[str, Any]:
             "missing_source_types",
             "formula_version",
         ],
+        "ui_contract": radar_ui_contract(),
     }
+
+
+def radar_ui_contract() -> dict[str, Any]:
+    return {
+        "version": "narrative-radar-ui-contract-v1",
+        "frontend_boundary": {
+            "score_authority": "narrative_service_api",
+            "ui_responsibility": [
+                "rendering",
+                "filters",
+                "interactions",
+                "drill_down_navigation",
+            ],
+            "score_recalculation": "forbidden",
+            "fni_report_role": "may_link_later_must_not_calculate_radar",
+        },
+        "data_endpoints": {
+            "list": "/api/v1/narratives/radar/bubbles",
+            "detail": "/api/v1/narratives/radar/evidence?narrative_id=<id>",
+            "preview_payload": "/api/v1/narratives/radar/preview",
+        },
+        "stable_identifiers": [
+            "narrative_id",
+            "candidate_narrative_id",
+            "evidence_refs",
+            "review_state.status",
+            "trust_status",
+        ],
+        "frontend_states": ["loading", "ready", "empty", "degraded", "stale"],
+        "visual_mapping": _bubble_visualization_contract(),
+    }
+
+
+def render_radar_ui(
+    *,
+    bubbles_payload: dict[str, Any],
+    ui_contract: dict[str, Any],
+    generated_at: str,
+) -> str:
+    bubbles = _list(bubbles_payload.get("bubbles"))
+    warnings = _list(bubbles_payload.get("degradation_warnings"))
+    ui_state = "empty" if not bubbles else ("degraded" if warnings else "ready")
+    bubble_markup = "\n".join(_render_bubble_card(item) for item in bubbles)
+    if not bubble_markup:
+        bubble_markup = _render_empty_state(warnings)
+    legend = _mapping(ui_contract.get("visual_mapping")).get("dimensions", {})
+    return "\n".join(
+        [
+            "<!doctype html>",
+            '<html lang="en">',
+            "<head>",
+            '<meta charset="utf-8" />',
+            '<meta name="viewport" content="width=device-width, initial-scale=1" />',
+            "<title>Narrative Radar</title>",
+            "<style>",
+            ":root{--ink:#1e242b;--muted:#617080;--line:#d8dee6;--panel:#ffffff;--accent:#0f766e;--warm:#b45309;--cool:#2563eb;--danger:#991b1b}",
+            "body{margin:0;background:#f4f6f8;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}",
+            "main{max-width:1180px;margin:0 auto;padding:24px}",
+            "header{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:16px}",
+            "h1{font-size:30px;line-height:1.1;margin:0 0 8px}",
+            "p{margin:0;color:var(--muted)}",
+            ".meta{font-size:13px;text-align:right}",
+            ".radar{position:relative;margin-top:22px;min-height:520px;border:1px solid var(--line);background:linear-gradient(180deg,#fff,#eef3f6);overflow:hidden}",
+            ".axis{position:absolute;color:#536272;font-size:12px;text-transform:uppercase;letter-spacing:.08em}",
+            ".x{bottom:12px;left:24px}.y{top:18px;right:22px}",
+            ".bubble{position:absolute;display:block;width:var(--size);height:var(--size);min-width:86px;min-height:86px;border-radius:50%;border:3px solid var(--border);background:var(--fill);box-shadow:0 16px 36px rgba(31,41,55,.14);padding:14px;color:#fff;text-decoration:none;overflow:hidden}",
+            ".bubble strong{display:block;font-size:15px;line-height:1.2}.bubble span{display:block;font-size:12px;margin-top:6px;color:rgba(255,255,255,.86)}",
+            ".detail{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:18px}",
+            ".tile{background:var(--panel);border:1px solid var(--line);padding:14px}",
+            ".tile h2{font-size:14px;margin:0 0 8px}.tile code{background:#edf2f7;padding:2px 5px}",
+            ".empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:28px}",
+            "</style>",
+            "</head>",
+            f'<body data-ui-state="{_html(ui_state)}" data-score-source="narrative-service">',
+            "<main>",
+            "<header>",
+            "<div>",
+            "<h1>Narrative Radar</h1>",
+            "<p>Service-owned bubble surface backed by Narrative Service radar data.</p>",
+            "</div>",
+            f'<div class="meta">score recalculation: none<br />generated: {_html(generated_at)}</div>',
+            "</header>",
+            '<section class="radar" aria-label="Narrative Radar bubble map">',
+            '<div class="axis x">trend acceleration</div>',
+            '<div class="axis y">market confirmation</div>',
+            bubble_markup,
+            "</section>",
+            '<section class="detail">',
+            _render_tile("Size", legend.get("size")),
+            _render_tile("Color", legend.get("color")),
+            _render_tile("Position", f"x={legend.get('x')} / y={legend.get('y')}"),
+            _render_tile("Trust Marker", legend.get("border")),
+            "</section>",
+            "</main>",
+            "</body>",
+            "</html>",
+        ]
+    )
 
 
 def radar_source_signals(events: list[dict[str, Any]]) -> dict[str, Any]:
@@ -1186,3 +1288,59 @@ def _float(value: Any, *, default: float = 0.0) -> float:
         return float(value)
     except (TypeError, ValueError):
         return default
+
+
+def _render_bubble_card(bubble: dict[str, Any]) -> str:
+    encoding = _mapping(bubble.get("visual_encoding"))
+    left = _clamp(8 + _float(encoding.get("x")), 8, 72)
+    bottom = _clamp(10 + _float(encoding.get("y")) * 0.7, 10, 70)
+    size = _clamp(86 + _float(encoding.get("size")) * 0.9, 86, 190)
+    fill = {
+        "emerging": "#0f766e",
+        "heating": "#b45309",
+        "stable": "#2563eb",
+        "cooling": "#475569",
+    }.get(str(encoding.get("color") or ""), "#2563eb")
+    border = "#111827" if bubble.get("trust_status") == "trusted_validated" else "#fbbf24"
+    return (
+        '<a class="bubble" '
+        f'href="{_html(bubble.get("detail_path"))}" '
+        f'style="left:{left:.1f}%;bottom:{bottom:.1f}%;--size:{size:.1f}px;'
+        f'--fill:{fill};--border:{border}">'
+        f"<strong>{_html(bubble.get('narrative_name'))}</strong>"
+        f"<span>heat_score {_html(bubble.get('heat_score'))}</span>"
+        f"<span>market_confirmation_score {_html(bubble.get('market_confirmation_score'))}</span>"
+        f"<span>{_html(bubble.get('trust_status'))}</span>"
+        "</a>"
+    )
+
+
+def _render_empty_state(warnings: list[dict[str, Any]]) -> str:
+    warning_text = "; ".join(
+        str(item.get("code") or item.get("message") or "") for item in warnings
+    )
+    return (
+        '<div class="empty">'
+        "<div>"
+        "<h2>No radar bubbles are available</h2>"
+        f"<p>{_html(warning_text or 'No source signals are available yet.')}</p>"
+        "</div>"
+        "</div>"
+    )
+
+
+def _render_tile(title: str, value: Any) -> str:
+    return (
+        '<div class="tile">'
+        f"<h2>{_html(title)}</h2>"
+        f"<code>{_html(value)}</code>"
+        "</div>"
+    )
+
+
+def _clamp(value: float, lower: float, upper: float) -> float:
+    return max(lower, min(upper, value))
+
+
+def _html(value: Any) -> str:
+    return escape(str(value or ""), quote=True)

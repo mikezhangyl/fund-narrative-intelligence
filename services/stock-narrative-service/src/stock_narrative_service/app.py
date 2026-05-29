@@ -40,6 +40,9 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path
         query = parse_qs(parsed.query)
+        if path == "/favicon.ico":
+            self._send_no_content()
+            return
         if path == "/api/health":
             self._send_json(
                 HTTPStatus.OK,
@@ -49,6 +52,23 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                     "provider_version": self.server.config.provider_version,
                 },
             )
+            return
+        if path == "/narratives/radar":
+            try:
+                html = self.server.store.radar_ui_html(
+                    as_of=_first_query_value(query, "as_of"),
+                    window_days=_first_query_value(query, "window_days"),
+                    baseline_days=_first_query_value(query, "baseline_days"),
+                    half_life_hours=_first_query_value(query, "half_life_hours"),
+                )
+            except Exception as exc:
+                self._send_error(
+                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                    "SERVICE_ERROR",
+                    str(exc),
+                )
+                return
+            self._send_html(HTTPStatus.OK, html)
             return
         if path == "/api/v1/narratives/evidence-packs/detail":
             data = self.server.store.evidence_pack_detail(
@@ -126,6 +146,9 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
             "/api/v1/narratives/evidence-packs": self.server.store.evidence_packs,
             "/api/v1/narratives/candidates": self.server.store.candidates,
             "/api/v1/narratives/radar/contract": self.server.store.radar_contract,
+            "/api/v1/narratives/radar/ui-contract": (
+                self.server.store.radar_ui_contract
+            ),
             "/api/v1/narratives/radar/signals": self.server.store.radar_signals,
             "/api/v1/narratives/radar/mined-candidates": (
                 self.server.store.radar_mined_candidates
@@ -368,6 +391,19 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def _send_html(self, status: HTTPStatus, html: str) -> None:
+        body = html.encode("utf-8")
+        self.send_response(int(status))
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _send_no_content(self) -> None:
+        self.send_response(int(HTTPStatus.NO_CONTENT))
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
 
 def _envelope(

@@ -1285,6 +1285,8 @@ def test_radar_contract_declares_service_ownership_score_schema_and_metadata(tmp
         "/api/v1/narratives/radar/bubbles",
         "/api/v1/narratives/radar/evidence",
         "/api/v1/narratives/radar/preview",
+        "/api/v1/narratives/radar/ui-contract",
+        "/narratives/radar",
     ]
     assert payload["response_envelope"] == {
         "status": "available|degraded|missing|failed",
@@ -2012,6 +2014,94 @@ def test_radar_preview_surface_uses_bubble_api_contract_without_report_semantics
     assert "report" not in json.dumps(payload["render_model"], ensure_ascii=False).lower()
 
 
+def test_radar_ui_contract_declares_frontend_boundary_and_states(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/radar/ui-contract")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "available"
+    payload = response["data"]
+    assert payload["version"] == "narrative-radar-ui-contract-v1"
+    assert payload["frontend_boundary"] == {
+        "score_authority": "narrative_service_api",
+        "ui_responsibility": ["rendering", "filters", "interactions", "drill_down_navigation"],
+        "score_recalculation": "forbidden",
+        "fni_report_role": "may_link_later_must_not_calculate_radar",
+    }
+    assert payload["data_endpoints"] == {
+        "list": "/api/v1/narratives/radar/bubbles",
+        "detail": "/api/v1/narratives/radar/evidence?narrative_id=<id>",
+        "preview_payload": "/api/v1/narratives/radar/preview",
+    }
+    assert payload["stable_identifiers"] == [
+        "narrative_id",
+        "candidate_narrative_id",
+        "evidence_refs",
+        "review_state.status",
+        "trust_status",
+    ]
+    assert payload["frontend_states"] == ["loading", "ready", "empty", "degraded", "stale"]
+    assert payload["visual_mapping"]["version"] == "bubble-chart-contract-v1"
+    assert payload["visual_mapping"]["dimensions"]["size"] == "heat_score"
+    assert "formula" not in json.dumps(payload, ensure_ascii=False).lower()
+
+
+def test_radar_service_ui_renders_bubble_surface_without_score_recalculation(tmp_path):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [_radar_event("EVT_ROBOT_D3A", "2026-05-28T10:00:00+08:00", 0.8)],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        html = _get_text(
+            f"{base_url}/narratives/radar?as_of=2026-05-29T00:00:00+08:00"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert "Narrative Radar" in html
+    assert "机器人执行器" in html
+    assert 'data-score-source="narrative-service"' in html
+    assert "score recalculation: none" in html
+    assert "candidate_untrusted" in html
+    assert "/api/v1/narratives/radar/evidence?narrative_id=C_ROBOT" in html
+    assert "heat_score" in html
+    assert "market_confirmation_score" in html
+    assert "fund report" not in html.lower()
+
+
+def test_radar_service_ui_renders_empty_diagnostics(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        html = _get_text(f"{base_url}/narratives/radar")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert "Narrative Radar" in html
+    assert "No radar bubbles are available" in html
+    assert "RADAR_BUBBLES_EMPTY" in html
+    assert 'data-ui-state="empty"' in html
+
+
 def test_radar_evidence_optional_explanation_is_disabled_by_default_and_non_authoritative(
     tmp_path,
 ):
@@ -2298,6 +2388,12 @@ def _start(server):
 def _get_json(url: str):
     with urlopen(url, timeout=2) as response:  # noqa: S310
         return json.loads(response.read().decode("utf-8"))
+
+
+def _get_text(url: str) -> str:
+    with urlopen(url, timeout=2) as response:  # noqa: S310
+        assert response.headers.get_content_type() == "text/html"
+        return response.read().decode("utf-8")
 
 
 def _get_json_error(url: str):

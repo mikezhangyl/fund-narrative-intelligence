@@ -1,3 +1,24 @@
 {
-  "generated_artifacts": []
+  "generated_artifacts": [
+    {
+      "type": "verification",
+      "path": ".ecc/runs/20260530-round4-productized-ops/artifacts/screenshots/round4-radar-ui.png",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "MIK-89 browser verification screenshot for Narrative Radar UI.",
+      "checksum_sha256": "0b7f7c88e53a4f6a6d49b178796d673c1c7f8bbb86f1739b3cecb1e10bf5b3d4",
+      "size_bytes": 70656,
+      "mtime_epoch": 1780072231
+    },
+    {
+      "type": "verification",
+      "path": ".ecc/runs/20260530-round4-productized-ops/artifacts/reports/round4-radar-ui-snapshot.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "MIK-89 Playwright accessibility snapshot for Narrative Radar UI.",
+      "checksum_sha256": "f36b026acd9b20c4347f5146fb4519f4b84af804de14c7c6530cf37eb85079e3",
+      "size_bytes": 1912,
+      "mtime_epoch": 1780072231
+    }
+  ]
 }

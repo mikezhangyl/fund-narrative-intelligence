@@ -25,6 +25,8 @@ from stock_narrative_service.radar import (
     radar_preview,
     radar_scores,
     radar_source_signals,
+    radar_ui_contract,
+    render_radar_ui,
 )
 
 INTAKE_LEDGER_VERSION = "service-intake-events-v1"
@@ -259,6 +261,9 @@ class NarrativeStore:
     def radar_contract(self) -> dict[str, Any]:
         return radar_contract(self.config)
 
+    def radar_ui_contract(self) -> dict[str, Any]:
+        return radar_ui_contract()
+
     def radar_signals(self) -> dict[str, Any]:
         return radar_source_signals(_all_events(self))
 
@@ -336,6 +341,25 @@ class NarrativeStore:
             window_days=window_days,
             baseline_days=baseline_days,
             half_life_hours=half_life_hours,
+        )
+
+    def radar_ui_html(
+        self,
+        *,
+        as_of: str = "",
+        window_days: Any = "",
+        baseline_days: Any = "",
+        half_life_hours: Any = "",
+    ) -> str:
+        return render_radar_ui(
+            bubbles_payload=self.radar_bubbles(
+                as_of=as_of,
+                window_days=window_days,
+                baseline_days=baseline_days,
+                half_life_hours=half_life_hours,
+            ),
+            ui_contract=self.radar_ui_contract(),
+            generated_at=_now(),
         )
 
     def ingest_events(self, payload: dict[str, Any]) -> dict[str, Any]:
