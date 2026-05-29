@@ -154,11 +154,34 @@ def test_narrative_service_contract_declares_append_only_ledger_policy():
         "narrative-review-actions-v1"
     )
     assert ledgers["promotion_decisions"]["status"] == "reserved"
+    assert ledgers["job_runs"]["version"] == "narrative-job-runs-v1"
+    assert "trusted_store_mutation" in ledgers["job_runs"]["required_record_fields"]
     assert "source_metadata" in ledgers["candidate_intake_events"]["required_record_fields"]
     assert "source_metadata" in ledgers["narrative_review_actions"]["required_record_fields"]
     assert policy["mutation_policy"]["failed_intake_writes"] == "none"
     assert "registry" in policy["mutation_policy"]["review_actions_must_not_mutate"]
     assert policy["migration"]["http_contract_change_allowed"] is False
+    assert policy["migration"]["durable_entities"] == [
+        "narratives",
+        "stock_narrative_mappings",
+        "evidence_packs",
+        "source_events",
+        "candidate_narratives",
+        "review_actions",
+        "promotion_decisions",
+        "radar_source_signals",
+        "radar_snapshots",
+        "job_runs",
+    ]
+    assert policy["migration"]["migration_phases"] == [
+        "backup_json_ledgers",
+        "create_schema",
+        "backfill_append_only_ledgers",
+        "backfill_read_models",
+        "run_http_parity_checks",
+        "enable_sqlite_adapter",
+        "retain_json_fallback_until_parity_passes",
+    ]
 
 
 def test_narrative_service_contract_declares_identity_policy():

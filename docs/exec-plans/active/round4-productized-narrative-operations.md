@@ -30,7 +30,7 @@ Execute in dependency order:
 3. Done locally, pending Linear closeout - `MIK-97` + `MIK-92`: review/promotion state machine and complete reviewer
    workflow.
 4. Done locally, pending Linear closeout - `MIK-95` + `MIK-90`: scheduling job model and operational run ledger.
-5. `MIK-96` + `MIK-91`: durable storage migration schema and migration
+5. Done locally, pending Linear closeout - `MIK-96` + `MIK-91`: durable storage migration schema and migration
    readiness.
 6. `MIK-86` + `MIK-87`: close parent packs after all child issues pass.
 
@@ -168,6 +168,32 @@ For every slice:
   `docs/product/round4-operational-scheduling-run-ledger-2026-05-30.html`
   with auxiliary Markdown at
   `docs/product/round4-operational-scheduling-run-ledger-2026-05-30.md`.
+
+### MIK-96 + MIK-91 - Durable Storage Migration Readiness
+
+- TDD red:
+  targeted HTTP test failed on missing
+  `/api/v1/narratives/storage/migration-plan`; conformance test failed on
+  missing `job_runs` ledger and Round 4 durable entity list.
+- TDD green:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py -q -k 'storage_migration_plan'`
+  and
+  `uv run pytest tests/test_narrative_service_conformance_probe.py -q -k 'append_only_ledger_policy'`
+  passed.
+- Service endpoint:
+  `GET /api/v1/narratives/storage/migration-plan`.
+- Schema scope:
+  migration plan covers narratives, stock mappings, evidence packs, source
+  events, candidates, review actions, promotion decisions, radar source signals,
+  radar snapshots, and job runs.
+- Invariants:
+  HTTP contracts cannot change; append-only semantics are preserved; JSON mode
+  remains fallback until parity passes; trusted promotion writes remain
+  `promotion_commit_only`.
+- Product note:
+  `docs/product/round4-durable-storage-migration-readiness-2026-05-30.html`
+  with auxiliary Markdown at
+  `docs/product/round4-durable-storage-migration-readiness-2026-05-30.md`.
 
 ## Final Acceptance Gates
 

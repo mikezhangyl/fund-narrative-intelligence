@@ -2429,6 +2429,67 @@ def test_disabled_and_failed_jobs_do_not_mutate_trusted_stores(tmp_path):
     assert config.evidence_packs_path.read_text(encoding="utf-8") == before_evidence
 
 
+def test_storage_migration_plan_declares_round4_entities_and_invariants(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/storage/migration-plan")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    payload = response["data"]
+    assert payload["version"] == "narrative-durable-storage-migration-plan-v1"
+    assert payload["current_store"] == "json_file_ledgers_v1"
+    assert payload["target_adapters"] == ["sqlite_local", "postgres_managed"]
+    assert [entity["name"] for entity in payload["entities"]] == [
+        "narratives",
+        "stock_narrative_mappings",
+        "evidence_packs",
+        "source_events",
+        "candidate_narratives",
+        "review_actions",
+        "promotion_decisions",
+        "radar_source_signals",
+        "radar_snapshots",
+        "job_runs",
+    ]
+    append_only = {
+        item["name"]: item
+        for item in payload["entities"]
+        if item["write_model"] == "append_only"
+    }
+    assert set(append_only) == {
+        "source_events",
+        "review_actions",
+        "promotion_decisions",
+        "radar_source_signals",
+        "radar_snapshots",
+        "job_runs",
+    }
+    assert append_only["review_actions"]["idempotency"] == (
+        "candidate_action_reviewer_idempotency_key"
+    )
+    assert append_only["job_runs"]["idempotency"] == "job_id_idempotency_key"
+    assert payload["contract_invariants"] == {
+        "http_contract_change_allowed": False,
+        "append_only_semantics_preserved": True,
+        "json_mode_remains_available": True,
+        "trusted_promotion_write_path": "promotion_commit_only",
+    }
+    assert payload["migration_phases"] == [
+        "backup_json_ledgers",
+        "create_schema",
+        "backfill_append_only_ledgers",
+        "backfill_read_models",
+        "run_http_parity_checks",
+        "enable_sqlite_adapter",
+        "retain_json_fallback_until_parity_passes",
+    ]
+
+
 def test_unknown_route_returns_error_envelope(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Round 4 Durable Storage Migration Readiness 验收说明</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f6f8fa;color:#20242b;line-height:1.6}
+    main{max-width:1080px;margin:0 auto;padding:32px}
+    section{margin:24px 0}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #d9dee7}
+    th,td{border-bottom:1px solid #e4e8ef;padding:10px;text-align:left;vertical-align:top}
+    code{background:#eef2f7;padding:2px 5px;border-radius:4px}
+    .meta{color:#5d6675}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Round 4 Durable Storage Migration Readiness 验收说明</h1>
+  <p class="meta">Linear: MIK-96 + MIK-91 · 日期: 2026-05-30</p>
+
+  <section>
+    <h2>能力目标</h2>
+    <p>本切片不直接切换 SQLite/Postgres，而是把 Narrative Service 从 JSON ledgers 迁移到 durable store 所需的 schema、迁移阶段和 contract invariants 明确化，并通过服务接口和 conformance contract 固化。JSON mode 在 parity 通过前仍然可用。</p>
+  </section>
+
+  <section>
+    <h2>服务入口</h2>
+    <table>
+      <thead><tr><th>入口</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/v1/narratives/storage/migration-plan</code></td><td>返回 current store、目标 adapter、实体清单、append-only/idempotency 规则、迁移阶段和 parity check endpoints。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>实体范围</h2>
+    <table>
+      <thead><tr><th>实体</th><th>写入模型</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><code>narratives</code></td><td>trusted read model</td><td>可信叙事 registry。</td></tr>
+        <tr><td><code>stock_narrative_mappings</code></td><td>trusted read model</td><td>股票到叙事映射。</td></tr>
+        <tr><td><code>evidence_packs</code></td><td>trusted read model</td><td>映射证据包。</td></tr>
+        <tr><td><code>source_events</code></td><td>append only</td><td>来源事件 ledger。</td></tr>
+        <tr><td><code>candidate_narratives</code></td><td>derived read model</td><td>候选叙事读模型。</td></tr>
+        <tr><td><code>review_actions</code></td><td>append only</td><td>人工 review action ledger。</td></tr>
+        <tr><td><code>promotion_decisions</code></td><td>append only</td><td>trust promotion decision ledger。</td></tr>
+        <tr><td><code>radar_source_signals</code></td><td>append only</td><td>Radar source signal ledger。</td></tr>
+        <tr><td><code>radar_snapshots</code></td><td>append only</td><td>窗口化 radar scoring snapshot。</td></tr>
+        <tr><td><code>job_runs</code></td><td>append only</td><td>operational job run ledger。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>迁移不变量</h2>
+    <ul>
+      <li>HTTP contract 不允许因存储 adapter 变化而破坏。</li>
+      <li>Append-only semantics 必须保留。</li>
+      <li>JSON mode 在 SQLite parity 通过前保持 fallback。</li>
+      <li>Trusted promotion write path 仍然只能是 promotion commit。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>验证</h2>
+    <p>新增服务测试先以 404 失败确认 RED，再实现后通过：<code>uv run pytest services/stock-narrative-service/tests/test_http_service.py -q -k 'storage_migration_plan'</code>。</p>
+    <p>Conformance contract 验证：<code>uv run pytest tests/test_narrative_service_conformance_probe.py -q -k 'append_only_ledger_policy'</code>。</p>
+  </section>
+</main>
+</body>
+</html>

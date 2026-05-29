@@ -16,6 +16,7 @@ Current storage remains JSON file ledgers:
 - Candidate intake events
 - Review actions
 - Promotion decisions
+- Job runs
 - Reviewed registry fixture
 - Reviewed stock mappings fixture
 - Mapping evidence packs fixture
@@ -54,6 +55,11 @@ The explicit repository methods are:
 - `review_actions`
 - `promotion_decisions`
 - `ops_summary`
+
+Round 4 also exposes a storage migration plan endpoint:
+
+- `storage_migration_plan` through
+  `GET /api/v1/narratives/storage/migration-plan`
 
 The current adapter is `JsonLedgerNarrativeRepository` with
 `storage_backend=json_file_ledgers_v1`. A future SQLite adapter must satisfy the
@@ -115,18 +121,43 @@ Evidence links:
 - `evidence_pack_id`
 - `payload_json`
 
+Round 4 durable entities added to the migration plan:
+
+- `narratives`
+- `stock_narrative_mappings`
+- `evidence_packs`
+- `source_events`
+- `candidate_narratives`
+- `review_actions`
+- `promotion_decisions`
+- `radar_source_signals`
+- `radar_snapshots`
+- `job_runs`
+
+Append-only tables must preserve deterministic or idempotency keys:
+
+- `source_events`: source event identity
+- `review_actions`: candidate/action/reviewer/idempotency key
+- `promotion_decisions`: candidate/target/review action
+- `radar_source_signals`: source event/candidate/signal
+- `radar_snapshots`: window parameters/formula version
+- `job_runs`: job id/idempotency key
+
 ## Backfill And Replay
 
 Backfill order:
 
 1. Backup JSON ledgers.
 2. Load source event ledger and preserve deterministic IDs.
-3. Rebuild candidate narrative read model from source events.
-4. Replay review actions by ledger sequence / reviewed_at.
-5. Replay promotion decisions after review action references exist.
-6. Recompute review queue and ops summary from SQLite.
+3. Create SQLite schema for all Round 4 lifecycle entities.
+4. Backfill append-only ledgers: source events, review actions, promotion
+   decisions, radar signals/snapshots, and job runs.
+5. Rebuild candidate narrative and trusted read models.
+6. Recompute review queue, radar preview, job run summaries, and ops summary
+   from SQLite.
 7. Compare endpoint responses against JSON mode for registry, candidates,
-   review queue, review actions, promotion decisions, and ops summary.
+   review queue, review actions, promotion decisions, radar preview, job runs,
+   and ops summary.
 
 Replay must be idempotent. Existing deterministic IDs are the conflict keys.
 

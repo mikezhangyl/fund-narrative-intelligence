@@ -400,6 +400,26 @@ storage_policy:
       record_type: promotion_decision
       status: reserved
       note: Future trusted-promotion decisions must use a separate append-only ledger.
+    job_runs:
+      path: services/stock-narrative-service/data/runtime/job_runs.json
+      version: narrative-job-runs-v1
+      collection_key: items
+      record_type: job_run
+      required_record_fields:
+        - schema_version
+        - ledger_record_type
+        - run_id
+        - job_id
+        - triggered_by
+        - started_at
+        - finished_at
+        - status
+        - duration_ms
+        - warnings
+        - artifacts
+        - error_category
+        - idempotency_key
+        - trusted_store_mutation
   mutation_policy:
     review_actions_mutate:
       - review_action_ledger
@@ -422,6 +442,25 @@ storage_policy:
     threshold: multiple reviewers, concurrent writes, or ledger queries that need transactional indexes
     http_contract_change_allowed: false
     invariant: Storage adapters may change, but HTTP endpoints, envelopes, trust states, and append-only record semantics must remain stable.
+    durable_entities:
+      - narratives
+      - stock_narrative_mappings
+      - evidence_packs
+      - source_events
+      - candidate_narratives
+      - review_actions
+      - promotion_decisions
+      - radar_source_signals
+      - radar_snapshots
+      - job_runs
+    migration_phases:
+      - backup_json_ledgers
+      - create_schema
+      - backfill_append_only_ledgers
+      - backfill_read_models
+      - run_http_parity_checks
+      - enable_sqlite_adapter
+      - retain_json_fallback_until_parity_passes
 
 identity_policy:
   explicit_id_rule: preserve_non_empty_external_ids

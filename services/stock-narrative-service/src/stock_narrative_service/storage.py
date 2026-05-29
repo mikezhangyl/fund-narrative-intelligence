@@ -616,6 +616,40 @@ class NarrativeStore:
         _write_object(self.config.job_runs_path, ledger)
         return {"run": run}
 
+    def storage_migration_plan(self) -> dict[str, Any]:
+        return {
+            "version": "narrative-durable-storage-migration-plan-v1",
+            "current_store": "json_file_ledgers_v1",
+            "target_adapters": ["sqlite_local", "postgres_managed"],
+            "entities": _durable_storage_entities(),
+            "contract_invariants": {
+                "http_contract_change_allowed": False,
+                "append_only_semantics_preserved": True,
+                "json_mode_remains_available": True,
+                "trusted_promotion_write_path": "promotion_commit_only",
+            },
+            "migration_phases": [
+                "backup_json_ledgers",
+                "create_schema",
+                "backfill_append_only_ledgers",
+                "backfill_read_models",
+                "run_http_parity_checks",
+                "enable_sqlite_adapter",
+                "retain_json_fallback_until_parity_passes",
+            ],
+            "parity_check_endpoints": [
+                "/api/v1/narratives/registry",
+                "/api/v1/narratives/mappings",
+                "/api/v1/narratives/evidence-packs",
+                "/api/v1/narratives/candidates",
+                "/api/v1/narratives/review-queue",
+                "/api/v1/narratives/review-actions",
+                "/api/v1/narratives/promotion/preflight",
+                "/api/v1/narratives/radar/preview",
+                "/api/v1/narratives/jobs/runs",
+            ],
+        }
+
     def ingest_events(self, payload: dict[str, Any]) -> dict[str, Any]:
         events = _event_list(payload.get("events"))
         dry_run = bool(payload.get("dry_run"))
@@ -1108,6 +1142,140 @@ def _job_run_summary(items: list[dict[str, Any]]) -> dict[str, int]:
         status = str(item.get("status") or "")
         summary[status] = summary.get(status, 0) + 1
     return summary
+
+
+def _durable_storage_entities() -> list[dict[str, Any]]:
+    return [
+        _entity(
+            name="narratives",
+            primary_key="narrative_id",
+            write_model="trusted_read_model",
+            idempotency="narrative_id",
+            source="reviewed_registry_or_promotion_commit",
+        ),
+        _entity(
+            name="stock_narrative_mappings",
+            primary_key="stock_code_narrative_id",
+            write_model="trusted_read_model",
+            idempotency="stock_code_narrative_id",
+            source="reviewed_mappings_or_promotion_commit",
+        ),
+        _entity(
+            name="evidence_packs",
+            primary_key="evidence_pack_id",
+            write_model="trusted_read_model",
+            idempotency="stock_code_narrative_id",
+            source="mapping_evidence_packs_or_promotion_commit",
+        ),
+        _entity(
+            name="source_events",
+            primary_key="event_id",
+            write_model="append_only",
+            idempotency="source_event_identity",
+            source="candidate_intake_events",
+        ),
+        _entity(
+            name="candidate_narratives",
+            primary_key="candidate_narrative_id",
+            write_model="derived_read_model",
+            idempotency="candidate_narrative_identity",
+            source="source_events",
+        ),
+        _entity(
+            name="review_actions",
+            primary_key="review_action_id",
+            write_model="append_only",
+            idempotency="candidate_action_reviewer_idempotency_key",
+            source="review_actions",
+        ),
+        _entity(
+            name="promotion_decisions",
+            primary_key="promotion_decision_id",
+            write_model="append_only",
+            idempotency="candidate_target_review_action",
+            source="promotion_decisions",
+        ),
+        _entity(
+            name="radar_source_signals",
+            primary_key="signal_id",
+            write_model="append_only",
+            idempotency="source_event_candidate_signal",
+            source="source_events",
+        ),
+        _entity(
+            name="radar_snapshots",
+            primary_key="snapshot_id",
+            write_model="append_only",
+            idempotency="window_parameters_formula_version",
+            source="radar_scores",
+        ),
+        _entity(
+            name="job_runs",
+            primary_key="run_id",
+            write_model="append_only",
+            idempotency="job_id_idempotency_key",
+            source="job_runs",
+        ),
+    ]
+
+
+def _entity(
+    *,
+    name: str,
+    primary_key: str,
+    write_model: str,
+    idempotency: str,
+    source: str,
+) -> dict[str, Any]:
+    return {
+        "name": name,
+        "primary_key": primary_key,
+        "write_model": write_model,
+        "idempotency": idempotency,
+        "source": source,
+        "required_columns": _required_columns_for_entity(name),
+    }
+
+
+def _required_columns_for_entity(name: str) -> list[str]:
+    columns_by_entity = {
+        "narratives": ["narrative_id", "name", "trust_status", "payload_json"],
+        "stock_narrative_mappings": [
+            "stock_code",
+            "narrative_id",
+            "trust_status",
+            "payload_json",
+        ],
+        "evidence_packs": ["evidence_pack_id", "stock_code", "narrative_id"],
+        "source_events": ["event_id", "source_type", "event_time", "payload_json"],
+        "candidate_narratives": [
+            "candidate_narrative_id",
+            "name",
+            "trust_status",
+            "payload_json",
+        ],
+        "review_actions": [
+            "review_action_id",
+            "candidate_narrative_id",
+            "action",
+            "reviewed_at",
+        ],
+        "promotion_decisions": [
+            "promotion_decision_id",
+            "candidate_narrative_id",
+            "target_narrative_id",
+            "review_action_id",
+        ],
+        "radar_source_signals": ["signal_id", "source_event_id", "narrative_id"],
+        "radar_snapshots": [
+            "snapshot_id",
+            "window_start",
+            "window_end",
+            "formula_version",
+        ],
+        "job_runs": ["run_id", "job_id", "started_at", "status"],
+    }
+    return columns_by_entity.get(name, [])
 
 
 def _duration_ms(started_at: str, finished_at: str) -> int:

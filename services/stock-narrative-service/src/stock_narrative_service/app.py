@@ -181,6 +181,9 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
             "/api/v1/narratives/jobs/definitions": (
                 self.server.store.job_definitions
             ),
+            "/api/v1/narratives/storage/migration-plan": (
+                self.server.store.storage_migration_plan
+            ),
         }
         if path == "/api/v1/narratives/review-queue":
             handler = lambda: self.server.store.review_queue(  # noqa: E731
