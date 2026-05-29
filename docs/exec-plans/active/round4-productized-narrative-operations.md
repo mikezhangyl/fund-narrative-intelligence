@@ -29,7 +29,7 @@ Execute in dependency order:
 2. Done - `MIK-94` + `MIK-89`: Narrative Radar UI contract and service UI surface.
 3. Done locally, pending Linear closeout - `MIK-97` + `MIK-92`: review/promotion state machine and complete reviewer
    workflow.
-4. `MIK-95` + `MIK-90`: scheduling job model and operational run ledger.
+4. Done locally, pending Linear closeout - `MIK-95` + `MIK-90`: scheduling job model and operational run ledger.
 5. `MIK-96` + `MIK-91`: durable storage migration schema and migration
    readiness.
 6. `MIK-86` + `MIK-87`: close parent packs after all child issues pass.
@@ -132,6 +132,42 @@ For every slice:
   `docs/product/round4-review-workflow-state-machine-2026-05-30.html` with
   auxiliary Markdown at
   `docs/product/round4-review-workflow-state-machine-2026-05-30.md`.
+
+### MIK-95 + MIK-90 - Operational Scheduling And Run Ledger
+
+- TDD red:
+  targeted HTTP tests failed on missing job definition/run-ledger config and
+  scheduling routes.
+- TDD green:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py -q -k 'job_schedule or manual_job_run or disabled_and_failed_jobs'`
+  passed with 3 tests.
+- Service endpoints:
+  `GET /api/v1/narratives/jobs/contract`,
+  `GET /api/v1/narratives/jobs/definitions`,
+  `POST /api/v1/narratives/jobs/run`, and
+  `GET /api/v1/narratives/jobs/runs`.
+- Job model:
+  default job definitions cover live provider smoke, source intake, radar
+  scoring, and report-pack generation with enabled flags, schedules,
+  parameters, timeout, concurrency guard, retry policy, and owner service.
+- Run ledger:
+  every manual run records `JR_*` run id, timestamps, status, duration,
+  warnings, artifacts, error category, idempotency key, and
+  `trusted_store_mutation=none`.
+- Guardrail:
+  disabled jobs fail before writing a run; unsupported job types record a
+  failed run without mutating trusted registry, mapping, or evidence stores.
+- Targeted regression:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  passed with 51 tests.
+- Static checks:
+  `uv run ruff check services/stock-narrative-service/src/stock_narrative_service services/stock-narrative-service/tests/test_http_service.py`.
+- Compile:
+  `uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests`.
+- Product note:
+  `docs/product/round4-operational-scheduling-run-ledger-2026-05-30.html`
+  with auxiliary Markdown at
+  `docs/product/round4-operational-scheduling-run-ledger-2026-05-30.md`.
 
 ## Final Acceptance Gates
 

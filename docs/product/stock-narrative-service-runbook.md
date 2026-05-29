@@ -311,7 +311,9 @@ The current durable store is JSON-file-backed append-only ledgers:
   `review_actions.json`;
 - trusted promotion decisions are reserved for a separate
   `narrative-promotion-decisions-v1` ledger and must not reuse the review-action
-  file.
+  file;
+- scheduled/manual job runs write `narrative-job-runs-v1` records to
+  `job_runs.json` and must disclose `trusted_store_mutation=none`.
 
 Each ledger record must preserve a schema version, record type, ledger sequence,
 recorded timestamp, actor/action or event fields, note where applicable, source

@@ -175,6 +175,12 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
             "/api/v1/narratives/review-workflow/contract": (
                 self.server.store.review_workflow_contract
             ),
+            "/api/v1/narratives/jobs/contract": (
+                self.server.store.scheduling_contract
+            ),
+            "/api/v1/narratives/jobs/definitions": (
+                self.server.store.job_definitions
+            ),
         }
         if path == "/api/v1/narratives/review-queue":
             handler = lambda: self.server.store.review_queue(  # noqa: E731
@@ -183,6 +189,11 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
         elif path == "/api/v1/narratives/review-workflow":
             handler = lambda: self.server.store.review_workflow_summary(  # noqa: E731
                 status=_first_query_value(query, "status")
+            )
+        elif path == "/api/v1/narratives/jobs/runs":
+            handler = lambda: self.server.store.job_runs(  # noqa: E731
+                job_id=_first_query_value(query, "job_id"),
+                status=_first_query_value(query, "status"),
             )
         else:
             handler = routes.get(path)
@@ -284,6 +295,26 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 self._send_error(
                     HTTPStatus.BAD_REQUEST,
                     "INVALID_REVIEW_ACTION",
+                    str(exc),
+                )
+                return
+            self._send_json(
+                HTTPStatus.OK,
+                _envelope(
+                    config=self.server.config,
+                    data=data,
+                    trust_status="candidate_untrusted",
+                ),
+            )
+            return
+        if self.path == "/api/v1/narratives/jobs/run":
+            try:
+                payload = self._read_json()
+                data = self.server.store.run_job(payload)
+            except Exception as exc:
+                self._send_error(
+                    HTTPStatus.BAD_REQUEST,
+                    "INVALID_JOB_RUN",
                     str(exc),
                 )
                 return

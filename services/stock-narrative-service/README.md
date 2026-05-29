@@ -2,7 +2,8 @@
 
 `stock-narrative-service` is a monorepo subservice for narrative registry,
 stock-to-narrative mappings, evidence packs, candidate intake, review queue,
-review action ledger, promotion preflight, and trust audit state.
+review action ledger, promotion preflight, trust audit state, and operational
+job run state.
 
 It is intentionally exposed as an HTTP service. FNI should consume it through
 `NARRATIVE_SERVICE_URL`; FNI should not import service internals.
@@ -60,6 +61,11 @@ First slice scope:
 - service/dev radar preview endpoint:
   `/api/v1/narratives/radar/preview`, plus optional non-authoritative
   evidence explanation through `include_explanation=true` on radar evidence.
+- operational job endpoints:
+  `/api/v1/narratives/jobs/contract`,
+  `/api/v1/narratives/jobs/definitions`,
+  `/api/v1/narratives/jobs/run`, and
+  `/api/v1/narratives/jobs/runs`.
 
 Non-goals:
 

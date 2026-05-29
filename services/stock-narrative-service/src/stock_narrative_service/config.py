@@ -29,5 +29,9 @@ class ServiceConfig:
     market_confirmation_path: Path = (
         SERVICE_ROOT / "data" / "runtime" / "radar_market_confirmation.json"
     )
+    job_definitions_path: Path = (
+        SERVICE_ROOT / "data" / "runtime" / "job_definitions.json"
+    )
+    job_runs_path: Path = SERVICE_ROOT / "data" / "runtime" / "job_runs.json"
     provider_name: str = "stock-narrative-service"
     provider_version: str = "v0"

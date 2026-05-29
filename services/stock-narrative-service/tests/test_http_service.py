@@ -2271,6 +2271,164 @@ def test_review_workflow_html_exposes_blocked_and_deferred_paths(tmp_path):
     assert "promotion commit is the only trusted-record write path" in html
 
 
+def test_job_schedule_contract_declares_definitions_run_ledger_and_bounds(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/jobs/contract")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    payload = response["data"]
+    assert payload["version"] == "narrative-scheduling-contract-v1"
+    assert payload["job_definition_fields"] == [
+        "job_id",
+        "job_type",
+        "enabled",
+        "schedule",
+        "parameters",
+        "owner_service",
+        "timeout_seconds",
+        "concurrency_guard",
+        "retry_policy",
+        "idempotency_key",
+    ]
+    assert payload["run_ledger_fields"] == [
+        "run_id",
+        "job_id",
+        "triggered_by",
+        "started_at",
+        "finished_at",
+        "status",
+        "duration_ms",
+        "warnings",
+        "artifacts",
+        "error_category",
+        "idempotency_key",
+    ]
+    assert payload["statuses"] == ["queued", "running", "success", "degraded", "failed"]
+    assert payload["write_safety"] == {
+        "source_intake": "dry_run_by_default",
+        "radar_scoring": "read_only_snapshot",
+        "live_provider_smoke": "diagnostic_only",
+        "report_pack_generation": "artifact_only",
+        "trusted_store_mutation": "forbidden",
+    }
+
+
+def test_manual_job_run_appends_idempotent_run_ledger_record(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        definitions = _get_json(f"{base_url}/api/v1/narratives/jobs/definitions")
+        first = _post_json(
+            f"{base_url}/api/v1/narratives/jobs/run",
+            {
+                "job_id": "narrative-radar-scoring",
+                "triggered_by": "manual",
+                "idempotency_key": "radar-score-manual-1",
+            },
+        )
+        second = _post_json(
+            f"{base_url}/api/v1/narratives/jobs/run",
+            {
+                "job_id": "narrative-radar-scoring",
+                "triggered_by": "manual",
+                "idempotency_key": "radar-score-manual-1",
+            },
+        )
+        runs = _get_json(f"{base_url}/api/v1/narratives/jobs/runs")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    job_ids = {item["job_id"] for item in definitions["data"]["jobs"]}
+    assert job_ids == {
+        "live-provider-smoke",
+        "source-intake",
+        "narrative-radar-scoring",
+        "report-pack-generation",
+    }
+    run = first["data"]["run"]
+    assert run["run_id"].startswith("JR_")
+    assert run["job_id"] == "narrative-radar-scoring"
+    assert run["triggered_by"] == "manual"
+    assert run["status"] in {"success", "degraded"}
+    assert run["duration_ms"] >= 0
+    assert run["started_at"] <= run["finished_at"]
+    assert run["error_category"] == ""
+    assert run["artifacts"][0]["path"] == "/api/v1/narratives/radar/preview"
+    assert second["data"]["run"]["run_id"] == run["run_id"]
+    assert second["data"]["run"]["idempotent_replay"] is True
+    assert runs["data"]["items"] == [run]
+    assert json.loads(config.job_runs_path.read_text(encoding="utf-8"))["items"] == [
+        run
+    ]
+
+
+def test_disabled_and_failed_jobs_do_not_mutate_trusted_stores(tmp_path):
+    config = _write_seed_files(tmp_path)
+    config.job_definitions_path.parent.mkdir(parents=True, exist_ok=True)
+    config.job_definitions_path.write_text(
+        json.dumps(
+            {
+                "version": "narrative-job-definitions-v1",
+                "jobs": [
+                    {
+                        "job_id": "disabled-intake",
+                        "job_type": "source_intake",
+                        "enabled": False,
+                        "schedule": {"mode": "manual"},
+                        "parameters": {},
+                        "owner_service": "stock-narrative-service",
+                    },
+                    {
+                        "job_id": "bad-job",
+                        "job_type": "unsupported",
+                        "enabled": True,
+                        "schedule": {"mode": "manual"},
+                        "parameters": {},
+                        "owner_service": "stock-narrative-service",
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    before_registry = config.registry_path.read_text(encoding="utf-8")
+    before_mappings = config.mappings_path.read_text(encoding="utf-8")
+    before_evidence = config.evidence_packs_path.read_text(encoding="utf-8")
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        disabled = _post_json_error(
+            f"{base_url}/api/v1/narratives/jobs/run",
+            {"job_id": "disabled-intake", "triggered_by": "manual"},
+        )
+        failed = _post_json(
+            f"{base_url}/api/v1/narratives/jobs/run",
+            {"job_id": "bad-job", "triggered_by": "manual"},
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert disabled["data"]["error"]["code"] == "INVALID_JOB_RUN"
+    run = failed["data"]["run"]
+    assert run["status"] == "failed"
+    assert run["error_category"] == "unsupported_job_type"
+    assert run["warnings"][0]["code"] == "JOB_TYPE_UNSUPPORTED"
+    assert config.registry_path.read_text(encoding="utf-8") == before_registry
+    assert config.mappings_path.read_text(encoding="utf-8") == before_mappings
+    assert config.evidence_packs_path.read_text(encoding="utf-8") == before_evidence
+
+
 def test_unknown_route_returns_error_envelope(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -2297,6 +2455,8 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
     review_actions_path = tmp_path / "runtime" / "review_actions.json"
     promotion_decisions_path = tmp_path / "runtime" / "promotion_decisions.json"
     market_confirmation_path = tmp_path / "runtime" / "radar_market_confirmation.json"
+    job_definitions_path = tmp_path / "runtime" / "job_definitions.json"
+    job_runs_path = tmp_path / "runtime" / "job_runs.json"
     registry_path.write_text(
         json.dumps(
             {
@@ -2362,6 +2522,8 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
         review_actions_path=review_actions_path,
         promotion_decisions_path=promotion_decisions_path,
         market_confirmation_path=market_confirmation_path,
+        job_definitions_path=job_definitions_path,
+        job_runs_path=job_runs_path,
     )
 
 

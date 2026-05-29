@@ -18,6 +18,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--intake-ledger-path", type=Path)
     parser.add_argument("--review-actions-path", type=Path)
     parser.add_argument("--promotion-decisions-path", type=Path)
+    parser.add_argument("--job-definitions-path", type=Path)
+    parser.add_argument("--job-runs-path", type=Path)
     return parser
 
 
@@ -47,6 +49,8 @@ def _config_from_args(args: argparse.Namespace) -> ServiceConfig:
         promotion_decisions_path=(
             args.promotion_decisions_path or defaults.promotion_decisions_path
         ),
+        job_definitions_path=args.job_definitions_path or defaults.job_definitions_path,
+        job_runs_path=args.job_runs_path or defaults.job_runs_path,
     )
 
 

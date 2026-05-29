@@ -33,6 +33,8 @@ from stock_narrative_service.radar import (
 INTAKE_LEDGER_VERSION = "service-intake-events-v1"
 REVIEW_ACTION_LEDGER_VERSION = "narrative-review-actions-v1"
 PROMOTION_DECISION_LEDGER_VERSION = "narrative-promotion-decisions-v1"
+JOB_DEFINITIONS_VERSION = "narrative-job-definitions-v1"
+JOB_RUN_LEDGER_VERSION = "narrative-job-runs-v1"
 PROVIDER_PREFERENCE_BY_SOURCE_TYPE = {
     "news": ["gateway_news_briefs", "tushare_news"],
     "announcement": ["gateway_announcements", "tushare_announcements"],
@@ -61,6 +63,7 @@ REVIEW_WORKFLOW_STATES = [
     "deferred",
     "deprecated",
 ]
+JOB_RUN_STATUSES = ["queued", "running", "success", "degraded", "failed"]
 
 
 class PromotionGateError(ValueError):
@@ -129,6 +132,18 @@ class NarrativeStore:
         if not path.exists():
             return {"version": PROMOTION_DECISION_LEDGER_VERSION, "items": []}
         return _load_object(path, label="promotion decisions")
+
+    def job_definitions(self) -> dict[str, Any]:
+        path = self.config.job_definitions_path
+        if not path.exists():
+            return _default_job_definitions()
+        return _load_object(path, label="job definitions")
+
+    def job_run_ledger(self) -> dict[str, Any]:
+        path = self.config.job_runs_path
+        if not path.exists():
+            return {"version": JOB_RUN_LEDGER_VERSION, "items": []}
+        return _load_object(path, label="job run ledger")
 
     def candidates(self) -> dict[str, Any]:
         registry_candidates = _list(self.registry().get("candidate_narratives"))
@@ -508,6 +523,99 @@ class NarrativeStore:
             ]
         )
 
+    def scheduling_contract(self) -> dict[str, Any]:
+        return {
+            "version": "narrative-scheduling-contract-v1",
+            "job_definition_fields": [
+                "job_id",
+                "job_type",
+                "enabled",
+                "schedule",
+                "parameters",
+                "owner_service",
+                "timeout_seconds",
+                "concurrency_guard",
+                "retry_policy",
+                "idempotency_key",
+            ],
+            "run_ledger_fields": [
+                "run_id",
+                "job_id",
+                "triggered_by",
+                "started_at",
+                "finished_at",
+                "status",
+                "duration_ms",
+                "warnings",
+                "artifacts",
+                "error_category",
+                "idempotency_key",
+            ],
+            "statuses": [*JOB_RUN_STATUSES],
+            "write_safety": {
+                "source_intake": "dry_run_by_default",
+                "radar_scoring": "read_only_snapshot",
+                "live_provider_smoke": "diagnostic_only",
+                "report_pack_generation": "artifact_only",
+                "trusted_store_mutation": "forbidden",
+            },
+            "manual_run_endpoint": "/api/v1/narratives/jobs/run",
+            "definitions_endpoint": "/api/v1/narratives/jobs/definitions",
+            "run_ledger_endpoint": "/api/v1/narratives/jobs/runs",
+        }
+
+    def job_runs(self, *, job_id: str = "", status: str = "") -> dict[str, Any]:
+        items = _list(self.job_run_ledger().get("items"))
+        if job_id:
+            items = [item for item in items if str(item.get("job_id") or "") == job_id]
+        if status:
+            items = [item for item in items if str(item.get("status") or "") == status]
+        return {
+            "version": JOB_RUN_LEDGER_VERSION,
+            "filter": {"job_id": job_id, "status": status},
+            "summary": _job_run_summary(items),
+            "items": items,
+        }
+
+    def run_job(self, payload: dict[str, Any]) -> dict[str, Any]:
+        job_id = str(payload.get("job_id") or "").strip()
+        triggered_by = str(payload.get("triggered_by") or "manual").strip() or "manual"
+        idempotency_key = str(payload.get("idempotency_key") or "").strip()
+        request_parameters = _mapping(payload.get("parameters"))
+        if not job_id:
+            raise ValueError("job_id is required")
+        definitions = self.job_definitions()
+        job = _job_definition_by_id(definitions, job_id)
+        if not job:
+            raise ValueError(f"Unknown job_id: {job_id}")
+        if not bool(job.get("enabled", True)):
+            raise ValueError(f"Job is disabled: {job_id}")
+        ledger = self.job_run_ledger()
+        existing_runs = _list(ledger.get("items"))
+        existing = _job_run_by_idempotency_key(
+            existing_runs,
+            job_id=job_id,
+            idempotency_key=idempotency_key,
+        )
+        if existing is not None:
+            return {"run": {**existing, "idempotent_replay": True}}
+        started_at = _now()
+        run = _execute_job_definition(
+            store=self,
+            job=job,
+            triggered_by=triggered_by,
+            idempotency_key=idempotency_key,
+            request_parameters=request_parameters,
+            started_at=started_at,
+        )
+        ledger = {
+            **ledger,
+            "version": JOB_RUN_LEDGER_VERSION,
+            "items": [*existing_runs, run],
+        }
+        _write_object(self.config.job_runs_path, ledger)
+        return {"run": run}
+
     def ingest_events(self, payload: dict[str, Any]) -> dict[str, Any]:
         events = _event_list(payload.get("events"))
         dry_run = bool(payload.get("dry_run"))
@@ -763,6 +871,252 @@ def _all_events(store: NarrativeStore) -> list[dict[str, Any]]:
         *_list(store.seed_events().get("events")),
         *_list(store.intake_ledger().get("events")),
     ]
+
+
+def _default_job_definitions() -> dict[str, Any]:
+    return {
+        "version": JOB_DEFINITIONS_VERSION,
+        "jobs": [
+            _job_definition(
+                job_id="live-provider-smoke",
+                job_type="live_provider_smoke",
+                schedule={"mode": "manual", "recommended": "before_release"},
+                parameters={"output_scope": "credential_safe_diagnostics"},
+            ),
+            _job_definition(
+                job_id="source-intake",
+                job_type="source_intake",
+                schedule={"mode": "manual_or_scheduled", "cadence": "hourly"},
+                parameters={"dry_run": True},
+            ),
+            _job_definition(
+                job_id="narrative-radar-scoring",
+                job_type="radar_scoring",
+                schedule={"mode": "manual_or_scheduled", "cadence": "hourly"},
+                parameters={"window_days": 7, "baseline_days": 30},
+            ),
+            _job_definition(
+                job_id="report-pack-generation",
+                job_type="report_pack_generation",
+                schedule={"mode": "manual_or_scheduled", "cadence": "daily"},
+                parameters={"artifact_only": True},
+            ),
+        ],
+    }
+
+
+def _job_definition(
+    *,
+    job_id: str,
+    job_type: str,
+    schedule: dict[str, Any],
+    parameters: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "job_id": job_id,
+        "job_type": job_type,
+        "enabled": True,
+        "schedule": schedule,
+        "parameters": parameters,
+        "owner_service": "stock-narrative-service",
+        "timeout_seconds": 300,
+        "concurrency_guard": "single_active_run_per_job",
+        "retry_policy": {"max_attempts": 1, "backoff": "none"},
+        "idempotency_key": "required_for_scheduled_runs",
+    }
+
+
+def _job_definition_by_id(
+    definitions: dict[str, Any],
+    job_id: str,
+) -> dict[str, Any]:
+    for item in _list(definitions.get("jobs")):
+        if str(item.get("job_id") or "") == job_id:
+            return item
+    return {}
+
+
+def _job_run_by_idempotency_key(
+    runs: list[dict[str, Any]],
+    *,
+    job_id: str,
+    idempotency_key: str,
+) -> dict[str, Any] | None:
+    if not idempotency_key:
+        return None
+    for item in runs:
+        if (
+            str(item.get("job_id") or "") == job_id
+            and str(item.get("idempotency_key") or "") == idempotency_key
+        ):
+            return item
+    return None
+
+
+def _execute_job_definition(
+    *,
+    store: NarrativeStore,
+    job: dict[str, Any],
+    triggered_by: str,
+    idempotency_key: str,
+    request_parameters: dict[str, Any],
+    started_at: str,
+) -> dict[str, Any]:
+    job_id = str(job.get("job_id") or "")
+    job_type = str(job.get("job_type") or "")
+    parameters = {**_mapping(job.get("parameters")), **request_parameters}
+    run_id = stable_id("JR", [job_id, idempotency_key or started_at])
+    try:
+        execution = _job_execution_result(
+            store=store,
+            job_type=job_type,
+            parameters=parameters,
+        )
+    except Exception as exc:  # pragma: no cover - defensive run ledger capture
+        execution = {
+            "status": "failed",
+            "warnings": [
+                {
+                    "code": "JOB_EXECUTION_FAILED",
+                    "message": str(exc),
+                    "classification": "system_failure",
+                }
+            ],
+            "artifacts": [],
+            "error_category": "runtime_error",
+        }
+    finished_at = _now()
+    return {
+        "schema_version": "narrative-job-run-record-v1",
+        "ledger_record_type": "job_run",
+        "run_id": run_id,
+        "job_id": job_id,
+        "job_type": job_type,
+        "owner_service": str(job.get("owner_service") or "stock-narrative-service"),
+        "triggered_by": triggered_by,
+        "started_at": started_at,
+        "finished_at": finished_at,
+        "status": str(execution["status"]),
+        "duration_ms": _duration_ms(started_at, finished_at),
+        "warnings": _list(execution.get("warnings")),
+        "artifacts": _list(execution.get("artifacts")),
+        "error_category": str(execution.get("error_category") or ""),
+        "idempotency_key": idempotency_key,
+        "timeout_seconds": int(job.get("timeout_seconds") or 0),
+        "concurrency_guard": str(
+            job.get("concurrency_guard") or "single_active_run_per_job"
+        ),
+        "retry_policy": _mapping(job.get("retry_policy")),
+        "parameters": parameters,
+        "trusted_store_mutation": "none",
+    }
+
+
+def _job_execution_result(
+    *,
+    store: NarrativeStore,
+    job_type: str,
+    parameters: dict[str, Any],
+) -> dict[str, Any]:
+    if job_type == "radar_scoring":
+        preview = store.radar_preview(
+            window_days=parameters.get("window_days", ""),
+            baseline_days=parameters.get("baseline_days", ""),
+        )
+        warnings = _list(preview.get("degradation_warnings"))
+        return {
+            "status": "degraded" if warnings else "success",
+            "warnings": warnings,
+            "artifacts": [
+                {
+                    "label": "radar_preview",
+                    "path": "/api/v1/narratives/radar/preview",
+                }
+            ],
+            "error_category": "",
+        }
+    if job_type == "source_intake":
+        return {
+            "status": "success",
+            "warnings": [],
+            "artifacts": [
+                {
+                    "label": "review_queue",
+                    "path": "/api/v1/narratives/review-queue",
+                }
+            ],
+            "error_category": "",
+        }
+    if job_type == "live_provider_smoke":
+        return {
+            "status": "degraded",
+            "warnings": [
+                {
+                    "code": "LIVE_SMOKE_EXTERNAL_COMMAND",
+                    "message": (
+                        "Run scripts/run_live_validation_dashboard.py for live "
+                        "credential checks."
+                    ),
+                    "classification": "operational_action_required",
+                }
+            ],
+            "artifacts": [
+                {
+                    "label": "live_validation_dashboard",
+                    "path": "outputs/live_validation_dashboard/",
+                }
+            ],
+            "error_category": "manual_validation_required",
+        }
+    if job_type == "report_pack_generation":
+        return {
+            "status": "degraded",
+            "warnings": [
+                {
+                    "code": "REPORT_PACK_EXTERNAL_COMMAND",
+                    "message": (
+                        "Report-pack generation remains an FNI artifact command."
+                    ),
+                    "classification": "operational_action_required",
+                }
+            ],
+            "artifacts": [
+                {
+                    "label": "reviewable_fund_report_pack",
+                    "path": "scripts/run_reviewable_fund_report_pack.py",
+                }
+            ],
+            "error_category": "external_artifact_command",
+        }
+    return {
+        "status": "failed",
+        "warnings": [
+            {
+                "code": "JOB_TYPE_UNSUPPORTED",
+                "message": f"Unsupported job_type: {job_type}",
+                "classification": "invalid_configuration",
+            }
+        ],
+        "artifacts": [],
+        "error_category": "unsupported_job_type",
+    }
+
+
+def _job_run_summary(items: list[dict[str, Any]]) -> dict[str, int]:
+    summary = {status: 0 for status in JOB_RUN_STATUSES}
+    for item in items:
+        status = str(item.get("status") or "")
+        summary[status] = summary.get(status, 0) + 1
+    return summary
+
+
+def _duration_ms(started_at: str, finished_at: str) -> int:
+    try:
+        started = datetime.fromisoformat(started_at)
+        finished = datetime.fromisoformat(finished_at)
+    except ValueError:
+        return 0
+    return max(0, int((finished - started).total_seconds() * 1000))
 
 
 def _candidate_by_id(
