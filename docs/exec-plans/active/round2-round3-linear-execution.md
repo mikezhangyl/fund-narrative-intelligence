@@ -216,8 +216,8 @@ Execute Round 3 after Round 2 foundations, unless a Round 2 slice directly
 unblocks a radar slice earlier:
 
 1. Done - `MIK-80` + `MIK-81` + `MIK-82`: ownership, score schema, time-series model.
-2. Done locally, pending Linear closeout - `MIK-75` + `MIK-83`: deterministic heat/trend scoring and market confirmation adapter boundary.
-3. `MIK-76`: structured source mining into candidate narrative signals.
+2. Done - `MIK-75` + `MIK-83`: deterministic heat/trend scoring and market confirmation adapter boundary.
+3. Done locally, pending Linear closeout - `MIK-76`: structured source mining into candidate narrative signals.
 4. `MIK-74` + `MIK-84`: radar bubble API and visualization contract.
 5. `MIK-77` + `MIK-85`: evidence drill-down and review/trust integration.
 6. `MIK-78`: service-owned preview surface.
@@ -283,6 +283,36 @@ unblocks a radar slice earlier:
   `docs/product/narrative-radar-scoring-and-confirmation-2026-05-29.html`
   with auxiliary Markdown at
   `docs/product/narrative-radar-scoring-and-confirmation-2026-05-29.md`.
+
+### MIK-76 - Structured Source Mining Into Candidate Narrative Signals
+
+- TDD red:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py::test_radar_mining_creates_candidate_signals_from_structured_events services/stock-narrative-service/tests/test_http_service.py::test_radar_mining_excludes_reserved_social_sources_and_discloses_policy -q`
+  failed because the mined-candidates endpoint did not exist.
+- TDD green:
+  the same targeted command passed with 2 tests.
+- Targeted regression:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  passed with 37 tests.
+- Static checks:
+  `uv run ruff check services/stock-narrative-service/src/stock_narrative_service services/stock-narrative-service/tests/test_http_service.py`.
+- Compile:
+  `uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests`.
+- Service endpoint:
+  `GET /api/v1/narratives/radar/mined-candidates` mines review-only
+  candidate narratives from structured news, announcement, and manual source
+  events.
+- Signal integration:
+  `GET /api/v1/narratives/radar/signals` now derives candidate signals from
+  structured source events when explicit `candidate_narratives` are absent.
+- Source policy:
+  `social_future` stays excluded; browser automation, social scraping,
+  proxy/anti-bot work, and market confirmation as narrative text source remain
+  disabled.
+- Product note:
+  `docs/product/narrative-radar-structured-source-mining-2026-05-29.html`
+  with auxiliary Markdown at
+  `docs/product/narrative-radar-structured-source-mining-2026-05-29.md`.
 
 ## Duplicate / Legacy Round 3 Issues
 

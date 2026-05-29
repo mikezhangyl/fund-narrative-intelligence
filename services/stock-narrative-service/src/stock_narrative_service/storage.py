@@ -19,6 +19,7 @@ from stock_narrative_service.identity import (
 )
 from stock_narrative_service.radar import (
     radar_contract,
+    radar_mined_candidates,
     radar_scores,
     radar_source_signals,
 )
@@ -257,6 +258,9 @@ class NarrativeStore:
 
     def radar_signals(self) -> dict[str, Any]:
         return radar_source_signals(_all_events(self))
+
+    def radar_mined_candidates(self) -> dict[str, Any]:
+        return radar_mined_candidates(_all_events(self))
 
     def radar_scores(
         self,

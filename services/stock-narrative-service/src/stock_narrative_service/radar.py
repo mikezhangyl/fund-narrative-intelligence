@@ -33,6 +33,7 @@ def radar_contract(config: ServiceConfig) -> dict[str, Any]:
             "/api/v1/narratives/radar/contract",
             "/api/v1/narratives/radar/signals",
             "/api/v1/narratives/radar/scores",
+            "/api/v1/narratives/radar/mined-candidates",
             "/api/v1/narratives/radar/bubbles",
             "/api/v1/narratives/radar/evidence",
         ],
@@ -115,6 +116,22 @@ def radar_source_signals(events: list[dict[str, Any]]) -> dict[str, Any]:
         "degradation_warnings": degradation_warnings,
         "source_availability": _source_availability(signals),
         "missing_source_types": _missing_source_types(signals),
+    }
+
+
+def radar_mined_candidates(events: list[dict[str, Any]]) -> dict[str, Any]:
+    eligible_events = [
+        event for event in events if _source_type(event) in _mining_policy()["allowed_source_types"]
+    ]
+    excluded_events = [
+        event for event in events if _source_type(event) in _mining_policy()["excluded_source_types"]
+    ]
+    candidates = _aggregate_mined_candidates(eligible_events)
+    return {
+        "version": "narrative-radar-mined-candidates-v1",
+        "mining_policy": _mining_policy(),
+        "candidate_narratives": candidates,
+        "excluded_event_count": len(excluded_events),
     }
 
 
@@ -204,6 +221,136 @@ def radar_source_model() -> dict[str, Any]:
             "public API shape."
         ),
         "negative_cache_policy": "failed upstream/provider attempts are not cached",
+    }
+
+
+def _mining_policy() -> dict[str, Any]:
+    return {
+        "method": "structured_event_cooccurrence_v0",
+        "allowed_source_types": ["announcement", "manual", "news"],
+        "excluded_source_types": ["social_future"],
+        "browser_automation": False,
+        "market_confirmation_used_as_source": False,
+        "trust_promotion_effect": "none",
+    }
+
+
+def _aggregate_mined_candidates(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[str, dict[str, Any]] = {}
+    for event in events:
+        candidate = _mined_candidate_from_event(event)
+        if candidate is None:
+            continue
+        candidate_id = str(candidate["candidate_narrative_id"])
+        previous = grouped.get(candidate_id)
+        grouped[candidate_id] = (
+            candidate if previous is None else _merge_mined_candidate(previous, candidate)
+        )
+    return sorted(
+        grouped.values(),
+        key=lambda item: (
+            str(item.get("name") or ""),
+            str(item.get("candidate_narrative_id") or ""),
+        ),
+    )
+
+
+def _mined_candidate_from_event(event: dict[str, Any]) -> dict[str, Any] | None:
+    source_type = _source_type(event)
+    if source_type not in _mining_policy()["allowed_source_types"]:
+        return None
+    name = _candidate_name_from_event(event)
+    if not name:
+        return None
+    candidate_id = stable_id("C_MINED", [name.casefold()])
+    extracted_entities = _extracted_entities(event)
+    return {
+        "candidate_narrative_id": candidate_id,
+        "name": name,
+        "trust_status": "candidate_untrusted",
+        "human_review_status": "candidate",
+        "confidence": 0.58,
+        "source_types": [source_type],
+        "stock_codes": _strings(event.get("stock_codes")),
+        "extracted_entities": extracted_entities,
+        "evidence_refs": [_event_evidence_ref(event)],
+        "provenance": {
+            "mining_method": _mining_policy()["method"],
+            "source_origins": [source_type],
+            "market_confirmation_used_as_source": False,
+            "promotion_effect": "none",
+        },
+        "representative_citation_ids": [str(event.get("event_id") or "")],
+    }
+
+
+def _merge_mined_candidate(
+    left: dict[str, Any],
+    right: dict[str, Any],
+) -> dict[str, Any]:
+    left_entities = _mapping(left.get("extracted_entities"))
+    right_entities = _mapping(right.get("extracted_entities"))
+    source_types = sorted(
+        {*_strings(left.get("source_types")), *_strings(right.get("source_types"))}
+    )
+    return {
+        **left,
+        "source_types": source_types,
+        "stock_codes": sorted(
+            {*_strings(left.get("stock_codes")), *_strings(right.get("stock_codes"))}
+        ),
+        "extracted_entities": {
+            key: sorted(
+                {
+                    *_strings(left_entities.get(key)),
+                    *_strings(right_entities.get(key)),
+                }
+            )
+            for key in ("tickers", "sectors", "concepts", "keywords")
+        },
+        "evidence_refs": sorted(
+            [
+                *_list(left.get("evidence_refs")),
+                *_list(right.get("evidence_refs")),
+            ],
+            key=lambda item: str(item.get("source_event_id") or ""),
+        ),
+        "provenance": {
+            **_mapping(left.get("provenance")),
+            "source_origins": source_types,
+        },
+        "representative_citation_ids": sorted(
+            {
+                *_strings(left.get("representative_citation_ids")),
+                *_strings(right.get("representative_citation_ids")),
+            }
+        ),
+    }
+
+
+def _candidate_name_from_event(event: dict[str, Any]) -> str:
+    hints = _strings(event.get("narrative_hints"))
+    if hints:
+        return hints[0]
+    entities = _extracted_entities(event)
+    concepts = _strings(entities.get("concepts"))
+    sectors = _strings(entities.get("sectors"))
+    if sectors and concepts:
+        return f"{sectors[0]}{concepts[0]}"
+    if concepts:
+        return concepts[0]
+    return ""
+
+
+def _event_evidence_ref(event: dict[str, Any]) -> dict[str, Any]:
+    metadata = _mapping(event.get("source_metadata"))
+    return {
+        "source_event_id": str(event.get("event_id") or ""),
+        "source_type": _source_type(event),
+        "source_url": str(event.get("source_url") or ""),
+        "title": str(event.get("title") or ""),
+        "event_time": str(event.get("event_time") or ""),
+        "provider": str(metadata.get("provider") or ""),
     }
 
 
@@ -445,7 +592,7 @@ def _narrative_name(rows: list[dict[str, Any]], candidate_id: str) -> str:
 
 def _signals_from_event(event: dict[str, Any]) -> list[dict[str, Any]]:
     event_id = str(event.get("event_id") or "").strip()
-    source_type = str(event.get("source_type") or "manual").strip() or "manual"
+    source_type = _source_type(event)
     event_time = str(event.get("event_time") or "").strip()
     ingested_at = str(event.get("ingested_at") or event.get("recorded_at") or event_time)
     source_weight = _float(
@@ -454,6 +601,10 @@ def _signals_from_event(event: dict[str, Any]) -> list[dict[str, Any]]:
     )
     source_metadata = _mapping(event.get("source_metadata"))
     extracted_entities = _extracted_entities(event)
+    candidates = _list(event.get("candidate_narratives"))
+    if not candidates:
+        mined_candidate = _mined_candidate_from_event(event)
+        candidates = [mined_candidate] if mined_candidate is not None else []
     return [
         _signal(
             event_id=event_id,
@@ -465,7 +616,7 @@ def _signals_from_event(event: dict[str, Any]) -> list[dict[str, Any]]:
             extracted_entities=extracted_entities,
             candidate=candidate,
         )
-        for candidate in _list(event.get("candidate_narratives"))
+        for candidate in candidates
     ]
 
 
@@ -603,6 +754,10 @@ def _extracted_entities(event: dict[str, Any]) -> dict[str, list[str]]:
             or event.get("narrative_hints")
         ),
     }
+
+
+def _source_type(event: dict[str, Any]) -> str:
+    return str(event.get("source_type") or "manual").strip() or "manual"
 
 
 def _evidence_refs(candidate: dict[str, Any]) -> list[str]:

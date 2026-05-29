@@ -1281,6 +1281,7 @@ def test_radar_contract_declares_service_ownership_score_schema_and_metadata(tmp
         "/api/v1/narratives/radar/contract",
         "/api/v1/narratives/radar/signals",
         "/api/v1/narratives/radar/scores",
+        "/api/v1/narratives/radar/mined-candidates",
         "/api/v1/narratives/radar/bubbles",
         "/api/v1/narratives/radar/evidence",
     ]
@@ -1581,6 +1582,117 @@ def test_radar_scores_degrade_market_confirmation_without_suppressing_source_hea
     assert not config.intake_ledger_path.exists()
 
 
+def test_radar_mining_creates_candidate_signals_from_structured_events(tmp_path):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [
+                    _structured_radar_source_event(
+                        "EVT_NEWS_ROBOT",
+                        "news",
+                        "gateway://news/robot",
+                        ["300124"],
+                    ),
+                    _structured_radar_source_event(
+                        "EVT_ANN_ROBOT",
+                        "announcement",
+                        "gateway://announcements/robot",
+                        ["002472"],
+                    ),
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        mined = _get_json(f"{base_url}/api/v1/narratives/radar/mined-candidates")
+        signals = _get_json(f"{base_url}/api/v1/narratives/radar/signals")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert mined["status"] == "available"
+    payload = mined["data"]
+    assert payload["version"] == "narrative-radar-mined-candidates-v1"
+    assert payload["mining_policy"] == {
+        "method": "structured_event_cooccurrence_v0",
+        "allowed_source_types": ["announcement", "manual", "news"],
+        "excluded_source_types": ["social_future"],
+        "browser_automation": False,
+        "market_confirmation_used_as_source": False,
+        "trust_promotion_effect": "none",
+    }
+    candidate = payload["candidate_narratives"][0]
+    assert candidate["candidate_narrative_id"].startswith("C_MINED_")
+    assert candidate["name"] == "机器人执行器"
+    assert candidate["trust_status"] == "candidate_untrusted"
+    assert candidate["human_review_status"] == "candidate"
+    assert candidate["source_types"] == ["announcement", "news"]
+    assert candidate["stock_codes"] == ["002472", "300124"]
+    assert candidate["extracted_entities"] == {
+        "tickers": ["002472", "300124"],
+        "sectors": ["机器人"],
+        "concepts": ["执行器"],
+        "keywords": ["执行器", "订单"],
+    }
+    assert [item["source_event_id"] for item in candidate["evidence_refs"]] == [
+        "EVT_ANN_ROBOT",
+        "EVT_NEWS_ROBOT",
+    ]
+    assert {signal["candidate_narrative_id"] for signal in signals["data"]["signals"]} == {
+        candidate["candidate_narrative_id"]
+    }
+    assert [signal["source_event_id"] for signal in signals["data"]["signals"]] == [
+        "EVT_ANN_ROBOT",
+        "EVT_NEWS_ROBOT",
+    ]
+    assert {signal["trust_status"] for signal in signals["data"]["signals"]} == {
+        "candidate_untrusted"
+    }
+    assert not config.intake_ledger_path.exists()
+
+
+def test_radar_mining_excludes_reserved_social_sources_and_discloses_policy(tmp_path):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [
+                    _structured_radar_source_event(
+                        "EVT_SOCIAL_RESERVED",
+                        "social_future",
+                        "social-future://reserved",
+                        ["300124"],
+                    )
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        mined = _get_json(f"{base_url}/api/v1/narratives/radar/mined-candidates")
+        signals = _get_json(f"{base_url}/api/v1/narratives/radar/signals")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert mined["data"]["candidate_narratives"] == []
+    assert mined["data"]["excluded_event_count"] == 1
+    assert mined["data"]["mining_policy"]["excluded_source_types"] == ["social_future"]
+    assert mined["data"]["mining_policy"]["browser_automation"] is False
+    assert mined["data"]["mining_policy"]["market_confirmation_used_as_source"] is False
+    assert signals["data"]["signals"] == []
+
+
 def test_unknown_route_returns_error_envelope(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -1758,6 +1870,36 @@ def _radar_event(
     if source_weight is not None:
         event["source_weight"] = source_weight
     return event
+
+
+def _structured_radar_source_event(
+    event_id: str,
+    source_type: str,
+    source_url: str,
+    stock_codes: list[str],
+) -> dict:
+    return {
+        "event_id": event_id,
+        "source_type": source_type,
+        "event_time": "2026-05-28T10:00:00+08:00",
+        "ingested_at": "2026-05-28T10:01:00+08:00",
+        "title": f"机器人执行器结构化来源 {event_id}",
+        "summary": "订单和执行器供应链事件共同指向机器人执行器叙事。",
+        "source_url": source_url,
+        "stock_codes": stock_codes,
+        "narrative_hints": ["机器人执行器"],
+        "extracted_entities": {
+            "tickers": stock_codes,
+            "sectors": ["机器人"],
+            "concepts": ["执行器"],
+            "keywords": ["订单", "执行器"],
+        },
+        "source_metadata": {
+            "provider": "gateway_news_briefs",
+            "permission_status": "licensed",
+            "degradation_state": "available",
+        },
+    }
 
 
 def _start(server):

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Narrative Radar 结构化来源挖掘 - 2026-05-29</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.65; margin: 40px auto; max-width: 920px; color: #172033; }
+    h1, h2 { line-height: 1.25; }
+    code { background: #f3f5f8; border-radius: 4px; padding: 1px 5px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d8dee8; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f6f8fb; }
+    .note { background: #f8fbff; border-left: 4px solid #2870c9; padding: 12px 14px; }
+  </style>
+</head>
+<body>
+  <h1>Narrative Radar 结构化来源挖掘</h1>
+  <p><strong>日期：</strong>2026-05-29</p>
+  <p><strong>覆盖 Linear：</strong>MIK-76</p>
+
+  <h2>服务接口</h2>
+  <p>Narrative Service 现在提供 <code>GET /api/v1/narratives/radar/mined-candidates</code>。接口从结构化来源事件中挖掘 review-only candidate narratives，并让 <code>/radar/signals</code> 在事件没有显式 <code>candidate_narratives</code> 时自动生成 candidate signal。</p>
+
+  <h2>挖掘策略</h2>
+  <table>
+    <thead><tr><th>类别</th><th>规则</th></tr></thead>
+    <tbody>
+      <tr><td>方法</td><td><code>structured_event_cooccurrence_v0</code></td></tr>
+      <tr><td>允许来源</td><td><code>news</code>、<code>announcement</code>、<code>manual</code></td></tr>
+      <tr><td>排除来源</td><td><code>social_future</code></td></tr>
+      <tr><td>市场确认</td><td>只能作为确认分数，不能作为叙事文本来源。</td></tr>
+      <tr><td>信任状态</td><td>输出保持 <code>candidate_untrusted</code>，不会自动 trusted promotion。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Candidate 输出</h2>
+  <p>每个 mined candidate 包含 deterministic id、名称、来源类型、股票代码、实体抽取结果、证据引用、provenance、review 状态和 trust 状态。证据引用回链到 source event id、URL、标题、时间、来源类型和 provider。</p>
+  <p class="note">本 slice 不包含社交平台抓取、浏览器自动化、代理、反爬或 Snowball、Taoguba、X/Twitter、Reddit 等来源接入。</p>
+
+  <h2>验收</h2>
+  <ul>
+    <li>RED：mined-candidates endpoint 缺失时两个 mining 测试失败。</li>
+    <li>GREEN：两个 mining 测试通过。</li>
+    <li>回归：service HTTP + storage repository 测试 <code>37 passed</code>。</li>
+    <li>静态检查：service package 和 HTTP 测试 ruff check 通过。</li>
+    <li>编译检查：service src/tests compileall 通过。</li>
+  </ul>
+</body>
+</html>

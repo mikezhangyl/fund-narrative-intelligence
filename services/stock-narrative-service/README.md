@@ -48,6 +48,9 @@ First slice scope:
 - deterministic Narrative Radar score endpoint:
   `/api/v1/narratives/radar/scores`, with market confirmation consumed only
   through a normalized mockable contract path.
+- structured source mining endpoint:
+  `/api/v1/narratives/radar/mined-candidates`, with mined candidates kept
+  review-only and excluded social/browser sources disclosed.
 
 Non-goals:
 
