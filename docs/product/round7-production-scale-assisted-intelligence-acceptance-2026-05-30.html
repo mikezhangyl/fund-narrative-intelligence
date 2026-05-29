@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Round 7 生产规模化与辅助智能验收</title>
+  <style>
+    body { margin: 0; background: #f7f8fa; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { max-width: 980px; margin: 0 auto; padding: 32px 20px 48px; }
+    h1 { font-size: 30px; margin: 0 0 12px; }
+    h2 { font-size: 20px; margin: 28px 0 10px; }
+    section { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; margin-top: 16px; }
+    code { background: #eef2f7; border-radius: 4px; padding: 2px 5px; }
+    li { margin: 6px 0; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Round 7 生产规模化与辅助智能验收</h1>
+  <p>本轮提供生产就绪看板、数据新鲜度/SLA、Runbook 动作、带引用的 AI 辅助说明，以及不会直接改变可信状态的反馈治理记录。</p>
+
+  <section>
+    <h2>交付范围</h2>
+    <ul>
+      <li>新增 <code>production-readiness-assisted-intelligence-v1</code> JSON 契约。</li>
+      <li>新增 <code>scripts/run_production_readiness_assistant.py</code>，输出 JSON 和中文 HTML。</li>
+      <li>生产健康看板区分 healthy、degraded、failed，并链接 runbook 动作。</li>
+      <li>数据新鲜度/SLA 元数据暴露 fresh、stale、breached 状态，不隐藏底层数据。</li>
+      <li>AI 辅助说明必须有 source/evidence 引用，可禁用，不能设置评分、信任状态或推广状态。</li>
+      <li>反馈记录进入 review/governance 输入，保留 audit trail，不能直接修改 trusted state。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>验收证据</h2>
+    <ul>
+      <li>测试：<code>tests/test_production_readiness_assistant.py</code> 覆盖健康、新鲜度、AI 安全、feedback 和 CLI 输出。</li>
+      <li>产物：<code>outputs/production_readiness_assistant/round7-final/production_readiness_assistant.json</code></li>
+      <li>产物：<code>outputs/production_readiness_assistant/round7-final/production_readiness_assistant.html</code></li>
+      <li>默认 fixture：<code>data/fixtures/production_readiness_assistant.v1.json</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>治理声明</h2>
+    <p>确定性评分、来源证据、人工评审状态和 promotion ledger 仍是权威来源；AI 输出只是带引用的阅读辅助。</p>
+  </section>
+</main>
+</body>
+</html>

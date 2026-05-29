@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Round 6 组合与基金叙事工作台验收</title>
+  <style>
+    body { margin: 0; background: #f6f7f9; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { max-width: 980px; margin: 0 auto; padding: 32px 20px 48px; }
+    h1 { font-size: 30px; margin: 0 0 12px; }
+    h2 { font-size: 20px; margin: 28px 0 10px; }
+    section { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; margin-top: 16px; }
+    code { background: #eef2f7; border-radius: 4px; padding: 2px 5px; }
+    li { margin: 6px 0; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Round 6 组合与基金叙事工作台验收</h1>
+  <p>本轮把已具备质量元数据的叙事能力转成用户工作台：保存观察列表、生成叙事暴露快照、比较快照变化、发出观察性提醒，并从升温雷达叙事下钻到受影响基金/持仓。</p>
+
+  <section>
+    <h2>交付范围</h2>
+    <ul>
+      <li>新增 <code>portfolio-narrative-workspace-v1</code> JSON 契约。</li>
+      <li>新增 <code>scripts/run_portfolio_narrative_workspace.py</code>，输出 JSON 和中文 HTML。</li>
+      <li>支持 watchlist / saved fund set 校验、暴露快照、质量拆分、快照对比、观察性 alert、雷达到组合影响。</li>
+      <li>字段 lineage 明确 Gateway、Narrative Service、FNI 的边界；FNI 不重算 Narrative Service 的质量分。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>验收证据</h2>
+    <ul>
+      <li>测试：<code>tests/test_portfolio_narrative_workspace.py</code> 覆盖工作台、HTML 和 CLI 输出。</li>
+      <li>产物：<code>outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json</code></li>
+      <li>产物：<code>outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.html</code></li>
+      <li>默认 fixture：<code>data/fixtures/portfolio_narrative_workspace.v1.json</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>边界声明</h2>
+    <p>提醒为观察性提醒，不包含买卖语言，不构成投资建议、交易策略、收益预测或自动决策。</p>
+  </section>
+</main>
+</body>
+</html>

@@ -14,6 +14,7 @@ This index is intentionally short. It is the default startup surface; do not exp
 - [single-fund-demo.md](./single-fund-demo.md)
 - [round2-round3-linear-execution.md](./round2-round3-linear-execution.md)
 - [round4-productized-narrative-operations.md](./round4-productized-narrative-operations.md)
+- [round6-round7-workspace-production.md](./round6-round7-workspace-production.md)
 
 ## Lookup Rule
 

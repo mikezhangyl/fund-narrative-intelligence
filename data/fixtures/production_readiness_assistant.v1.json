@@ -1,0 +1,164 @@
+{
+  "services": [
+    {
+      "service_id": "gateway",
+      "display_name": "Market Data Gateway",
+      "owner_service": "Gateway",
+      "latest_run": {
+        "run_id": "gw-20260530",
+        "status": "succeeded",
+        "completed_at": "2026-05-30T09:55:00+08:00",
+        "artifact_refs": ["outputs/gateway/latest.json"]
+      },
+      "warnings": [],
+      "runbooks": [
+        {
+          "category": "data_gap",
+          "title": "检查 provider 权限",
+          "href": "docs/runbooks/gateway.md"
+        }
+      ]
+    },
+    {
+      "service_id": "narrative-service",
+      "display_name": "Narrative Service",
+      "owner_service": "Narrative Service",
+      "latest_run": {
+        "run_id": "ns-20260530",
+        "status": "warning",
+        "completed_at": "2026-05-30T09:40:00+08:00",
+        "artifact_refs": ["outputs/narrative/latest.json"]
+      },
+      "warnings": [
+        {
+          "category": "stale_evidence",
+          "message": "two narratives stale"
+        }
+      ],
+      "runbooks": [
+        {
+          "category": "stale_evidence",
+          "title": "重跑质量审计",
+          "href": "docs/runbooks/narrative.md"
+        },
+        {
+          "category": "provider_degraded",
+          "title": "检查来源降级",
+          "href": "docs/runbooks/provider.md"
+        }
+      ]
+    },
+    {
+      "service_id": "fni",
+      "display_name": "FNI reports",
+      "owner_service": "FNI",
+      "latest_run": {
+        "run_id": "fni-20260530",
+        "status": "failed",
+        "completed_at": "2026-05-30T08:50:00+08:00",
+        "artifact_refs": ["outputs/fni/latest.json"]
+      },
+      "warnings": [
+        {
+          "category": "report_failed",
+          "message": "workspace report failed"
+        }
+      ],
+      "runbooks": [
+        {
+          "category": "report_failed",
+          "title": "查看报告失败排查",
+          "href": "docs/runbooks/fni.md"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "fund_holdings",
+      "surface": "fund holdings",
+      "source_timestamp": "2026-05-30T09:50:00+08:00",
+      "last_successful_run_at": "2026-05-30T09:50:00+08:00",
+      "sla_target_hours": 24,
+      "degraded_reasons": []
+    },
+    {
+      "dataset_id": "narrative_radar",
+      "surface": "narrative radar",
+      "source_timestamp": "2026-05-30T05:00:00+08:00",
+      "last_successful_run_at": "2026-05-30T05:00:00+08:00",
+      "sla_target_hours": 2,
+      "degraded_reasons": ["delayed_run"]
+    },
+    {
+      "dataset_id": "evidence_quality",
+      "surface": "evidence quality",
+      "source_timestamp": "2026-05-28T09:00:00+08:00",
+      "last_successful_run_at": "2026-05-28T09:00:00+08:00",
+      "sla_target_hours": 24,
+      "degraded_reasons": ["stale_evidence"]
+    },
+    {
+      "dataset_id": "workspace_outputs",
+      "surface": "workspace outputs",
+      "source_timestamp": "2026-05-29T08:00:00+08:00",
+      "last_successful_run_at": "2026-05-29T08:00:00+08:00",
+      "sla_target_hours": 12,
+      "degraded_reasons": ["report_failed"]
+    }
+  ],
+  "ai_summary_inputs": [
+    {
+      "summary_id": "sum-ai-infra",
+      "object_type": "narrative",
+      "object_id": "N_AI_INFRA",
+      "source_ids": ["SRC_AI_001"],
+      "evidence_ids": ["EV_AI_001"],
+      "score_component_ids": ["heat_score", "quality_score"],
+      "text": "AI 基础设施热度来自多条已引用证据，但仍需人工复核。",
+      "model": "disabled-safe-template",
+      "prompt_version": "summary-v1"
+    },
+    {
+      "summary_id": "sum-blockers",
+      "object_type": "quality_audit",
+      "object_id": "audit-20260530",
+      "source_ids": ["SRC_QA_001"],
+      "evidence_ids": ["EV_QA_001"],
+      "score_component_ids": ["staleness", "source_diversity"],
+      "text": "质量阻塞主要来自证据过期和来源集中。",
+      "model": "disabled-safe-template",
+      "prompt_version": "summary-v1"
+    }
+  ],
+  "feedback": [
+    {
+      "feedback_id": "fb-001",
+      "type": "bad_mapping",
+      "severity": "high",
+      "status": "open",
+      "linked_object": {
+        "type": "narrative_mapping",
+        "id": "MAP_AI_001"
+      },
+      "reviewer": {
+        "role": "operator",
+        "display_name": "reviewer-a"
+      }
+    },
+    {
+      "feedback_id": "fb-002",
+      "type": "confusing_summary",
+      "severity": "medium",
+      "status": "triaged",
+      "linked_object": {
+        "type": "ai_summary",
+        "id": "sum-blockers"
+      },
+      "reviewer": {
+        "role": "analyst",
+        "display_name": "reviewer-b"
+      }
+    }
+  ]
+}

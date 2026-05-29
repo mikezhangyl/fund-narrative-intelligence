@@ -202,6 +202,37 @@ Round 5 acceptance is documented in
 The auxiliary Markdown note is
 `docs/product/round5-evidence-intelligence-quality-acceptance-2026-05-30.md`.
 
+Round 6 Portfolio and Fund Narrative Workspace adds watchlists/saved fund sets,
+portfolio narrative exposure snapshots, snapshot comparison, observational
+alerts, and radar-to-fund impact drill-down without recommendation language:
+
+```bash
+uv run python scripts/run_portfolio_narrative_workspace.py
+```
+
+The canonical readable output is Chinese HTML at
+`portfolio_narrative_workspace.html`; JSON remains the machine-readable
+contract. Round 6 acceptance is documented in
+`docs/product/round6-portfolio-fund-narrative-workspace-acceptance-2026-05-30.html`.
+The auxiliary Markdown note is
+`docs/product/round6-portfolio-fund-narrative-workspace-acceptance-2026-05-30.md`.
+
+Round 7 Production Scale and Assisted Intelligence adds production readiness
+health/runbook surfaces, data freshness/SLA metadata, citation-backed
+AI-assisted explanations that can be disabled, and feedback records that create
+review inputs without mutating trusted state:
+
+```bash
+uv run python scripts/run_production_readiness_assistant.py
+```
+
+The canonical readable output is Chinese HTML at
+`production_readiness_assistant.html`; JSON remains the machine-readable
+contract. Round 7 acceptance is documented in
+`docs/product/round7-production-scale-assisted-intelligence-acceptance-2026-05-30.html`.
+The auxiliary Markdown note is
+`docs/product/round7-production-scale-assisted-intelligence-acceptance-2026-05-30.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

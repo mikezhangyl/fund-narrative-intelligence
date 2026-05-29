@@ -286,6 +286,75 @@ quality_policy:
     - CONTRADICTORY_CLAIMS
   historical_retention_rule: stale and contradicted records remain auditable and are not deleted
 
+portfolio_workspace_policy:
+  contract_version: portfolio-narrative-workspace-v1
+  owner: fni
+  consumer_boundary:
+    gateway_owns:
+      - fund_holdings
+      - fund_profile
+      - market_data
+    narrative_service_owns:
+      - narrative_radar
+      - narrative_quality
+      - trust_state
+      - evidence_ids
+    fni_owns:
+      - workspace_watchlists
+      - exposure_snapshots
+      - snapshot_comparisons
+      - observational_alerts
+      - report_artifacts
+  cli: scripts/run_portfolio_narrative_workspace.py
+  fixture: data/fixtures/portfolio_narrative_workspace.v1.json
+  outputs:
+    json: portfolio_narrative_workspace.json
+    html: portfolio_narrative_workspace.html
+  alert_policy:
+    recommendation_language_allowed: false
+    allowed_alert_types:
+      - dominant_narrative_added
+      - large_exposure_change
+      - quality_degradation
+      - heating_radar_overlap
+    disclosure_required: true
+  fni_recomputes_narrative_quality: false
+
+production_readiness_policy:
+  contract_version: production-readiness-assisted-intelligence-v1
+  owner: fni
+  cli: scripts/run_production_readiness_assistant.py
+  fixture: data/fixtures/production_readiness_assistant.v1.json
+  outputs:
+    json: production_readiness_assistant.json
+    html: production_readiness_assistant.html
+  observability_fields:
+    - service_health
+    - latest_run_status
+    - warnings
+    - artifact_refs
+    - runbook_actions
+  freshness_fields:
+    - dataset_id
+    - source_timestamp
+    - last_successful_run_at
+    - sla_target_hours
+    - freshness_status
+    - breach
+    - degraded_reasons
+  ai_assistance_policy:
+    explanatory_only: true
+    citations_required: true
+    disable_supported: true
+    can_set_score: false
+    can_set_trust_state: false
+    can_set_promotion_status: false
+  feedback_policy:
+    can_mutate_trusted_state: false
+    creates_review_queue_input: true
+    audit_trail_required: true
+  secret_redaction_required: true
+
 trust_state_machine:
   record_states:
     - local_fixture

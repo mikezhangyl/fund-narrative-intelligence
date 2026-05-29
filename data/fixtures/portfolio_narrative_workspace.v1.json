@@ -1,0 +1,178 @@
+{
+  "workspace_id": "ws-demo",
+  "workspace_name": "Round 6 Demo Workspace",
+  "watchlists": [
+    {
+      "watchlist_id": "wl-core-growth",
+      "name": "核心成长组合",
+      "type": "portfolio",
+      "notes": "基金和 ETF 混合观察",
+      "instruments": [
+        {
+          "symbol": "161725",
+          "kind": "fund",
+          "weight": 0.6
+        },
+        {
+          "symbol": "512760",
+          "kind": "etf",
+          "weight": 0.4
+        }
+      ]
+    },
+    {
+      "watchlist_id": "wl-technology",
+      "name": "科技主题观察",
+      "type": "fund_set",
+      "instruments": [
+        {
+          "symbol": "515880",
+          "kind": "etf",
+          "weight": 1.0
+        }
+      ]
+    }
+  ],
+  "current_snapshots": [
+    {
+      "watchlist_id": "wl-core-growth",
+      "snapshot_id": "snap-core-growth-current",
+      "as_of": "2026-05-30T09:00:00+08:00",
+      "source_diagnostics": [
+        {
+          "field": "holdings",
+          "source_service": "Gateway",
+          "status": "fresh"
+        },
+        {
+          "field": "narrative_quality",
+          "source_service": "Narrative Service",
+          "status": "fresh"
+        }
+      ],
+      "exposures": [
+        {
+          "narrative_id": "N_AI_INFRA",
+          "narrative_name": "AI 基础设施",
+          "raw_exposure": 0.42,
+          "trust_state": "trusted",
+          "quality_grade": "A",
+          "quality_score": 87,
+          "holdings": [
+            {
+              "symbol": "600519",
+              "name": "贵州茅台",
+              "weight": 0.08,
+              "mapping_quality": "reviewed"
+            }
+          ],
+          "evidence_ids": ["EV_AI_001"]
+        },
+        {
+          "narrative_id": "N_SEMI_CAPEX",
+          "narrative_name": "半导体景气",
+          "raw_exposure": 0.24,
+          "trust_state": "candidate",
+          "quality_grade": "B",
+          "quality_score": 72,
+          "holdings": [
+            {
+              "symbol": "688981",
+              "name": "中芯国际",
+              "weight": 0.12,
+              "mapping_quality": "candidate"
+            }
+          ],
+          "evidence_ids": ["EV_SEMI_001"]
+        }
+      ]
+    },
+    {
+      "watchlist_id": "wl-technology",
+      "snapshot_id": "snap-technology-current",
+      "as_of": "2026-05-30T09:00:00+08:00",
+      "source_diagnostics": [
+        {
+          "field": "holdings",
+          "source_service": "Gateway",
+          "status": "fresh"
+        }
+      ],
+      "exposures": [
+        {
+          "narrative_id": "N_AI_INFRA",
+          "narrative_name": "AI 基础设施",
+          "raw_exposure": 0.22,
+          "trust_state": "trusted",
+          "quality_grade": "A",
+          "quality_score": 86,
+          "holdings": [
+            {
+              "symbol": "000063",
+              "name": "中兴通讯",
+              "weight": 0.11,
+              "mapping_quality": "reviewed"
+            }
+          ],
+          "evidence_ids": ["EV_AI_001"]
+        }
+      ]
+    }
+  ],
+  "previous_snapshots": [
+    {
+      "watchlist_id": "wl-core-growth",
+      "snapshot_id": "snap-core-growth-previous",
+      "as_of": "2026-05-29T09:00:00+08:00",
+      "exposures": [
+        {
+          "narrative_id": "N_AI_INFRA",
+          "narrative_name": "AI 基础设施",
+          "raw_exposure": 0.26,
+          "trust_state": "trusted",
+          "quality_grade": "A",
+          "quality_score": 88
+        },
+        {
+          "narrative_id": "N_SEMI_CAPEX",
+          "narrative_name": "半导体景气",
+          "raw_exposure": 0.22,
+          "trust_state": "trusted",
+          "quality_grade": "A",
+          "quality_score": 81
+        }
+      ]
+    },
+    {
+      "watchlist_id": "wl-technology",
+      "snapshot_id": "snap-technology-previous",
+      "as_of": "2026-05-29T09:00:00+08:00",
+      "exposures": [
+        {
+          "narrative_id": "N_AI_INFRA",
+          "narrative_name": "AI 基础设施",
+          "raw_exposure": 0.18,
+          "trust_state": "trusted",
+          "quality_grade": "A",
+          "quality_score": 86
+        }
+      ]
+    }
+  ],
+  "radar_narratives": [
+    {
+      "narrative_id": "N_AI_INFRA",
+      "narrative_name": "AI 基础设施",
+      "heat_score": 91,
+      "trend": "heating",
+      "evidence_ids": ["EV_AI_001"]
+    },
+    {
+      "narrative_id": "N_ROBOTICS",
+      "narrative_name": "机器人",
+      "heat_score": 82,
+      "trend": "heating",
+      "evidence_ids": ["EV_ROBOT_001"]
+    }
+  ]
+}
