@@ -215,7 +215,7 @@ Execute Round 2 in dependency order:
 Execute Round 3 after Round 2 foundations, unless a Round 2 slice directly
 unblocks a radar slice earlier:
 
-1. `MIK-80` + `MIK-81` + `MIK-82`: ownership, score schema, time-series model.
+1. Done locally, pending Linear closeout - `MIK-80` + `MIK-81` + `MIK-82`: ownership, score schema, time-series model.
 2. `MIK-75`: deterministic heat and trend scoring.
 3. `MIK-76`: structured source mining into candidate narrative signals.
 4. `MIK-74` + `MIK-84`: radar bubble API and visualization contract.
@@ -223,6 +223,37 @@ unblocks a radar slice earlier:
 6. `MIK-78`: service-owned preview surface.
 7. `MIK-79`: optional AI explanation as non-authoritative evidence summary.
 8. `MIK-68` + `MIK-69`: close parent packs after all child issues pass.
+
+## Round 3 Completed Slice Evidence
+
+### MIK-80 + MIK-81 + MIK-82 - Radar Boundary, Score Schema, And Signal Model
+
+- TDD red:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py -q`
+  initially failed because `/api/v1/narratives/radar/contract` and
+  `/api/v1/narratives/radar/signals` returned 404.
+- TDD green:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py -q`
+  passed with 31 tests.
+- Targeted regression:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  passed with 33 tests.
+- Static checks:
+  `uv run ruff check services/stock-narrative-service/src/stock_narrative_service services/stock-narrative-service/tests/test_http_service.py`.
+- Compile:
+  `uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests`.
+- Service contract:
+  `GET /api/v1/narratives/radar/contract` declares Narrative Service
+  ownership, provider/consumer boundaries, score schema, response envelope, AI
+  non-authority policy, and degraded-source metadata fields.
+- Time-series contract:
+  `GET /api/v1/narratives/radar/signals` replays seed and intake events into
+  append-only radar source signals and daily window snapshots without writing a
+  failed-provider negative cache.
+- Product note:
+  `docs/product/narrative-radar-service-boundary-and-model-2026-05-29.html`
+  with auxiliary Markdown at
+  `docs/product/narrative-radar-service-boundary-and-model-2026-05-29.md`.
 
 ## Duplicate / Legacy Round 3 Issues
 

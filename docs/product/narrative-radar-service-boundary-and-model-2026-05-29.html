@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Narrative Radar 服务边界与时间序列模型 - 2026-05-29</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.65; margin: 40px auto; max-width: 920px; color: #172033; }
+    h1, h2 { line-height: 1.25; }
+    code { background: #f3f5f8; border-radius: 4px; padding: 1px 5px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d8dee8; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f6f8fb; }
+    .note { background: #f7fbff; border-left: 4px solid #2870c9; padding: 12px 14px; }
+  </style>
+</head>
+<body>
+  <h1>Narrative Radar 服务边界与时间序列模型</h1>
+  <p><strong>日期：</strong>2026-05-29</p>
+  <p><strong>覆盖 Linear：</strong>MIK-80、MIK-81、MIK-82</p>
+
+  <h2>结论</h2>
+  <p>Narrative Radar 归属于 Narrative Service。FNI 后续可以消费 radar HTTP 响应并做展示或报告引用，但不能在 FNI 内部挖掘来源事件、计算 radar 分数、推断趋势状态，或修改 candidate/trusted narrative 状态。外部 provider 访问和 provider 归一化仍由 Gateway 负责。</p>
+
+  <h2>已实现的服务契约</h2>
+  <table>
+    <thead>
+      <tr><th>Endpoint</th><th>用途</th><th>边界</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>GET /api/v1/narratives/radar/contract</code></td>
+        <td>暴露 radar 归属、响应 envelope、score schema、降级元数据字段和时间序列模型。</td>
+        <td>只描述服务契约，不调用外部 provider。</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/v1/narratives/radar/signals</code></td>
+        <td>从 seed/intake events 可重放生成 radar source signals 和 daily snapshots。</td>
+        <td>只读取 Narrative Service ledger，不写 negative cache。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Score Schema</h2>
+  <p>公式版本为 <code>radar-deterministic-v0</code>。每个后续 radar score 必须暴露 deterministic 组件，而不能只返回 opaque heat number。</p>
+  <ul>
+    <li><code>heat_score</code></li>
+    <li><code>trend_score</code></li>
+    <li><code>momentum_state</code></li>
+    <li><code>market_confirmation_score</code></li>
+    <li><code>evidence_quality_score</code></li>
+    <li><code>source_attention_components</code></li>
+    <li><code>window_start</code> / <code>window_end</code></li>
+    <li><code>baseline_window</code></li>
+    <li><code>formula_version</code></li>
+    <li><code>degradation_warnings</code></li>
+  </ul>
+  <p class="note">AI 以后可以用于证据摘要解释，但不能覆盖 deterministic scores，也不能改变 trust state。</p>
+
+  <h2>Source-Signal Time-Series Model</h2>
+  <p>Radar source signal 是 append-only ledger 的公共模型。每条 signal 绑定 source event、candidate narrative、实体抽取、时间戳、source weight、signal strength、evidence refs 和 provider metadata。</p>
+  <p>当前实现输出 daily snapshots，并在模型里声明 hourly/daily 两种粒度；后续加入 hourly window 时不改变 public API shape。</p>
+
+  <h2>验收</h2>
+  <ul>
+    <li>RED：<code>uv run pytest services/stock-narrative-service/tests/test_http_service.py -q</code> 因 radar endpoints 缺失失败。</li>
+    <li>GREEN：同一测试命令通过，结果为 <code>31 passed</code>。</li>
+    <li>静态检查：新增 service 文件和测试的 ruff check 通过。</li>
+    <li>编译检查：<code>uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests</code> 通过。</li>
+  </ul>
+</body>
+</html>

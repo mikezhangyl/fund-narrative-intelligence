@@ -125,6 +125,8 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
             "/api/v1/narratives/mappings": self.server.store.mappings,
             "/api/v1/narratives/evidence-packs": self.server.store.evidence_packs,
             "/api/v1/narratives/candidates": self.server.store.candidates,
+            "/api/v1/narratives/radar/contract": self.server.store.radar_contract,
+            "/api/v1/narratives/radar/signals": self.server.store.radar_signals,
             "/api/v1/narratives/trust-audits/latest": (
                 self.server.store.trust_audit_latest
             ),

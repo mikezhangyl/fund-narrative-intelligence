@@ -42,6 +42,9 @@ First slice scope:
 - stateful review queue with optional status filtering;
 - review action ledger, promotion preflight, ops summary, and trust audit
   surfaces.
+- Narrative Radar ownership contract and source-signal replay endpoints:
+  `/api/v1/narratives/radar/contract` and
+  `/api/v1/narratives/radar/signals`.
 
 Non-goals:
 

@@ -17,6 +17,7 @@ from stock_narrative_service.identity import (
     source_event_identity,
     stable_id,
 )
+from stock_narrative_service.radar import radar_contract, radar_source_signals
 
 INTAKE_LEDGER_VERSION = "service-intake-events-v1"
 REVIEW_ACTION_LEDGER_VERSION = "narrative-review-actions-v1"
@@ -246,6 +247,12 @@ class NarrativeStore:
                 product_data_gaps=_product_data_gaps(summary),
             ),
         }
+
+    def radar_contract(self) -> dict[str, Any]:
+        return radar_contract(self.config)
+
+    def radar_signals(self) -> dict[str, Any]:
+        return radar_source_signals(_all_events(self))
 
     def ingest_events(self, payload: dict[str, Any]) -> dict[str, Any]:
         events = _event_list(payload.get("events"))

@@ -1256,6 +1256,190 @@ def test_promotion_preflight_rejects_unknown_candidate(tmp_path):
         thread.join(timeout=2)
 
 
+def test_radar_contract_declares_service_ownership_score_schema_and_metadata(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/radar/contract")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "available"
+    assert response["source"] == "narrative_service"
+    payload = response["data"]
+    assert payload["version"] == "narrative-radar-contract-v1"
+    assert payload["ownership"] == {
+        "radar_owner": "narrative_service",
+        "provider_owner": "gateway",
+        "consumer_role": "fni_consumes_service_api_only",
+        "score_authority": "narrative_service",
+    }
+    assert payload["service_owned_endpoints"] == [
+        "/api/v1/narratives/radar/contract",
+        "/api/v1/narratives/radar/signals",
+        "/api/v1/narratives/radar/bubbles",
+        "/api/v1/narratives/radar/evidence",
+    ]
+    assert payload["response_envelope"] == {
+        "status": "available|degraded|missing|failed",
+        "source": "narrative_service",
+        "provider": "stock-narrative-service",
+        "provider_version": "v0",
+        "data": "endpoint payload",
+        "warnings": "degraded or missing source metadata",
+        "diagnostics": "operational diagnostics",
+        "trust_metadata": "candidate/trusted state metadata",
+    }
+    score_schema = payload["score_schema"]
+    assert score_schema["formula_version"] == "radar-deterministic-v0"
+    assert score_schema["required_fields"] == [
+        "heat_score",
+        "trend_score",
+        "momentum_state",
+        "market_confirmation_score",
+        "evidence_quality_score",
+        "source_attention_components",
+        "window_start",
+        "window_end",
+        "baseline_window",
+        "formula_version",
+        "degradation_warnings",
+    ]
+    assert score_schema["ai_policy"] == (
+        "AI summaries may explain evidence later but cannot override deterministic scores."
+    )
+    assert payload["degraded_metadata_fields"] == [
+        "degradation_warnings",
+        "source_availability",
+        "missing_source_types",
+        "formula_version",
+    ]
+
+
+def test_radar_signals_replay_fixture_events_into_time_series_snapshots(tmp_path):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [
+                    {
+                        "event_id": "EVT_ROBOT_1",
+                        "source_type": "news",
+                        "event_time": "2026-05-28T09:15:00+08:00",
+                        "ingested_at": "2026-05-28T09:16:00+08:00",
+                        "title": "机器人执行器订单增加",
+                        "source_url": "gateway://news/robot-1",
+                        "stock_codes": ["300124"],
+                        "extracted_entities": {
+                            "tickers": ["300124"],
+                            "sectors": ["机器人"],
+                            "concepts": ["执行器"],
+                            "keywords": ["订单", "执行器"],
+                        },
+                        "source_metadata": {
+                            "provider": "gateway_news_briefs",
+                            "permission_status": "licensed",
+                            "degradation_state": "available",
+                        },
+                        "candidate_narratives": [
+                            {
+                                "candidate_narrative_id": "C_ROBOT",
+                                "name": "机器人执行器",
+                                "confidence": 0.7,
+                                "representative_citation_ids": ["SRC_ROBOT_1"],
+                            }
+                        ],
+                    },
+                    {
+                        "event_id": "EVT_ROBOT_2",
+                        "source_type": "announcement",
+                        "event_time": "2026-05-28T15:30:00+08:00",
+                        "title": "机器人供应链公告",
+                        "source_url": "gateway://announcements/robot-2",
+                        "stock_codes": ["002472"],
+                        "source_weight": 1.2,
+                        "candidate_narratives": [
+                            {
+                                "candidate_narrative_id": "C_ROBOT",
+                                "name": "机器人执行器",
+                                "confidence": 0.8,
+                                "representative_citation_ids": ["SRC_ROBOT_2"],
+                            }
+                        ],
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/radar/signals")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "available"
+    payload = response["data"]
+    assert payload["version"] == "narrative-radar-source-signals-v1"
+    assert payload["source_model"]["storage_model"] == "append_only_source_signal_ledger"
+    assert payload["source_model"]["window_granularities"] == ["hourly", "daily"]
+    assert payload["degradation_warnings"] == []
+    assert [signal["source_event_id"] for signal in payload["signals"]] == [
+        "EVT_ROBOT_1",
+        "EVT_ROBOT_2",
+    ]
+    assert payload["signals"][0] == {
+        "signal_id": payload["signals"][0]["signal_id"],
+        "source_event_id": "EVT_ROBOT_1",
+        "source_type": "news",
+        "candidate_narrative_id": "C_ROBOT",
+        "narrative_name": "机器人执行器",
+        "extracted_entities": {
+            "tickers": ["300124"],
+            "sectors": ["机器人"],
+            "concepts": ["执行器"],
+            "keywords": ["订单", "执行器"],
+        },
+        "event_time": "2026-05-28T09:15:00+08:00",
+        "ingested_at": "2026-05-28T09:16:00+08:00",
+        "signal_strength": 0.7,
+        "source_weight": 1.0,
+        "weighted_attention": 0.7,
+        "evidence_refs": ["SRC_ROBOT_1"],
+        "source_metadata": {
+            "provider": "gateway_news_briefs",
+            "permission_status": "licensed",
+            "degradation_state": "available",
+        },
+        "trust_status": "candidate_untrusted",
+    }
+    assert payload["window_snapshots"] == [
+        {
+            "window_id": "daily:2026-05-28:C_ROBOT",
+            "granularity": "daily",
+            "window_start": "2026-05-28T00:00:00+08:00",
+            "window_end": "2026-05-29T00:00:00+08:00",
+            "candidate_narrative_id": "C_ROBOT",
+            "narrative_name": "机器人执行器",
+            "source_signal_count": 2,
+            "source_count": 2,
+            "total_signal_strength": 1.5,
+            "weighted_attention": 1.66,
+            "source_event_ids": ["EVT_ROBOT_1", "EVT_ROBOT_2"],
+            "source_types": ["announcement", "news"],
+            "degradation_warnings": [],
+        }
+    ]
+    assert not config.intake_ledger_path.exists()
+
+
 def test_unknown_route_returns_error_envelope(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
