@@ -114,6 +114,8 @@ Default product planning workflow now uses Linear as the durable tracker: when t
 
 Round 4 under milestone `M10 - Productized Narrative Operations` is implemented on branch `codex/round4-develop`: live validation smoke, Narrative Radar UI, review workflow state machine, operational job run ledger, and durable storage migration plan. PM parent is `MIK-86`; Architect parent is `MIK-87`. Final acceptance is recorded in `docs/product/round4-productized-narrative-operations-acceptance-2026-05-30.html`.
 
+Round 5-7 planning is open in Linear and documented at `docs/product/round-5-7-product-architecture-roadmap-2026-05-30.md` with Linear document `Round 5-7 Product + Architecture Roadmap`. New milestones: `M11 - Evidence Intelligence & Narrative Quality`, `M12 - Portfolio & Fund Narrative Workspace`, and `M13 - Production Scale & Assisted Intelligence`. PM/Architect parents are `MIK-129`/`MIK-130`, `MIK-131`/`MIK-132`, and `MIK-133`/`MIK-134`. Recommended next developer slice is `MIK-139 + MIK-140`, then `MIK-135 + MIK-136`, so evidence quality schema/source lineage land before portfolio workspace or AI-assisted summaries.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.
