@@ -236,6 +236,86 @@ def radar_bubbles(
     }
 
 
+def radar_evidence_detail(
+    *,
+    events: list[dict[str, Any]],
+    review_actions: dict[str, Any],
+    config: ServiceConfig,
+    narrative_id: str,
+    as_of: str = "",
+    window_days: Any = "",
+    baseline_days: Any = "",
+    half_life_hours: Any = "",
+) -> dict[str, Any]:
+    narrative_id = str(narrative_id or "").strip()
+    score_payload = radar_scores(
+        events=events,
+        config=config,
+        as_of=as_of,
+        window_days=window_days,
+        baseline_days=baseline_days,
+        half_life_hours=half_life_hours,
+    )
+    signals = [
+        signal
+        for signal in radar_source_signals(events)["signals"]
+        if str(signal.get("candidate_narrative_id") or "") == narrative_id
+    ]
+    score = _score_by_candidate(score_payload, narrative_id)
+    latest_action = _latest_review_action(review_actions, narrative_id)
+    review_state = _radar_review_state(latest_action)
+    event_lookup = {
+        str(event.get("event_id") or ""): event
+        for event in events
+        if event.get("event_id")
+    }
+    return {
+        "version": "narrative-radar-evidence-detail-v1",
+        "narrative_id": narrative_id,
+        "narrative_name": _narrative_name(signals, narrative_id),
+        "linked_record": {
+            "record_type": "candidate_narrative",
+            "candidate_narrative_id": narrative_id,
+            "trust_status": _bubble_trust_status(signals),
+        },
+        "radar_state": {
+            "state": review_state["radar_state"],
+            "allowed_states": ["candidate", "reviewed", "trusted", "rejected", "deprecated"],
+        },
+        "review_state": {
+            "status": review_state["status"],
+            "latest_review_action_id": str(latest_action.get("review_action_id") or ""),
+            "latest_action": str(latest_action.get("action") or ""),
+            "reviewed_by": str(latest_action.get("reviewed_by") or ""),
+            "reviewed_at": str(latest_action.get("reviewed_at") or ""),
+            "review_note": str(latest_action.get("review_note") or ""),
+        },
+        "trust_status": _bubble_trust_status(signals),
+        "promotion_effect": "none",
+        "representative_stocks": sorted(
+            {
+                ticker
+                for signal in signals
+                for ticker in _strings(
+                    _mapping(signal.get("extracted_entities")).get("tickers")
+                )
+            }
+        ),
+        "extracted_entities": _merged_entities(signals),
+        "evidence_refs": [
+            _detail_evidence_ref(signal=signal, event=event_lookup.get(event_id, {}))
+            for signal in signals
+            if (event_id := str(signal.get("source_event_id") or ""))
+        ],
+        "score_components": _mapping(score.get("source_attention_components")),
+        "degradation_warnings": _list(score.get("degradation_warnings")),
+        "historical_interpretation": (
+            "Radar detail remains readable after review state changes; rejected or "
+            "deprecated narratives are not current trusted signals."
+        ),
+    }
+
+
 def radar_source_model() -> dict[str, Any]:
     return {
         "storage_model": "append_only_source_signal_ledger",
@@ -305,6 +385,10 @@ def _bubble_row(
     return {
         "narrative_id": str(score.get("candidate_narrative_id") or ""),
         "narrative_name": str(score.get("narrative_name") or ""),
+        "detail_path": (
+            "/api/v1/narratives/radar/evidence?narrative_id="
+            f"{score.get('candidate_narrative_id') or ''}"
+        ),
         "heat_score": _float(score.get("heat_score")),
         "trend_score": _float(score.get("trend_score")),
         "trend_acceleration": _float(score.get("trend_acceleration")),
@@ -359,6 +443,67 @@ def _sparkline_points(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         }
         for snapshot in _daily_snapshots(rows)
     ]
+
+
+def _score_by_candidate(
+    score_payload: dict[str, Any],
+    candidate_id: str,
+) -> dict[str, Any]:
+    for score in _list(score_payload.get("scores")):
+        if str(score.get("candidate_narrative_id") or "") == candidate_id:
+            return score
+    return {}
+
+
+def _latest_review_action(
+    review_actions: dict[str, Any],
+    candidate_id: str,
+) -> dict[str, Any]:
+    matches = [
+        item
+        for item in _list(review_actions.get("items"))
+        if str(item.get("candidate_narrative_id") or "") == candidate_id
+    ]
+    return matches[-1] if matches else {}
+
+
+def _radar_review_state(latest_action: dict[str, Any]) -> dict[str, str]:
+    action = str(latest_action.get("action") or "")
+    if action == "reject":
+        return {"radar_state": "rejected", "status": "rejected"}
+    if action == "approve":
+        return {"radar_state": "reviewed", "status": "ready_for_trust_audit"}
+    if action == "defer":
+        return {"radar_state": "candidate", "status": "deferred"}
+    return {"radar_state": "candidate", "status": "pending_review"}
+
+
+def _merged_entities(rows: list[dict[str, Any]]) -> dict[str, list[str]]:
+    return {
+        key: sorted(
+            {
+                value
+                for row in rows
+                for value in _strings(_mapping(row.get("extracted_entities")).get(key))
+            }
+        )
+        for key in ("tickers", "sectors", "concepts", "keywords")
+    }
+
+
+def _detail_evidence_ref(
+    *,
+    signal: dict[str, Any],
+    event: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "source_event_id": str(signal.get("source_event_id") or ""),
+        "source_type": str(signal.get("source_type") or ""),
+        "source_url": str(event.get("source_url") or ""),
+        "title": str(event.get("title") or ""),
+        "event_time": str(signal.get("event_time") or ""),
+        "evidence_refs": _strings(signal.get("evidence_refs")),
+    }
 
 
 def _mining_policy() -> dict[str, Any]:

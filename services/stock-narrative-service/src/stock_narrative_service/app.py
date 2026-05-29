@@ -156,6 +156,14 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 baseline_days=_first_query_value(query, "baseline_days"),
                 half_life_hours=_first_query_value(query, "half_life_hours"),
             )
+        if path == "/api/v1/narratives/radar/evidence":
+            handler = lambda: self.server.store.radar_evidence_detail(  # noqa: E731
+                narrative_id=_first_query_value(query, "narrative_id"),
+                as_of=_first_query_value(query, "as_of"),
+                window_days=_first_query_value(query, "window_days"),
+                baseline_days=_first_query_value(query, "baseline_days"),
+                half_life_hours=_first_query_value(query, "half_life_hours"),
+            )
         if handler is None:
             self._send_error(HTTPStatus.NOT_FOUND, "ROUTE_NOT_FOUND", "Unknown route.")
             return

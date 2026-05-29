@@ -54,6 +54,9 @@ First slice scope:
 - library-agnostic bubble data endpoint:
   `/api/v1/narratives/radar/bubbles`, with visual mapping metadata and no FNI
   score recalculation requirement.
+- radar evidence drill-down endpoint:
+  `/api/v1/narratives/radar/evidence`, with source evidence, score components,
+  review ledger state, and trust status.
 
 Non-goals:
 

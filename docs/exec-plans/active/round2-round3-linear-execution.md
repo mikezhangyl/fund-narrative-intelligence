@@ -219,7 +219,7 @@ unblocks a radar slice earlier:
 2. Done - `MIK-75` + `MIK-83`: deterministic heat/trend scoring and market confirmation adapter boundary.
 3. Done locally, pending push/Linear closeout - `MIK-76`: structured source mining into candidate narrative signals.
 4. Done locally, pending push/Linear closeout - `MIK-74` + `MIK-84`: radar bubble API and visualization contract.
-5. `MIK-77` + `MIK-85`: evidence drill-down and review/trust integration.
+5. Done locally, pending push/Linear closeout - `MIK-77` + `MIK-85`: evidence drill-down and review/trust integration.
 6. `MIK-78`: service-owned preview surface.
 7. `MIK-79`: optional AI explanation as non-authoritative evidence summary.
 8. `MIK-68` + `MIK-69`: close parent packs after all child issues pass.
@@ -342,6 +342,33 @@ unblocks a radar slice earlier:
   `docs/product/narrative-radar-bubble-api-contract-2026-05-29.html`
   with auxiliary Markdown at
   `docs/product/narrative-radar-bubble-api-contract-2026-05-29.md`.
+
+### MIK-77 + MIK-85 - Radar Evidence Detail And Review State
+
+- TDD red:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py::test_radar_bubbles_return_visualization_ready_contract_without_recalculation services/stock-narrative-service/tests/test_http_service.py::test_radar_evidence_detail_tracks_review_state_transitions -q`
+  failed on missing bubble `detail_path` and missing radar evidence endpoint.
+- TDD green:
+  the same targeted command passed with 2 tests.
+- Targeted regression:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  passed with 40 tests.
+- Static checks:
+  `uv run ruff check services/stock-narrative-service/src/stock_narrative_service/radar.py services/stock-narrative-service/src/stock_narrative_service/app.py services/stock-narrative-service/src/stock_narrative_service/storage.py services/stock-narrative-service/tests/test_http_service.py`.
+- Compile:
+  `uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests`.
+- Service endpoint:
+  `GET /api/v1/narratives/radar/evidence?narrative_id=<id>` returns source
+  evidence references, representative stocks, extracted entities, score
+  components, linked candidate record, trust status, and latest review state.
+- Review integration:
+  pending candidate, approved/reviewed, and rejected states are explicit and
+  service-owned; rejected or deprecated history remains interpretable without
+  becoming a current trusted signal.
+- Product note:
+  `docs/product/narrative-radar-evidence-review-detail-2026-05-29.html`
+  with auxiliary Markdown at
+  `docs/product/narrative-radar-evidence-review-detail-2026-05-29.md`.
 
 ## Duplicate / Legacy Round 3 Issues
 

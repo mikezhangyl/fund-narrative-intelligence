@@ -1792,6 +1792,9 @@ def test_radar_bubbles_return_visualization_ready_contract_without_recalculation
         "visual_encoding",
     }
     assert bubble["narrative_id"] == "C_ROBOT"
+    assert bubble["detail_path"] == (
+        "/api/v1/narratives/radar/evidence?narrative_id=C_ROBOT"
+    )
     assert bubble["narrative_name"] == "机器人执行器"
     assert bubble["heat_score"] == 82.0
     assert bubble["trend_score"] == 79.55
@@ -1854,6 +1857,106 @@ def test_radar_bubbles_empty_inputs_return_structured_metadata(tmp_path):
         }
     ]
     assert response["data"]["visualization_contract"]["library_agnostic"] is True
+
+
+def test_radar_evidence_detail_tracks_review_state_transitions(tmp_path):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [_seed_candidate_radar_event()],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        pending = _get_json(
+            f"{base_url}/api/v1/narratives/radar/evidence?narrative_id=C_SEED"
+            "&as_of=2026-05-29T00:00:00+08:00"
+        )
+        approval = _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "radar-reviewer",
+                "review_note": "Structured radar detail is reviewable.",
+            },
+        )
+        reviewed = _get_json(
+            f"{base_url}/api/v1/narratives/radar/evidence?narrative_id=C_SEED"
+            "&as_of=2026-05-29T00:00:00+08:00"
+        )
+        rejection = _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "reject",
+                "reviewed_by": "radar-reviewer",
+                "review_note": "Not durable enough for current radar.",
+            },
+        )
+        rejected = _get_json(
+            f"{base_url}/api/v1/narratives/radar/evidence?narrative_id=C_SEED"
+            "&as_of=2026-05-29T00:00:00+08:00"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert pending["status"] == "available"
+    assert pending["data"]["version"] == "narrative-radar-evidence-detail-v1"
+    assert pending["data"]["narrative_id"] == "C_SEED"
+    assert pending["data"]["linked_record"] == {
+        "record_type": "candidate_narrative",
+        "candidate_narrative_id": "C_SEED",
+        "trust_status": "candidate_untrusted",
+    }
+    assert pending["data"]["radar_state"]["state"] == "candidate"
+    assert pending["data"]["review_state"]["status"] == "pending_review"
+    assert reviewed["data"]["radar_state"]["state"] == "reviewed"
+    assert reviewed["data"]["review_state"]["latest_review_action_id"] == approval[
+        "data"
+    ]["decision"]["review_action_id"]
+    assert reviewed["data"]["review_state"]["status"] == "ready_for_trust_audit"
+    assert rejected["data"]["radar_state"]["state"] == "rejected"
+    assert rejected["data"]["review_state"]["latest_review_action_id"] == rejection[
+        "data"
+    ]["decision"]["review_action_id"]
+    assert rejected["data"]["review_state"]["status"] == "rejected"
+    assert rejected["data"]["trust_status"] == "candidate_untrusted"
+    assert rejected["data"]["promotion_effect"] == "none"
+    assert rejected["data"]["representative_stocks"] == ["300124"]
+    assert rejected["data"]["extracted_entities"] == {
+        "tickers": ["300124"],
+        "sectors": ["机器人"],
+        "concepts": ["执行器"],
+        "keywords": ["执行器", "订单"],
+    }
+    assert rejected["data"]["evidence_refs"] == [
+        {
+            "source_event_id": "EVT_SEED_RADAR",
+            "source_type": "news",
+            "source_url": "gateway://news/seed-radar",
+            "title": "机器人执行器 seed radar source",
+            "event_time": "2026-05-28T10:00:00+08:00",
+            "evidence_refs": ["SRC_SEED_RADAR"],
+        }
+    ]
+    assert set(rejected["data"]["score_components"]) >= {
+        "current_weighted_attention",
+        "baseline_weighted_attention",
+        "baseline_daily_average",
+        "previous_window_weighted_attention",
+    }
+    assert rejected["data"]["historical_interpretation"] == (
+        "Radar detail remains readable after review state changes; rejected or "
+        "deprecated narratives are not current trusted signals."
+    )
 
 
 def test_unknown_route_returns_error_envelope(tmp_path):
@@ -2062,6 +2165,28 @@ def _structured_radar_source_event(
             "permission_status": "licensed",
             "degradation_state": "available",
         },
+    }
+
+
+def _seed_candidate_radar_event() -> dict:
+    event = _structured_radar_source_event(
+        "EVT_SEED_RADAR",
+        "news",
+        "gateway://news/seed-radar",
+        ["300124"],
+    )
+    return {
+        **event,
+        "title": "机器人执行器 seed radar source",
+        "candidate_narratives": [
+            {
+                "candidate_narrative_id": "C_SEED",
+                "name": "机器人执行器",
+                "confidence": 0.77,
+                "representative_citation_ids": ["SRC_SEED_RADAR"],
+                "trust_status": "candidate_untrusted",
+            }
+        ],
     }
 
 
