@@ -1,0 +1,17 @@
+config/narrative_service_contract.yaml
+data/fixtures/portfolio_narrative_workspace.v1.json
+data/fixtures/production_readiness_assistant.v1.json
+docs/exec-plans/active/index.md
+docs/exec-plans/active/round6-round7-workspace-production.md
+docs/memory/current-brief.md
+docs/product/README.md
+docs/product/round6-portfolio-fund-narrative-workspace-acceptance-2026-05-30.html
+docs/product/round6-portfolio-fund-narrative-workspace-acceptance-2026-05-30.md
+docs/product/round7-production-scale-assisted-intelligence-acceptance-2026-05-30.html
+docs/product/round7-production-scale-assisted-intelligence-acceptance-2026-05-30.md
+scripts/run_portfolio_narrative_workspace.py
+scripts/run_production_readiness_assistant.py
+src/scanners/portfolio_narrative_workspace.py
+src/scanners/production_readiness_assistant.py
+tests/test_portfolio_narrative_workspace.py
+tests/test_production_readiness_assistant.py

@@ -1,0 +1,36 @@
+{
+  "commands": [
+    {
+      "command": "uv run pytest tests/test_portfolio_narrative_workspace.py tests/test_production_readiness_assistant.py -q",
+      "status": "passed",
+      "summary": "7 passed"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "passed"
+    },
+    {
+      "command": "uv run python -m compileall src services scripts tests",
+      "status": "passed"
+    },
+    {
+      "command": "uv run pytest -q",
+      "status": "passed",
+      "summary": "561 passed, 1 skipped"
+    },
+    {
+      "command": "uv run python scripts/run_portfolio_narrative_workspace.py --as-of 2026-05-30T09:30:00+08:00 --output-dir outputs/portfolio_narrative_workspace/round6-final",
+      "status": "passed",
+      "summary": "status=completed; JSON and Chinese HTML generated"
+    },
+    {
+      "command": "uv run python scripts/run_production_readiness_assistant.py --as-of 2026-05-30T10:00:00+08:00 --output-dir outputs/production_readiness_assistant/round7-final",
+      "status": "passed",
+      "summary": "status=completed; JSON and Chinese HTML generated"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}
