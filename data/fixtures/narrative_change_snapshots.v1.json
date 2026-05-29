@@ -1,0 +1,80 @@
+{
+  "version": "fund-narrative-change-snapshots-v1",
+  "previous_snapshot": {
+    "fund": {
+      "fund_code": "000001",
+      "fund_name": "示例成长混合"
+    },
+    "as_of_date": "2026-03-31",
+    "holding_source": {
+      "provider": "mock-fixture-provider",
+      "data_quality": "mock",
+      "source_url": "mock://fixtures/fund_000001_previous.json"
+    },
+    "narrative_source": {
+      "source": "local_registry",
+      "provider": "fixture-narrative-registry",
+      "data_fetch_mode": "fixture"
+    },
+    "mapping_trust_state": "untrusted_experimental",
+    "data_gaps": [],
+    "narrative_exposures": [
+      {
+        "narrative_id": "N_BAIJIU_CONSUMPTION",
+        "narrative_name": "高端白酒消费",
+        "raw_exposure": 0.22
+      },
+      {
+        "narrative_id": "N_COMMUNICATION_EQUIPMENT",
+        "narrative_name": "通信设备",
+        "raw_exposure": 0.16
+      },
+      {
+        "narrative_id": "N_SEMI_CAPEX",
+        "narrative_name": "半导体景气",
+        "raw_exposure": 0.11
+      }
+    ]
+  },
+  "current_snapshot": {
+    "fund": {
+      "fund_code": "000001",
+      "fund_name": "示例成长混合"
+    },
+    "as_of_date": "2026-06-30",
+    "holding_source": {
+      "provider": "mock-fixture-provider",
+      "data_quality": "mock",
+      "source_url": "mock://fixtures/fund_000001_current.json"
+    },
+    "narrative_source": {
+      "source": "narrative_service",
+      "provider": "stock-narrative-service",
+      "data_fetch_mode": "narrative_service"
+    },
+    "mapping_trust_state": "untrusted_experimental",
+    "data_gaps": [
+      {
+        "scope": "market_data_gateway",
+        "reason": "gateway live credentials not configured for fixture comparison"
+      }
+    ],
+    "narrative_exposures": [
+      {
+        "narrative_id": "N_BAIJIU_CONSUMPTION",
+        "narrative_name": "高端白酒消费",
+        "raw_exposure": 0.4
+      },
+      {
+        "narrative_id": "N_COMMUNICATION_EQUIPMENT",
+        "narrative_name": "通信设备",
+        "raw_exposure": 0.08
+      },
+      {
+        "narrative_id": "N_AI_INFRA",
+        "narrative_name": "人工智能基础设施",
+        "raw_exposure": 0.14
+      }
+    ]
+  }
+}

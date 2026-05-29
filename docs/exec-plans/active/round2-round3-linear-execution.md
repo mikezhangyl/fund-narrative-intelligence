@@ -32,7 +32,7 @@ Execute Round 2 in dependency order:
 4. Done - `MIK-55`: structured news-to-candidate narrative intake.
 5. Done locally, pending Linear closeout - `MIK-56`: announcement-to-evidence mapping intake.
 6. Done locally, pending Linear closeout - `MIK-65`: fund report artifact contract.
-7. `MIK-57`: fund narrative change monitor report.
+7. Done locally, pending Linear closeout - `MIK-57`: fund narrative change monitor report.
 8. `MIK-58`: reviewable fund report pack.
 9. `MIK-66`: governance audit schema and export contract.
 10. `MIK-59`: narrative governance audit export.
@@ -101,6 +101,25 @@ Execute Round 2 in dependency order:
   `uv run pytest tests/test_fund_report_artifact_contract.py tests/test_workspace_snapshot.py tests/test_v1_acceptance_script.py -q`
   (`24 passed`);
   `uv run pytest -q` (`540 passed, 1 skipped`).
+
+### MIK-57 - Fund Narrative Change Monitor Report
+
+- TDD red: `uv run pytest tests/test_fund_narrative_change_monitor.py -q`
+  initially failed on missing `scripts.run_fund_narrative_change_monitor`.
+- TDD green: `uv run pytest tests/test_fund_narrative_change_monitor.py -q`
+  passed with 3 tests.
+- Fixture acceptance:
+  `uv run python scripts/run_fund_narrative_change_monitor.py --output-dir outputs/fund_narrative_change_monitor/2026-05-29-mik-57-fixture`
+- Output JSON:
+  `outputs/fund_narrative_change_monitor/2026-05-29-mik-57-fixture/fund_narrative_change_monitor_report.json`
+- Output HTML:
+  `outputs/fund_narrative_change_monitor/2026-05-29-mik-57-fixture/fund_narrative_change_monitor_report.html`
+- Product note:
+  `docs/product/fund-narrative-change-monitor-2026-05-29.md`
+- Verification:
+  `uv run pytest tests/test_fund_narrative_change_monitor.py tests/test_fund_exposure_comparison_report.py tests/test_fund_narrative_exposure_matrix_report.py -q`
+  (`11 passed`);
+  `uv run ruff check src/scanners/fund_narrative_change_monitor.py scripts/run_fund_narrative_change_monitor.py tests/test_fund_narrative_change_monitor.py`.
 
 ## Round 3 Queue
 

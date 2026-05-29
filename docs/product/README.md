@@ -79,6 +79,15 @@ Fund report packs now have a stable artifact manifest contract at
 `config/fund_report_artifact_contract.json`. The MIK-65 acceptance note is
 `docs/product/fund-report-artifact-contract-2026-05-29.md`.
 
+Fund narrative exposure changes can be monitored with:
+
+```bash
+python scripts/run_fund_narrative_change_monitor.py
+```
+
+The MIK-57 acceptance note is
+`docs/product/fund-narrative-change-monitor-2026-05-29.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence
