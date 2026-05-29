@@ -1,0 +1,67 @@
+# Round 4 Productized Narrative Operations Execution Plan
+
+Last updated: 2026-05-30
+
+## Goal
+
+Complete all Round 4 Productized Narrative Operations Linear requirements,
+using TDD and marking each requirement Done only after implementation,
+verification, checkpoint commit, and Linear evidence comment.
+
+Active branch: `codex/round4-develop`
+
+Canonical run: `.ecc/runs/20260530-round4-productized-ops/`
+
+## Source Of Truth
+
+- Linear project: `Fund Narrative Intelligence`
+- Milestone: `M10 - Productized Narrative Operations`
+- Linear document: `Round 4 Productized Narrative Operations Plan`
+- Local plan:
+  `docs/product/round-4-productized-narrative-operations-plan-2026-05-30.md`
+
+## Queue
+
+Execute in dependency order:
+
+1. `MIK-93` + `MIK-88`: live validation taxonomy and credential-safe smoke
+   surface.
+2. `MIK-94` + `MIK-89`: Narrative Radar UI contract and service UI surface.
+3. `MIK-97` + `MIK-92`: review/promotion state machine and complete reviewer
+   workflow.
+4. `MIK-95` + `MIK-90`: scheduling job model and operational run ledger.
+5. `MIK-96` + `MIK-91`: durable storage migration schema and migration
+   readiness.
+6. `MIK-86` + `MIK-87`: close parent packs after all child issues pass.
+
+## Slice Acceptance Rules
+
+For every slice:
+
+- Write tests first and confirm RED when feasible.
+- Implement only the current dependency slice.
+- Run targeted tests plus relevant static checks.
+- Add or update product documentation when behavior or contracts change.
+- Commit with conventional commit format.
+- Add a Linear evidence comment with commit, tests, and artifact links.
+- Mark issues Done only after verification passes.
+
+## Final Acceptance Gates
+
+```bash
+uv run ruff check .
+uv run python -m compileall -q src tests scripts services/stock-narrative-service/src services/stock-narrative-service/tests
+uv run pytest -q
+uv run python scripts/validate_stock_narrative_service_acceptance.py
+git diff --check main...HEAD
+```
+
+## Known Boundaries
+
+- No AI prediction, trading execution, social scraping, browser automation,
+  proxy rotation, or anti-bot infrastructure.
+- Gateway owns external provider access and provider degradation semantics.
+- Narrative Service owns radar, candidate intake, scoring, review state, trust
+  promotion, and narrative lifecycle storage contracts.
+- FNI consumes downstream contracts and validates/report-pack behavior; it does
+  not calculate radar scores.
