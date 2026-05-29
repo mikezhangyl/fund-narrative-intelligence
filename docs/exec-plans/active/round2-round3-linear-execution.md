@@ -217,12 +217,12 @@ unblocks a radar slice earlier:
 
 1. Done - `MIK-80` + `MIK-81` + `MIK-82`: ownership, score schema, time-series model.
 2. Done - `MIK-75` + `MIK-83`: deterministic heat/trend scoring and market confirmation adapter boundary.
-3. Done locally, pending push/Linear closeout - `MIK-76`: structured source mining into candidate narrative signals.
-4. Done locally, pending push/Linear closeout - `MIK-74` + `MIK-84`: radar bubble API and visualization contract.
-5. Done locally, pending push/Linear closeout - `MIK-77` + `MIK-85`: evidence drill-down and review/trust integration.
-6. Done locally, pending push/Linear closeout - `MIK-78`: service-owned preview surface.
-7. Done locally, pending push/Linear closeout - `MIK-79`: optional AI explanation as non-authoritative evidence summary.
-8. `MIK-68` + `MIK-69`: close parent packs after all child issues pass.
+3. Done - `MIK-76`: structured source mining into candidate narrative signals.
+4. Done - `MIK-74` + `MIK-84`: radar bubble API and visualization contract.
+5. Done - `MIK-77` + `MIK-85`: evidence drill-down and review/trust integration.
+6. Done - `MIK-78`: service-owned preview surface.
+7. Done - `MIK-79`: optional AI explanation as non-authoritative evidence summary.
+8. Ready for Linear closeout - `MIK-68` + `MIK-69`: close parent packs after all child issues pass.
 
 ## Round 3 Completed Slice Evidence
 
@@ -401,9 +401,36 @@ unblocks a radar slice earlier:
 ## Duplicate / Legacy Round 3 Issues
 
 Linear also contains early Round 3 PM issues `MIK-70` to `MIK-73`. The formal
-Round 3 plan supersedes them with `MIK-74` to `MIK-85`. During Round 3 closeout,
-verify whether each early issue is duplicate coverage of a completed formal
-issue and close it appropriately in Linear with evidence.
+Round 3 plan supersedes them with `MIK-74` to `MIK-85`. Close them as covered
+legacy PM stories, not as separate new implementation work:
+
+- `MIK-70` maps to `MIK-74` + `MIK-84`: bubble-ready radar API, visualization
+  fields, degraded metadata, and service-owned response envelope.
+- `MIK-71` maps to `MIK-75` + `MIK-81` + `MIK-83` + `MIK-85`:
+  deterministic heat/trend scoring, explicit score components, market
+  confirmation boundary, and candidate/trust labeling.
+- `MIK-72` maps to `MIK-77` + `MIK-85`: read-only evidence detail, source
+  events, score components, representative stocks/sectors, evidence gaps, and
+  review/trust state.
+- `MIK-73` maps to `MIK-74` + `MIK-84`: client visualization contract with
+  size, color, border, axes, tooltip, and sample response semantics.
+
+Linear check on 2026-05-29 confirmed `MIK-74` to `MIK-85` are Done, while
+`MIK-70` to `MIK-73` remained Todo. These legacy issues should receive closeout
+comments that point to the formal issue mapping, pushed commits, product docs,
+and final verification before being marked Done.
+
+## Round 3 Parent Closeout Readiness
+
+- PM parent `MIK-68` has all formal PM children completed:
+  `MIK-74`, `MIK-75`, `MIK-76`, `MIK-77`, `MIK-78`, and `MIK-79`.
+- Architect parent `MIK-69` has all architecture children completed:
+  `MIK-80`, `MIK-81`, `MIK-82`, `MIK-83`, `MIK-84`, and `MIK-85`.
+- Final implementation checkpoint before closeout:
+  `45c57bd feat: add radar preview explanation contract`.
+- Latest pushed verification:
+  `uv run pytest -q` (`551 passed, 1 skipped`);
+  `uv run python scripts/validate_stock_narrative_service_acceptance.py`.
 
 ## Verification Discipline
 
