@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Narrative Radar 预览与解释契约 - 2026-05-29</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.65; margin: 40px auto; max-width: 920px; color: #172033; }
+    h1, h2 { line-height: 1.25; }
+    code { background: #f3f5f8; border-radius: 4px; padding: 1px 5px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d8dee8; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f6f8fb; }
+    .note { background: #f8fbff; border-left: 4px solid #2870c9; padding: 12px 14px; }
+  </style>
+</head>
+<body>
+  <h1>Narrative Radar 预览与解释契约</h1>
+  <p><strong>日期：</strong>2026-05-29</p>
+  <p><strong>覆盖 Linear：</strong>MIK-78、MIK-79</p>
+
+  <h2>服务预览接口</h2>
+  <p>Narrative Service 现在提供 <code>GET /api/v1/narratives/radar/preview</code>。该接口是 service/dev preview payload，不是投资报告，也不是 FNI fund workflow。它复用 bubble API 的数据和 visualization contract，客户端不需要重新计算 score。</p>
+
+  <h2>预览语义</h2>
+  <table>
+    <thead><tr><th>字段</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td><code>surface.type</code></td><td><code>service_dev_preview</code></td></tr>
+      <tr><td><code>not_report_product</code></td><td>明确不是正式报告产品。</td></tr>
+      <tr><td><code>score_recalculation</code></td><td><code>none</code>，不在预览层重算分数。</td></tr>
+      <tr><td><code>layout_contract</code></td><td>内部验证用 responsive contract。</td></tr>
+      <tr><td><code>render_model</code></td><td>bubbles、legend 和 interaction hints。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>可选解释契约</h2>
+  <p><code>/api/v1/narratives/radar/evidence</code> 默认返回 <code>explanation.enabled=false</code>。当显式传入 <code>include_explanation=true</code> 时，返回非权威解释摘要，并引用 evidence refs。</p>
+  <p class="note">解释文本不能改变 score，不能改变 trust state，不能做预测，不能创建 AI-only narrative，也不能自动 trusted promotion。</p>
+
+  <h2>验收</h2>
+  <ul>
+    <li>RED：缺少 preview endpoint 和 explanation contract 时目标测试失败。</li>
+    <li>GREEN：两个目标测试通过。</li>
+    <li>回归：service HTTP + storage repository 测试 <code>42 passed</code>。</li>
+    <li>静态检查：service package 和 HTTP 测试 ruff check 通过。</li>
+    <li>编译检查：service src/tests compileall 通过。</li>
+  </ul>
+</body>
+</html>

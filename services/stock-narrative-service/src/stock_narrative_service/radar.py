@@ -36,6 +36,7 @@ def radar_contract(config: ServiceConfig) -> dict[str, Any]:
             "/api/v1/narratives/radar/mined-candidates",
             "/api/v1/narratives/radar/bubbles",
             "/api/v1/narratives/radar/evidence",
+            "/api/v1/narratives/radar/preview",
         ],
         "response_envelope": {
             "status": "available|degraded|missing|failed",
@@ -246,6 +247,7 @@ def radar_evidence_detail(
     window_days: Any = "",
     baseline_days: Any = "",
     half_life_hours: Any = "",
+    include_explanation: bool = False,
 ) -> dict[str, Any]:
     narrative_id = str(narrative_id or "").strip()
     score_payload = radar_scores(
@@ -269,7 +271,7 @@ def radar_evidence_detail(
         for event in events
         if event.get("event_id")
     }
-    return {
+    detail = {
         "version": "narrative-radar-evidence-detail-v1",
         "narrative_id": narrative_id,
         "narrative_name": _narrative_name(signals, narrative_id),
@@ -313,6 +315,63 @@ def radar_evidence_detail(
             "Radar detail remains readable after review state changes; rejected or "
             "deprecated narratives are not current trusted signals."
         ),
+    }
+    return {
+        **detail,
+        "explanation": _optional_explanation(
+            detail=detail,
+            enabled=include_explanation,
+        ),
+    }
+
+
+def radar_preview(
+    *,
+    events: list[dict[str, Any]],
+    config: ServiceConfig,
+    as_of: str = "",
+    window_days: Any = "",
+    baseline_days: Any = "",
+    half_life_hours: Any = "",
+) -> dict[str, Any]:
+    bubbles = radar_bubbles(
+        events=events,
+        config=config,
+        as_of=as_of,
+        window_days=window_days,
+        baseline_days=baseline_days,
+        half_life_hours=half_life_hours,
+    )
+    return {
+        "version": "narrative-radar-preview-v1",
+        "surface": {
+            "type": "service_dev_preview",
+            "not_report_product": True,
+            "score_recalculation": "none",
+            "data_source_endpoint": "/api/v1/narratives/radar/bubbles",
+        },
+        "layout_contract": {
+            "responsive": True,
+            "min_width": 320,
+            "preferred_width": 960,
+            "bubble_layer": "svg_or_canvas_client_choice",
+        },
+        "visualization_contract": bubbles["visualization_contract"],
+        "render_model": {
+            "bubbles": bubbles["bubbles"],
+            "legend": {
+                "size": "heat",
+                "color": "momentum_state",
+                "border": "trust_status",
+                "x_axis": "trend_acceleration",
+                "y_axis": "market_confirmation_score",
+            },
+            "interactions": {
+                "hover": "tooltip_fields",
+                "click": "detail_path",
+            },
+        },
+        "degradation_warnings": bubbles["degradation_warnings"],
     }
 
 
@@ -503,6 +562,36 @@ def _detail_evidence_ref(
         "title": str(event.get("title") or ""),
         "event_time": str(signal.get("event_time") or ""),
         "evidence_refs": _strings(signal.get("evidence_refs")),
+    }
+
+
+def _optional_explanation(
+    *,
+    detail: dict[str, Any],
+    enabled: bool,
+) -> dict[str, Any]:
+    base = {
+        "enabled": enabled,
+        "authoritative": False,
+        "score_effect": "none",
+        "trust_effect": "none",
+    }
+    if not enabled:
+        return base
+    evidence_refs = [
+        str(item.get("source_event_id") or "")
+        for item in _list(detail.get("evidence_refs"))
+        if item.get("source_event_id")
+    ]
+    narrative_name = str(detail.get("narrative_name") or detail.get("narrative_id") or "")
+    return {
+        **base,
+        "generator": "optional_ai_summary_contract_v0",
+        "summary": (
+            f"{narrative_name} is explained from {len(evidence_refs)} source "
+            "event(s); this text is explanatory and cannot change scores or trust."
+        ),
+        "evidence_refs": evidence_refs,
     }
 
 

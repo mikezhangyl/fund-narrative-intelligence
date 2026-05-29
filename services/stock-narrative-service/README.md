@@ -57,10 +57,14 @@ First slice scope:
 - radar evidence drill-down endpoint:
   `/api/v1/narratives/radar/evidence`, with source evidence, score components,
   review ledger state, and trust status.
+- service/dev radar preview endpoint:
+  `/api/v1/narratives/radar/preview`, plus optional non-authoritative
+  evidence explanation through `include_explanation=true` on radar evidence.
 
 Non-goals:
 
 - AI narrative discovery;
+- AI prediction or AI-authoritative scoring/trust promotion;
 - social scraping;
 - browser automation;
 - production review UI;

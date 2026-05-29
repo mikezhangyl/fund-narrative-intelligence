@@ -1284,6 +1284,7 @@ def test_radar_contract_declares_service_ownership_score_schema_and_metadata(tmp
         "/api/v1/narratives/radar/mined-candidates",
         "/api/v1/narratives/radar/bubbles",
         "/api/v1/narratives/radar/evidence",
+        "/api/v1/narratives/radar/preview",
     ]
     assert payload["response_envelope"] == {
         "status": "available|degraded|missing|failed",
@@ -1957,6 +1958,104 @@ def test_radar_evidence_detail_tracks_review_state_transitions(tmp_path):
         "Radar detail remains readable after review state changes; rejected or "
         "deprecated narratives are not current trusted signals."
     )
+
+
+def test_radar_preview_surface_uses_bubble_api_contract_without_report_semantics(
+    tmp_path,
+):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [_radar_event("EVT_ROBOT_D3A", "2026-05-28T10:00:00+08:00", 0.8)],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        preview = _get_json(
+            f"{base_url}/api/v1/narratives/radar/preview"
+            "?as_of=2026-05-29T00:00:00+08:00"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert preview["status"] == "available"
+    payload = preview["data"]
+    assert payload["version"] == "narrative-radar-preview-v1"
+    assert payload["surface"] == {
+        "type": "service_dev_preview",
+        "not_report_product": True,
+        "score_recalculation": "none",
+        "data_source_endpoint": "/api/v1/narratives/radar/bubbles",
+    }
+    assert payload["layout_contract"] == {
+        "responsive": True,
+        "min_width": 320,
+        "preferred_width": 960,
+        "bubble_layer": "svg_or_canvas_client_choice",
+    }
+    assert payload["visualization_contract"]["dimensions"]["size"] == "heat_score"
+    assert payload["render_model"]["bubbles"][0]["narrative_id"] == "C_ROBOT"
+    assert payload["render_model"]["legend"] == {
+        "size": "heat",
+        "color": "momentum_state",
+        "border": "trust_status",
+        "x_axis": "trend_acceleration",
+        "y_axis": "market_confirmation_score",
+    }
+    assert "report" not in json.dumps(payload["render_model"], ensure_ascii=False).lower()
+
+
+def test_radar_evidence_optional_explanation_is_disabled_by_default_and_non_authoritative(
+    tmp_path,
+):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [_seed_candidate_radar_event()],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        disabled = _get_json(
+            f"{base_url}/api/v1/narratives/radar/evidence?narrative_id=C_SEED"
+        )
+        enabled = _get_json(
+            f"{base_url}/api/v1/narratives/radar/evidence?narrative_id=C_SEED"
+            "&include_explanation=true"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert disabled["data"]["explanation"] == {
+        "enabled": False,
+        "authoritative": False,
+        "score_effect": "none",
+        "trust_effect": "none",
+    }
+    explanation = enabled["data"]["explanation"]
+    assert explanation["enabled"] is True
+    assert explanation["authoritative"] is False
+    assert explanation["score_effect"] == "none"
+    assert explanation["trust_effect"] == "none"
+    assert explanation["generator"] == "optional_ai_summary_contract_v0"
+    assert explanation["summary"].startswith("机器人执行器 is explained from 1 source")
+    assert explanation["evidence_refs"] == ["EVT_SEED_RADAR"]
+    assert enabled["data"]["score_components"] == disabled["data"]["score_components"]
+    assert enabled["data"]["trust_status"] == disabled["data"]["trust_status"]
 
 
 def test_unknown_route_returns_error_envelope(tmp_path):

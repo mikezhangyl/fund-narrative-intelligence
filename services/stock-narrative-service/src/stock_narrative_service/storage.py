@@ -22,6 +22,7 @@ from stock_narrative_service.radar import (
     radar_contract,
     radar_evidence_detail,
     radar_mined_candidates,
+    radar_preview,
     radar_scores,
     radar_source_signals,
 )
@@ -306,12 +307,31 @@ class NarrativeStore:
         window_days: Any = "",
         baseline_days: Any = "",
         half_life_hours: Any = "",
+        include_explanation: bool = False,
     ) -> dict[str, Any]:
         return radar_evidence_detail(
             events=_all_events(self),
             review_actions=self.review_actions(),
             config=self.config,
             narrative_id=narrative_id,
+            as_of=as_of,
+            window_days=window_days,
+            baseline_days=baseline_days,
+            half_life_hours=half_life_hours,
+            include_explanation=include_explanation,
+        )
+
+    def radar_preview(
+        self,
+        *,
+        as_of: str = "",
+        window_days: Any = "",
+        baseline_days: Any = "",
+        half_life_hours: Any = "",
+    ) -> dict[str, Any]:
+        return radar_preview(
+            events=_all_events(self),
+            config=self.config,
             as_of=as_of,
             window_days=window_days,
             baseline_days=baseline_days,

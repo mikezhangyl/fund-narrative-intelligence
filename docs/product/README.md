@@ -143,6 +143,12 @@ documented in
 The auxiliary Markdown note is
 `docs/product/narrative-radar-evidence-review-detail-2026-05-29.md`.
 
+Narrative Radar service preview payload and optional non-authoritative
+explanation contract are documented in
+`docs/product/narrative-radar-preview-and-explanation-contract-2026-05-29.html`.
+The auxiliary Markdown note is
+`docs/product/narrative-radar-preview-and-explanation-contract-2026-05-29.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

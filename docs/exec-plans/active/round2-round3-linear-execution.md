@@ -220,8 +220,8 @@ unblocks a radar slice earlier:
 3. Done locally, pending push/Linear closeout - `MIK-76`: structured source mining into candidate narrative signals.
 4. Done locally, pending push/Linear closeout - `MIK-74` + `MIK-84`: radar bubble API and visualization contract.
 5. Done locally, pending push/Linear closeout - `MIK-77` + `MIK-85`: evidence drill-down and review/trust integration.
-6. `MIK-78`: service-owned preview surface.
-7. `MIK-79`: optional AI explanation as non-authoritative evidence summary.
+6. Done locally, pending push/Linear closeout - `MIK-78`: service-owned preview surface.
+7. Done locally, pending push/Linear closeout - `MIK-79`: optional AI explanation as non-authoritative evidence summary.
 8. `MIK-68` + `MIK-69`: close parent packs after all child issues pass.
 
 ## Round 3 Completed Slice Evidence
@@ -369,6 +369,34 @@ unblocks a radar slice earlier:
   `docs/product/narrative-radar-evidence-review-detail-2026-05-29.html`
   with auxiliary Markdown at
   `docs/product/narrative-radar-evidence-review-detail-2026-05-29.md`.
+
+### MIK-78 + MIK-79 - Radar Preview And Optional Explanation Contract
+
+- TDD red:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py::test_radar_preview_surface_uses_bubble_api_contract_without_report_semantics services/stock-narrative-service/tests/test_http_service.py::test_radar_evidence_optional_explanation_is_disabled_by_default_and_non_authoritative -q`
+  failed on missing radar preview endpoint and missing optional explanation
+  contract.
+- TDD green:
+  the same targeted command passed with 2 tests.
+- Targeted regression:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  passed with 42 tests.
+- Static checks:
+  `uv run ruff check services/stock-narrative-service/src/stock_narrative_service services/stock-narrative-service/tests/test_http_service.py`.
+- Compile:
+  `uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests`.
+- Service preview:
+  `GET /api/v1/narratives/radar/preview` exposes a service/dev preview payload
+  using bubble API data and visualization contract metadata without client-side
+  score recalculation.
+- Optional explanation:
+  `GET /api/v1/narratives/radar/evidence?...&include_explanation=true` returns
+  non-authoritative evidence summary metadata with `score_effect=none` and
+  `trust_effect=none`; explanation is disabled by default.
+- Product note:
+  `docs/product/narrative-radar-preview-and-explanation-contract-2026-05-29.html`
+  with auxiliary Markdown at
+  `docs/product/narrative-radar-preview-and-explanation-contract-2026-05-29.md`.
 
 ## Duplicate / Legacy Round 3 Issues
 
