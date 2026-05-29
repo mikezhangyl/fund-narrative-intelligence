@@ -24,7 +24,7 @@ Canonical run: `.ecc/runs/20260530-round4-productized-ops/`
 
 Execute in dependency order:
 
-1. Done locally, pending Linear closeout - `MIK-93` + `MIK-88`: live validation taxonomy and credential-safe smoke
+1. Done - `MIK-93` + `MIK-88`: live validation taxonomy and credential-safe smoke
    surface.
 2. `MIK-94` + `MIK-89`: Narrative Radar UI contract and service UI surface.
 3. `MIK-97` + `MIK-92`: review/promotion state machine and complete reviewer
