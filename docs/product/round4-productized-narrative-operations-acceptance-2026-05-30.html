@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Round 4 Productized Narrative Operations 总验收</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f6f8fa;color:#20242b;line-height:1.6}
+    main{max-width:1120px;margin:0 auto;padding:32px}
+    section{margin:24px 0}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #d9dee7}
+    th,td{border-bottom:1px solid #e4e8ef;padding:10px;text-align:left;vertical-align:top}
+    code{background:#eef2f7;padding:2px 5px;border-radius:4px}
+    .meta{color:#5d6675}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Round 4 Productized Narrative Operations 总验收</h1>
+  <p class="meta">Milestone: M10 · Linear: MIK-86 到 MIK-97 · 日期: 2026-05-30</p>
+
+  <section>
+    <h2>完成范围</h2>
+    <table>
+      <thead><tr><th>需求</th><th>结果</th><th>主要产物</th></tr></thead>
+      <tbody>
+        <tr><td><code>MIK-93 + MIK-88</code></td><td>Live validation taxonomy 和 credential-safe smoke surface 完成。</td><td><code>round4-live-provider-credential-smoke-2026-05-30.html</code></td></tr>
+        <tr><td><code>MIK-94 + MIK-89</code></td><td>Narrative Radar UI contract 和 service-owned UI 完成。</td><td><code>/api/v1/narratives/radar/ui-contract</code>, <code>/narratives/radar</code></td></tr>
+        <tr><td><code>MIK-97 + MIK-92</code></td><td>Review workflow state machine、evidence drill-down、promotion guardrails 完成。</td><td><code>/api/v1/narratives/review-workflow</code>, <code>/narratives/review</code></td></tr>
+        <tr><td><code>MIK-95 + MIK-90</code></td><td>Operational scheduling job model 和 run ledger 完成。</td><td><code>/api/v1/narratives/jobs/*</code></td></tr>
+        <tr><td><code>MIK-96 + MIK-91</code></td><td>Durable storage migration schema 和 readiness 完成。</td><td><code>/api/v1/narratives/storage/migration-plan</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>最终验证</h2>
+    <table>
+      <thead><tr><th>命令</th><th>结果</th></tr></thead>
+      <tbody>
+        <tr><td><code>uv run ruff check .</code></td><td>通过。</td></tr>
+        <tr><td><code>uv run python -m compileall -q src tests scripts services/stock-narrative-service/src services/stock-narrative-service/tests</code></td><td>通过。</td></tr>
+        <tr><td><code>uv run pytest -q</code></td><td>553 passed, 1 skipped。</td></tr>
+        <tr><td><code>uv run python scripts/validate_stock_narrative_service_acceptance.py</code></td><td>completed；conformance endpoint count 13；service smoke、fallback smoke、service-backed report 均通过。</td></tr>
+        <tr><td><code>git diff --check main...HEAD</code></td><td>通过。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>工程决策</h2>
+    <ul>
+      <li>没有直接引入新的前端栈；Radar 和 Review 操作页由 Narrative Service 提供轻量 HTML surface。</li>
+      <li>没有直接切换 SQLite/Postgres；Round 4 先固定 migration schema、contract invariants 和 parity phases。</li>
+      <li>Operational scheduling 先落 job definition 和 append-only run ledger；真正 cron/worker 可以在后续基于同一 contract 接入。</li>
+      <li>所有 promotion 仍然只能通过 explicit promotion commit；review、preflight、scheduler、migration plan 都不写 trusted records。</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

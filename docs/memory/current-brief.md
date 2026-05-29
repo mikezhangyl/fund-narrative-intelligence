@@ -98,7 +98,7 @@ The Narrative Service promotion transaction boundary is now enabled only through
 
 The review workspace entry point is `uv run python scripts/run_narrative_review_workspace.py --service-url <base-url> --output-dir <dir>`. It writes JSON and Chinese HTML grouped by review status, links candidate detail/evidence detail endpoints, shows preflight missing gates, and can optionally submit `approve`, `reject`, or `defer` actions through `POST /api/v1/narratives/review-actions` before rendering.
 
-The in-repo Narrative Service now records human review actions through `POST /api/v1/narratives/review-actions` and exposes them through `GET /api/v1/narratives/review-actions`. Actions support `approve`, `reject`, and `defer`, are persisted in a local JSON ledger, and remain explicitly non-promotional: candidates stay `candidate_untrusted` until a separate trusted promotion workflow exists.
+The in-repo Narrative Service now records human review actions through `POST /api/v1/narratives/review-actions` and exposes them through `GET /api/v1/narratives/review-actions`. Actions support `approve`, `reject`, and `defer`, are persisted in a local JSON ledger, and remain explicitly non-promotional: candidates stay `candidate_untrusted` until the separate promotion workflow commits trusted records.
 
 The Narrative Service also exposes `POST /api/v1/narratives/promotion/preflight`. It checks candidate source evidence, rationale, exclusion criteria, and service-ledger approval, then returns `blocked` or `ready_for_trust_audit`. It is intentionally non-mutating and cannot create trusted records.
 
@@ -112,7 +112,7 @@ Future Linear implementation issues should follow `docs/product/developer-ready-
 
 Default product planning workflow now uses Linear as the durable tracker: when the user raises a new product direction, scenario, or capability idea, first act as PM to create product requirements/user stories/non-goals/acceptance criteria, then act as Architect to add service boundaries/data ownership/API contracts/schema implications/dependencies/verification gates, then create or update Linear milestones/issues/dependency relations and a canonical linked planning document. Developer chats should implement from Linear issues and linked docs, not raw chat memory; PM/Architect acceptance feedback should be written into docs first and referenced from Linear.
 
-Round 4 planning is open in Linear under milestone `M10 - Productized Narrative Operations`. PM parent is `MIK-86`; Architect parent is `MIK-87`. The canonical handoff is `docs/product/round-4-productized-narrative-operations-plan-2026-05-30.md` and Linear document `Round 4 Productized Narrative Operations Plan`. Recommended first developer slice is `MIK-93 + MIK-88` to establish live validation taxonomy and credential-safe smoke before Radar UI, scheduling, or durable-store migration work.
+Round 4 under milestone `M10 - Productized Narrative Operations` is implemented on branch `codex/round4-develop`: live validation smoke, Narrative Radar UI, review workflow state machine, operational job run ledger, and durable storage migration plan. PM parent is `MIK-86`; Architect parent is `MIK-87`. Final acceptance is recorded in `docs/product/round4-productized-narrative-operations-acceptance-2026-05-30.html`.
 
 ## Default Context Budget
 

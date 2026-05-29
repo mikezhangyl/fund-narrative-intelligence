@@ -32,7 +32,7 @@ Execute in dependency order:
 4. Done locally, pending Linear closeout - `MIK-95` + `MIK-90`: scheduling job model and operational run ledger.
 5. Done locally, pending Linear closeout - `MIK-96` + `MIK-91`: durable storage migration schema and migration
    readiness.
-6. `MIK-86` + `MIK-87`: close parent packs after all child issues pass.
+6. Done locally, pending Linear closeout - `MIK-86` + `MIK-87`: close parent packs after all child issues pass.
 
 ## Slice Acceptance Rules
 
@@ -194,6 +194,26 @@ For every slice:
   `docs/product/round4-durable-storage-migration-readiness-2026-05-30.html`
   with auxiliary Markdown at
   `docs/product/round4-durable-storage-migration-readiness-2026-05-30.md`.
+
+### MIK-86 + MIK-87 - Parent Closeout
+
+- Final lint:
+  `uv run ruff check .` passed.
+- Final compile:
+  `uv run python -m compileall -q src tests scripts services/stock-narrative-service/src services/stock-narrative-service/tests`
+  passed.
+- Final full suite:
+  `uv run pytest -q` passed with 553 tests and 1 skipped.
+- Service acceptance:
+  `uv run python scripts/validate_stock_narrative_service_acceptance.py`
+  completed; generated ignored artifacts under
+  `outputs/stock_narrative_service_acceptance/2026-05-29T165703+0000/`.
+- Diff whitespace:
+  `git diff --check main...HEAD` passed.
+- Product acceptance:
+  `docs/product/round4-productized-narrative-operations-acceptance-2026-05-30.html`
+  with auxiliary Markdown at
+  `docs/product/round4-productized-narrative-operations-acceptance-2026-05-30.md`.
 
 ## Final Acceptance Gates
 
