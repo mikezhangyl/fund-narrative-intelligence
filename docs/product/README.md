@@ -110,6 +110,9 @@ python scripts/run_narrative_governance_audit_export.py
 The MIK-59 acceptance note is
 `docs/product/narrative-governance-audit-export-2026-05-29.md`.
 
+Narrative Service durable storage migration is documented in
+`docs/product/narrative-service-storage-migration-path-2026-05-29.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

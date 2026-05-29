@@ -36,7 +36,7 @@ Execute Round 2 in dependency order:
 8. Done locally, pending Linear closeout - `MIK-58`: reviewable fund report pack.
 9. Done locally, pending Linear closeout - `MIK-66`: governance audit schema and export contract.
 10. Done locally, pending Linear closeout - `MIK-59`: narrative governance audit export.
-11. `MIK-64`: durable Narrative Service storage migration path.
+11. Done locally, pending Linear closeout - `MIK-64`: durable Narrative Service storage migration path.
 12. `MIK-52` + `MIK-60`: close parent packs after all child issues pass.
 
 ## Completed Slice Evidence
@@ -178,6 +178,22 @@ Execute Round 2 in dependency order:
   `docs/product/narrative-governance-audit-export-2026-05-29.md`
 - Verification:
   `uv run ruff check src/scanners/governance_audit.py src/scanners/narrative_governance_audit_export.py scripts/run_narrative_governance_audit_export.py tests/test_narrative_governance_audit_export.py`.
+
+### MIK-64 - Durable Narrative Service Storage Migration Path
+
+- TDD red:
+  `uv run pytest services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  initially failed on missing `stock_narrative_service.repository`.
+- TDD green:
+  `uv run pytest services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  passed with 2 tests.
+- Repository contract:
+  `services/stock-narrative-service/src/stock_narrative_service/repository.py`
+- Product note:
+  `docs/product/narrative-service-storage-migration-path-2026-05-29.md`
+- Verification:
+  JSON fixture repository behavior matches current `NarrativeStore`, and a
+  SQLite-ready fake adapter satisfies the future repository method contract.
 
 ## Round 3 Queue
 
