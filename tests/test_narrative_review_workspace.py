@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 import sys
 import threading
 from pathlib import Path
@@ -15,6 +17,32 @@ if str(SRC_ROOT) not in sys.path:
 
 from stock_narrative_service.app import create_server  # noqa: E402
 from stock_narrative_service.config import ServiceConfig  # noqa: E402
+
+
+def test_direct_cli_bootstraps_repo_root_before_argument_validation(tmp_path):
+    project_root = Path(__file__).resolve().parents[1]
+    script_path = project_root / "scripts" / "run_narrative_review_workspace.py"
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", None)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script_path),
+            "--output-dir",
+            str(tmp_path / "workspace"),
+        ],
+        cwd=project_root,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    output = result.stdout + result.stderr
+    assert result.returncode != 0
+    assert "--service-url or NARRATIVE_SERVICE_URL is required" in output
+    assert "ModuleNotFoundError" not in output
 
 
 def test_review_workspace_groups_queue_and_links_detail_endpoints():

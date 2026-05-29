@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from datetime import UTC, datetime
 from html import escape
 from pathlib import Path
@@ -10,7 +11,11 @@ from typing import Any
 from urllib.parse import quote, urljoin
 from urllib.request import Request, urlopen
 
-from src.config import DEFAULT_OUTPUT_DIR
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.config import DEFAULT_OUTPUT_DIR  # noqa: E402
 
 DEFAULT_WORKSPACE_DIR = DEFAULT_OUTPUT_DIR / "narrative_review_workspace"
 REVIEW_ACTIONS = ("approve", "reject", "defer")
