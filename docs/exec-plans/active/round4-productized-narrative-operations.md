@@ -26,8 +26,8 @@ Execute in dependency order:
 
 1. Done - `MIK-93` + `MIK-88`: live validation taxonomy and credential-safe smoke
    surface.
-2. Done locally, pending Linear closeout - `MIK-94` + `MIK-89`: Narrative Radar UI contract and service UI surface.
-3. `MIK-97` + `MIK-92`: review/promotion state machine and complete reviewer
+2. Done - `MIK-94` + `MIK-89`: Narrative Radar UI contract and service UI surface.
+3. Done locally, pending Linear closeout - `MIK-97` + `MIK-92`: review/promotion state machine and complete reviewer
    workflow.
 4. `MIK-95` + `MIK-90`: scheduling job model and operational run ledger.
 5. `MIK-96` + `MIK-91`: durable storage migration schema and migration
@@ -99,6 +99,39 @@ For every slice:
   `docs/product/round4-narrative-radar-ui-surface-2026-05-30.html` with
   auxiliary Markdown at
   `docs/product/round4-narrative-radar-ui-surface-2026-05-30.md`.
+
+### MIK-97 + MIK-92 - Review Workflow State Machine And Trust Promotion
+
+- TDD red:
+  targeted HTTP tests failed on missing
+  `/api/v1/narratives/review-workflow/contract`,
+  `/api/v1/narratives/review-workflow`, and `/narratives/review` routes.
+- TDD green:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py -q -k 'review_workflow'`
+  passed with 3 tests.
+- Service endpoints:
+  `GET /api/v1/narratives/review-workflow/contract`,
+  `GET /api/v1/narratives/review-workflow`, and `GET /narratives/review`.
+- State model:
+  candidate input remains `candidate_untrusted`; queue states are
+  `pending_review`, `approved_blocked_by_evidence`,
+  `ready_for_trust_audit`, `rejected`, and `deferred`; successful promotion
+  reports `trusted_validated`; `deprecated` is reserved for later lifecycle
+  deprecation.
+- Guardrail:
+  review actions and preflight remain non-mutating; promotion commit is the
+  only trusted-record write path; failed promotion writes no trusted records.
+- Targeted regression:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  passed with 48 tests.
+- Static checks:
+  `uv run ruff check services/stock-narrative-service/src/stock_narrative_service services/stock-narrative-service/tests/test_http_service.py`.
+- Compile:
+  `uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests`.
+- Product note:
+  `docs/product/round4-review-workflow-state-machine-2026-05-30.html` with
+  auxiliary Markdown at
+  `docs/product/round4-review-workflow-state-machine-2026-05-30.md`.
 
 ## Final Acceptance Gates
 

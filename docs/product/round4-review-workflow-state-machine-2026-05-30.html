@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Round 4 Review Workflow 状态机验收说明</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f6f8fa;color:#20242b;line-height:1.6}
+    main{max-width:1080px;margin:0 auto;padding:32px}
+    section{margin:24px 0}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #d9dee7}
+    th,td{border-bottom:1px solid #e4e8ef;padding:10px;text-align:left;vertical-align:top}
+    code{background:#eef2f7;padding:2px 5px;border-radius:4px}
+    .meta{color:#5d6675}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Round 4 Review Workflow 状态机验收说明</h1>
+  <p class="meta">Linear: MIK-97 + MIK-92 · 日期: 2026-05-30</p>
+
+  <section>
+    <h2>能力目标</h2>
+    <p>本切片把候选叙事从 evidence drill-down、人工 review action、promotion preflight 到 trusted promotion commit 的路径整理成服务拥有的状态机。review action 和 preflight 都不会写 trusted record；只有 promotion commit 在所有 gate 通过后写入可信 registry、mapping、evidence pack 和 promotion decision ledger。</p>
+  </section>
+
+  <section>
+    <h2>服务入口</h2>
+    <table>
+      <thead><tr><th>入口</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/v1/narratives/review-workflow/contract</code></td><td>返回状态机、guardrail、transition 和审计字段。</td></tr>
+        <tr><td><code>GET /api/v1/narratives/review-workflow</code></td><td>返回每个 candidate 的当前 workflow state、preflight 状态、最新 review action 和 promotion decision。</td></tr>
+        <tr><td><code>GET /narratives/review</code></td><td>返回操作员 HTML 页面，用于查看 pending、blocked、ready、deferred、rejected、trusted 路径。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>状态模型</h2>
+    <table>
+      <thead><tr><th>状态</th><th>含义</th></tr></thead>
+      <tbody>
+        <tr><td><code>candidate_untrusted</code></td><td>候选输入的信任起点；不能直接进入可信 registry。</td></tr>
+        <tr><td><code>pending_review</code></td><td>等待人工 approve、reject 或 defer。</td></tr>
+        <tr><td><code>approved_blocked_by_evidence</code></td><td>已 approve，但 source evidence、rationale、exclusion 等 gate 不完整。</td></tr>
+        <tr><td><code>ready_for_trust_audit</code></td><td>review 和 evidence gates 已通过，可进入 trust audit。</td></tr>
+        <tr><td><code>trusted_validated</code></td><td>promotion commit 成功，可信记录已原子写入。</td></tr>
+        <tr><td><code>rejected</code></td><td>人工拒绝，不进入 promotion。</td></tr>
+        <tr><td><code>deferred</code></td><td>人工延期，需要下一轮来源或上下文。</td></tr>
+        <tr><td><code>deprecated</code></td><td>预留给后续可信叙事下线流程。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>关键约束</h2>
+    <ul>
+      <li>Intake 只创建 candidate_untrusted 记录。</li>
+      <li>Review action 只允许 approve、reject、defer，不能直接 promotion。</li>
+      <li>Promotion preflight 是 non-mutating。</li>
+      <li>Promotion commit 是唯一 trusted-record write path。</li>
+      <li>Failed promotion 不写 trusted records。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>验证</h2>
+    <p>新增测试先以 404 失败确认 RED，再实现服务入口后通过：<code>uv run pytest services/stock-narrative-service/tests/test_http_service.py -q -k 'review_workflow'</code>。</p>
+    <p>相关服务回归：<code>uv run pytest services/stock-narrative-service/tests/test_http_service.py services/stock-narrative-service/tests/test_storage_repository_contract.py -q</code>，共 48 个测试通过。</p>
+  </section>
+</main>
+</body>
+</html>

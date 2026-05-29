@@ -2148,6 +2148,129 @@ def test_radar_evidence_optional_explanation_is_disabled_by_default_and_non_auth
     assert enabled["data"]["trust_status"] == disabled["data"]["trust_status"]
 
 
+def test_review_workflow_contract_defines_state_machine_and_guardrails(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/review-workflow/contract")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    payload = response["data"]
+    assert payload["version"] == "narrative-review-workflow-contract-v1"
+    assert payload["states"] == [
+        "candidate_untrusted",
+        "pending_review",
+        "approved_blocked_by_evidence",
+        "ready_for_trust_audit",
+        "trusted_validated",
+        "rejected",
+        "deferred",
+        "deprecated",
+    ]
+    assert payload["rules"] == {
+        "intake": "creates candidate_untrusted records only",
+        "review_action": "approve/reject/defer only; cannot promote directly",
+        "preflight": "non_mutating",
+        "promotion_commit": "only trusted-record write path",
+        "failed_promotion": "writes no trusted records",
+    }
+    assert payload["transitions"]["pending_review"]["approve"] == [
+        "approved_blocked_by_evidence",
+        "ready_for_trust_audit",
+    ]
+    assert payload["audit_fields"] == [
+        "reviewed_by",
+        "action",
+        "reviewed_at",
+        "review_note",
+        "promotion_decision_id",
+    ]
+
+
+def test_review_workflow_summary_tracks_happy_path_to_trusted_promotion(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        before = _get_json(f"{base_url}/api/v1/narratives/review-workflow")
+        review = _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "approve",
+                "reviewed_by": "workflow-reviewer",
+                "review_note": "Evidence, rationale, and exclusion gates are present.",
+            },
+        )
+        preflight = _post_json(
+            f"{base_url}/api/v1/narratives/promotion/preflight",
+            {"candidate_narrative_id": "C_SEED"},
+        )
+        commit = _post_json(
+            f"{base_url}/api/v1/narratives/promotion/commit",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "target_narrative_id": "N_ROBOTICS_ACTUATOR",
+                "target_stock_codes": ["300124"],
+                "review_action_id": review["data"]["decision"]["review_action_id"],
+                "trust_audit_id": "TA_WORKFLOW",
+                "trust_audit_result": "passed",
+                "promoted_by": "workflow-reviewer",
+                "promotion_note": "Controlled fixture promotion.",
+            },
+        )
+        after = _get_json(f"{base_url}/api/v1/narratives/review-workflow")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert before["data"]["items"][0]["workflow_state"] == "pending_review"
+    assert preflight["data"]["result"] == "ready_for_trust_audit"
+    assert commit["data"]["decision"]["promotion_effect"] == "trusted_validated"
+    item = after["data"]["items"][0]
+    assert item["workflow_state"] == "trusted_validated"
+    assert item["promotion_decision_id"] == commit["data"]["decision"]["promotion_decision_id"]
+    assert item["audit_trail"]["latest_review_action_id"] == review["data"]["decision"][
+        "review_action_id"
+    ]
+    assert item["audit_trail"]["promotion_decision_id"] == commit["data"]["decision"][
+        "promotion_decision_id"
+    ]
+    assert after["data"]["summary"]["trusted_validated"] == 1
+
+
+def test_review_workflow_html_exposes_blocked_and_deferred_paths(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        _post_json(
+            f"{base_url}/api/v1/narratives/review-actions",
+            {
+                "candidate_narrative_id": "C_SEED",
+                "action": "defer",
+                "reviewed_by": "workflow-reviewer",
+                "review_note": "Needs another source cycle.",
+            },
+        )
+        html = _get_text(f"{base_url}/narratives/review")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert "Narrative Review Workflow" in html
+    assert "C_SEED" in html
+    assert "deferred" in html
+    assert "promotion preflight" in html
+    assert "promotion commit is the only trusted-record write path" in html
+
+
 def test_unknown_route_returns_error_envelope(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)

@@ -70,6 +70,20 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 return
             self._send_html(HTTPStatus.OK, html)
             return
+        if path == "/narratives/review":
+            try:
+                html = self.server.store.review_workflow_html(
+                    status=_first_query_value(query, "status"),
+                )
+            except Exception as exc:
+                self._send_error(
+                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                    "SERVICE_ERROR",
+                    str(exc),
+                )
+                return
+            self._send_html(HTTPStatus.OK, html)
+            return
         if path == "/api/v1/narratives/evidence-packs/detail":
             data = self.server.store.evidence_pack_detail(
                 stock_code=_first_query_value(query, "stock_code"),
@@ -158,9 +172,16 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
             ),
             "/api/v1/narratives/ops/summary": self.server.store.ops_summary,
             "/api/v1/narratives/review-actions": self.server.store.review_actions,
+            "/api/v1/narratives/review-workflow/contract": (
+                self.server.store.review_workflow_contract
+            ),
         }
         if path == "/api/v1/narratives/review-queue":
             handler = lambda: self.server.store.review_queue(  # noqa: E731
+                status=_first_query_value(query, "status")
+            )
+        elif path == "/api/v1/narratives/review-workflow":
+            handler = lambda: self.server.store.review_workflow_summary(  # noqa: E731
                 status=_first_query_value(query, "status")
             )
         else:

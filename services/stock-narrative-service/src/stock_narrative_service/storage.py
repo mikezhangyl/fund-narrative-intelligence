@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from copy import deepcopy
 from datetime import UTC, datetime
+from html import escape
 from pathlib import Path
 from typing import Any
 
@@ -49,6 +50,16 @@ PROMOTION_ATOMIC_WRITE_SET = [
     "trusted_stock_mapping_record",
     "trusted_evidence_pack_record",
     "promotion_decision_ledger_record",
+]
+REVIEW_WORKFLOW_STATES = [
+    "candidate_untrusted",
+    "pending_review",
+    "approved_blocked_by_evidence",
+    "ready_for_trust_audit",
+    "trusted_validated",
+    "rejected",
+    "deferred",
+    "deprecated",
 ]
 
 
@@ -360,6 +371,141 @@ class NarrativeStore:
             ),
             ui_contract=self.radar_ui_contract(),
             generated_at=_now(),
+        )
+
+    def review_workflow_contract(self) -> dict[str, Any]:
+        return {
+            "version": "narrative-review-workflow-contract-v1",
+            "states": [*REVIEW_WORKFLOW_STATES],
+            "rules": {
+                "intake": "creates candidate_untrusted records only",
+                "review_action": "approve/reject/defer only; cannot promote directly",
+                "preflight": "non_mutating",
+                "promotion_commit": "only trusted-record write path",
+                "failed_promotion": "writes no trusted records",
+            },
+            "transitions": {
+                "candidate_untrusted": {
+                    "intake": "pending_review",
+                },
+                "pending_review": {
+                    "approve": [
+                        "approved_blocked_by_evidence",
+                        "ready_for_trust_audit",
+                    ],
+                    "reject": "rejected",
+                    "defer": "deferred",
+                },
+                "approved_blocked_by_evidence": {
+                    "complete_evidence_gates": "ready_for_trust_audit",
+                },
+                "ready_for_trust_audit": {
+                    "promotion_commit": "trusted_validated",
+                },
+                "trusted_validated": {
+                    "deprecate": "deprecated",
+                },
+            },
+            "audit_fields": [
+                "reviewed_by",
+                "action",
+                "reviewed_at",
+                "review_note",
+                "promotion_decision_id",
+            ],
+        }
+
+    def review_workflow_summary(self, *, status: str = "") -> dict[str, Any]:
+        candidates = self.candidates()["candidate_narratives"]
+        latest_actions = _latest_actions_by_candidate(self.review_actions())
+        promotion_decisions = _latest_promotions_by_candidate(self.promotion_decisions())
+        items = [
+            _review_workflow_item(
+                candidate=candidate,
+                latest_action=latest_actions.get(
+                    candidate["candidate_narrative_id"],
+                    {},
+                ),
+                promotion_decision=promotion_decisions.get(
+                    candidate["candidate_narrative_id"],
+                    {},
+                ),
+            )
+            for candidate in candidates
+        ]
+        if status:
+            items = [item for item in items if item["workflow_state"] == status]
+        return {
+            "version": "narrative-review-workflow-v1",
+            "generated_at": _now(),
+            "contract_version": self.review_workflow_contract()["version"],
+            "filter": {"status": status},
+            "summary": _workflow_summary(items),
+            "items": items,
+        }
+
+    def review_workflow_html(self, *, status: str = "") -> str:
+        payload = self.review_workflow_summary(status=status)
+        rows = "\n".join(
+            _render_review_workflow_row(item)
+            for item in _list(payload.get("items"))
+        )
+        if not rows:
+            rows = (
+                '<tr><td colspan="5">No review workflow items match this filter.</td>'
+                "</tr>"
+            )
+        summary = _mapping(payload.get("summary"))
+        summary_markup = "".join(
+            f'<span><strong>{_html(key)}</strong> {_html(value)}</span>'
+            for key, value in summary.items()
+        )
+        return "\n".join(
+            [
+                "<!doctype html>",
+                '<html lang="en">',
+                "<head>",
+                '<meta charset="utf-8" />',
+                '<meta name="viewport" content="width=device-width, initial-scale=1" />',
+                "<title>Narrative Review Workflow</title>",
+                "<style>",
+                "body{margin:0;background:#f5f7fa;color:#1e252c;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}",
+                "main{max-width:1120px;margin:0 auto;padding:24px}",
+                "header{border-bottom:1px solid #d9e0e8;padding-bottom:16px}",
+                "h1{font-size:28px;margin:0 0 8px}",
+                "p{margin:0;color:#5d6b7a}",
+                ".summary{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}",
+                ".summary span{border:1px solid #d9e0e8;background:#fff;padding:8px 10px}",
+                "table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #d9e0e8}",
+                "th,td{text-align:left;border-bottom:1px solid #e4e9ef;padding:10px;vertical-align:top}",
+                "th{font-size:12px;text-transform:uppercase;color:#5d6b7a;background:#edf2f7}",
+                "code{background:#edf2f7;padding:2px 5px}",
+                ".guardrails{margin-top:16px;color:#45515f}",
+                "</style>",
+                "</head>",
+                "<body>",
+                "<main>",
+                "<header>",
+                "<h1>Narrative Review Workflow</h1>",
+                (
+                    "<p>Human review, promotion preflight, and trusted promotion "
+                    "state surface for candidate narratives.</p>"
+                ),
+                "</header>",
+                f'<section class="summary">{summary_markup}</section>',
+                "<table>",
+                "<thead><tr><th>Candidate</th><th>State</th><th>Preflight</th>"
+                "<th>Review Action</th><th>Promotion</th></tr></thead>",
+                f"<tbody>{rows}</tbody>",
+                "</table>",
+                (
+                    '<p class="guardrails">promotion preflight is non-mutating; '
+                    "promotion commit is the only trusted-record write path.</p>"
+                ),
+                "</main>",
+                "</body>",
+                "</html>",
+            ]
         )
 
     def ingest_events(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -726,6 +872,93 @@ def _promotion_decision_by_id(
         if str(item.get("promotion_decision_id") or "") == promotion_decision_id:
             return item
     return None
+
+
+def _latest_promotions_by_candidate(
+    payload: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    latest: dict[str, dict[str, Any]] = {}
+    for item in _list(payload.get("items")):
+        candidate_id = str(item.get("candidate_narrative_id") or "")
+        if candidate_id:
+            latest[candidate_id] = item
+    return latest
+
+
+def _review_workflow_item(
+    *,
+    candidate: dict[str, Any],
+    latest_action: dict[str, Any],
+    promotion_decision: dict[str, Any],
+) -> dict[str, Any]:
+    queue_item = _review_queue_item(
+        candidate=candidate,
+        latest_action=latest_action,
+    )
+    candidate_id = str(candidate["candidate_narrative_id"])
+    promotion_decision_id = str(promotion_decision.get("promotion_decision_id") or "")
+    workflow_state = (
+        "trusted_validated"
+        if promotion_decision_id
+        else str(queue_item.get("status") or "pending_review")
+    )
+    return {
+        "workflow_item_id": f"RWF_{candidate_id}",
+        "candidate_narrative_id": candidate_id,
+        "candidate_name": str(candidate.get("name") or candidate_id),
+        "trust_status": str(candidate.get("trust_status") or "candidate_untrusted"),
+        "workflow_state": workflow_state,
+        "review_status": str(queue_item.get("status") or ""),
+        "recommended_action": str(queue_item.get("recommended_action") or ""),
+        "preflight_result": str(queue_item.get("preflight_result") or ""),
+        "missing_gates": _strings(queue_item.get("missing_gates")),
+        "latest_review_action": latest_action,
+        "promotion_decision_id": promotion_decision_id,
+        "promotion_decision": promotion_decision,
+        "audit_trail": {
+            "latest_review_action_id": str(
+                latest_action.get("review_action_id") or ""
+            ),
+            "reviewed_by": str(latest_action.get("reviewed_by") or ""),
+            "action": str(latest_action.get("action") or ""),
+            "reviewed_at": str(latest_action.get("reviewed_at") or ""),
+            "review_note": str(latest_action.get("review_note") or ""),
+            "promotion_decision_id": promotion_decision_id,
+        },
+        "links": {
+            "candidate_detail": (
+                f"/api/v1/narratives/candidates/{candidate_id}"
+            ),
+            "promotion_preflight": "/api/v1/narratives/promotion/preflight",
+            "promotion_commit": "/api/v1/narratives/promotion/commit",
+        },
+    }
+
+
+def _workflow_summary(items: list[dict[str, Any]]) -> dict[str, int]:
+    summary = {state: 0 for state in REVIEW_WORKFLOW_STATES}
+    for item in items:
+        state = str(item.get("workflow_state") or "")
+        summary[state] = summary.get(state, 0) + 1
+    return summary
+
+
+def _render_review_workflow_row(item: dict[str, Any]) -> str:
+    audit = _mapping(item.get("audit_trail"))
+    review_action = audit.get("action") or "none"
+    promotion_id = item.get("promotion_decision_id") or "none"
+    return (
+        "<tr>"
+        f"<td><code>{_html(item.get('candidate_narrative_id'))}</code><br />"
+        f"{_html(item.get('candidate_name'))}</td>"
+        f"<td>{_html(item.get('workflow_state'))}</td>"
+        f"<td>{_html(item.get('preflight_result'))}<br />"
+        f"missing: {_html(', '.join(_strings(item.get('missing_gates'))) or 'none')}</td>"
+        f"<td>{_html(review_action)}<br />"
+        f"{_html(audit.get('reviewed_by') or 'unreviewed')}</td>"
+        f"<td>{_html(promotion_id)}</td>"
+        "</tr>"
+    )
 
 
 def _registry_with_promotion(
@@ -1290,6 +1523,10 @@ def _float(value: Any) -> float:
     if value in (None, ""):
         return 0.0
     return float(value)
+
+
+def _html(value: Any) -> str:
+    return escape(str(value or ""), quote=True)
 
 
 def _now() -> str:

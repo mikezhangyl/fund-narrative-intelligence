@@ -161,6 +161,12 @@ documented in
 The auxiliary Markdown note is
 `docs/product/round4-narrative-radar-ui-surface-2026-05-30.md`.
 
+Round 4 review workflow state machine, evidence review surface, and trust
+promotion guardrails are documented in
+`docs/product/round4-review-workflow-state-machine-2026-05-30.html`.
+The auxiliary Markdown note is
+`docs/product/round4-review-workflow-state-machine-2026-05-30.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence
