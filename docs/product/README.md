@@ -64,6 +64,17 @@ contract, keeps direct crawling disabled, and records source trace rows for
 candidate creation or reinforcement. The MIK-55 acceptance note is
 `docs/product/structured-news-candidate-intake-2026-05-29.md`.
 
+Structured announcement events can become review-only mapping evidence with:
+
+```bash
+python scripts/run_announcement_mapping_intake.py
+```
+
+This path links announcement evidence to candidate stock-to-narrative mappings,
+keeps missing source URL/date as visible quality gaps, and never writes trusted
+mapping state. The MIK-56 acceptance note is
+`docs/product/announcement-mapping-intake-2026-05-29.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

@@ -1,0 +1,60 @@
+{
+  "version": "announcement-events-for-mapping-intake-v1",
+  "events": [
+    {
+      "event_id": "EVT_ANN_OPTICAL_001",
+      "source_type": "announcement",
+      "provider": "gateway_announcements",
+      "provider_version": "2026-05",
+      "permission_status": "licensed",
+      "degradation_state": "available",
+      "source_url": "gateway://announcements/300308/20260529",
+      "event_time": "2026-05-29T10:00:00+08:00",
+      "title": "中际旭创披露高速光通信订单进展",
+      "summary": "公告摘要提到高速光模块和光通信订单进展，可作为股票到光模块叙事的候选证据。",
+      "stock_codes": ["300308"],
+      "mentioned_stocks": [
+        {"stock_code": "300308", "stock_name": "中际旭创"}
+      ],
+      "narrative_hints": ["光模块", "高速光通信"],
+      "evidence_claims": [
+        "business_relevance",
+        "specificity"
+      ],
+      "candidate_narratives": [
+        {
+          "narrative_id": "N_OPTICAL_MODULE_CHAIN",
+          "name": "光模块产业链",
+          "canonical_taxonomy": "通信设备",
+          "confidence": 0.74
+        }
+      ]
+    },
+    {
+      "event_id": "EVT_ANN_BAIJIU_GAP_001",
+      "source_type": "announcement",
+      "provider": "gateway_announcements",
+      "provider_version": "2026-05",
+      "permission_status": "licensed",
+      "degradation_state": "partial",
+      "title": "贵州茅台渠道经营说明摘要",
+      "summary": "公告摘要提到高端白酒渠道经营情况，但缺少源 URL 和公告日期，必须保留质量缺口。",
+      "stock_codes": ["600519"],
+      "mentioned_stocks": [
+        {"stock_code": "600519", "stock_name": "贵州茅台"}
+      ],
+      "narrative_hints": ["白酒", "渠道", "消费"],
+      "evidence_claims": [
+        "business_relevance"
+      ],
+      "candidate_narratives": [
+        {
+          "narrative_id": "N_BAIJIU_CONSUMPTION",
+          "name": "高端白酒消费",
+          "canonical_taxonomy": "消费",
+          "confidence": 0.68
+        }
+      ]
+    }
+  ]
+}

@@ -29,8 +29,8 @@ Execute Round 2 in dependency order:
 1. Done - `MIK-61` + `MIK-53`: release baseline and merge protocol.
 2. Done - `MIK-62` + `MIK-54`: live validation taxonomy and dashboard.
 3. Done - `MIK-63` + `MIK-67`: source event schema and gateway change-request protocol.
-4. Done locally, pending Linear closeout - `MIK-55`: structured news-to-candidate narrative intake.
-5. `MIK-56`: announcement-to-evidence mapping intake.
+4. Done - `MIK-55`: structured news-to-candidate narrative intake.
+5. Done locally, pending Linear closeout - `MIK-56`: announcement-to-evidence mapping intake.
 6. `MIK-65`: fund report artifact contract.
 7. `MIK-57`: fund narrative change monitor report.
 8. `MIK-58`: reviewable fund report pack.
@@ -60,6 +60,25 @@ Execute Round 2 in dependency order:
   `uv run python -m compileall -q src tests scripts services/stock-narrative-service/src services/stock-narrative-service/tests`;
   `uv run pytest -q` (`534 passed, 1 skipped`);
   `uv run python scripts/validate_stock_narrative_service_acceptance.py`.
+
+### MIK-56 - Announcement-To-Evidence Mapping Intake
+
+- TDD red: `uv run pytest tests/test_announcement_mapping_intake.py -q`
+  initially failed on missing `scripts.run_announcement_mapping_intake`.
+- TDD green: `uv run pytest tests/test_announcement_mapping_intake.py -q`
+  passed with 3 tests.
+- Fixture acceptance:
+  `uv run python scripts/run_announcement_mapping_intake.py --output-dir outputs/announcement_mapping_intake/2026-05-29-mik-56-fixture`
+- Output JSON:
+  `outputs/announcement_mapping_intake/2026-05-29-mik-56-fixture/announcement_mapping_intake_report.json`
+- Output HTML:
+  `outputs/announcement_mapping_intake/2026-05-29-mik-56-fixture/announcement_mapping_intake_report.html`
+- Product note:
+  `docs/product/announcement-mapping-intake-2026-05-29.md`
+- Verification:
+  `uv run pytest tests/test_announcement_mapping_intake.py tests/test_mapping_evidence_pack_report.py tests/test_source_event_schema.py -q`
+  (`10 passed`);
+  `uv run ruff check src/scanners/announcement_mapping_intake.py scripts/run_announcement_mapping_intake.py tests/test_announcement_mapping_intake.py`.
 
 ## Round 3 Queue
 
