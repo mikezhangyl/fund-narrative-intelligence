@@ -110,6 +110,8 @@ The deterministic Narrative Service CI gate is `uv run python scripts/validate_s
 
 Future Linear implementation issues should follow `docs/product/developer-ready-linear-handoff-format.md`: include product intent, scope, non-goals, architecture constraints, dependencies, acceptance criteria, and verification commands; pick the next highest-priority Todo issue in milestone order; and close completed slices with checkpoint commit details plus verification evidence in the Linear comment.
 
+Default product planning workflow now uses Linear as the durable tracker: when the user raises a new product direction, scenario, or capability idea, first act as PM to create product requirements/user stories/non-goals/acceptance criteria, then act as Architect to add service boundaries/data ownership/API contracts/schema implications/dependencies/verification gates, then create or update Linear milestones/issues/dependency relations and a canonical linked planning document. Developer chats should implement from Linear issues and linked docs, not raw chat memory; PM/Architect acceptance feedback should be written into docs first and referenced from Linear.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.

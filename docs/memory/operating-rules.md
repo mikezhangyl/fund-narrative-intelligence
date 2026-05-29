@@ -85,3 +85,29 @@ Before closing a branch or worktree, record:
 - review status
 - artifact locations
 - keep / merge / PR / discard decision
+
+## Linear Product Workflow
+
+Use Linear as the durable product planning and execution tracker. When the user
+raises a new product direction, scenario, or capability idea, convert it into
+tracked requirements instead of leaving it only in chat.
+
+Default sequence:
+
+1. Act as PM first: turn the user scenario into product requirements, user
+   stories, non-goals, acceptance criteria, and milestone ordering.
+2. Act as Architect second: add service boundaries, data ownership, API
+   contracts, schema implications, dependency ordering, and verification gates.
+3. Create or update the corresponding Linear project, milestone, parent issues,
+   child issues, and dependency relations.
+4. Write a canonical planning or handoff document in the project's docs and, when
+   useful, mirror it into a Linear document.
+5. Developer chats should implement from Linear issues and linked docs, not from
+   raw chat memory.
+6. After development, return to PM/Architect mode for acceptance review and write
+   review comments into documents first; Linear comments should point to those
+   documents when substantial feedback exists.
+
+This workflow is the default for new coherent capabilities. Small tactical
+fixes may still be handled directly, but feature planning should become Linear
+requirements before development starts.
