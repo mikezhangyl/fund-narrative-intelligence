@@ -1,0 +1,39 @@
+{
+  "version": "narrative-governance-registry-fixture-v1",
+  "narratives": [
+    {
+      "narrative_id": "N_LOCAL_PROMOTED",
+      "display_name": "本地提升叙事",
+      "status": "promoted",
+      "trust_status": "trusted_validated",
+      "human_review_status": "approved",
+      "reviewed_by": "codex-review",
+      "reviewed_at": "2026-05-29T00:00:00+08:00",
+      "promotion_action_id": "approve_local_only",
+      "representative_citation_ids": ["SRC_A", "SRC_B"]
+    },
+    {
+      "narrative_id": "N_LEDGER_APPROVED",
+      "display_name": "服务账本审批叙事",
+      "status": "active",
+      "trust_status": "trusted_validated",
+      "human_review_status": "approved",
+      "reviewed_by": "service-review",
+      "reviewed_at": "2026-05-29T00:00:00+08:00",
+      "promotion_action_id": "approve_service",
+      "service_ledger_approval_id": "LEDGER_APPROVE_N_LEDGER_APPROVED",
+      "representative_citation_ids": ["SRC_C"]
+    }
+  ],
+  "candidate_narratives": [
+    {
+      "candidate_narrative_id": "C_PENDING",
+      "display_name": "待审候选叙事",
+      "status": "candidate",
+      "trust_status": "candidate_untrusted",
+      "human_review_status": "pending",
+      "reviewed_by": "",
+      "representative_citation_ids": []
+    }
+  ]
+}

@@ -35,7 +35,7 @@ Execute Round 2 in dependency order:
 7. Done locally, pending Linear closeout - `MIK-57`: fund narrative change monitor report.
 8. Done locally, pending Linear closeout - `MIK-58`: reviewable fund report pack.
 9. Done locally, pending Linear closeout - `MIK-66`: governance audit schema and export contract.
-10. `MIK-59`: narrative governance audit export.
+10. Done locally, pending Linear closeout - `MIK-59`: narrative governance audit export.
 11. `MIK-64`: durable Narrative Service storage migration path.
 12. `MIK-52` + `MIK-60`: close parent packs after all child issues pass.
 
@@ -158,6 +158,26 @@ Execute Round 2 in dependency order:
   `uv run pytest tests/test_governance_audit_schema.py tests/test_source_event_schema.py -q`
   (`7 passed`);
   `uv run ruff check src/scanners/governance_audit.py tests/test_governance_audit_schema.py`.
+
+### MIK-59 - Narrative Governance Audit Export
+
+- TDD red: `uv run pytest tests/test_narrative_governance_audit_export.py -q`
+  initially failed on missing `scripts.run_narrative_governance_audit_export`.
+- TDD green:
+  `uv run pytest tests/test_narrative_governance_audit_export.py tests/test_governance_audit_schema.py -q`
+  passed with 5 tests.
+- Fixture:
+  `data/fixtures/narrative_governance_registry.v1.json`
+- Fixture acceptance:
+  `uv run python scripts/run_narrative_governance_audit_export.py --registry-path data/fixtures/narrative_governance_registry.v1.json --output-dir outputs/narrative_governance_audit/2026-05-29-mik-59-fixture`
+- Output JSON:
+  `outputs/narrative_governance_audit/2026-05-29-mik-59-fixture/narrative_governance_audit_export.json`
+- Output HTML:
+  `outputs/narrative_governance_audit/2026-05-29-mik-59-fixture/narrative_governance_audit_export.html`
+- Product note:
+  `docs/product/narrative-governance-audit-export-2026-05-29.md`
+- Verification:
+  `uv run ruff check src/scanners/governance_audit.py src/scanners/narrative_governance_audit_export.py scripts/run_narrative_governance_audit_export.py tests/test_narrative_governance_audit_export.py`.
 
 ## Round 3 Queue
 
