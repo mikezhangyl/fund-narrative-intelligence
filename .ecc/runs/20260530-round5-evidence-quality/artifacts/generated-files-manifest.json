@@ -1,0 +1,25 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "acceptance_report",
+      "path": "docs/product/round5-evidence-intelligence-quality-acceptance-2026-05-30.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Canonical Chinese HTML Round 5 acceptance report."
+    },
+    {
+      "type": "acceptance_note",
+      "path": "docs/product/round5-evidence-intelligence-quality-acceptance-2026-05-30.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Auxiliary Markdown pointer to the canonical HTML acceptance report."
+    },
+    {
+      "type": "execution_plan",
+      "path": "docs/exec-plans/active/round5-evidence-intelligence-quality.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Round 5 implementation plan and verification checklist."
+    }
+  ]
+}

@@ -182,6 +182,26 @@ Round 4 final productized narrative operations acceptance is documented in
 The auxiliary Markdown note is
 `docs/product/round4-productized-narrative-operations-acceptance-2026-05-30.md`.
 
+Round 5 Evidence Intelligence and Narrative Quality adds Narrative Service-owned
+quality scorecards, source lineage/reliability metadata, extraction quality
+review, stale/contradiction detection, quality audit API, Chinese HTML quality
+workspace, and deterministic JSON/HTML export:
+
+```bash
+uv run python scripts/run_narrative_quality_audit.py
+```
+
+The service endpoints are `/api/v1/narratives/quality/contract`,
+`/api/v1/narratives/quality/scorecards`,
+`/api/v1/narratives/quality/extractions`,
+`/api/v1/narratives/quality/audit`, and `/narratives/quality`.
+Quality metadata is owned by Narrative Service; FNI may consume it later but
+must not recompute service quality scores.
+Round 5 acceptance is documented in
+`docs/product/round5-evidence-intelligence-quality-acceptance-2026-05-30.html`.
+The auxiliary Markdown note is
+`docs/product/round5-evidence-intelligence-quality-acceptance-2026-05-30.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

@@ -138,6 +138,11 @@ GET  /api/v1/narratives/review-actions
 POST /api/v1/narratives/review-actions
 POST /api/v1/narratives/promotion/preflight
 POST /api/v1/narratives/promotion/commit
+GET  /api/v1/narratives/quality/contract
+GET  /api/v1/narratives/quality/scorecards
+GET  /api/v1/narratives/quality/extractions
+GET  /api/v1/narratives/quality/audit
+GET  /narratives/quality
 ```
 
 `GET /api/v1/narratives/review-queue` supports optional `?status=` filtering.
@@ -202,6 +207,39 @@ trust statuses, review queue summary, and latest trust-audit result. It is an
 operational snapshot, not a promotion or mutation endpoint. The endpoint's
 `data.diagnostics` is the canonical service operational snapshot for developer
 handoffs and CI-style acceptance checks.
+
+## Evidence Quality
+
+Round 5 quality endpoints are deterministic replay surfaces owned by Narrative
+Service:
+
+```bash
+curl http://127.0.0.1:8800/api/v1/narratives/quality/contract
+curl "http://127.0.0.1:8800/api/v1/narratives/quality/scorecards?as_of=2026-05-29T00:00:00+08:00"
+curl http://127.0.0.1:8800/api/v1/narratives/quality/extractions
+curl http://127.0.0.1:8800/api/v1/narratives/quality/audit
+```
+
+The Chinese operator workspace is:
+
+```bash
+open http://127.0.0.1:8800/narratives/quality
+```
+
+To export machine-readable JSON plus canonical Chinese HTML without starting a
+server:
+
+```bash
+uv run python scripts/run_narrative_quality_audit.py \
+  --output-dir outputs/narrative_quality/manual
+```
+
+Quality scorecards disclose source diversity, extraction confidence, provider
+reliability, freshness/staleness, contradiction status, issue codes, and source
+lineage. Source lineage keeps provider/degradation metadata but strips secret,
+token, key, password, and credential-like fields. Quality scoring is explanatory
+metadata only: it cannot promote trusted records, and FNI consumers must not
+recompute Narrative Service quality scores.
 
 ## Provider-Aware Intake
 

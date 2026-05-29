@@ -1,0 +1,13 @@
+config/narrative_service_contract.yaml
+docs/exec-plans/active/round5-evidence-intelligence-quality.md
+docs/memory/current-brief.md
+docs/product/README.md
+docs/product/round5-evidence-intelligence-quality-acceptance-2026-05-30.html
+docs/product/round5-evidence-intelligence-quality-acceptance-2026-05-30.md
+docs/product/stock-narrative-service-runbook.md
+scripts/run_narrative_quality_audit.py
+services/stock-narrative-service/src/stock_narrative_service/app.py
+services/stock-narrative-service/src/stock_narrative_service/quality.py
+services/stock-narrative-service/src/stock_narrative_service/storage.py
+services/stock-narrative-service/tests/test_http_service.py
+tests/test_narrative_quality_audit.py

@@ -84,6 +84,24 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 return
             self._send_html(HTTPStatus.OK, html)
             return
+        if path == "/narratives/quality":
+            try:
+                html = self.server.store.quality_audit_html(
+                    as_of=_first_query_value(query, "as_of"),
+                    freshness_window_days=_first_query_value(
+                        query,
+                        "freshness_window_days",
+                    ),
+                )
+            except Exception as exc:
+                self._send_error(
+                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                    "SERVICE_ERROR",
+                    str(exc),
+                )
+                return
+            self._send_html(HTTPStatus.OK, html)
+            return
         if path == "/api/v1/narratives/evidence-packs/detail":
             data = self.server.store.evidence_pack_detail(
                 stock_code=_first_query_value(query, "stock_code"),
@@ -184,6 +202,12 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
             "/api/v1/narratives/storage/migration-plan": (
                 self.server.store.storage_migration_plan
             ),
+            "/api/v1/narratives/quality/contract": (
+                self.server.store.quality_contract
+            ),
+            "/api/v1/narratives/quality/extractions": (
+                self.server.store.extraction_quality_review
+            ),
         }
         if path == "/api/v1/narratives/review-queue":
             handler = lambda: self.server.store.review_queue(  # noqa: E731
@@ -231,6 +255,22 @@ class NarrativeRequestHandler(BaseHTTPRequestHandler):
                 window_days=_first_query_value(query, "window_days"),
                 baseline_days=_first_query_value(query, "baseline_days"),
                 half_life_hours=_first_query_value(query, "half_life_hours"),
+            )
+        if path == "/api/v1/narratives/quality/scorecards":
+            handler = lambda: self.server.store.quality_scorecards(  # noqa: E731
+                as_of=_first_query_value(query, "as_of"),
+                freshness_window_days=_first_query_value(
+                    query,
+                    "freshness_window_days",
+                ),
+            )
+        if path == "/api/v1/narratives/quality/audit":
+            handler = lambda: self.server.store.quality_audit(  # noqa: E731
+                as_of=_first_query_value(query, "as_of"),
+                freshness_window_days=_first_query_value(
+                    query,
+                    "freshness_window_days",
+                ),
             )
         if handler is None:
             self._send_error(HTTPStatus.NOT_FOUND, "ROUTE_NOT_FOUND", "Unknown route.")

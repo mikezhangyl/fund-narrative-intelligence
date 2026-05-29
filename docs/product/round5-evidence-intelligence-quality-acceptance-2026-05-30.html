@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Round 5 Evidence Intelligence & Narrative Quality Acceptance</title>
+  <style>
+    body{margin:0;background:#f5f7fa;color:#17212b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}
+    main{max-width:1040px;margin:0 auto;padding:28px}
+    h1{font-size:30px;margin:0 0 8px}
+    h2{font-size:20px;margin:26px 0 10px}
+    p{margin:0 0 10px;color:#536273}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #d9e0e8;margin-top:10px}
+    th,td{text-align:left;border-bottom:1px solid #e5ebf1;padding:10px;vertical-align:top}
+    th{font-size:12px;color:#5c6b7c;background:#eef3f7;text-transform:uppercase}
+    code{background:#eef3f7;padding:2px 5px}
+    .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:18px 0}
+    .metric{background:#fff;border:1px solid #d9e0e8;padding:12px}
+    .metric strong{display:block;font-size:22px;color:#0f766e}
+    .note{background:#fff;border-left:4px solid #0f766e;padding:12px 14px;margin:14px 0}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Round 5 证据智能与叙事质量验收</h1>
+  <p>日期：2026-05-30。范围：Linear M11，父需求 MIK-129 / MIK-130，子需求 MIK-135 到 MIK-142。</p>
+
+  <section class="summary">
+    <div class="metric"><span>新增服务端点</span><strong>5</strong></div>
+    <div class="metric"><span>新增测试文件</span><strong>1</strong></div>
+    <div class="metric"><span>目标测试</span><strong>5 passed</strong></div>
+    <div class="metric"><span>服务验收</span><strong>completed</strong></div>
+  </section>
+
+  <div class="note">
+    Round 5 没有引入预测、自动可信晋升、浏览器抓取或 AI 权威证据。质量分、来源 lineage、抽取复核、陈旧/矛盾信号和审计输出均由 Narrative Service 负责，FNI 后续只能消费这些元数据，不能重新计算服务质量分。
+  </div>
+
+  <h2>能力覆盖</h2>
+  <table>
+    <thead><tr><th>Linear</th><th>交付</th><th>验收点</th></tr></thead>
+    <tbody>
+      <tr><td><code>MIK-139</code></td><td>证据质量 schema 与确定性评分契约</td><td><code>/api/v1/narratives/quality/contract</code> 和 <code>/quality/scorecards</code> 暴露公式版本、质量分、等级、组件、issue codes，AI 不能覆盖分数。</td></tr>
+      <tr><td><code>MIK-140</code></td><td>来源 lineage 与可靠性模型</td><td>scorecard 中保留 provider、permission、degradation、source timestamp、ingestion timestamp；secret/token/key/password/credential 字段被过滤。</td></tr>
+      <tr><td><code>MIK-135</code></td><td>证据质量 scorecard</td><td>候选叙事和 evidence pack 都能暴露质量 scorecard；低质量证据不会被单一数字隐藏。</td></tr>
+      <tr><td><code>MIK-136</code></td><td>结构化事件抽取质量复核</td><td><code>/quality/extractions</code> 显示 extracted entities、抽取置信度、缺失字段、候选叙事链接；模糊抽取保持 candidate/untrusted。</td></tr>
+      <tr><td><code>MIK-141</code> / <code>MIK-137</code></td><td>陈旧与矛盾检测</td><td>fixture 可重放 active/stale/contradicted 情况；陈旧或矛盾只降低质量并暴露元数据，不删除历史记录。</td></tr>
+      <tr><td><code>MIK-142</code> / <code>MIK-138</code></td><td>质量审计 API、导出和工作台</td><td><code>/quality/audit</code> 输出 issue summary、provider summary、export manifest；<code>/narratives/quality</code> 是中文 HTML 工作台；CLI 可导出 JSON + HTML。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>验证记录</h2>
+  <table>
+    <thead><tr><th>命令</th><th>结果</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>uv run pytest tests/test_narrative_quality_audit.py services/stock-narrative-service/tests/test_http_service.py -q -k quality</code></td><td>5 passed</td><td>覆盖质量 API、HTML、CLI 导出。</td></tr>
+      <tr><td><code>uv run ruff check ...</code></td><td>All checks passed</td><td>覆盖本轮修改文件。</td></tr>
+      <tr><td><code>uv run python scripts/validate_stock_narrative_service_acceptance.py --output-dir outputs/stock_narrative_service_acceptance/round5-quality</code></td><td>completed</td><td>conformance endpoint_count=17，provider smoke 和 fallback smoke 均 completed。</td></tr>
+      <tr><td><code>uv run python scripts/run_narrative_quality_audit.py --as-of 2026-05-29T00:00:00+08:00 --output-dir outputs/narrative_quality/round5_acceptance</code></td><td>completed</td><td>生成 <code>narrative_quality_audit.json</code> 与 <code>narrative_quality_audit.html</code>。</td></tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

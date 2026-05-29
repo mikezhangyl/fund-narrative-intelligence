@@ -2271,6 +2271,150 @@ def test_review_workflow_html_exposes_blocked_and_deferred_paths(tmp_path):
     assert "promotion commit is the only trusted-record write path" in html
 
 
+def test_quality_contract_scorecards_and_lineage_are_deterministic(tmp_path):
+    config = _write_seed_files(tmp_path)
+    _write_detail_evidence_pack(config)
+    _write_quality_fixture_events(config)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        contract = _get_json(f"{base_url}/api/v1/narratives/quality/contract")
+        scorecards = _get_json(
+            f"{base_url}/api/v1/narratives/quality/scorecards?as_of=2026-05-29T00:00:00+08:00"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    contract_payload = contract["data"]
+    assert contract_payload["version"] == "narrative-quality-contract-v1"
+    assert contract_payload["ownership"] == {
+        "quality_owner": "narrative_service",
+        "provider_owner": "gateway",
+        "consumer_role": "fni_consumes_quality_metadata_only",
+    }
+    assert "source_lineage" in contract_payload["required_sections"]
+    assert contract_payload["ai_policy"]["score_override_allowed"] is False
+
+    payload = scorecards["data"]
+    assert payload["version"] == "narrative-quality-scorecards-v1"
+    assert payload["formula_version"] == "evidence-quality-deterministic-v1"
+    evidence_pack_card = payload["evidence_pack_scorecards"][0]
+    assert evidence_pack_card["evidence_pack_id"].startswith("EPACK_")
+    assert evidence_pack_card["quality_grade"] in {"A", "B"}
+    assert evidence_pack_card["lookup"] == {
+        "stock_code": "600519",
+        "narrative_id": "N_BAIJIU",
+    }
+    cards = {item["narrative_id"]: item for item in payload["scorecards"]}
+    strong = cards["C_QUALITY_STRONG"]
+    weak = cards["C_QUALITY_WEAK"]
+
+    assert strong["quality_grade"] == "A"
+    assert strong["quality_score"] > weak["quality_score"]
+    assert strong["components"]["source_diversity"]["source_count"] == 2
+    assert strong["components"]["provider_reliability"]["classification"] == "reliable"
+    assert weak["components"]["provider_reliability"]["classification"] == "blocked"
+    assert "LOW_SOURCE_DIVERSITY" in weak["issue_codes"]
+    assert "PROVIDER_PERMISSION_BLOCKED" in weak["issue_codes"]
+    assert "api_key" not in json.dumps(payload, ensure_ascii=False)
+    assert "SECRET" not in json.dumps(payload, ensure_ascii=False)
+
+
+def test_quality_extraction_review_keeps_ambiguous_events_untrusted(tmp_path):
+    config = _write_seed_files(tmp_path)
+    _write_quality_fixture_events(config)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/quality/extractions")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    payload = response["data"]
+    assert payload["version"] == "narrative-extraction-quality-review-v1"
+    items = {item["source_event_id"]: item for item in payload["items"]}
+    ambiguous = items["EVT_QUALITY_WEAK"]
+    assert ambiguous["review_status"] == "needs_review"
+    assert ambiguous["trust_effect"] == "none"
+    assert "tickers" in ambiguous["missing_entity_fields"]
+    assert ambiguous["linked_candidate_narratives"] == ["C_QUALITY_WEAK"]
+    assert payload["summary"]["needs_review"] >= 1
+
+
+def test_quality_detects_stale_and_contradictory_narratives_without_deleting_history(
+    tmp_path,
+):
+    config = _write_seed_files(tmp_path)
+    _write_quality_fixture_events(config)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(
+            f"{base_url}/api/v1/narratives/quality/scorecards?as_of=2026-05-29T00:00:00+08:00&freshness_window_days=14"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    cards = {item["narrative_id"]: item for item in response["data"]["scorecards"]}
+    stale = cards["C_QUALITY_STALE"]
+    contradicted = cards["C_QUALITY_CONFLICT"]
+
+    assert stale["staleness"]["status"] == "stale"
+    assert "STALE_EVIDENCE" in stale["issue_codes"]
+    assert contradicted["contradiction"]["status"] == "contradicted"
+    assert "CONTRADICTORY_CLAIMS" in contradicted["issue_codes"]
+    assert contradicted["quality_score"] < cards["C_QUALITY_STRONG"]["quality_score"]
+    assert response["data"]["historical_retention"] == (
+        "stale and contradicted records remain auditable and are not deleted"
+    )
+
+
+def test_quality_audit_api_and_html_workspace_are_reviewable(tmp_path):
+    config = _write_seed_files(tmp_path)
+    _write_quality_fixture_events(config)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        audit = _get_json(
+            f"{base_url}/api/v1/narratives/quality/audit?as_of=2026-05-29T00:00:00+08:00"
+        )
+        html = _get_text(
+            f"{base_url}/narratives/quality?as_of=2026-05-29T00:00:00+08:00"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    payload = audit["data"]
+    assert payload["version"] == "narrative-quality-audit-v1"
+    assert payload["export_manifest"]["formula_version"] == (
+        "evidence-quality-deterministic-v1"
+    )
+    assert payload["summary"]["narrative_count"] == 4
+    assert payload["summary"]["issue_count"] >= 4
+    assert {
+        "PROVIDER_PERMISSION_BLOCKED",
+        "LOW_EXTRACTION_CONFIDENCE",
+        "STALE_EVIDENCE",
+        "CONTRADICTORY_CLAIMS",
+    }.issubset(set(payload["issue_summary"]))
+    assert payload["source_provider_summary"]["gateway_news_briefs"]["event_count"] >= 1
+    assert payload["consumer_policy"]["fni_recomputes_quality"] is False
+
+    assert '<html lang="zh-CN">' in html
+    assert "叙事质量审计工作台" in html
+    assert "证据质量" in html
+    assert "CONTRADICTORY_CLAIMS" in html
+    assert "EVT_QUALITY_WEAK" in html
+
+
 def test_job_schedule_contract_declares_definitions_run_ledger_and_bounds(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -2723,6 +2867,213 @@ def _seed_candidate_radar_event() -> dict:
             }
         ],
     }
+
+
+def _write_quality_fixture_events(config: ServiceConfig) -> None:
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [
+                    {
+                        "event_id": "EVT_QUALITY_STRONG_NEWS",
+                        "source_type": "news",
+                        "event_time": "2026-05-28T10:00:00+08:00",
+                        "ingested_at": "2026-05-28T10:01:00+08:00",
+                        "title": "机器人执行器订单加速",
+                        "source_url": "gateway://news/quality-strong",
+                        "stock_codes": ["300124"],
+                        "extraction_confidence": 0.92,
+                        "claim_type": "demand",
+                        "claim_polarity": "positive",
+                        "extracted_entities": {
+                            "tickers": ["300124"],
+                            "sectors": ["机器人"],
+                            "concepts": ["执行器"],
+                            "keywords": ["订单", "加速"],
+                        },
+                        "source_metadata": {
+                            "provider": "gateway_news_briefs",
+                            "permission_status": "licensed",
+                            "degradation_state": "available",
+                            "api_key": "SECRET_SHOULD_NOT_PERSIST",
+                        },
+                        "candidate_narratives": [
+                            {
+                                "candidate_narrative_id": "C_QUALITY_STRONG",
+                                "name": "机器人执行器",
+                                "confidence": 0.9,
+                                "representative_citation_ids": [
+                                    "EVT_QUALITY_STRONG_NEWS"
+                                ],
+                            }
+                        ],
+                    },
+                    {
+                        "event_id": "EVT_QUALITY_STRONG_ANN",
+                        "source_type": "announcement",
+                        "event_time": "2026-05-27T10:00:00+08:00",
+                        "ingested_at": "2026-05-27T10:01:00+08:00",
+                        "title": "机器人执行器公告验证订单",
+                        "source_url": "gateway://announcement/quality-strong",
+                        "stock_codes": ["300124"],
+                        "extraction_confidence": 0.86,
+                        "claim_type": "demand",
+                        "claim_polarity": "positive",
+                        "extracted_entities": {
+                            "tickers": ["300124"],
+                            "sectors": ["机器人"],
+                            "concepts": ["执行器"],
+                            "keywords": ["公告", "订单"],
+                        },
+                        "source_metadata": {
+                            "provider": "gateway_announcements",
+                            "permission_status": "licensed",
+                            "degradation_state": "available",
+                        },
+                        "candidate_narratives": [
+                            {
+                                "candidate_narrative_id": "C_QUALITY_STRONG",
+                                "name": "机器人执行器",
+                                "confidence": 0.86,
+                                "representative_citation_ids": [
+                                    "EVT_QUALITY_STRONG_ANN"
+                                ],
+                            }
+                        ],
+                    },
+                    {
+                        "event_id": "EVT_QUALITY_WEAK",
+                        "source_type": "news",
+                        "event_time": "2026-05-28T11:00:00+08:00",
+                        "ingested_at": "2026-05-28T11:01:00+08:00",
+                        "title": "低置信度算力传闻",
+                        "source_url": "gateway://news/quality-weak",
+                        "extraction_confidence": 0.31,
+                        "claim_type": "capacity",
+                        "claim_polarity": "positive",
+                        "extracted_entities": {
+                            "tickers": [],
+                            "sectors": ["算力"],
+                            "concepts": [],
+                            "keywords": ["传闻"],
+                        },
+                        "source_metadata": {
+                            "provider": "gateway_news_briefs",
+                            "permission_status": "provider_permission_required",
+                            "degradation_state": "blocked",
+                        },
+                        "candidate_narratives": [
+                            {
+                                "candidate_narrative_id": "C_QUALITY_WEAK",
+                                "name": "算力租赁",
+                                "confidence": 0.31,
+                                "representative_citation_ids": ["EVT_QUALITY_WEAK"],
+                            }
+                        ],
+                    },
+                    {
+                        "event_id": "EVT_QUALITY_STALE",
+                        "source_type": "manual",
+                        "event_time": "2026-04-01T10:00:00+08:00",
+                        "ingested_at": "2026-04-01T10:01:00+08:00",
+                        "title": "旧周期光伏叙事",
+                        "source_url": "manual://quality-stale",
+                        "stock_codes": ["601012"],
+                        "extraction_confidence": 0.74,
+                        "claim_type": "demand",
+                        "claim_polarity": "positive",
+                        "extracted_entities": {
+                            "tickers": ["601012"],
+                            "sectors": ["光伏"],
+                            "concepts": ["组件"],
+                            "keywords": ["旧周期"],
+                        },
+                        "source_metadata": {
+                            "provider": "manual_research_note",
+                            "permission_status": "internal_review",
+                            "degradation_state": "available",
+                        },
+                        "candidate_narratives": [
+                            {
+                                "candidate_narrative_id": "C_QUALITY_STALE",
+                                "name": "光伏旧周期",
+                                "confidence": 0.74,
+                                "representative_citation_ids": ["EVT_QUALITY_STALE"],
+                            }
+                        ],
+                    },
+                    {
+                        "event_id": "EVT_QUALITY_CONFLICT_POS",
+                        "source_type": "announcement",
+                        "event_time": "2026-05-28T09:00:00+08:00",
+                        "ingested_at": "2026-05-28T09:01:00+08:00",
+                        "title": "储能订单增加",
+                        "source_url": "gateway://announcement/conflict-pos",
+                        "stock_codes": ["300750"],
+                        "extraction_confidence": 0.78,
+                        "claim_type": "orders",
+                        "claim_polarity": "positive",
+                        "extracted_entities": {
+                            "tickers": ["300750"],
+                            "sectors": ["储能"],
+                            "concepts": ["电池"],
+                            "keywords": ["订单", "增加"],
+                        },
+                        "source_metadata": {
+                            "provider": "gateway_announcements",
+                            "permission_status": "licensed",
+                            "degradation_state": "available",
+                        },
+                        "candidate_narratives": [
+                            {
+                                "candidate_narrative_id": "C_QUALITY_CONFLICT",
+                                "name": "储能订单",
+                                "confidence": 0.78,
+                                "representative_citation_ids": [
+                                    "EVT_QUALITY_CONFLICT_POS"
+                                ],
+                            }
+                        ],
+                    },
+                    {
+                        "event_id": "EVT_QUALITY_CONFLICT_NEG",
+                        "source_type": "news",
+                        "event_time": "2026-05-28T12:00:00+08:00",
+                        "ingested_at": "2026-05-28T12:01:00+08:00",
+                        "title": "储能订单取消",
+                        "source_url": "gateway://news/conflict-neg",
+                        "stock_codes": ["300750"],
+                        "extraction_confidence": 0.76,
+                        "claim_type": "orders",
+                        "claim_polarity": "negative",
+                        "extracted_entities": {
+                            "tickers": ["300750"],
+                            "sectors": ["储能"],
+                            "concepts": ["电池"],
+                            "keywords": ["订单", "取消"],
+                        },
+                        "source_metadata": {
+                            "provider": "gateway_news_briefs",
+                            "permission_status": "licensed",
+                            "degradation_state": "available",
+                        },
+                        "candidate_narratives": [
+                            {
+                                "candidate_narrative_id": "C_QUALITY_CONFLICT",
+                                "name": "储能订单",
+                                "confidence": 0.76,
+                                "representative_citation_ids": [
+                                    "EVT_QUALITY_CONFLICT_NEG"
+                                ],
+                            }
+                        ],
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
 
 
 def _start(server):

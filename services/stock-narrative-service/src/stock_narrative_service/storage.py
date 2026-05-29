@@ -18,6 +18,13 @@ from stock_narrative_service.identity import (
     source_event_identity,
     stable_id,
 )
+from stock_narrative_service.quality import (
+    extraction_quality_review,
+    quality_audit,
+    quality_contract,
+    quality_scorecards,
+    render_quality_audit_html,
+)
 from stock_narrative_service.radar import (
     radar_bubbles,
     radar_contract,
@@ -386,6 +393,51 @@ class NarrativeStore:
             ),
             ui_contract=self.radar_ui_contract(),
             generated_at=_now(),
+        )
+
+    def quality_contract(self) -> dict[str, Any]:
+        return quality_contract()
+
+    def quality_scorecards(
+        self,
+        *,
+        as_of: str = "",
+        freshness_window_days: Any = "",
+    ) -> dict[str, Any]:
+        return quality_scorecards(
+            _all_events(self),
+            evidence_packs=self.evidence_packs(),
+            as_of=as_of,
+            freshness_window_days=freshness_window_days,
+        )
+
+    def extraction_quality_review(self) -> dict[str, Any]:
+        return extraction_quality_review(_all_events(self))
+
+    def quality_audit(
+        self,
+        *,
+        as_of: str = "",
+        freshness_window_days: Any = "",
+    ) -> dict[str, Any]:
+        return quality_audit(
+            _all_events(self),
+            evidence_packs=self.evidence_packs(),
+            as_of=as_of,
+            freshness_window_days=freshness_window_days,
+        )
+
+    def quality_audit_html(
+        self,
+        *,
+        as_of: str = "",
+        freshness_window_days: Any = "",
+    ) -> str:
+        return render_quality_audit_html(
+            self.quality_audit(
+                as_of=as_of,
+                freshness_window_days=freshness_window_days,
+            )
         )
 
     def review_workflow_contract(self) -> dict[str, Any]:

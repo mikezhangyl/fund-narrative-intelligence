@@ -165,6 +165,24 @@ endpoints:
     purpose: Check whether a candidate has enough review and evidence gates for a separate trust audit.
     conformance_payload:
       candidate_narrative_id: C_AUTO_3D71C39000
+  - method: GET
+    path: /api/v1/narratives/quality/contract
+    purpose: Return the Narrative Service-owned quality scoring, source lineage, staleness, contradiction, and consumer-boundary contract.
+  - method: GET
+    path: /api/v1/narratives/quality/scorecards
+    purpose: Return deterministic evidence quality scorecards by candidate narrative.
+    optional_query:
+      as_of: ISO timestamp used for deterministic freshness scoring.
+      freshness_window_days: Positive integer window for stale evidence detection.
+  - method: GET
+    path: /api/v1/narratives/quality/extractions
+    purpose: Return reviewable structured extraction quality rows for source events.
+  - method: GET
+    path: /api/v1/narratives/quality/audit
+    purpose: Return deterministic narrative quality audit data with issue summaries and export manifest.
+    optional_query:
+      as_of: ISO timestamp used for deterministic freshness scoring.
+      freshness_window_days: Positive integer window for stale evidence detection.
 
 fallback:
   local_prototype:
@@ -225,6 +243,48 @@ intake_policy:
     reinforcement_trust_status: candidate_untrusted
     reinforcement_promotion_effect: none
     trusted_promotion_allowed: false
+
+quality_policy:
+  formula_version: evidence-quality-deterministic-v1
+  owner: narrative_service
+  provider_owner: gateway
+  consumer_policy:
+    fni_recomputes_quality: false
+    ai_can_override_scores: false
+    automatic_trust_promotion: false
+  workspace_surface: /narratives/quality
+  scorecard_components:
+    - source_diversity
+    - extraction_confidence
+    - provider_reliability
+    - recency_staleness
+    - contradiction
+  source_lineage_fields:
+    - source_event_id
+    - source_type
+    - provider
+    - provider_version
+    - permission_status
+    - fetch_status
+    - degradation_reason
+    - source_timestamp
+    - ingestion_timestamp
+    - normalized_source_event_id
+    - reliability_classification
+  source_lineage_forbidden_fields:
+    - api_key
+    - token
+    - password
+    - credential
+    - secret
+  quality_issue_codes:
+    - LOW_SOURCE_DIVERSITY
+    - LOW_EXTRACTION_CONFIDENCE
+    - PROVIDER_PERMISSION_BLOCKED
+    - PROVIDER_DEGRADED
+    - STALE_EVIDENCE
+    - CONTRADICTORY_CLAIMS
+  historical_retention_rule: stale and contradicted records remain auditable and are not deleted
 
 trust_state_machine:
   record_states:

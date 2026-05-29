@@ -1,0 +1,36 @@
+{
+  "commands": [
+    {
+      "command": "uv run ruff check .",
+      "status": "passed"
+    },
+    {
+      "command": "uv run python -m compileall src services scripts tests",
+      "status": "passed"
+    },
+    {
+      "command": "uv run pytest -q",
+      "status": "passed",
+      "summary": "554 passed, 1 skipped"
+    },
+    {
+      "command": "uv run python scripts/validate_stock_narrative_service_acceptance.py --output-dir outputs/stock_narrative_service_acceptance/round5-final",
+      "status": "passed",
+      "summary": "status=completed; conformance endpoint_count=17"
+    },
+    {
+      "command": "uv run python scripts/run_narrative_quality_audit.py --as-of 2026-05-29T00:00:00+08:00 --output-dir outputs/narrative_quality/round5_final",
+      "status": "passed",
+      "summary": "status=completed; formula_version=evidence-quality-deterministic-v1"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    },
+    {
+      "command": "Playwright navigate http://127.0.0.1:8896/narratives/quality?as_of=2026-05-29T00:00:00+08:00",
+      "status": "passed_with_note",
+      "summary": "Page title and snapshot loaded; screenshot capture timed out in the MCP screenshot call."
+    }
+  ]
+}
