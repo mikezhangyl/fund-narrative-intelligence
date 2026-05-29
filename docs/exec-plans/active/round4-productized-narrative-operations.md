@@ -24,7 +24,7 @@ Canonical run: `.ecc/runs/20260530-round4-productized-ops/`
 
 Execute in dependency order:
 
-1. `MIK-93` + `MIK-88`: live validation taxonomy and credential-safe smoke
+1. Done locally, pending Linear closeout - `MIK-93` + `MIK-88`: live validation taxonomy and credential-safe smoke
    surface.
 2. `MIK-94` + `MIK-89`: Narrative Radar UI contract and service UI surface.
 3. `MIK-97` + `MIK-92`: review/promotion state machine and complete reviewer
@@ -45,6 +45,33 @@ For every slice:
 - Commit with conventional commit format.
 - Add a Linear evidence comment with commit, tests, and artifact links.
 - Mark issues Done only after verification passes.
+
+## Completed Slice Evidence
+
+### MIK-93 + MIK-88 - Live Validation Taxonomy And Credential-Safe Smoke
+
+- TDD red:
+  `uv run pytest tests/test_live_validation_dashboard.py -q` failed on the
+  missing Round 4 taxonomy, missing row-level ownership/next-action fields,
+  old status names, and secret-bearing URL leakage.
+- TDD green:
+  `uv run pytest tests/test_live_validation_dashboard.py -q` passed with 7
+  tests.
+- Targeted regression:
+  `uv run pytest tests/test_live_validation_dashboard.py tests/test_stock_narrative_service_acceptance.py -q`
+  passed with 8 tests.
+- Static checks:
+  `uv run ruff check scripts/run_live_validation_dashboard.py tests/test_live_validation_dashboard.py`.
+- Compile:
+  `uv run python -m compileall -q scripts tests`.
+- Fixture acceptance:
+  `uv run python scripts/run_live_validation_dashboard.py --output-dir outputs/live_validation_dashboard/2026-05-30-mik-93-88-fixture`
+  returned `completed_with_actions`, `contract_failed_count=0`, and
+  `action_required_count=7`.
+- Product note:
+  `docs/product/round4-live-provider-credential-smoke-2026-05-30.html` with
+  auxiliary Markdown at
+  `docs/product/round4-live-provider-credential-smoke-2026-05-30.md`.
 
 ## Final Acceptance Gates
 

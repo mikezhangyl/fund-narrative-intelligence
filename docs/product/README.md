@@ -149,6 +149,12 @@ explanation contract are documented in
 The auxiliary Markdown note is
 `docs/product/narrative-radar-preview-and-explanation-contract-2026-05-29.md`.
 
+Round 4 live provider credential smoke and credential-safe diagnostics are
+documented in
+`docs/product/round4-live-provider-credential-smoke-2026-05-30.html`.
+The auxiliary Markdown note is
+`docs/product/round4-live-provider-credential-smoke-2026-05-30.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

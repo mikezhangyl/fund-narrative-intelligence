@@ -9,7 +9,7 @@ from html import escape
 from pathlib import Path
 from time import perf_counter
 from typing import Any, Callable
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urlencode, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -19,12 +19,15 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.config import DEFAULT_OUTPUT_DIR  # noqa: E402
 
 STATUS_TAXONOMY = [
-    "passed",
-    "degraded",
-    "blocked",
+    "configured",
     "not_configured",
-    "product_gap",
-    "system_failure",
+    "reachable",
+    "provider_permission_required",
+    "request_timeout",
+    "upstream_degraded",
+    "schema_mismatch",
+    "contract_failed",
+    "success",
 ]
 
 FetchJson = Callable[
@@ -65,12 +68,13 @@ def main(argv: list[str] | None = None) -> int:
             {
                 **outputs,
                 "status": report["summary"]["overall_status"],
-                "system_failure_count": report["summary"]["system_failure_count"],
+                "contract_failed_count": report["summary"]["contract_failed_count"],
+                "action_required_count": report["summary"]["action_required_count"],
             },
             ensure_ascii=False,
         )
     )
-    return 0 if report["summary"]["system_failure_count"] == 0 else 1
+    return 0
 
 
 def build_dashboard(
@@ -157,19 +161,31 @@ def build_dashboard(
         "generated_at": generated_at,
         "taxonomy": {
             "statuses": STATUS_TAXONOMY,
-            "aliases": {"not_configured": ["missing_config", "missing_url"]},
+            "aliases": {
+                "not_configured": ["missing_config", "missing_url"],
+                "success": ["passed"],
+                "upstream_degraded": ["degraded"],
+                "provider_permission_required": ["blocked", "permission_required"],
+                "contract_failed": ["system_failure"],
+            },
             "rules": {
-                "passed": "Configured probe returned usable payload data.",
-                "degraded": "Probe returned data with warnings or degraded status.",
-                "blocked": "Probe reached a configured service but authorization or request semantics blocked it.",
+                "configured": "Required local boundary configuration exists; no secret value is returned.",
                 "not_configured": "Required local gateway or Narrative Service URL is absent.",
-                "product_gap": "Service is reachable but returned no business data for the requested probe.",
-                "system_failure": "Runtime, network, timeout, or server failure prevented validation.",
+                "reachable": "Configured boundary responded, but no business contract was evaluated.",
+                "provider_permission_required": "Provider or gateway route requires permission, credential, quota, or authorization.",
+                "request_timeout": "Bounded request timed out without failing the whole smoke run.",
+                "upstream_degraded": "Configured boundary returned degraded payload, warnings, or upstream instability.",
+                "schema_mismatch": "Configured boundary responded with an unexpected or empty contract shape.",
+                "contract_failed": "Configured boundary failed the expected HTTP or JSON contract.",
+                "success": "Configured probe returned usable payload data.",
             },
         },
         "inputs": {
             "gateway_url_configured": bool(gateway_url.strip()),
             "service_url_configured": bool(service_url.strip()),
+            "gateway_url": _redact_url(gateway_url.strip()),
+            "service_url": _redact_url(service_url.strip()),
+            "secrets_redacted": True,
             "timeout_seconds": timeout_seconds,
             "fund_code": fund_code,
             "stock_symbol": stock_symbol,
@@ -195,34 +211,48 @@ def write_outputs(*, output_dir: Path, report: dict[str, Any]) -> dict[str, str]
 
 def _deterministic_contract_row() -> dict[str, Any]:
     contract = PROJECT_ROOT / "config" / "narrative_service_contract.yaml"
+    status = "success" if contract.exists() else "contract_failed"
     return {
+        "id": "deterministic_local.narrative_service_contract_file",
         "group": "deterministic_local",
         "capability": "narrative_service_contract_file",
+        "owner_service": "fni",
         "mode": "deterministic_local",
-        "status": "passed" if contract.exists() else "system_failure",
-        "status_label_zh": "已通过" if contract.exists() else "系统失败",
+        "status": status,
+        "status_label_zh": _status_label(status),
         "source": "repo",
         "endpoint": str(contract),
+        "required_credential_hint": "none",
         "latency_ms": 0,
         "row_count": 1 if contract.exists() else 0,
         "warnings": [],
-        "message": "Narrative Service contract exists in repo.",
+        "failure_reason": None if contract.exists() else "contract_file_missing",
+        "next_action": _next_action(status, owner_service="fni"),
+        "message": "Narrative Service contract exists in repo."
+        if contract.exists()
+        else "Narrative Service contract file is missing.",
     }
 
 
 def _gateway_configuration_row(*, gateway_url: str) -> dict[str, Any]:
     configured = bool(gateway_url.strip())
+    status = "configured" if configured else "not_configured"
     return {
+        "id": "gateway_health.gateway_configuration",
         "group": "gateway_health",
         "capability": "gateway_configuration",
+        "owner_service": "stock-data-gateway",
         "mode": "live_provider",
-        "status": "passed" if configured else "not_configured",
-        "status_label_zh": "已配置" if configured else "缺少配置",
+        "status": status,
+        "status_label_zh": _status_label(status),
         "source": "MARKET_DATA_GATEWAY_URL",
-        "endpoint": gateway_url.strip(),
+        "endpoint": _redact_url(gateway_url.strip()),
+        "required_credential_hint": "MARKET_DATA_GATEWAY_URL",
         "latency_ms": 0,
         "row_count": 1 if configured else 0,
         "warnings": [],
+        "failure_reason": None if configured else "missing_config: MARKET_DATA_GATEWAY_URL",
+        "next_action": _next_action(status, owner_service="stock-data-gateway"),
         "message": "Gateway URL configured." if configured else "MARKET_DATA_GATEWAY_URL is not configured.",
     }
 
@@ -283,27 +313,35 @@ def _combined_gateway_row(
     statuses = {item["status"] for item in checks}
     if statuses == {"not_configured"}:
         status = "not_configured"
-    elif "system_failure" in statuses:
-        status = "system_failure"
-    elif "blocked" in statuses:
-        status = "blocked"
-    elif "degraded" in statuses:
-        status = "degraded"
-    elif statuses == {"product_gap"}:
-        status = "product_gap"
+    elif "contract_failed" in statuses:
+        status = "contract_failed"
+    elif "request_timeout" in statuses:
+        status = "request_timeout"
+    elif "provider_permission_required" in statuses:
+        status = "provider_permission_required"
+    elif "upstream_degraded" in statuses:
+        status = "upstream_degraded"
+    elif "schema_mismatch" in statuses:
+        status = "schema_mismatch"
     else:
-        status = "passed"
+        status = "success"
+    owner_service = "stock-data-gateway"
     return {
+        "id": "sector_flow_structure_news.gateway_sector_flow_structure_news",
         "group": "sector_flow_structure_news",
         "capability": "gateway_sector_flow_structure_news",
+        "owner_service": owner_service,
         "mode": "live_provider",
         "status": status,
         "status_label_zh": _status_label(status),
         "source": "MARKET_DATA_GATEWAY_URL",
         "endpoint": "combined gateway sector/flow/structure/news probes",
+        "required_credential_hint": "gateway-managed provider credentials",
         "latency_ms": sum(int(item.get("latency_ms") or 0) for item in checks),
         "row_count": sum(int(item.get("row_count") or 0) for item in checks),
         "warnings": [warning for item in checks for warning in _list(item.get("warnings"))],
+        "failure_reason": _combined_failure_reason(checks),
+        "next_action": _next_action(status, owner_service=owner_service),
         "message": "; ".join(str(item.get("message") or "") for item in checks if item.get("message")),
         "checks": checks,
     }
@@ -322,19 +360,26 @@ def _probe_row(
     query: dict[str, Any] | None = None,
     payload: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    base_url = base_url.strip().rstrip("/")
+    base_url = _clean_base_url(base_url)
+    owner_service = _owner_service(group=group, capability=capability)
     if not base_url:
+        status = "not_configured"
         return {
+            "id": f"{group}.{capability}",
             "group": group,
             "capability": capability,
+            "owner_service": owner_service,
             "mode": mode,
-            "status": "not_configured",
-            "status_label_zh": _status_label("not_configured"),
+            "status": status,
+            "status_label_zh": _status_label(status),
             "source": "configured_http_boundary",
             "endpoint": path,
+            "required_credential_hint": _credential_hint(owner_service=owner_service, capability=capability),
             "latency_ms": 0,
             "row_count": 0,
             "warnings": [],
+            "failure_reason": "missing_config: configured local service URL",
+            "next_action": _next_action(status, owner_service=owner_service),
             "message": "Required local service URL is not configured.",
         }
     url = _url(base_url=base_url, path=path, query=query)
@@ -347,11 +392,11 @@ def _probe_row(
             timeout_seconds=timeout_seconds,
         )
     except TimeoutError as exc:
-        return _failure_row(group, capability, mode, url, started_at, f"timeout: {exc}")
+        return _failure_row(group, capability, mode, url, started_at, f"timeout: {exc}", "request_timeout")
     except OSError as exc:
-        return _failure_row(group, capability, mode, url, started_at, str(exc))
+        return _failure_row(group, capability, mode, url, started_at, str(exc), "contract_failed")
     except Exception as exc:  # pragma: no cover - defensive boundary
-        return _failure_row(group, capability, mode, url, started_at, str(exc))
+        return _failure_row(group, capability, mode, url, started_at, str(exc), "contract_failed")
     latency_ms = int((perf_counter() - started_at) * 1000)
     row_count = _row_count(response)
     warnings = _warnings(response)
@@ -361,17 +406,28 @@ def _probe_row(
         row_count=row_count,
         warnings=warnings,
     )
+    failure_reason = _failure_reason(
+        status=status,
+        http_status=status_code,
+        payload=response,
+        warnings=warnings,
+    )
     return {
+        "id": f"{group}.{capability}",
         "group": group,
         "capability": capability,
+        "owner_service": owner_service,
         "mode": mode,
         "status": status,
         "status_label_zh": _status_label(status),
-        "source": base_url,
-        "endpoint": url,
+        "source": _redact_url(base_url),
+        "endpoint": _redact_url(url),
+        "required_credential_hint": _credential_hint(owner_service=owner_service, capability=capability),
         "latency_ms": latency_ms,
         "row_count": row_count,
         "warnings": warnings,
+        "failure_reason": failure_reason,
+        "next_action": _next_action(status, owner_service=owner_service),
         "message": _message(status, row_count=row_count, warnings=warnings),
     }
 
@@ -384,17 +440,21 @@ def _classify_response(
     warnings: list[dict[str, Any]],
 ) -> str:
     if http_status >= 500:
-        return "system_failure"
-    if http_status in {401, 403, 429} or 400 <= http_status < 500:
-        return "blocked"
+        return "upstream_degraded"
+    if http_status in {408, 504}:
+        return "request_timeout"
+    if http_status in {401, 403, 429}:
+        return "provider_permission_required"
+    if 400 <= http_status < 500:
+        return "contract_failed"
     status = str(payload.get("status") or "").lower()
     if status in {"degraded", "partial"} or warnings:
-        return "degraded"
+        return "upstream_degraded"
     if status in {"missing", "not_found"}:
-        return "product_gap"
+        return "schema_mismatch"
     if row_count == 0 and "data" in payload:
-        return "product_gap"
-    return "passed"
+        return "schema_mismatch"
+    return "success"
 
 
 def _failure_row(
@@ -404,18 +464,25 @@ def _failure_row(
     endpoint: str,
     started_at: float,
     message: str,
+    status: str,
 ) -> dict[str, Any]:
+    owner_service = _owner_service(group=group, capability=capability)
     return {
+        "id": f"{group}.{capability}",
         "group": group,
         "capability": capability,
+        "owner_service": owner_service,
         "mode": mode,
-        "status": "system_failure",
-        "status_label_zh": _status_label("system_failure"),
+        "status": status,
+        "status_label_zh": _status_label(status),
         "source": "configured_http_boundary",
-        "endpoint": endpoint,
+        "endpoint": _redact_url(endpoint),
+        "required_credential_hint": _credential_hint(owner_service=owner_service, capability=capability),
         "latency_ms": int((perf_counter() - started_at) * 1000),
         "row_count": 0,
-        "warnings": [{"code": "SYSTEM_FAILURE", "message": message}],
+        "warnings": [{"code": status.upper(), "message": message}],
+        "failure_reason": message,
+        "next_action": _next_action(status, owner_service=owner_service),
         "message": message,
     }
 
@@ -476,14 +543,24 @@ def _summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         status = str(row.get("status") or "")
         if status in counts:
             counts[status] += 1
-    system_failure_count = counts["system_failure"]
+    action_required_statuses = {
+        "not_configured",
+        "provider_permission_required",
+        "request_timeout",
+        "upstream_degraded",
+        "schema_mismatch",
+        "contract_failed",
+    }
+    action_required_count = sum(counts[status] for status in action_required_statuses)
     return {
-        "overall_status": "system_failure" if system_failure_count else "completed",
+        "overall_status": "completed_with_actions" if action_required_count else "completed",
         "status_counts": counts,
-        "system_failure_count": system_failure_count,
+        "contract_failed_count": counts["contract_failed"],
+        "action_required_count": action_required_count,
         "not_configured_count": counts["not_configured"],
-        "degraded_count": counts["degraded"],
-        "product_gap_count": counts["product_gap"],
+        "upstream_degraded_count": counts["upstream_degraded"],
+        "request_timeout_count": counts["request_timeout"],
+        "provider_permission_required_count": counts["provider_permission_required"],
         "deterministic_check_count": sum(1 for row in rows if row.get("mode") == "deterministic_local"),
         "live_provider_check_count": sum(1 for row in rows if row.get("mode") == "live_provider"),
     }
@@ -494,10 +571,12 @@ def _render_html(report: dict[str, Any]) -> str:
         "<tr>"
         f"<td>{_html(row.get('group'))}</td>"
         f"<td>{_html(row.get('capability'))}</td>"
+        f"<td>{_html(row.get('owner_service'))}</td>"
         f"<td><code>{_html(row.get('status'))}</code> {_html(row.get('status_label_zh'))}</td>"
         f"<td>{_html(row.get('mode'))}</td>"
         f"<td>{_html(row.get('row_count'))}</td>"
         f"<td>{_html(row.get('message'))}</td>"
+        f"<td>{_html(_mapping(row.get('next_action')).get('description'))}</td>"
         "</tr>"
         for row in _list(report.get("rows"))
     ]
@@ -522,11 +601,11 @@ def _render_html(report: dict[str, Any]) -> str:
             "<h1>实时验证看板</h1>",
             f"<p>生成时间: {_html(report.get('generated_at'))}</p>",
             f"<p>整体状态: <code>{_html(_mapping(report.get('summary')).get('overall_status'))}</code></p>",
-            "<table><thead><tr><th>分组</th><th>能力</th><th>状态</th><th>模式</th><th>行数</th><th>说明</th></tr></thead><tbody>",
-            *(rows or ['<tr><td colspan="6">无验证结果</td></tr>']),
+            "<table><thead><tr><th>分组</th><th>能力</th><th>归属</th><th>状态</th><th>模式</th><th>行数</th><th>说明</th><th>下一步</th></tr></thead><tbody>",
+            *(rows or ['<tr><td colspan="8">无验证结果</td></tr>']),
             "</tbody></table>",
             "<section><h2>状态口径</h2>",
-            "<p>缺少配置会标记为 <code>not_configured</code> / 缺少配置，不视为系统失败。</p>",
+            "<p>缺少配置会标记为 <code>not_configured</code> / 缺少配置，不视为整次 smoke 失败。</p>",
             "<p>FNI 只调用已配置的本地 gateway 或 Narrative Service HTTP 边界，不直接调用外部数据源。</p>",
             "</section>",
             "</main>",
@@ -537,28 +616,122 @@ def _render_html(report: dict[str, Any]) -> str:
 
 
 def _message(status: str, *, row_count: int, warnings: list[dict[str, Any]]) -> str:
-    if status == "passed":
+    if status in {"success", "reachable"}:
         return f"Probe returned usable payload data; row_count={row_count}."
-    if status == "degraded":
+    if status == "configured":
+        return "Required local boundary configuration is present."
+    if status == "upstream_degraded":
         return f"Probe returned degraded payload or warnings; warning_count={len(warnings)}."
-    if status == "product_gap":
-        return "Service reachable, but requested business data is empty or missing."
-    if status == "blocked":
-        return "Configured endpoint rejected or blocked the request."
+    if status == "schema_mismatch":
+        return "Service reachable, but response shape or business data did not match the smoke contract."
+    if status == "provider_permission_required":
+        return "Configured endpoint requires provider permission, credential, quota, or authorization."
+    if status == "request_timeout":
+        return "Configured endpoint timed out inside the bounded smoke window."
     if status == "not_configured":
         return "Required URL is not configured."
-    return "Probe failed at runtime."
+    return "Probe failed the expected HTTP or JSON contract."
 
 
 def _status_label(status: str) -> str:
     return {
-        "passed": "已通过",
-        "degraded": "降级",
-        "blocked": "受阻",
+        "configured": "已配置",
         "not_configured": "缺少配置",
-        "product_gap": "产品数据缺口",
-        "system_failure": "系统失败",
+        "reachable": "可连通",
+        "provider_permission_required": "需要权限",
+        "request_timeout": "请求超时",
+        "upstream_degraded": "上游降级",
+        "schema_mismatch": "契约不匹配",
+        "contract_failed": "契约失败",
+        "success": "成功",
     }.get(status, status)
+
+
+def _failure_reason(
+    *,
+    status: str,
+    http_status: int,
+    payload: dict[str, Any],
+    warnings: list[dict[str, Any]],
+) -> str | None:
+    if status in {"configured", "reachable", "success"}:
+        return None
+    error = payload.get("error")
+    if isinstance(error, dict):
+        code = str(error.get("code") or "").strip()
+        message = str(error.get("message") or "").strip()
+        if code or message:
+            return ": ".join(item for item in (code, message) if item)
+    if warnings:
+        code = str(warnings[0].get("code") or "").strip()
+        message = str(warnings[0].get("message") or "").strip()
+        return ": ".join(item for item in (code, message) if item) or status
+    return f"http_status={http_status}"
+
+
+def _combined_failure_reason(checks: list[dict[str, Any]]) -> str | None:
+    reasons = [
+        str(item.get("failure_reason"))
+        for item in checks
+        if item.get("failure_reason")
+    ]
+    return "; ".join(reasons) if reasons else None
+
+
+def _owner_service(*, group: str, capability: str) -> str:
+    if group == "deterministic_local":
+        return "fni"
+    if "narrative" in group or "narrative" in capability or "review" in group:
+        return "narrative-service"
+    return "stock-data-gateway"
+
+
+def _credential_hint(*, owner_service: str, capability: str) -> str:
+    if owner_service == "stock-data-gateway":
+        if "tushare" in capability or "daily" in capability or "fund" in capability:
+            return "MARKET_DATA_GATEWAY_URL plus gateway-managed Tushare permission; token value redacted"
+        return "MARKET_DATA_GATEWAY_URL plus gateway-managed provider permission; secret values redacted"
+    if owner_service == "narrative-service":
+        return "NARRATIVE_SERVICE_URL; no service secret value returned"
+    return "none"
+
+
+def _next_action(status: str, *, owner_service: str) -> dict[str, str]:
+    descriptions = {
+        "configured": "Continue to endpoint smoke checks.",
+        "not_configured": "Set the local service URL before relying on live provider output.",
+        "reachable": "Add or run a business contract probe for this service.",
+        "provider_permission_required": "Check provider credential, permission, quota, or gateway route policy.",
+        "request_timeout": "Increase bounded timeout only after confirming route health and expected latency.",
+        "upstream_degraded": "Inspect gateway/provider warnings and retry after upstream recovery.",
+        "schema_mismatch": "Compare response payload with the documented smoke contract.",
+        "contract_failed": "Fix the owning service HTTP/JSON contract before downstream runs.",
+        "success": "No action required.",
+    }
+    return {
+        "owner_service": owner_service,
+        "description": descriptions.get(status, "Review the owning service diagnostics."),
+    }
+
+
+def _clean_base_url(value: str) -> str:
+    raw = value.strip().rstrip("/")
+    if not raw:
+        return ""
+    parsed = urlparse(raw)
+    if not parsed.scheme or not parsed.netloc:
+        return raw
+    cleaned = parsed._replace(query="", fragment="").geturl().rstrip("/")
+    return cleaned
+
+
+def _redact_url(value: str) -> str:
+    if not value:
+        return ""
+    parsed = urlparse(value)
+    if not parsed.query:
+        return value
+    return parsed._replace(query="REDACTED").geturl()
 
 
 def _default_output_dir() -> Path:

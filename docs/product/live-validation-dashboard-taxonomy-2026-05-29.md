@@ -1,6 +1,6 @@
 # Live Validation Dashboard Taxonomy - 2026-05-29
 
-Linear issues: `MIK-62`, `MIK-54`
+Linear issues: `MIK-62`, `MIK-54`, `MIK-93`, `MIK-88`
 
 ## Purpose
 
@@ -27,7 +27,40 @@ FNI must call only configured local gateway or Narrative Service HTTP boundaries
 It must not directly call Tushare, AkShare, EastMoney, news websites, browser
 automation, proxy, CAPTCHA, or anti-detect infrastructure from this dashboard.
 
-## Status Taxonomy
+## Round 4 Credential-Safe Status Taxonomy
+
+Round 4 upgrades the dashboard taxonomy so it can act as a live provider
+credential smoke surface without leaking secrets or collapsing partial provider
+failures into an all-or-nothing result.
+
+- `configured`: required local boundary configuration exists; no secret value is
+  returned.
+- `not_configured`: required URL is absent. Alias: `missing_config`.
+- `reachable`: configured boundary responded, but no business contract was
+  evaluated.
+- `provider_permission_required`: provider or gateway route requires permission,
+  credential, quota, or authorization.
+- `request_timeout`: bounded request timed out without failing the whole smoke
+  run.
+- `upstream_degraded`: configured boundary returned degraded payload, warnings,
+  or upstream instability.
+- `schema_mismatch`: configured boundary responded with an unexpected or empty
+  contract shape.
+- `contract_failed`: configured boundary failed the expected HTTP or JSON
+  contract.
+- `success`: configured probe returned usable payload data.
+
+Each row includes `id`, `owner_service`, `endpoint`,
+`required_credential_hint`, `status`, `latency_ms`, `warnings`,
+`failure_reason`, and `next_action`. Environment variable names such as
+`MARKET_DATA_GATEWAY_URL`, `NARRATIVE_SERVICE_URL`, or provider credential hints
+may appear, but secret values must not appear in JSON, HTML, logs, or comments.
+
+Partial failures are expected operational states. A timeout, permission block,
+or upstream degraded provider row should produce a bounded row-level diagnostic
+and next action, not abort the whole dashboard.
+
+## Round 2 Compatibility Notes
 
 - `passed`: configured probe returned usable payload data.
 - `degraded`: configured probe returned data with warnings or degraded status.
@@ -62,16 +95,21 @@ Dashboard JSON uses `live-validation-dashboard-v1` and includes:
 
 Each row includes:
 
+- `id`
 - `group`
 - `capability`
+- `owner_service`
 - `mode`
 - `status`
 - `status_label_zh`
 - `source`
 - `endpoint`
+- `required_credential_hint`
 - `latency_ms`
 - `row_count`
 - `warnings`
+- `failure_reason`
+- `next_action`
 - `message`
 
 ## Acceptance Notes
