@@ -97,6 +97,10 @@ python scripts/run_reviewable_fund_report_pack.py --artifact-root <pipeline-outp
 The MIK-58 acceptance note is
 `docs/product/reviewable-fund-report-pack-2026-05-29.md`.
 
+Governance audit exports use the schema at
+`config/governance_audit_schema.json`. The MIK-66 acceptance note is
+`docs/product/governance-audit-schema-2026-05-29.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

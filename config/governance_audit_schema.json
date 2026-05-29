@@ -1,0 +1,34 @@
+{
+  "version": "governance-audit-schema-v1",
+  "read_only": true,
+  "record_types": [
+    "narrative",
+    "candidate_narrative",
+    "stock_mapping",
+    "candidate_mapping",
+    "evidence_pack",
+    "promotion_decision"
+  ],
+  "required_trust_state_fields": [
+    "status",
+    "trust_status",
+    "human_review_status",
+    "source_store",
+    "service_ledger_approval_id"
+  ],
+  "csv_flattening": {
+    "list_separator": " | ",
+    "dict_separator": "; ",
+    "nested_key_separator": "."
+  },
+  "warning_policy": {
+    "pm_facing": [
+      "missing_service_ledger_approval"
+    ],
+    "developer_facing": [
+      "missing_service_ledger_approval",
+      "unsupported_record_type",
+      "missing_required_trust_state_field"
+    ]
+  }
+}

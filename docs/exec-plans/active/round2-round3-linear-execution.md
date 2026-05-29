@@ -34,7 +34,7 @@ Execute Round 2 in dependency order:
 6. Done locally, pending Linear closeout - `MIK-65`: fund report artifact contract.
 7. Done locally, pending Linear closeout - `MIK-57`: fund narrative change monitor report.
 8. Done locally, pending Linear closeout - `MIK-58`: reviewable fund report pack.
-9. `MIK-66`: governance audit schema and export contract.
+9. Done locally, pending Linear closeout - `MIK-66`: governance audit schema and export contract.
 10. `MIK-59`: narrative governance audit export.
 11. `MIK-64`: durable Narrative Service storage migration path.
 12. `MIK-52` + `MIK-60`: close parent packs after all child issues pass.
@@ -141,6 +141,23 @@ Execute Round 2 in dependency order:
   `uv run pytest tests/test_reviewable_fund_report_pack.py tests/test_fund_report_artifact_contract.py tests/test_workspace_snapshot.py -q`
   (`23 passed`);
   `uv run ruff check src/scanners/reviewable_fund_report_pack.py scripts/run_reviewable_fund_report_pack.py tests/test_reviewable_fund_report_pack.py`.
+
+### MIK-66 - Governance Audit Schema And Export Contract
+
+- TDD red: `uv run pytest tests/test_governance_audit_schema.py -q`
+  initially failed on missing `src.scanners.governance_audit`.
+- TDD green: `uv run pytest tests/test_governance_audit_schema.py -q`
+  passed with 3 tests.
+- Schema config:
+  `config/governance_audit_schema.json`
+- Product note:
+  `docs/product/governance-audit-schema-2026-05-29.md`
+- Fixture:
+  `data/fixtures/governance_audit_records.v1.json`
+- Verification:
+  `uv run pytest tests/test_governance_audit_schema.py tests/test_source_event_schema.py -q`
+  (`7 passed`);
+  `uv run ruff check src/scanners/governance_audit.py tests/test_governance_audit_schema.py`.
 
 ## Round 3 Queue
 

@@ -1,0 +1,38 @@
+{
+  "version": "governance-audit-records-fixture-v1",
+  "records": [
+    {
+      "record_type": "narrative",
+      "record_id": "N_PROMOTED_LOCAL_ONLY",
+      "display_name": "本地已提升但无服务审批",
+      "status": "promoted",
+      "trust_status": "trusted_validated",
+      "human_review_status": "approved",
+      "source_store": "local_seed",
+      "service_ledger_approval_id": "",
+      "updated_at": "2026-05-29T00:00:00+08:00"
+    },
+    {
+      "record_type": "narrative",
+      "record_id": "N_APPROVED_IN_LEDGER",
+      "display_name": "服务审批存在的叙事",
+      "status": "active",
+      "trust_status": "trusted_validated",
+      "human_review_status": "approved",
+      "source_store": "narrative_service",
+      "service_ledger_approval_id": "APPROVE_N_APPROVED_IN_LEDGER",
+      "updated_at": "2026-05-29T00:00:00+08:00"
+    },
+    {
+      "record_type": "candidate_mapping",
+      "record_id": "CMAP_REVIEW_ONLY",
+      "display_name": "候选映射",
+      "status": "candidate",
+      "trust_status": "candidate_untrusted",
+      "human_review_status": "pending",
+      "source_store": "candidate_intake",
+      "service_ledger_approval_id": "",
+      "updated_at": "2026-05-29T00:00:00+08:00"
+    }
+  ]
+}
