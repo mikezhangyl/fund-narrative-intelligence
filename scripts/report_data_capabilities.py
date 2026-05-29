@@ -78,7 +78,11 @@ CAPABILITY_GROUPS = (
             "earnings_calendar",
         ),
     },
-    {"group_id": "news", "name": "News", "dataset_ids": ("news_briefs",)},
+    {
+        "group_id": "news",
+        "name": "News",
+        "dataset_ids": ("news_briefs", "narrative_source_events"),
+    },
     {"group_id": "cyq", "name": "CYQ / Cost Basis", "dataset_ids": ("cyq_chips",)},
     {
         "group_id": "narrative_service",

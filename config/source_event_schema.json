@@ -1,0 +1,60 @@
+{
+  "version": "source-event-schema-v1",
+  "purpose": "Normalize auditable source events for candidate narrative intake without direct crawling or trusted promotion.",
+  "required_fields": [
+    "source_type",
+    "provider",
+    "source_url",
+    "event_time",
+    "title",
+    "summary",
+    "stock_codes",
+    "narrative_hints",
+    "evidence_claims"
+  ],
+  "supported_source_types": [
+    "news",
+    "announcement",
+    "manual",
+    "social",
+    "social_future"
+  ],
+  "source_type_aliases": {
+    "social_reserved": "social_future"
+  },
+  "provider_preferences": {
+    "news": [
+      "gateway_news_briefs",
+      "tushare_news"
+    ],
+    "announcement": [
+      "gateway_announcements",
+      "tushare_announcements",
+      "cninfo_announcements"
+    ],
+    "manual": [
+      "manual_research_note"
+    ],
+    "social": [
+      "social_future_reserved"
+    ],
+    "social_future": [
+      "social_future_reserved"
+    ]
+  },
+  "quality_gap_codes": [
+    "missing_source_url",
+    "missing_event_time",
+    "missing_stock_codes"
+  ],
+  "trust_policy": {
+    "default_trust_status": "candidate_untrusted",
+    "promotion_effect": "none",
+    "automatic_trusted_promotion": false
+  },
+  "external_access_policy": {
+    "owner": "stock-data-gateway",
+    "fni_rule": "gateway_change_request_first",
+    "direct_crawling_allowed": false
+  }
+}

@@ -6,7 +6,9 @@ from datetime import UTC, datetime
 from html import escape
 from typing import Any
 
-SOURCE_TYPES = {"news", "announcement", "social", "manual"}
+from src.scanners.source_event_schema import SCHEMA_VERSION, validate_source_event
+
+SOURCE_TYPES = {"news", "announcement", "social", "social_future", "manual"}
 
 
 def build_candidate_narrative_intake_report(
@@ -24,6 +26,10 @@ def build_candidate_narrative_intake_report(
         "version": "candidate-narrative-intake-v1",
         "generated_at": _utc_now(),
         "status": "candidate_untrusted",
+        "source_event_schema": {
+            "version": SCHEMA_VERSION,
+            "config": "config/source_event_schema.json",
+        },
         "summary": {
             "event_count": len(events),
             "source_type_count": len({event["source_type"] for event in events}),
@@ -136,22 +142,31 @@ def render_html_report(report: dict[str, Any]) -> str:
 
 
 def _event_payload(event: dict[str, Any]) -> dict[str, Any]:
-    source_type = str(event.get("source_type") or "manual")
+    normalized = validate_source_event(event)
+    source_type = str(normalized.get("source_type") or "manual")
     if source_type not in SOURCE_TYPES:
         source_type = "manual"
     return {
-        "event_id": str(event.get("event_id") or _stable_id("EVT", [event])),
+        "schema_version": str(normalized.get("schema_version") or ""),
+        "event_id": str(normalized.get("event_id") or _stable_id("EVT", [event])),
+        "dedupe_key": str(normalized.get("dedupe_key") or ""),
         "source_type": source_type,
-        "event_time": str(event.get("event_time") or ""),
-        "title": str(event.get("title") or ""),
-        "summary": str(event.get("summary") or ""),
-        "source_name": str(event.get("source_name") or ""),
-        "source_url": str(event.get("source_url") or ""),
-        "mentioned_stocks": [_stock_payload(item) for item in _list(event.get("mentioned_stocks"))],
-        "keywords": _strings(event.get("keywords")),
+        "event_time": str(normalized.get("event_time") or ""),
+        "title": str(normalized.get("title") or ""),
+        "summary": str(normalized.get("summary") or ""),
+        "source_name": str(normalized.get("provider") or event.get("source_name") or ""),
+        "source_url": str(normalized.get("source_url") or ""),
+        "source_metadata": _mapping(normalized.get("source_metadata")),
+        "quality_gaps": _strings(normalized.get("quality_gaps")),
+        "evidence_claims": _strings(normalized.get("evidence_claims")),
+        "trust_status": str(normalized.get("trust_status") or "candidate_untrusted"),
+        "promotion_effect": str(normalized.get("promotion_effect") or "none"),
+        "mentioned_stocks": [_stock_payload(item) for item in _list(normalized.get("mentioned_stocks"))],
+        "stock_codes": _strings(normalized.get("stock_codes")),
+        "keywords": _strings(normalized.get("keywords")),
         "candidate_narratives": [
             _event_candidate_payload(item)
-            for item in _list(event.get("candidate_narratives"))
+            for item in _list(normalized.get("candidate_narratives"))
         ],
     }
 

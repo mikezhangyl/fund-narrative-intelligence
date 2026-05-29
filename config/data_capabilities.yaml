@@ -368,6 +368,44 @@ datasets:
     notes:
       - FNI should consume structured news through the gateway before considering any direct news-site crawling.
 
+  narrative_source_events:
+    description: Normalized news, announcement, manual, and future-social source events for candidate narrative intake.
+    current_status: planned
+    acquisition_difficulty: medium
+    gateway_mode: gateway_planned
+    required_fields:
+      - source_type
+      - provider
+      - source_url
+      - event_time
+      - title
+      - summary
+      - stock_codes
+      - narrative_hints
+      - evidence_claims
+    freshness: source_event_time_window
+    primary_source:
+      provider: gateway
+      endpoint: source-events
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: local_fixture
+        endpoint: data/fixtures/source_events.news_announcement.v1.json
+        access_mode: deterministic_fixture
+        current_status: available_for_tests
+    validation:
+      live_probe_capability: narrative_source_events
+    risks:
+      rate_limit: delegated_to_gateway
+      anti_bot: gateway_owned_not_fni
+      operational_cost: provider_permission_dependent
+    analysis_use_cases:
+      - candidate_narrative_intake
+      - narrative_radar_service
+    notes:
+      - New external narrative source access must start with a stock-data-gateway change request.
+      - FNI may keep local fixtures for deterministic tests but must not add direct crawling for new source expansion.
+
   cyq_chips:
     description: A-share daily cost-basis/chip distribution rows by price bucket.
     current_status: available

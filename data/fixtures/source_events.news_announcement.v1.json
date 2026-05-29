@@ -1,0 +1,83 @@
+{
+  "version": "source-events-fixture-v1",
+  "events": [
+    {
+      "event_id": "EVT_NEWS_ROBOTICS_20260529",
+      "source_type": "news",
+      "provider": "gateway_news_briefs",
+      "provider_version": "2026-05",
+      "permission_status": "licensed",
+      "degradation_state": "available",
+      "source_url": "gateway://news/briefs/robotics-20260529",
+      "event_time": "2026-05-29T09:30:00+08:00",
+      "title": "机器人执行器产业链新闻热度上升",
+      "summary": "结构化新闻摘要提到机器人、执行器和减速器等关键词。",
+      "stock_codes": [
+        "300024",
+        "688017"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "300024",
+          "stock_name": "机器人"
+        },
+        {
+          "stock_code": "688017",
+          "stock_name": "绿的谐波"
+        }
+      ],
+      "narrative_hints": [
+        "机器人",
+        "执行器",
+        "减速器"
+      ],
+      "evidence_claims": [
+        "source_mentions_industry_chain_attention"
+      ],
+      "candidate_narratives": [
+        {
+          "name": "机器人执行器",
+          "canonical_taxonomy": "机器人",
+          "confidence": 0.66
+        }
+      ]
+    },
+    {
+      "event_id": "EVT_ANNOUNCEMENT_OPTICAL_20260529",
+      "source_type": "announcement",
+      "provider": "gateway_announcements",
+      "provider_version": "2026-05",
+      "permission_status": "licensed",
+      "degradation_state": "available",
+      "source_url": "gateway://announcements/300308/20260529",
+      "event_time": "2026-05-29T10:00:00+08:00",
+      "title": "光模块公司公告披露高速光通信订单进展",
+      "summary": "公告样例用于生成候选证据，不能自动提升为可信叙事或可信映射。",
+      "stock_codes": [
+        "300308"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "300308",
+          "stock_name": "中际旭创"
+        }
+      ],
+      "narrative_hints": [
+        "光模块",
+        "高速光通信",
+        "AI算力"
+      ],
+      "evidence_claims": [
+        "announcement_supports_business_relevance"
+      ],
+      "candidate_narratives": [
+        {
+          "narrative_id": "N_OPTICAL_MODULE_CHAIN",
+          "name": "光模块产业链",
+          "canonical_taxonomy": "通信设备",
+          "confidence": 0.7
+        }
+      ]
+    }
+  ]
+}
