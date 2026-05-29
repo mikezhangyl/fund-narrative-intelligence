@@ -12,6 +12,7 @@ This index is intentionally short. It is the default startup surface; do not exp
 - [narrative-service-migration-roadmap.md](./narrative-service-migration-roadmap.md)
 - [information-source-diversification.md](./information-source-diversification.md)
 - [single-fund-demo.md](./single-fund-demo.md)
+- [round2-round3-linear-execution.md](./round2-round3-linear-execution.md)
 
 ## Lookup Rule
 
