@@ -5,7 +5,7 @@
   "branch": "codex/round2-3-linear-develop",
   "worktree": "/Users/mikezhang/Coding/AI-Learning/fund-narrative-intelligence",
   "base_commit": "09c174d545c64ad97696abd5dc57c4cfc528f22f",
-  "head_commit": "6d4d8d5b86a171122a6c2411ad5a4e6604c897f7",
+  "head_commit": "4d0f0eeba34f92ae3f8ebff53152a340a96746e8",
   "merge_base": "09c174d545c64ad97696abd5dc57c4cfc528f22f",
   "quality_reviewed_commit": null,
   "reviewed_snapshot_type": null,

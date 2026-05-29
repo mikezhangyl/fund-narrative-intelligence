@@ -26,10 +26,10 @@ Future implementation work starts from `main` as the accepted release baseline.
 
 Execute Round 2 in dependency order:
 
-1. `MIK-61` + `MIK-53`: release baseline and merge protocol.
-2. `MIK-62` + `MIK-54`: live validation taxonomy and dashboard.
-3. `MIK-63` + `MIK-67`: source event schema and gateway change-request protocol.
-4. `MIK-55`: structured news-to-candidate narrative intake.
+1. Done - `MIK-61` + `MIK-53`: release baseline and merge protocol.
+2. Done - `MIK-62` + `MIK-54`: live validation taxonomy and dashboard.
+3. Done - `MIK-63` + `MIK-67`: source event schema and gateway change-request protocol.
+4. Done locally, pending Linear closeout - `MIK-55`: structured news-to-candidate narrative intake.
 5. `MIK-56`: announcement-to-evidence mapping intake.
 6. `MIK-65`: fund report artifact contract.
 7. `MIK-57`: fund narrative change monitor report.
@@ -38,6 +38,28 @@ Execute Round 2 in dependency order:
 10. `MIK-59`: narrative governance audit export.
 11. `MIK-64`: durable Narrative Service storage migration path.
 12. `MIK-52` + `MIK-60`: close parent packs after all child issues pass.
+
+## Completed Slice Evidence
+
+### MIK-55 - Structured News-To-Candidate Narrative Intake
+
+- TDD red: `uv run pytest tests/test_news_candidate_intake.py -q` initially
+  failed on missing `scripts.run_news_candidate_intake`.
+- TDD green: `uv run pytest tests/test_news_candidate_intake.py -q` passed
+  with 3 tests.
+- Fixture acceptance:
+  `uv run python scripts/run_news_candidate_intake.py --output-dir outputs/news_candidate_intake/2026-05-29-mik-55-fixture`
+- Output JSON:
+  `outputs/news_candidate_intake/2026-05-29-mik-55-fixture/news_candidate_intake_report.json`
+- Output HTML:
+  `outputs/news_candidate_intake/2026-05-29-mik-55-fixture/news_candidate_intake_report.html`
+- Product note:
+  `docs/product/structured-news-candidate-intake-2026-05-29.md`
+- Verification:
+  `uv run ruff check .`;
+  `uv run python -m compileall -q src tests scripts services/stock-narrative-service/src services/stock-narrative-service/tests`;
+  `uv run pytest -q` (`534 passed, 1 skipped`);
+  `uv run python scripts/validate_stock_narrative_service_acceptance.py`.
 
 ## Round 3 Queue
 

@@ -119,6 +119,7 @@ def _source_metadata(
     raw = dict(metadata) if isinstance(metadata, dict) else {}
     preferences = _mapping(schema.get("provider_preferences"))
     return {
+        **raw,
         "provider": provider,
         "provider_version": str(
             raw.get("provider_version") or event.get("provider_version") or ""

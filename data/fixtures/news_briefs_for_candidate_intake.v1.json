@@ -1,0 +1,49 @@
+{
+  "version": "news-briefs-for-candidate-intake-v1",
+  "rows": [
+    {
+      "id": "NEWS_ROBOT_001",
+      "datetime": "2026-05-29 09:35:00",
+      "title": "机器人执行器产业链订单预期升温",
+      "content": "多家机器人执行器和减速器公司被提及，市场关注人形机器人产业链订单节奏。",
+      "source": "tushare",
+      "src": "sina",
+      "url": "https://example.test/news/robot-actuator",
+      "stock_codes": ["300024", "688017"],
+      "mentioned_stocks": [
+        {"stock_code": "300024", "stock_name": "机器人"},
+        {"stock_code": "688017", "stock_name": "绿的谐波"}
+      ],
+      "keywords": ["机器人", "执行器", "减速器"],
+      "candidate_narratives": [
+        {
+          "name": "机器人执行器",
+          "canonical_taxonomy": "机器人",
+          "confidence": 0.66
+        }
+      ]
+    },
+    {
+      "id": "NEWS_BAIJIU_001",
+      "datetime": "2026-05-29 10:20:00",
+      "title": "白酒龙头渠道调研更新",
+      "content": "高端白酒渠道库存和价格受到关注，消费复苏预期带动板块讨论。",
+      "source": "tushare",
+      "src": "sina",
+      "url": "https://example.test/news/baijiu-channel",
+      "stock_codes": ["600519"],
+      "mentioned_stocks": [
+        {"stock_code": "600519", "stock_name": "贵州茅台"}
+      ],
+      "keywords": ["白酒", "渠道", "消费"],
+      "candidate_narratives": [
+        {
+          "narrative_id": "N_BAIJIU_CONSUMPTION",
+          "name": "高端白酒消费",
+          "canonical_taxonomy": "消费",
+          "confidence": 0.72
+        }
+      ]
+    }
+  ]
+}

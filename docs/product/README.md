@@ -53,6 +53,17 @@ Intake accepts event-style records from future `news`, `announcement`,
 stock mappings, and review-queue items; it must not mutate the reviewed or
 trusted stores automatically.
 
+Structured news briefs can be converted into the same intake staging layer with:
+
+```bash
+python scripts/run_news_candidate_intake.py
+```
+
+This path consumes gateway/Tushare news briefs through a provider-neutral
+contract, keeps direct crawling disabled, and records source trace rows for
+candidate creation or reinforcement. The MIK-55 acceptance note is
+`docs/product/structured-news-candidate-intake-2026-05-29.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence
