@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Narrative Radar Bubble API 契约 - 2026-05-29</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.65; margin: 40px auto; max-width: 920px; color: #172033; }
+    h1, h2 { line-height: 1.25; }
+    code { background: #f3f5f8; border-radius: 4px; padding: 1px 5px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d8dee8; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f6f8fb; }
+    .note { background: #f8fbff; border-left: 4px solid #2870c9; padding: 12px 14px; }
+  </style>
+</head>
+<body>
+  <h1>Narrative Radar Bubble API 契约</h1>
+  <p><strong>日期：</strong>2026-05-29</p>
+  <p><strong>覆盖 Linear：</strong>MIK-74、MIK-84</p>
+
+  <h2>服务接口</h2>
+  <p>Narrative Service 现在提供 <code>GET /api/v1/narratives/radar/bubbles</code>。该接口返回 service-owned、library-agnostic JSON，前端可以直接绘制 bubble chart，FNI 不需要重新计算 heat、trend、market confirmation 或 evidence quality。</p>
+
+  <h2>Bubble Row 字段</h2>
+  <table>
+    <thead><tr><th>字段</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>heat_score</code></td><td>气泡大小。</td></tr>
+      <tr><td><code>trend_acceleration</code></td><td>X 轴位置。</td></tr>
+      <tr><td><code>market_confirmation_score</code></td><td>Y 轴位置。</td></tr>
+      <tr><td><code>momentum_state</code></td><td>颜色。</td></tr>
+      <tr><td><code>trust_status</code></td><td>边框或标记。</td></tr>
+      <tr><td><code>evidence_quality_score</code></td><td>证据质量标记。</td></tr>
+      <tr><td><code>evidence_refs</code> / <code>sparkline_points</code> / <code>score_components</code></td><td>tooltip 和 drill-down 入口。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Visualization Contract</h2>
+  <p>响应包含 <code>visualization_contract.version=bubble-chart-contract-v1</code>，并明确 size、x、y、color、border、marker 和 tooltip 字段映射。该契约不绑定任何前端图表库。</p>
+
+  <h2>降级输入</h2>
+  <p class="note">当没有可用 source signals 时，接口返回空 bubble list，并包含 <code>RADAR_BUBBLES_EMPTY</code> product-data-gap warning；契约元数据仍然返回，避免 silent success。</p>
+
+  <h2>验收</h2>
+  <ul>
+    <li>RED：bubble endpoint 缺失时两个 bubble 测试失败。</li>
+    <li>GREEN：两个 bubble 测试通过。</li>
+    <li>回归：service HTTP + storage repository 测试 <code>39 passed</code>。</li>
+    <li>静态检查：相关 service 文件和 HTTP 测试 ruff check 通过。</li>
+    <li>编译检查：service src/tests compileall 通过。</li>
+  </ul>
+</body>
+</html>

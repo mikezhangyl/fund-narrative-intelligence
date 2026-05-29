@@ -217,8 +217,8 @@ unblocks a radar slice earlier:
 
 1. Done - `MIK-80` + `MIK-81` + `MIK-82`: ownership, score schema, time-series model.
 2. Done - `MIK-75` + `MIK-83`: deterministic heat/trend scoring and market confirmation adapter boundary.
-3. Done locally, pending Linear closeout - `MIK-76`: structured source mining into candidate narrative signals.
-4. `MIK-74` + `MIK-84`: radar bubble API and visualization contract.
+3. Done locally, pending push/Linear closeout - `MIK-76`: structured source mining into candidate narrative signals.
+4. Done locally, pending push/Linear closeout - `MIK-74` + `MIK-84`: radar bubble API and visualization contract.
 5. `MIK-77` + `MIK-85`: evidence drill-down and review/trust integration.
 6. `MIK-78`: service-owned preview surface.
 7. `MIK-79`: optional AI explanation as non-authoritative evidence summary.
@@ -313,6 +313,35 @@ unblocks a radar slice earlier:
   `docs/product/narrative-radar-structured-source-mining-2026-05-29.html`
   with auxiliary Markdown at
   `docs/product/narrative-radar-structured-source-mining-2026-05-29.md`.
+
+### MIK-74 + MIK-84 - Radar Bubble API And Visualization Contract
+
+- TDD red:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py::test_radar_bubbles_return_visualization_ready_contract_without_recalculation services/stock-narrative-service/tests/test_http_service.py::test_radar_bubbles_empty_inputs_return_structured_metadata -q`
+  failed because the bubble endpoint did not exist.
+- TDD green:
+  the same targeted command passed with 2 tests.
+- Targeted regression:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  passed with 39 tests.
+- Static checks:
+  `uv run ruff check services/stock-narrative-service/src/stock_narrative_service/radar.py services/stock-narrative-service/src/stock_narrative_service/app.py services/stock-narrative-service/src/stock_narrative_service/storage.py services/stock-narrative-service/tests/test_http_service.py`.
+- Compile:
+  `uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests`.
+- Service endpoint:
+  `GET /api/v1/narratives/radar/bubbles` emits visualization-ready bubble rows
+  from service-owned scores and source signals.
+- Visualization contract:
+  `bubble-chart-contract-v1` maps size, x, y, color, border, marker, and
+  tooltip fields without coupling to a frontend library or requiring FNI score
+  recalculation.
+- Degraded/empty behavior:
+  empty source inputs return `RADAR_BUBBLES_EMPTY` product-data-gap metadata
+  with the visualization contract still present.
+- Product note:
+  `docs/product/narrative-radar-bubble-api-contract-2026-05-29.html`
+  with auxiliary Markdown at
+  `docs/product/narrative-radar-bubble-api-contract-2026-05-29.md`.
 
 ## Duplicate / Legacy Round 3 Issues
 

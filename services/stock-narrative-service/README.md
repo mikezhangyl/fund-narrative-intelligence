@@ -51,6 +51,9 @@ First slice scope:
 - structured source mining endpoint:
   `/api/v1/narratives/radar/mined-candidates`, with mined candidates kept
   review-only and excluded social/browser sources disclosed.
+- library-agnostic bubble data endpoint:
+  `/api/v1/narratives/radar/bubbles`, with visual mapping metadata and no FNI
+  score recalculation requirement.
 
 Non-goals:
 

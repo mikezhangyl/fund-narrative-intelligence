@@ -131,6 +131,12 @@ is documented in
 The auxiliary Markdown note is
 `docs/product/narrative-radar-structured-source-mining-2026-05-29.md`.
 
+Narrative Radar bubble API and library-agnostic visualization contract are
+documented in
+`docs/product/narrative-radar-bubble-api-contract-2026-05-29.html`.
+The auxiliary Markdown note is
+`docs/product/narrative-radar-bubble-api-contract-2026-05-29.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

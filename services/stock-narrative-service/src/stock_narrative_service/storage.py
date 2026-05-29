@@ -18,6 +18,7 @@ from stock_narrative_service.identity import (
     stable_id,
 )
 from stock_narrative_service.radar import (
+    radar_bubbles,
     radar_contract,
     radar_mined_candidates,
     radar_scores,
@@ -271,6 +272,23 @@ class NarrativeStore:
         half_life_hours: Any = "",
     ) -> dict[str, Any]:
         return radar_scores(
+            events=_all_events(self),
+            config=self.config,
+            as_of=as_of,
+            window_days=window_days,
+            baseline_days=baseline_days,
+            half_life_hours=half_life_hours,
+        )
+
+    def radar_bubbles(
+        self,
+        *,
+        as_of: str = "",
+        window_days: Any = "",
+        baseline_days: Any = "",
+        half_life_hours: Any = "",
+    ) -> dict[str, Any]:
+        return radar_bubbles(
             events=_all_events(self),
             config=self.config,
             as_of=as_of,

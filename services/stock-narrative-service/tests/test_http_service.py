@@ -1693,6 +1693,169 @@ def test_radar_mining_excludes_reserved_social_sources_and_discloses_policy(tmp_
     assert signals["data"]["signals"] == []
 
 
+def test_radar_bubbles_return_visualization_ready_contract_without_recalculation(
+    tmp_path,
+):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [
+                    _radar_event("EVT_ROBOT_D1", "2026-05-26T10:00:00+08:00", 0.3),
+                    _radar_event("EVT_ROBOT_D2", "2026-05-27T10:00:00+08:00", 0.5),
+                    _radar_event("EVT_ROBOT_D3A", "2026-05-28T10:00:00+08:00", 0.8),
+                    _radar_event(
+                        "EVT_ROBOT_D3B",
+                        "2026-05-28T15:30:00+08:00",
+                        0.7,
+                        source_type="announcement",
+                        source_weight=1.2,
+                    ),
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    config.market_confirmation_path.parent.mkdir(parents=True, exist_ok=True)
+    config.market_confirmation_path.write_text(
+        json.dumps(
+            {
+                "version": "radar-market-confirmation-v1",
+                "items": [
+                    {
+                        "candidate_narrative_id": "C_ROBOT",
+                        "market_confirmation_score": 64,
+                        "status": "available",
+                        "source": "gateway_contract_fixture",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(
+            f"{base_url}/api/v1/narratives/radar/bubbles"
+            "?as_of=2026-05-29T00:00:00+08:00"
+            "&window_days=1&baseline_days=3&half_life_hours=24"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "available"
+    payload = response["data"]
+    assert payload["version"] == "narrative-radar-bubbles-v1"
+    assert payload["visualization_contract"] == {
+        "version": "bubble-chart-contract-v1",
+        "library_agnostic": True,
+        "dimensions": {
+            "size": "heat_score",
+            "x": "trend_acceleration",
+            "y": "market_confirmation_score",
+            "color": "momentum_state",
+            "border": "trust_status",
+            "marker": "evidence_quality_score",
+            "tooltip": [
+                "evidence_refs",
+                "representative_stocks",
+                "source_count",
+                "score_components",
+                "sparkline_points",
+                "degradation_warnings",
+            ],
+        },
+    }
+    bubble = payload["bubbles"][0]
+    assert set(bubble) >= {
+        "narrative_id",
+        "narrative_name",
+        "heat_score",
+        "trend_score",
+        "trend_acceleration",
+        "momentum_state",
+        "market_confirmation_score",
+        "trust_status",
+        "evidence_quality_score",
+        "source_count",
+        "representative_stocks",
+        "window_metrics",
+        "sparkline_points",
+        "evidence_refs",
+        "score_components",
+        "degradation_warnings",
+        "updated_at",
+        "visual_encoding",
+    }
+    assert bubble["narrative_id"] == "C_ROBOT"
+    assert bubble["narrative_name"] == "机器人执行器"
+    assert bubble["heat_score"] == 82.0
+    assert bubble["trend_score"] == 79.55
+    assert bubble["trend_acceleration"] == 27.8
+    assert bubble["momentum_state"] == "heating"
+    assert bubble["market_confirmation_score"] == 64.0
+    assert bubble["trust_status"] == "candidate_untrusted"
+    assert bubble["source_count"] == 4
+    assert bubble["representative_stocks"] == ["300124"]
+    assert bubble["window_metrics"] == {
+        "window_start": "2026-05-28T00:00:00+08:00",
+        "window_end": "2026-05-29T00:00:00+08:00",
+        "baseline_window": {
+            "window_start": "2026-05-26T00:00:00+08:00",
+            "window_end": "2026-05-28T00:00:00+08:00",
+            "average_weighted_attention": 0.16,
+        },
+    }
+    assert bubble["sparkline_points"] == [
+        {"window_start": "2026-05-26T00:00:00+08:00", "weighted_attention": 0.3},
+        {"window_start": "2026-05-27T00:00:00+08:00", "weighted_attention": 0.5},
+        {"window_start": "2026-05-28T00:00:00+08:00", "weighted_attention": 1.64},
+    ]
+    assert bubble["evidence_refs"] == [
+        "SRC_EVT_ROBOT_D1",
+        "SRC_EVT_ROBOT_D2",
+        "SRC_EVT_ROBOT_D3A",
+        "SRC_EVT_ROBOT_D3B",
+    ]
+    assert bubble["score_components"] == bubble["source_attention_components"]
+    assert bubble["visual_encoding"] == {
+        "size": 82.0,
+        "x": 27.8,
+        "y": 64.0,
+        "color": "heating",
+        "border": "candidate_untrusted",
+        "marker": 100.0,
+    }
+    assert payload["degradation_warnings"] == []
+
+
+def test_radar_bubbles_empty_inputs_return_structured_metadata(tmp_path):
+    config = _write_seed_files(tmp_path)
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(f"{base_url}/api/v1/narratives/radar/bubbles")
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "available"
+    assert response["data"]["bubbles"] == []
+    assert response["data"]["degradation_warnings"] == [
+        {
+            "code": "RADAR_BUBBLES_EMPTY",
+            "message": "No radar bubbles are available from current source signals.",
+            "classification": "product_data_gap",
+        }
+    ]
+    assert response["data"]["visualization_contract"]["library_agnostic"] is True
+
+
 def test_unknown_route_returns_error_envelope(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)

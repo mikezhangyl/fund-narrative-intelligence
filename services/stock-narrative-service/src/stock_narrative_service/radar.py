@@ -188,6 +188,54 @@ def radar_scores(
     }
 
 
+def radar_bubbles(
+    *,
+    events: list[dict[str, Any]],
+    config: ServiceConfig,
+    as_of: str = "",
+    window_days: Any = "",
+    baseline_days: Any = "",
+    half_life_hours: Any = "",
+) -> dict[str, Any]:
+    score_payload = radar_scores(
+        events=events,
+        config=config,
+        as_of=as_of,
+        window_days=window_days,
+        baseline_days=baseline_days,
+        half_life_hours=half_life_hours,
+    )
+    signals = radar_source_signals(events)["signals"]
+    signals_by_candidate = _signals_by_candidate(signals)
+    bubbles = [
+        _bubble_row(
+            score=score,
+            rows=signals_by_candidate.get(
+                str(score.get("candidate_narrative_id") or ""),
+                [],
+            ),
+            updated_at=str(score_payload["scoring_config"]["as_of"]),
+        )
+        for score in _list(score_payload.get("scores"))
+    ]
+    warnings = _list(score_payload.get("degradation_warnings"))
+    if not bubbles:
+        warnings = [
+            *warnings,
+            {
+                "code": "RADAR_BUBBLES_EMPTY",
+                "message": "No radar bubbles are available from current source signals.",
+                "classification": "product_data_gap",
+            },
+        ]
+    return {
+        "version": "narrative-radar-bubbles-v1",
+        "visualization_contract": _bubble_visualization_contract(),
+        "bubbles": bubbles,
+        "degradation_warnings": warnings,
+    }
+
+
 def radar_source_model() -> dict[str, Any]:
     return {
         "storage_model": "append_only_source_signal_ledger",
@@ -222,6 +270,95 @@ def radar_source_model() -> dict[str, Any]:
         ),
         "negative_cache_policy": "failed upstream/provider attempts are not cached",
     }
+
+
+def _bubble_visualization_contract() -> dict[str, Any]:
+    return {
+        "version": "bubble-chart-contract-v1",
+        "library_agnostic": True,
+        "dimensions": {
+            "size": "heat_score",
+            "x": "trend_acceleration",
+            "y": "market_confirmation_score",
+            "color": "momentum_state",
+            "border": "trust_status",
+            "marker": "evidence_quality_score",
+            "tooltip": [
+                "evidence_refs",
+                "representative_stocks",
+                "source_count",
+                "score_components",
+                "sparkline_points",
+                "degradation_warnings",
+            ],
+        },
+    }
+
+
+def _bubble_row(
+    *,
+    score: dict[str, Any],
+    rows: list[dict[str, Any]],
+    updated_at: str,
+) -> dict[str, Any]:
+    source_components = _mapping(score.get("source_attention_components"))
+    return {
+        "narrative_id": str(score.get("candidate_narrative_id") or ""),
+        "narrative_name": str(score.get("narrative_name") or ""),
+        "heat_score": _float(score.get("heat_score")),
+        "trend_score": _float(score.get("trend_score")),
+        "trend_acceleration": _float(score.get("trend_acceleration")),
+        "momentum_state": str(score.get("momentum_state") or "stable"),
+        "market_confirmation_score": _float(score.get("market_confirmation_score")),
+        "trust_status": _bubble_trust_status(rows),
+        "evidence_quality_score": _float(score.get("evidence_quality_score")),
+        "source_count": len({str(row.get("source_event_id") or "") for row in rows}),
+        "representative_stocks": sorted(
+            {
+                ticker
+                for row in rows
+                for ticker in _strings(_mapping(row.get("extracted_entities")).get("tickers"))
+            }
+        ),
+        "window_metrics": {
+            "window_start": str(score.get("window_start") or ""),
+            "window_end": str(score.get("window_end") or ""),
+            "baseline_window": _mapping(score.get("baseline_window")),
+        },
+        "sparkline_points": _sparkline_points(rows),
+        "evidence_refs": sorted(
+            {ref for row in rows for ref in _strings(row.get("evidence_refs"))}
+        ),
+        "source_attention_components": source_components,
+        "score_components": source_components,
+        "degradation_warnings": _list(score.get("degradation_warnings")),
+        "updated_at": updated_at,
+        "visual_encoding": {
+            "size": _float(score.get("heat_score")),
+            "x": _float(score.get("trend_acceleration")),
+            "y": _float(score.get("market_confirmation_score")),
+            "color": str(score.get("momentum_state") or "stable"),
+            "border": _bubble_trust_status(rows),
+            "marker": _float(score.get("evidence_quality_score")),
+        },
+    }
+
+
+def _bubble_trust_status(rows: list[dict[str, Any]]) -> str:
+    statuses = {str(row.get("trust_status") or "") for row in rows}
+    if "trusted_validated" in statuses:
+        return "trusted_validated"
+    return "candidate_untrusted"
+
+
+def _sparkline_points(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "window_start": str(snapshot.get("window_start") or ""),
+            "weighted_attention": _float(snapshot.get("weighted_attention")),
+        }
+        for snapshot in _daily_snapshots(rows)
+    ]
 
 
 def _mining_policy() -> dict[str, Any]:
