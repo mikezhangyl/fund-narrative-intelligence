@@ -30,14 +30,14 @@ Execute Round 2 in dependency order:
 2. Done - `MIK-62` + `MIK-54`: live validation taxonomy and dashboard.
 3. Done - `MIK-63` + `MIK-67`: source event schema and gateway change-request protocol.
 4. Done - `MIK-55`: structured news-to-candidate narrative intake.
-5. Done locally, pending Linear closeout - `MIK-56`: announcement-to-evidence mapping intake.
-6. Done locally, pending Linear closeout - `MIK-65`: fund report artifact contract.
-7. Done locally, pending Linear closeout - `MIK-57`: fund narrative change monitor report.
-8. Done locally, pending Linear closeout - `MIK-58`: reviewable fund report pack.
-9. Done locally, pending Linear closeout - `MIK-66`: governance audit schema and export contract.
-10. Done locally, pending Linear closeout - `MIK-59`: narrative governance audit export.
-11. Done locally, pending Linear closeout - `MIK-64`: durable Narrative Service storage migration path.
-12. `MIK-52` + `MIK-60`: close parent packs after all child issues pass.
+5. Done - `MIK-56`: announcement-to-evidence mapping intake.
+6. Done - `MIK-65`: fund report artifact contract.
+7. Done - `MIK-57`: fund narrative change monitor report.
+8. Done - `MIK-58`: reviewable fund report pack.
+9. Done - `MIK-66`: governance audit schema and export contract.
+10. Done - `MIK-59`: narrative governance audit export.
+11. Done - `MIK-64`: durable Narrative Service storage migration path.
+12. Done - `MIK-52` + `MIK-60`: close parent packs after all child issues pass.
 
 ## Completed Slice Evidence
 
@@ -194,6 +194,21 @@ Execute Round 2 in dependency order:
 - Verification:
   JSON fixture repository behavior matches current `NarrativeStore`, and a
   SQLite-ready fake adapter satisfies the future repository method contract.
+
+### MIK-52 + MIK-60 - Round 2 Parent Closeout
+
+- PM child issues completed in Linear:
+  `MIK-53`, `MIK-54`, `MIK-55`, `MIK-56`, `MIK-57`, `MIK-58`, `MIK-59`.
+- Architecture child issues completed in Linear:
+  `MIK-61`, `MIK-62`, `MIK-63`, `MIK-64`, `MIK-65`, `MIK-66`, `MIK-67`.
+- Round 2 checkpoint range:
+  `7df28b6` through `56e9d46`.
+- Latest full verification:
+  `uv run pytest -q` (`551 passed, 1 skipped`);
+  `uv run python scripts/validate_stock_narrative_service_acceptance.py`
+  (`status=completed`, `endpoint_count=13`).
+- Parent Linear closeout:
+  `MIK-52` and `MIK-60` are ready to mark Done after this evidence checkpoint.
 
 ## Round 3 Queue
 
