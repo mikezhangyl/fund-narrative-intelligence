@@ -88,6 +88,15 @@ python scripts/run_fund_narrative_change_monitor.py
 The MIK-57 acceptance note is
 `docs/product/fund-narrative-change-monitor-2026-05-29.md`.
 
+A static reviewable fund report pack can be built with:
+
+```bash
+python scripts/run_reviewable_fund_report_pack.py --artifact-root <pipeline-output-dir>
+```
+
+The MIK-58 acceptance note is
+`docs/product/reviewable-fund-report-pack-2026-05-29.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

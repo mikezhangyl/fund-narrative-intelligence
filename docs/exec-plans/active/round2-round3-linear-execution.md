@@ -33,7 +33,7 @@ Execute Round 2 in dependency order:
 5. Done locally, pending Linear closeout - `MIK-56`: announcement-to-evidence mapping intake.
 6. Done locally, pending Linear closeout - `MIK-65`: fund report artifact contract.
 7. Done locally, pending Linear closeout - `MIK-57`: fund narrative change monitor report.
-8. `MIK-58`: reviewable fund report pack.
+8. Done locally, pending Linear closeout - `MIK-58`: reviewable fund report pack.
 9. `MIK-66`: governance audit schema and export contract.
 10. `MIK-59`: narrative governance audit export.
 11. `MIK-64`: durable Narrative Service storage migration path.
@@ -120,6 +120,27 @@ Execute Round 2 in dependency order:
   `uv run pytest tests/test_fund_narrative_change_monitor.py tests/test_fund_exposure_comparison_report.py tests/test_fund_narrative_exposure_matrix_report.py -q`
   (`11 passed`);
   `uv run ruff check src/scanners/fund_narrative_change_monitor.py scripts/run_fund_narrative_change_monitor.py tests/test_fund_narrative_change_monitor.py`.
+
+### MIK-58 - Reviewable Fund Report Pack
+
+- TDD red: `uv run pytest tests/test_reviewable_fund_report_pack.py -q`
+  initially failed on missing `scripts.run_reviewable_fund_report_pack`.
+- TDD green: `uv run pytest tests/test_reviewable_fund_report_pack.py -q`
+  passed with 3 tests.
+- Pipeline fixture:
+  `uv run python -m src.main --fund-code 000001 --provider-mode mock --output-dir outputs/reviewable_fund_report_pack/2026-05-29-mik-58-pipeline`
+- Pack fixture:
+  `uv run python scripts/run_reviewable_fund_report_pack.py --artifact-root outputs/reviewable_fund_report_pack/2026-05-29-mik-58-pipeline --output-dir outputs/reviewable_fund_report_pack/2026-05-29-mik-58-fixture --reference-artifact fund_holding_exposure=fund_holding_exposure_report.html --reference-artifact narrative_matrix=fund_narrative_exposure_matrix_report.html --reference-artifact mapping_evidence_pack=mapping_evidence_pack_report.html --reference-artifact change_monitor=fund_narrative_change_monitor_report.html`
+- Output JSON:
+  `outputs/reviewable_fund_report_pack/2026-05-29-mik-58-fixture/reviewable_fund_report_pack.json`
+- Output HTML:
+  `outputs/reviewable_fund_report_pack/2026-05-29-mik-58-fixture/reviewable_fund_report_pack.html`
+- Product note:
+  `docs/product/reviewable-fund-report-pack-2026-05-29.md`
+- Verification:
+  `uv run pytest tests/test_reviewable_fund_report_pack.py tests/test_fund_report_artifact_contract.py tests/test_workspace_snapshot.py -q`
+  (`23 passed`);
+  `uv run ruff check src/scanners/reviewable_fund_report_pack.py scripts/run_reviewable_fund_report_pack.py tests/test_reviewable_fund_report_pack.py`.
 
 ## Round 3 Queue
 
