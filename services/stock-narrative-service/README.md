@@ -45,6 +45,9 @@ First slice scope:
 - Narrative Radar ownership contract and source-signal replay endpoints:
   `/api/v1/narratives/radar/contract` and
   `/api/v1/narratives/radar/signals`.
+- deterministic Narrative Radar score endpoint:
+  `/api/v1/narratives/radar/scores`, with market confirmation consumed only
+  through a normalized mockable contract path.
 
 Non-goals:
 

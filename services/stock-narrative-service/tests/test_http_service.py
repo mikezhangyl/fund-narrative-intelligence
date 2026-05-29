@@ -1280,6 +1280,7 @@ def test_radar_contract_declares_service_ownership_score_schema_and_metadata(tmp
     assert payload["service_owned_endpoints"] == [
         "/api/v1/narratives/radar/contract",
         "/api/v1/narratives/radar/signals",
+        "/api/v1/narratives/radar/scores",
         "/api/v1/narratives/radar/bubbles",
         "/api/v1/narratives/radar/evidence",
     ]
@@ -1440,6 +1441,146 @@ def test_radar_signals_replay_fixture_events_into_time_series_snapshots(tmp_path
     assert not config.intake_ledger_path.exists()
 
 
+def test_radar_scores_are_deterministic_and_mark_sustained_heating(tmp_path):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [
+                    _radar_event("EVT_ROBOT_D1", "2026-05-26T10:00:00+08:00", 0.3),
+                    _radar_event("EVT_ROBOT_D2", "2026-05-27T10:00:00+08:00", 0.5),
+                    _radar_event("EVT_ROBOT_D3A", "2026-05-28T10:00:00+08:00", 0.8),
+                    _radar_event(
+                        "EVT_ROBOT_D3B",
+                        "2026-05-28T15:30:00+08:00",
+                        0.7,
+                        source_type="announcement",
+                        source_weight=1.2,
+                    ),
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    config.market_confirmation_path.parent.mkdir(parents=True, exist_ok=True)
+    config.market_confirmation_path.write_text(
+        json.dumps(
+            {
+                "version": "radar-market-confirmation-v1",
+                "items": [
+                    {
+                        "candidate_narrative_id": "C_ROBOT",
+                        "market_confirmation_score": 64,
+                        "status": "available",
+                        "source": "gateway_contract_fixture",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(
+            f"{base_url}/api/v1/narratives/radar/scores"
+            "?as_of=2026-05-29T00:00:00+08:00"
+            "&window_days=1&baseline_days=3&half_life_hours=24"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    assert response["status"] == "available"
+    payload = response["data"]
+    assert payload["version"] == "narrative-radar-scores-v1"
+    assert payload["scoring_config"] == {
+        "as_of": "2026-05-29T00:00:00+08:00",
+        "window_days": 1,
+        "baseline_days": 3,
+        "recency_decay_half_life_hours": 24.0,
+        "formula_version": "radar-deterministic-v0",
+    }
+    assert payload["market_confirmation_adapter"] == {
+        "adapter": "local_contract_fixture",
+        "source_owner": "gateway",
+        "direct_provider_access": False,
+        "path": str(config.market_confirmation_path),
+    }
+    score = payload["scores"][0]
+    assert score["candidate_narrative_id"] == "C_ROBOT"
+    assert score["narrative_name"] == "机器人执行器"
+    assert score["heat_score"] == 82.0
+    assert score["trend_score"] == 79.55
+    assert score["trend_acceleration"] == 27.8
+    assert score["momentum_state"] == "heating"
+    assert score["market_confirmation_score"] == 64.0
+    assert score["evidence_quality_score"] == 100.0
+    assert score["formula_version"] == "radar-deterministic-v0"
+    assert score["window_start"] == "2026-05-28T00:00:00+08:00"
+    assert score["window_end"] == "2026-05-29T00:00:00+08:00"
+    assert score["baseline_window"] == {
+        "window_start": "2026-05-26T00:00:00+08:00",
+        "window_end": "2026-05-28T00:00:00+08:00",
+        "average_weighted_attention": 0.16,
+    }
+    assert score["source_attention_components"] == {
+        "current_weighted_attention": 1.64,
+        "baseline_weighted_attention": 0.33,
+        "baseline_daily_average": 0.16,
+        "previous_window_weighted_attention": 0.25,
+        "source_signal_count": 4,
+        "current_source_signal_count": 2,
+    }
+    assert score["degradation_warnings"] == []
+    assert "AI" not in json.dumps(score, ensure_ascii=False)
+
+
+def test_radar_scores_degrade_market_confirmation_without_suppressing_source_heat(
+    tmp_path,
+):
+    config = _write_seed_files(tmp_path)
+    config.candidate_events_path.write_text(
+        json.dumps(
+            {
+                "version": "candidate-narrative-events-v1",
+                "events": [
+                    _radar_event("EVT_ROBOT_CURRENT", "2026-05-28T10:00:00+08:00", 0.9)
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    server = create_server(("127.0.0.1", 0), config=config)
+    thread = _start(server)
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        response = _get_json(
+            f"{base_url}/api/v1/narratives/radar/scores"
+            "?as_of=2026-05-29T00:00:00+08:00"
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    score = response["data"]["scores"][0]
+    assert response["status"] == "available"
+    assert score["heat_score"] > 0
+    assert score["market_confirmation_score"] == 0.0
+    assert score["degradation_warnings"] == [
+        {
+            "code": "MARKET_CONFIRMATION_MISSING",
+            "message": "No normalized market confirmation is available for C_ROBOT.",
+            "classification": "source_degraded",
+        }
+    ]
+    assert response["data"]["degradation_warnings"] == score["degradation_warnings"]
+    assert response["data"]["market_confirmation_adapter"]["direct_provider_access"] is False
+    assert not config.intake_ledger_path.exists()
+
+
 def test_unknown_route_returns_error_envelope(tmp_path):
     config = _write_seed_files(tmp_path)
     server = create_server(("127.0.0.1", 0), config=config)
@@ -1465,6 +1606,7 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
     intake_ledger_path = tmp_path / "runtime" / "intake_events.json"
     review_actions_path = tmp_path / "runtime" / "review_actions.json"
     promotion_decisions_path = tmp_path / "runtime" / "promotion_decisions.json"
+    market_confirmation_path = tmp_path / "runtime" / "radar_market_confirmation.json"
     registry_path.write_text(
         json.dumps(
             {
@@ -1529,6 +1671,7 @@ def _write_seed_files(tmp_path: Path) -> ServiceConfig:
         intake_ledger_path=intake_ledger_path,
         review_actions_path=review_actions_path,
         promotion_decisions_path=promotion_decisions_path,
+        market_confirmation_path=market_confirmation_path,
     )
 
 
@@ -1574,6 +1717,47 @@ def _write_detail_evidence_pack(config: ServiceConfig) -> None:
         ),
         encoding="utf-8",
     )
+
+
+def _radar_event(
+    event_id: str,
+    event_time: str,
+    confidence: float,
+    *,
+    source_type: str = "news",
+    source_weight: float | None = None,
+) -> dict:
+    event = {
+        "event_id": event_id,
+        "source_type": source_type,
+        "event_time": event_time,
+        "ingested_at": event_time,
+        "title": f"机器人执行器 signal {event_id}",
+        "source_url": f"gateway://radar/{event_id}",
+        "stock_codes": ["300124"],
+        "extracted_entities": {
+            "tickers": ["300124"],
+            "sectors": ["机器人"],
+            "concepts": ["执行器"],
+            "keywords": ["订单", "执行器"],
+        },
+        "source_metadata": {
+            "provider": "gateway_news_briefs",
+            "permission_status": "licensed",
+            "degradation_state": "available",
+        },
+        "candidate_narratives": [
+            {
+                "candidate_narrative_id": "C_ROBOT",
+                "name": "机器人执行器",
+                "confidence": confidence,
+                "representative_citation_ids": [f"SRC_{event_id}"],
+            }
+        ],
+    }
+    if source_weight is not None:
+        event["source_weight"] = source_weight
+    return event
 
 
 def _start(server):

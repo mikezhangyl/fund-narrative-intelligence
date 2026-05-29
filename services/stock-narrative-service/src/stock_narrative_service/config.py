@@ -26,5 +26,8 @@ class ServiceConfig:
     promotion_decisions_path: Path = (
         SERVICE_ROOT / "data" / "runtime" / "promotion_decisions.json"
     )
+    market_confirmation_path: Path = (
+        SERVICE_ROOT / "data" / "runtime" / "radar_market_confirmation.json"
+    )
     provider_name: str = "stock-narrative-service"
     provider_version: str = "v0"

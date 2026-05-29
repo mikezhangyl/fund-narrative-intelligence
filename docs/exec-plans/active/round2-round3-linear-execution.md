@@ -215,8 +215,8 @@ Execute Round 2 in dependency order:
 Execute Round 3 after Round 2 foundations, unless a Round 2 slice directly
 unblocks a radar slice earlier:
 
-1. Done locally, pending Linear closeout - `MIK-80` + `MIK-81` + `MIK-82`: ownership, score schema, time-series model.
-2. `MIK-75`: deterministic heat and trend scoring.
+1. Done - `MIK-80` + `MIK-81` + `MIK-82`: ownership, score schema, time-series model.
+2. Done locally, pending Linear closeout - `MIK-75` + `MIK-83`: deterministic heat/trend scoring and market confirmation adapter boundary.
 3. `MIK-76`: structured source mining into candidate narrative signals.
 4. `MIK-74` + `MIK-84`: radar bubble API and visualization contract.
 5. `MIK-77` + `MIK-85`: evidence drill-down and review/trust integration.
@@ -254,6 +254,35 @@ unblocks a radar slice earlier:
   `docs/product/narrative-radar-service-boundary-and-model-2026-05-29.html`
   with auxiliary Markdown at
   `docs/product/narrative-radar-service-boundary-and-model-2026-05-29.md`.
+
+### MIK-75 + MIK-83 - Radar Scoring And Market Confirmation Boundary
+
+- TDD red:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py -q`
+  failed on missing scoring endpoint and market confirmation config behavior.
+- TDD green:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py::test_radar_scores_are_deterministic_and_mark_sustained_heating services/stock-narrative-service/tests/test_http_service.py::test_radar_scores_degrade_market_confirmation_without_suppressing_source_heat -q`
+  passed with 2 tests.
+- Targeted regression:
+  `uv run pytest services/stock-narrative-service/tests/test_http_service.py services/stock-narrative-service/tests/test_storage_repository_contract.py -q`
+  passed with 35 tests.
+- Static checks:
+  `uv run ruff check services/stock-narrative-service/src/stock_narrative_service services/stock-narrative-service/tests/test_http_service.py`.
+- Compile:
+  `uv run python -m compileall -q services/stock-narrative-service/src services/stock-narrative-service/tests`.
+- Service endpoint:
+  `GET /api/v1/narratives/radar/scores` returns deterministic
+  `radar-deterministic-v0` heat, trend, acceleration, momentum, evidence
+  quality, market confirmation, source attention components, and window
+  metadata.
+- Market confirmation boundary:
+  `ServiceConfig.market_confirmation_path` supplies a mockable normalized
+  contract adapter; missing confirmation produces degraded metadata without
+  suppressing source-driven heat.
+- Product note:
+  `docs/product/narrative-radar-scoring-and-confirmation-2026-05-29.html`
+  with auxiliary Markdown at
+  `docs/product/narrative-radar-scoring-and-confirmation-2026-05-29.md`.
 
 ## Duplicate / Legacy Round 3 Issues
 

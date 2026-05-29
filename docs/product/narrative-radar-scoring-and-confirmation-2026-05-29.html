@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Narrative Radar 评分与市场确认边界 - 2026-05-29</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.65; margin: 40px auto; max-width: 920px; color: #172033; }
+    h1, h2 { line-height: 1.25; }
+    code { background: #f3f5f8; border-radius: 4px; padding: 1px 5px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d8dee8; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f6f8fb; }
+    .note { background: #f8fbff; border-left: 4px solid #2870c9; padding: 12px 14px; }
+  </style>
+</head>
+<body>
+  <h1>Narrative Radar 评分与市场确认边界</h1>
+  <p><strong>日期：</strong>2026-05-29</p>
+  <p><strong>覆盖 Linear：</strong>MIK-75、MIK-83</p>
+
+  <h2>服务接口</h2>
+  <p>Narrative Service 现在提供 <code>GET /api/v1/narratives/radar/scores</code>。接口支持 <code>as_of</code>、<code>window_days</code>、<code>baseline_days</code>、<code>half_life_hours</code> 查询参数，并返回公式版本 <code>radar-deterministic-v0</code> 的 deterministic score。</p>
+
+  <h2>Score 字段</h2>
+  <table>
+    <thead><tr><th>字段</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td><code>heat_score</code></td><td>当前窗口内的加权来源注意力。</td></tr>
+      <tr><td><code>trend_score</code></td><td>当前窗口相对于 baseline window 的升温程度。</td></tr>
+      <tr><td><code>trend_acceleration</code></td><td>当前窗口相对于上一窗口的变化幅度。</td></tr>
+      <tr><td><code>momentum_state</code></td><td><code>emerging</code>、<code>heating</code>、<code>stable</code> 或 <code>cooling</code>。</td></tr>
+      <tr><td><code>market_confirmation_score</code></td><td>归一化市场确认输入，不作为 narrative source text。</td></tr>
+      <tr><td><code>evidence_quality_score</code></td><td>来源类型、证据引用和审阅状态相关的证据质量。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>市场确认边界</h2>
+  <p>市场确认通过 mockable local contract adapter 接入，读取 <code>ServiceConfig.market_confirmation_path</code> 的归一化确认记录。Gateway 仍然拥有外部市场数据和 provider 访问；Narrative Service 不直接接入 Tushare、AkShare、EastMoney 或其他 raw provider。</p>
+  <p class="note">缺失 market confirmation 会生成 degraded metadata，但不会压制由来源证据支撑的 heat score。</p>
+
+  <h2>验收</h2>
+  <ul>
+    <li>RED：service HTTP 测试先因 scoring endpoint/config 缺失失败。</li>
+    <li>GREEN：两个 scoring 测试通过。</li>
+    <li>回归：service HTTP + storage repository 测试 <code>35 passed</code>。</li>
+    <li>静态检查：service package 和 HTTP 测试的 ruff check 通过。</li>
+    <li>编译检查：service src/tests compileall 通过。</li>
+  </ul>
+</body>
+</html>

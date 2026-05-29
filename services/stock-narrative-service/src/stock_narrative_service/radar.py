@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 from stock_narrative_service.config import ServiceConfig
@@ -30,6 +32,7 @@ def radar_contract(config: ServiceConfig) -> dict[str, Any]:
         "service_owned_endpoints": [
             "/api/v1/narratives/radar/contract",
             "/api/v1/narratives/radar/signals",
+            "/api/v1/narratives/radar/scores",
             "/api/v1/narratives/radar/bubbles",
             "/api/v1/narratives/radar/evidence",
         ],
@@ -115,6 +118,59 @@ def radar_source_signals(events: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def radar_scores(
+    *,
+    events: list[dict[str, Any]],
+    config: ServiceConfig,
+    as_of: str = "",
+    window_days: Any = "",
+    baseline_days: Any = "",
+    half_life_hours: Any = "",
+) -> dict[str, Any]:
+    scoring_config = _scoring_config(
+        as_of=as_of,
+        window_days=window_days,
+        baseline_days=baseline_days,
+        half_life_hours=half_life_hours,
+    )
+    signals = radar_source_signals(events)["signals"]
+    adapter = LocalMarketConfirmationAdapter(config.market_confirmation_path)
+    confirmations = adapter.confirmations_by_candidate()
+    scores = [
+        _score_candidate(
+            candidate_id=candidate_id,
+            rows=rows,
+            scoring_config=scoring_config,
+            market_confirmation=confirmations.get(candidate_id, {}),
+        )
+        for candidate_id, rows in _signals_by_candidate(signals).items()
+    ]
+    warnings = [
+        warning
+        for score in scores
+        for warning in _list(score.get("degradation_warnings"))
+    ]
+    return {
+        "version": "narrative-radar-scores-v1",
+        "scoring_config": {
+            "as_of": scoring_config["as_of"].isoformat(),
+            "window_days": scoring_config["window_days"],
+            "baseline_days": scoring_config["baseline_days"],
+            "recency_decay_half_life_hours": scoring_config["half_life_hours"],
+            "formula_version": RADAR_FORMULA_VERSION,
+        },
+        "market_confirmation_adapter": adapter.metadata(),
+        "scores": sorted(
+            scores,
+            key=lambda item: (
+                -_float(item.get("heat_score")),
+                str(item.get("candidate_narrative_id") or ""),
+            ),
+        ),
+        "degradation_warnings": warnings,
+    }
+
+
 def radar_source_model() -> dict[str, Any]:
     return {
         "storage_model": "append_only_source_signal_ledger",
@@ -149,6 +205,242 @@ def radar_source_model() -> dict[str, Any]:
         ),
         "negative_cache_policy": "failed upstream/provider attempts are not cached",
     }
+
+
+class LocalMarketConfirmationAdapter:
+    def __init__(self, path: Path):
+        self.path = path
+
+    def metadata(self) -> dict[str, Any]:
+        return {
+            "adapter": "local_contract_fixture",
+            "source_owner": "gateway",
+            "direct_provider_access": False,
+            "path": str(self.path),
+        }
+
+    def confirmations_by_candidate(self) -> dict[str, dict[str, Any]]:
+        if not self.path.exists():
+            return {}
+        payload = json.loads(self.path.read_text(encoding="utf-8"))
+        return {
+            str(item.get("candidate_narrative_id") or ""): dict(item)
+            for item in _list(payload.get("items"))
+            if item.get("candidate_narrative_id")
+        }
+
+
+def _scoring_config(
+    *,
+    as_of: str,
+    window_days: Any,
+    baseline_days: Any,
+    half_life_hours: Any,
+) -> dict[str, Any]:
+    return {
+        "as_of": _parse_datetime(as_of) if as_of else datetime.now(UTC),
+        "window_days": max(1, int(_float(window_days, default=1))),
+        "baseline_days": max(2, int(_float(baseline_days, default=7))),
+        "half_life_hours": max(1.0, _float(half_life_hours, default=24.0)),
+    }
+
+
+def _signals_by_candidate(
+    signals: list[dict[str, Any]],
+) -> dict[str, list[dict[str, Any]]]:
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for signal in signals:
+        candidate_id = str(signal.get("candidate_narrative_id") or "")
+        if not candidate_id:
+            continue
+        grouped[candidate_id] = [*grouped.get(candidate_id, []), signal]
+    return grouped
+
+
+def _score_candidate(
+    *,
+    candidate_id: str,
+    rows: list[dict[str, Any]],
+    scoring_config: dict[str, Any],
+    market_confirmation: dict[str, Any],
+) -> dict[str, Any]:
+    as_of = scoring_config["as_of"]
+    window_days = int(scoring_config["window_days"])
+    baseline_days = int(scoring_config["baseline_days"])
+    half_life_hours = float(scoring_config["half_life_hours"])
+    window_start_dt = as_of - timedelta(days=window_days)
+    baseline_start_dt = as_of - timedelta(days=baseline_days)
+    current_rows = _rows_between(rows, start=window_start_dt, end=as_of)
+    baseline_rows = _rows_between(rows, start=baseline_start_dt, end=window_start_dt)
+    previous_rows = _rows_between(
+        rows,
+        start=window_start_dt - timedelta(days=window_days),
+        end=window_start_dt,
+    )
+    current_attention = _attention(
+        current_rows,
+        window_start=window_start_dt,
+        half_life_hours=half_life_hours,
+    )
+    baseline_attention = _attention(
+        baseline_rows,
+        window_start=window_start_dt,
+        half_life_hours=half_life_hours,
+    )
+    previous_attention = _attention(
+        previous_rows,
+        window_start=window_start_dt,
+        half_life_hours=half_life_hours,
+    )
+    baseline_day_count = max(1, baseline_days - window_days)
+    baseline_daily_average = baseline_attention / baseline_day_count
+    market_score, market_warnings = _market_confirmation_score(
+        candidate_id=candidate_id,
+        confirmation=market_confirmation,
+    )
+    score_warnings = [
+        *_degradation_warnings(rows),
+        *market_warnings,
+    ]
+    return {
+        "candidate_narrative_id": candidate_id,
+        "narrative_name": _narrative_name(rows, candidate_id),
+        "heat_score": round(min(100.0, current_attention * 50.0), 2),
+        "trend_score": round(
+            max(0.0, min(100.0, 50.0 + (current_attention - baseline_daily_average) * 20.0)),
+            2,
+        ),
+        "trend_acceleration": round((current_attention - previous_attention) * 20.0, 2),
+        "momentum_state": _momentum_state(
+            current_attention=current_attention,
+            previous_attention=previous_attention,
+            baseline_daily_average=baseline_daily_average,
+        ),
+        "market_confirmation_score": market_score,
+        "evidence_quality_score": _evidence_quality_score(rows),
+        "source_attention_components": {
+            "current_weighted_attention": round(current_attention, 2),
+            "baseline_weighted_attention": round(baseline_attention, 2),
+            "baseline_daily_average": round(baseline_daily_average, 2),
+            "previous_window_weighted_attention": round(previous_attention, 2),
+            "source_signal_count": len(rows),
+            "current_source_signal_count": len(current_rows),
+        },
+        "window_start": window_start_dt.isoformat(),
+        "window_end": as_of.isoformat(),
+        "baseline_window": {
+            "window_start": baseline_start_dt.isoformat(),
+            "window_end": window_start_dt.isoformat(),
+            "average_weighted_attention": round(baseline_daily_average, 2),
+        },
+        "formula_version": RADAR_FORMULA_VERSION,
+        "degradation_warnings": score_warnings,
+    }
+
+
+def _rows_between(
+    rows: list[dict[str, Any]],
+    *,
+    start: datetime,
+    end: datetime,
+) -> list[dict[str, Any]]:
+    return [
+        row
+        for row in rows
+        if start <= _parse_datetime(str(row.get("event_time") or "")) < end
+    ]
+
+
+def _attention(
+    rows: list[dict[str, Any]],
+    *,
+    window_start: datetime,
+    half_life_hours: float,
+) -> float:
+    return sum(
+        _float(row.get("weighted_attention"))
+        * _recency_decay(
+            event_time=_parse_datetime(str(row.get("event_time") or "")),
+            window_start=window_start,
+            half_life_hours=half_life_hours,
+        )
+        for row in rows
+    )
+
+
+def _recency_decay(
+    *,
+    event_time: datetime,
+    window_start: datetime,
+    half_life_hours: float,
+) -> float:
+    if event_time >= window_start:
+        return 1.0
+    half_life_days = max(1.0 / 24.0, half_life_hours / 24.0)
+    days_back = max(0, (window_start.date() - event_time.date()).days)
+    return 0.5 ** (days_back / half_life_days)
+
+
+def _market_confirmation_score(
+    *,
+    candidate_id: str,
+    confirmation: dict[str, Any],
+) -> tuple[float, list[dict[str, str]]]:
+    if not confirmation:
+        return 0.0, [
+            {
+                "code": "MARKET_CONFIRMATION_MISSING",
+                "message": (
+                    f"No normalized market confirmation is available for {candidate_id}."
+                ),
+                "classification": "source_degraded",
+            }
+        ]
+    status = str(confirmation.get("status") or "available")
+    score = round(_float(confirmation.get("market_confirmation_score")), 2)
+    if status == "available":
+        return score, []
+    return score, [
+        {
+            "code": "MARKET_CONFIRMATION_DEGRADED",
+            "message": (
+                f"Market confirmation for {candidate_id} is {status}; source heat "
+                "is retained."
+            ),
+            "classification": "source_degraded",
+        }
+    ]
+
+
+def _evidence_quality_score(rows: list[dict[str, Any]]) -> float:
+    source_types = {str(row.get("source_type") or "") for row in rows}
+    rows_with_refs = [row for row in rows if _strings(row.get("evidence_refs"))]
+    reference_ratio = len(rows_with_refs) / len(rows) if rows else 0.0
+    score = 40.0 + min(2, len(source_types)) * 20.0 + reference_ratio * 20.0
+    return round(min(100.0, score), 2)
+
+
+def _momentum_state(
+    *,
+    current_attention: float,
+    previous_attention: float,
+    baseline_daily_average: float,
+) -> str:
+    if current_attention >= previous_attention > baseline_daily_average:
+        return "heating"
+    if current_attention > baseline_daily_average and previous_attention == 0:
+        return "emerging"
+    if current_attention < previous_attention:
+        return "cooling"
+    return "stable"
+
+
+def _narrative_name(rows: list[dict[str, Any]], candidate_id: str) -> str:
+    for row in rows:
+        name = str(row.get("narrative_name") or "").strip()
+        if name:
+            return name
+    return candidate_id
 
 
 def _signals_from_event(event: dict[str, Any]) -> list[dict[str, Any]]:
@@ -334,6 +626,9 @@ def _parse_datetime(value: str) -> datetime:
     cleaned = str(value or "").strip()
     if cleaned.endswith("Z"):
         cleaned = f"{cleaned[:-1]}+00:00"
+    if " " in cleaned and cleaned.rsplit(" ", 1)[-1].count(":") == 1:
+        prefix, offset = cleaned.rsplit(" ", 1)
+        cleaned = f"{prefix}+{offset}"
     if not cleaned:
         return datetime.now(UTC)
     parsed = datetime.fromisoformat(cleaned)
