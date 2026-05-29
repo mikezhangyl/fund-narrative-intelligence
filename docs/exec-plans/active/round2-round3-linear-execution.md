@@ -31,7 +31,7 @@ Execute Round 2 in dependency order:
 3. Done - `MIK-63` + `MIK-67`: source event schema and gateway change-request protocol.
 4. Done - `MIK-55`: structured news-to-candidate narrative intake.
 5. Done locally, pending Linear closeout - `MIK-56`: announcement-to-evidence mapping intake.
-6. `MIK-65`: fund report artifact contract.
+6. Done locally, pending Linear closeout - `MIK-65`: fund report artifact contract.
 7. `MIK-57`: fund narrative change monitor report.
 8. `MIK-58`: reviewable fund report pack.
 9. `MIK-66`: governance audit schema and export contract.
@@ -79,6 +79,28 @@ Execute Round 2 in dependency order:
   `uv run pytest tests/test_announcement_mapping_intake.py tests/test_mapping_evidence_pack_report.py tests/test_source_event_schema.py -q`
   (`10 passed`);
   `uv run ruff check src/scanners/announcement_mapping_intake.py scripts/run_announcement_mapping_intake.py tests/test_announcement_mapping_intake.py`.
+
+### MIK-65 - Fund Report Artifact Contract
+
+- TDD red: `uv run pytest tests/test_fund_report_artifact_contract.py -q`
+  initially failed on missing `run_id`, missing contract config, old missing
+  artifact error shape, and missing HTML JSON artifact links.
+- TDD green: `uv run pytest tests/test_fund_report_artifact_contract.py -q`
+  passed with 3 tests.
+- Contract config:
+  `config/fund_report_artifact_contract.json`
+- Product note:
+  `docs/product/fund-report-artifact-contract-2026-05-29.md`
+- Fixture acceptance:
+  `uv run python -m src.main --fund-code 000001 --provider-mode mock --output-dir outputs/fund_report_artifact_contract/2026-05-29-mik-65-pipeline`
+- Manifest validation:
+  `uv run python -m src.main --validate-artifact-manifest outputs/fund_report_artifact_contract/2026-05-29-mik-65-pipeline/fund_000001_manifest.json`
+- Workspace build validation:
+  `uv run python -m src.main --build-workspace-snapshot outputs/fund_report_artifact_contract/2026-05-29-mik-65-pipeline`
+- Verification:
+  `uv run pytest tests/test_fund_report_artifact_contract.py tests/test_workspace_snapshot.py tests/test_v1_acceptance_script.py -q`
+  (`24 passed`);
+  `uv run pytest -q` (`540 passed, 1 skipped`).
 
 ## Round 3 Queue
 

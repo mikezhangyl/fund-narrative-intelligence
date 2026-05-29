@@ -75,6 +75,10 @@ keeps missing source URL/date as visible quality gaps, and never writes trusted
 mapping state. The MIK-56 acceptance note is
 `docs/product/announcement-mapping-intake-2026-05-29.md`.
 
+Fund report packs now have a stable artifact manifest contract at
+`config/fund_report_artifact_contract.json`. The MIK-65 acceptance note is
+`docs/product/fund-report-artifact-contract-2026-05-29.md`.
+
 Narrative intelligence remains a future independent service boundary. FNI may
 keep local prototypes for report integration and contract discovery, but the
 future service should own registry lifecycle, stock mapping lifecycle, evidence

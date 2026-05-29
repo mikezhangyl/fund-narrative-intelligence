@@ -52,6 +52,7 @@ from src.validation import (
     validate_financial_metrics_payload,
     validate_market_quote_payload,
     validate_news_evidence_payload,
+    validate_pipeline_artifact_manifest_payload,
     validate_valuation_snapshot_payload,
 )
 
@@ -634,7 +635,17 @@ def run_pipeline(
         ),
         source_table_path,
     )
-    report_paths = write_reports(scoring_payload, output_path)
+    report_paths = write_reports(
+        scoring_payload,
+        output_path,
+        artifact_links={
+            "Raw JSON": raw_path.name,
+            "Scoring JSON": scoring_path.name,
+            "Review Queue JSON": review_queue_path.name,
+            "Source Table JSON": source_table_path.name,
+            "Signal Trace JSON": signal_trace_path.name,
+        },
+    )
     manifest_payload = _artifact_manifest(
         fund_code=fund_code,
         as_of_date=as_of_date,
@@ -652,6 +663,7 @@ def run_pipeline(
             "html": report_paths["html"],
         },
     )
+    validate_pipeline_artifact_manifest_payload(manifest_payload)
     write_json_artifact(manifest_payload, manifest_path)
 
     return {
@@ -675,20 +687,84 @@ def _artifact_manifest(
 ) -> dict[str, Any]:
     return {
         "version": "pipeline-artifact-manifest-v1",
+        "run_id": _run_id(fund_code=fund_code, as_of_date=as_of_date),
+        "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "fund_code": fund_code,
         "as_of_date": as_of_date,
         "provider_mode": provider_mode,
         "data_quality": data_quality,
         "web_ready": True,
+        "source_modes": _manifest_source_modes(
+            provider_mode=provider_mode,
+            provider_foundation=provider_foundation,
+        ),
+        "warning_counts": _manifest_warning_counts(
+            provider_foundation=provider_foundation,
+            degradation_events=degradation_events,
+        ),
+        "trust_states": {
+            "candidate_outputs": "candidate_untrusted",
+            "report_pack": "review_required",
+            "trusted_promotion": "disabled",
+        },
         "provider_foundation": provider_foundation,
         "degradation_events": degradation_events,
         "artifacts": {
             key: {
                 "path": path.name,
                 "format": _artifact_format(path),
+                "source_control": "generated_output_only",
+                "reader_surface": key == "html",
             }
             for key, path in artifact_paths.items()
         },
+    }
+
+
+def _run_id(*, fund_code: str, as_of_date: str) -> str:
+    return f"fund_{fund_code}_{as_of_date.replace('-', '')}"
+
+
+def _manifest_source_modes(
+    *,
+    provider_mode: str,
+    provider_foundation: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "provider_mode": provider_mode,
+        "effective_data_quality": provider_foundation["effective_data_quality"],
+        "layers": {
+            key: {
+                "provider_name": layer["provider_name"],
+                "data_quality": layer["data_quality"],
+                "is_mock": bool(layer["is_mock"]),
+            }
+            for key, layer in provider_foundation["layers"].items()
+        },
+    }
+
+
+def _manifest_warning_counts(
+    *,
+    provider_foundation: dict[str, Any],
+    degradation_events: list[dict[str, str]],
+) -> dict[str, int]:
+    layers = list(provider_foundation["layers"].values())
+    mock_layer_count = sum(1 for layer in layers if layer["is_mock"])
+    unavailable_layer_count = sum(1 for layer in layers if layer["data_quality"] == "unavailable")
+    partial_layer_count = sum(1 for layer in layers if layer["data_quality"] == "partial")
+    degradation_event_count = len(degradation_events)
+    return {
+        "degradation_event_count": degradation_event_count,
+        "mock_layer_count": mock_layer_count,
+        "unavailable_layer_count": unavailable_layer_count,
+        "partial_layer_count": partial_layer_count,
+        "total_warning_count": (
+            degradation_event_count
+            + mock_layer_count
+            + unavailable_layer_count
+            + partial_layer_count
+        ),
     }
 
 

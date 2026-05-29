@@ -722,11 +722,16 @@ def validate_pipeline_artifact_manifest_payload(payload: dict[str, Any]) -> None
         payload,
         {
             "version",
+            "run_id",
+            "generated_at",
             "fund_code",
             "as_of_date",
             "provider_mode",
             "data_quality",
             "web_ready",
+            "source_modes",
+            "warning_counts",
+            "trust_states",
             "provider_foundation",
             "degradation_events",
             "artifacts",
@@ -735,7 +740,14 @@ def validate_pipeline_artifact_manifest_payload(payload: dict[str, Any]) -> None
     )
     if payload["version"] != "pipeline-artifact-manifest-v1":
         raise ProviderContractError("pipeline artifact manifest version is unsupported")
-    for field in {"fund_code", "as_of_date", "provider_mode", "data_quality"}:
+    for field in {
+        "run_id",
+        "generated_at",
+        "fund_code",
+        "as_of_date",
+        "provider_mode",
+        "data_quality",
+    }:
         if not isinstance(payload[field], str) or not payload[field]:
             raise ProviderContractError(
                 f"pipeline artifact manifest {field} must be a non-empty string"
@@ -750,6 +762,9 @@ def validate_pipeline_artifact_manifest_payload(payload: dict[str, Any]) -> None
         raise ProviderContractError(
             "pipeline artifact manifest degradation_events must be a list"
         )
+    _validate_pipeline_manifest_source_modes(payload)
+    _validate_pipeline_manifest_warning_counts(payload)
+    _validate_pipeline_manifest_trust_states(payload["trust_states"])
     _validate_pipeline_manifest_artifacts(payload["artifacts"])
 
 
@@ -1412,7 +1427,7 @@ def _validate_pipeline_manifest_artifacts(artifacts: Any) -> None:
         context = f"pipeline artifact manifest artifacts.{key}"
         artifact = artifacts[key]
         _require_mapping(artifact, context)
-        _require_keys(artifact, {"path", "format"}, context)
+        _require_keys(artifact, {"path", "format", "source_control", "reader_surface"}, context)
         path = artifact["path"]
         if not isinstance(path, str) or not path:
             raise ProviderContractError(f"{context}.path must be a non-empty string")
@@ -1420,6 +1435,13 @@ def _validate_pipeline_manifest_artifacts(artifacts: Any) -> None:
             raise ProviderContractError(f"{context}.path must be a relative file path")
         if artifact["format"] != expected_format:
             raise ProviderContractError(f"{context}.format must be {expected_format}")
+        if artifact["source_control"] not in {
+            "generated_output_only",
+            "source_controlled",
+        }:
+            raise ProviderContractError(f"{context}.source_control is unsupported")
+        if not isinstance(artifact["reader_surface"], bool):
+            raise ProviderContractError(f"{context}.reader_surface must be boolean")
     signal_trace = artifacts.get("signal_trace")
     if signal_trace is not None:
         _validate_manifest_artifact_descriptor(
@@ -1436,7 +1458,7 @@ def _validate_manifest_artifact_descriptor(
 ) -> None:
     context = f"pipeline artifact manifest artifacts.{artifact_key}"
     _require_mapping(artifact, context)
-    _require_keys(artifact, {"path", "format"}, context)
+    _require_keys(artifact, {"path", "format", "source_control", "reader_surface"}, context)
     path = artifact["path"]
     if not isinstance(path, str) or not path:
         raise ProviderContractError(f"{context}.path must be a non-empty string")
@@ -1444,6 +1466,102 @@ def _validate_manifest_artifact_descriptor(
         raise ProviderContractError(f"{context}.path must be a relative file path")
     if artifact["format"] != expected_format:
         raise ProviderContractError(f"{context}.format must be {expected_format}")
+    if artifact["source_control"] not in {
+        "generated_output_only",
+        "source_controlled",
+    }:
+        raise ProviderContractError(f"{context}.source_control is unsupported")
+    if not isinstance(artifact["reader_surface"], bool):
+        raise ProviderContractError(f"{context}.reader_surface must be boolean")
+
+
+def _validate_pipeline_manifest_source_modes(payload: dict[str, Any]) -> None:
+    source_modes = payload["source_modes"]
+    _require_mapping(source_modes, "pipeline artifact manifest source_modes")
+    _require_keys(
+        source_modes,
+        {"provider_mode", "effective_data_quality", "layers"},
+        "pipeline artifact manifest source_modes",
+    )
+    if source_modes["provider_mode"] != payload["provider_mode"]:
+        raise ProviderContractError(
+            "pipeline artifact manifest source_modes provider_mode mismatch"
+        )
+    if source_modes["effective_data_quality"] != payload["data_quality"]:
+        raise ProviderContractError(
+            "pipeline artifact manifest source_modes effective_data_quality mismatch"
+        )
+    layers = source_modes["layers"]
+    _require_mapping(layers, "pipeline artifact manifest source_modes.layers")
+    foundation_layers = payload["provider_foundation"].get("layers")
+    _require_mapping(
+        foundation_layers,
+        "pipeline artifact manifest provider_foundation.layers",
+    )
+    for layer_name, foundation_layer in foundation_layers.items():
+        layer_context = f"pipeline artifact manifest source_modes.layers.{layer_name}"
+        if layer_name not in layers:
+            raise ProviderContractError(f"{layer_context} is required")
+        layer = layers[layer_name]
+        _require_mapping(layer, layer_context)
+        _require_keys(
+            layer,
+            {"provider_name", "data_quality", "is_mock"},
+            layer_context,
+        )
+        for field in {"provider_name", "data_quality", "is_mock"}:
+            if layer[field] != foundation_layer[field]:
+                raise ProviderContractError(f"{layer_context}.{field} mismatch")
+
+
+def _validate_pipeline_manifest_warning_counts(payload: dict[str, Any]) -> None:
+    warning_counts = payload["warning_counts"]
+    _require_mapping(warning_counts, "pipeline artifact manifest warning_counts")
+    expected = _expected_pipeline_manifest_warning_counts(payload)
+    for key, expected_value in expected.items():
+        if warning_counts.get(key) != expected_value:
+            raise ProviderContractError(
+                f"pipeline artifact manifest warning_counts {key} mismatch"
+            )
+
+
+def _expected_pipeline_manifest_warning_counts(payload: dict[str, Any]) -> dict[str, int]:
+    layers = list(payload["provider_foundation"]["layers"].values())
+    degradation_event_count = len(payload["degradation_events"])
+    mock_layer_count = sum(1 for layer in layers if layer["is_mock"])
+    unavailable_layer_count = sum(
+        1 for layer in layers if layer["data_quality"] == "unavailable"
+    )
+    partial_layer_count = sum(1 for layer in layers if layer["data_quality"] == "partial")
+    return {
+        "degradation_event_count": degradation_event_count,
+        "mock_layer_count": mock_layer_count,
+        "unavailable_layer_count": unavailable_layer_count,
+        "partial_layer_count": partial_layer_count,
+        "total_warning_count": (
+            degradation_event_count
+            + mock_layer_count
+            + unavailable_layer_count
+            + partial_layer_count
+        ),
+    }
+
+
+def _validate_pipeline_manifest_trust_states(trust_states: Any) -> None:
+    _require_mapping(trust_states, "pipeline artifact manifest trust_states")
+    _require_keys(
+        trust_states,
+        {"candidate_outputs", "report_pack", "trusted_promotion"},
+        "pipeline artifact manifest trust_states",
+    )
+    if trust_states["candidate_outputs"] != "candidate_untrusted":
+        raise ProviderContractError(
+            "pipeline artifact manifest trust_states candidate_outputs mismatch"
+        )
+    if trust_states["trusted_promotion"] != "disabled":
+        raise ProviderContractError(
+            "pipeline artifact manifest trust_states trusted_promotion mismatch"
+        )
 
 
 def _validate_review_queue_exclusion(exclusion: Any, context: str) -> None:

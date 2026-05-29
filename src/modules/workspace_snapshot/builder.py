@@ -312,6 +312,10 @@ def _read_manifest_json_artifact(
     if not isinstance(artifact, dict):
         raise ValueError(f"manifest missing artifact: {artifact_key}")
     artifact_path = artifact_root / str(artifact.get("path") or "")
+    if not artifact_path.exists():
+        raise ValueError(
+            f"manifest artifact {artifact_key} does not exist: {artifact_path}"
+        )
     return _read_json_object(artifact_path)
 
 

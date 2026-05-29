@@ -1,0 +1,51 @@
+{
+  "version": "fund-report-artifact-contract-v1",
+  "manifest_version": "pipeline-artifact-manifest-v1",
+  "required_manifest_fields": [
+    "version",
+    "run_id",
+    "generated_at",
+    "fund_code",
+    "as_of_date",
+    "provider_mode",
+    "data_quality",
+    "web_ready",
+    "source_modes",
+    "warning_counts",
+    "trust_states",
+    "provider_foundation",
+    "degradation_events",
+    "artifacts"
+  ],
+  "artifact_naming": {
+    "raw": "fund_{fund_code}_raw.json",
+    "scoring": "fund_{fund_code}_scoring.json",
+    "review_queue": "fund_{fund_code}_review_queue.json",
+    "source_table": "fund_{fund_code}_source_table.json",
+    "signal_trace": "fund_{fund_code}_signal_trace.json",
+    "manifest": "fund_{fund_code}_manifest.json",
+    "markdown": "fund_{fund_code}_report.md",
+    "html": "fund_{fund_code}_report.html",
+    "workspace_snapshot": "fund_{fund_code}_workspace_snapshot.json"
+  },
+  "artifact_source_control": {
+    "generated_outputs": "generated_output_only",
+    "contract_config": "source_controlled",
+    "contract_documentation": "source_controlled"
+  },
+  "reader_surface": {
+    "canonical": "html",
+    "html_links_required": [
+      "raw",
+      "scoring",
+      "review_queue",
+      "source_table",
+      "signal_trace"
+    ]
+  },
+  "missing_data_policy": {
+    "gateway_or_service_missing": "record_degradation_event_and_warning_count",
+    "missing_artifact": "fail_manifest_validation",
+    "trusted_promotion": "disabled"
+  }
+}

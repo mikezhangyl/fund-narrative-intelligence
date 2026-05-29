@@ -21,10 +21,14 @@ _RADAR_DIMENSIONS = [
 ]
 
 
-def write_reports(scoring_payload: dict[str, Any], output_dir: Path) -> dict[str, Path]:
+def write_reports(
+    scoring_payload: dict[str, Any],
+    output_dir: Path,
+    artifact_links: dict[str, str] | None = None,
+) -> dict[str, Path]:
     fund_code = scoring_payload["metadata"]["fund_code"]
     markdown = render_markdown_report(scoring_payload)
-    html = render_html_report(scoring_payload, markdown)
+    html = render_html_report(scoring_payload, markdown, artifact_links=artifact_links)
 
     markdown_path = output_dir / f"fund_{fund_code}_report.md"
     html_path = output_dir / f"fund_{fund_code}_report.html"
@@ -126,7 +130,11 @@ def render_markdown_report(scoring_payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = None) -> str:
+def render_html_report(
+    scoring_payload: dict[str, Any],
+    markdown: str | None = None,
+    artifact_links: dict[str, str] | None = None,
+) -> str:
     del markdown
     fund = scoring_payload["fund"]
     metadata = scoring_payload["metadata"]
@@ -174,6 +182,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
     .axis-list {{ display: grid; gap: 8px; }}
     .axis-item {{ display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed #e5e7eb; padding-bottom: 6px; }}
     .axis-value {{ color: #1d4ed8; font-weight: 700; }}
+    .artifact-links ul {{ margin: 8px 0 0; padding-left: 20px; }}
+    .artifact-links a {{ color: #1d4ed8; }}
     @media (max-width: 900px) {{ .radar-layout {{ grid-template-columns: 1fr; }} }}
   </style>
 </head>
@@ -185,6 +195,8 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
   </header>
 
   {data_source_notice_html}
+
+  {_render_artifact_links_html(artifact_links)}
 
   <section class="holdings">
     <h2>Top Holdings</h2>
@@ -257,6 +269,23 @@ def render_html_report(scoring_payload: dict[str, Any], markdown: str | None = N
 </body>
 </html>
 """
+
+
+def _render_artifact_links_html(artifact_links: dict[str, str] | None) -> str:
+    if not artifact_links:
+        return ""
+    rows = "\n".join(
+        f'<li><a href="{escape(path, quote=True)}">{escape(label)}</a></li>'
+        for label, path in sorted(artifact_links.items())
+    )
+    return (
+        '<section class="artifact-links">'
+        "<h2>Underlying JSON Artifacts</h2>"
+        "<ul>"
+        f"{rows}"
+        "</ul>"
+        "</section>"
+    )
 
 
 def _render_data_source_notice_lines(scoring_payload: dict[str, Any]) -> list[str]:
