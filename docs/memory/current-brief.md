@@ -122,6 +122,8 @@ Round 6 under milestone `M12 - Portfolio & Fund Narrative Workspace` is implemen
 
 Round 7 under milestone `M13 - Production Scale & Assisted Intelligence` is implemented on branch `codex/round6-round7-develop`. FNI now has `scripts/run_production_readiness_assistant.py`, backed by `production-readiness-assisted-intelligence-v1`, for production health/runbook status, data freshness/SLA metadata, citation-backed AI-assisted summaries that can be disabled, and feedback governance records that cannot directly mutate trusted state. Acceptance is recorded in `docs/product/round7-production-scale-assisted-intelligence-acceptance-2026-05-30.html`.
 
+Round 6/7 implementation on `codex/round6-round7-develop` was accepted by PM/Architect on 2026-05-30. Acceptance review is `docs/product/pm-architect-acceptance-review-round6-round7-2026-05-30.md`; verification re-run passed targeted tests, ruff, compileall, full pytest (`561 passed, 1 skipped`), and Round 6/7 JSON + Chinese HTML exports. Linear issues `MIK-131` through `MIK-158` were marked Done.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.
