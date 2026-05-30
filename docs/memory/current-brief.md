@@ -124,6 +124,8 @@ Round 7 under milestone `M13 - Production Scale & Assisted Intelligence` is impl
 
 Round 6/7 implementation on `codex/round6-round7-develop` was accepted by PM/Architect on 2026-05-30. Acceptance review is `docs/product/pm-architect-acceptance-review-round6-round7-2026-05-30.md`; verification re-run passed targeted tests, ruff, compileall, full pytest (`561 passed, 1 skipped`), and Round 6/7 JSON + Chinese HTML exports. Linear issues `MIK-131` through `MIK-158` were marked Done.
 
+Round 8 planning is open in Linear under milestone `M14 - Interactive Product Shell & Release Packaging`. PM parent is `MIK-159`; Architect parent is `MIK-160`. The canonical handoff is `docs/product/round8-interactive-product-shell-release-plan-2026-05-30.md` and Linear document `Round 8 Interactive Product Shell & Release Packaging Plan`. Recommended first developer slice is `MIK-165 + MIK-166`, then `MIK-161 + MIK-162`, so route/data-source contracts and artifact indexing land before product shell UI.
+
 ## Default Context Budget
 
 Use this file as the default memory entry point. Do not read `docs/memory/project-context.md`, `docs/memory/architecture-decisions.md`, every execution plan, or `.ecc/runs/**` by default. Load those heavier files only when the task asks for history, architecture rationale, a named plan, or a specific run artifact.
