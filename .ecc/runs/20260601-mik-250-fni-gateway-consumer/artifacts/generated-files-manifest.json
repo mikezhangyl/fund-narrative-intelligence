@@ -1,0 +1,54 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "narrative_source_gateway_probe_json",
+      "path": "outputs/narrative_source_gateway_probe/2026-06-01-mik-250-fixture/narrative_source_gateway_probe.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable fixture-mode conformance report for provider-neutral narrative source gateway rows.",
+      "checksum_sha256": "2816b68551fc5637a64d5f2ffd067d6ffb603aa65be979992265de77d7ff4830",
+      "mtime_epoch": 1780250213,
+      "size_bytes": 12271
+    },
+    {
+      "type": "narrative_source_gateway_probe_html",
+      "path": "outputs/narrative_source_gateway_probe/2026-06-01-mik-250-fixture/narrative_source_gateway_probe.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese HTML fixture-mode report showing trust, source quality, license, retention, metadata-only, and degradation labels.",
+      "checksum_sha256": "2533f26a8399e25c5a977e79d936d06ae761d65ade24741489f86bbf15bd0b2d",
+      "mtime_epoch": 1780250213,
+      "size_bytes": 3150
+    },
+    {
+      "type": "narrative_source_gateway_live_status_json",
+      "path": "outputs/narrative_source_gateway_probe/2026-06-01-mik-250-live-status/narrative_source_gateway_probe.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable live environment status report showing the gateway URL is not configured.",
+      "checksum_sha256": "87b1291b6855265394779ae32815fa7aaddcb7da7310cb0938e13e9dbec78b2b",
+      "mtime_epoch": 1780250213,
+      "size_bytes": 2001
+    },
+    {
+      "type": "narrative_source_gateway_live_status_html",
+      "path": "outputs/narrative_source_gateway_probe/2026-06-01-mik-250-live-status/narrative_source_gateway_probe.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese HTML live environment status report with clear gateway-unavailable degradation labels.",
+      "checksum_sha256": "c2fdafda0f60791bc65850fadb011b21edfc78a409c143c29723eac5e39d0470",
+      "mtime_epoch": 1780250213,
+      "size_bytes": 3060
+    },
+    {
+      "type": "gateway_fixture",
+      "path": ".ecc/runs/20260601-mik-250-fni-gateway-consumer/artifacts/mock_gateway_narrative_source_response.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Gateway-shaped mock payload used by probe and tests.",
+      "checksum_sha256": "68aadfe89e7dfa85f79a9b07c0f98214a36d5807ff249aaeb9a0ea31daa71702",
+      "mtime_epoch": 1780249831,
+      "size_bytes": 4273
+    }
+  ]
+}

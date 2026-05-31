@@ -87,7 +87,13 @@ CAPABILITY_GROUPS = (
     {
         "group_id": "narrative_service",
         "name": "Narrative Service",
-        "dataset_ids": ("narrative_service",),
+        "dataset_ids": (
+            "narrative_service",
+            "narrative_official_filings",
+            "narrative_official_disclosures",
+            "narrative_news_context",
+            "narrative_social_heat",
+        ),
     },
 )
 

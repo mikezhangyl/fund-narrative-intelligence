@@ -1,0 +1,112 @@
+{
+  "official_filings": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-sec-aapl-20260601",
+          "source_type": "filing",
+          "source_provider": "sec_edgar",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/320193/sample.htm",
+          "title": "Apple 8-K filing",
+          "event_time": "2026-06-01T02:00:00Z",
+          "fetched_at": "2026-06-01T02:01:00Z",
+          "trust_tier": "official_primary",
+          "source_quality": "trusted_fact_candidate",
+          "license_scope": "metadata_and_public_filing_reference",
+          "retention_policy": "metadata_and_permitted_excerpt",
+          "metadata_only": false,
+          "degradation_events": [],
+          "summary": "Official filing sample supplied by the gateway contract fixture.",
+          "stock_codes": ["AAPL"],
+          "narrative_hints": ["AI infrastructure"]
+        }
+      ]
+    },
+    "meta": {"provider": "gateway", "endpoint": "narrative_source_events"}
+  },
+  "official_disclosures": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-cninfo-000001-20260601",
+          "source_type": "announcement",
+          "source_provider": "cninfo",
+          "source_url": "https://www.cninfo.com.cn/new/disclosure/detail",
+          "title": "平安银行股东会公告",
+          "event_time": "2026-06-01T03:00:00Z",
+          "fetched_at": "2026-06-01T03:01:00Z",
+          "trust_tier": "official_primary",
+          "source_quality": "trusted_fact_candidate",
+          "license_scope": "metadata_and_public_disclosure_reference",
+          "retention_policy": "metadata_and_permitted_excerpt",
+          "metadata_only": false,
+          "degradation_events": [],
+          "summary": "CNINFO official disclosure sample supplied by the gateway contract fixture.",
+          "stock_codes": ["000001.SZ"],
+          "narrative_hints": ["governance"]
+        }
+      ]
+    },
+    "meta": {"provider": "gateway", "endpoint": "narrative_source_events"}
+  },
+  "news_context": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-news-semiconductor-20260601",
+          "source_type": "news",
+          "source_provider": "public_news_context",
+          "source_url": "https://news.example.invalid/semiconductor-context",
+          "title": "半导体产业链上下游新闻上下文",
+          "event_time": "2026-06-01T04:00:00Z",
+          "fetched_at": "2026-06-01T04:01:00Z",
+          "trust_tier": "context_only",
+          "source_quality": "context_only",
+          "license_scope": "metadata_and_link_reference",
+          "retention_policy": "metadata_only",
+          "metadata_only": true,
+          "degradation_events": [
+            {
+              "code": "context_only",
+              "message": "Public news context cannot satisfy trusted evidence by itself."
+            }
+          ],
+          "summary": "Public news context sample supplied by the gateway contract fixture.",
+          "stock_codes": ["688981.SH"],
+          "narrative_hints": ["半导体"]
+        }
+      ]
+    },
+    "meta": {"provider": "gateway", "endpoint": "narrative_source_events"}
+  },
+  "social_heat": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-stocktwits-aapl-20260601",
+          "source_type": "social",
+          "source_provider": "stocktwits",
+          "source_url": "https://stocktwits.com/symbol/AAPL",
+          "title": "AAPL Stocktwits heat sample",
+          "event_time": "2026-06-01T05:00:00Z",
+          "fetched_at": "2026-06-01T05:01:00Z",
+          "trust_tier": "heat_signal_only",
+          "source_quality": "context_only",
+          "license_scope": "metadata_and_permitted_excerpt",
+          "retention_policy": "metadata_only",
+          "metadata_only": true,
+          "degradation_events": [
+            {
+              "code": "heat_only",
+              "message": "Social heat cannot satisfy trusted evidence."
+            }
+          ],
+          "summary": "Social heat sample supplied by the gateway contract fixture.",
+          "stock_codes": ["AAPL"],
+          "narrative_hints": ["retail_discussion_heat"]
+        }
+      ]
+    },
+    "meta": {"provider": "gateway", "endpoint": "narrative_source_events"}
+  }
+}

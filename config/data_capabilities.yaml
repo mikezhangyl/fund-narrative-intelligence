@@ -1,5 +1,5 @@
 version: data-capabilities-v1
-updated_at: "2026-05-28"
+updated_at: "2026-06-01"
 purpose: >
   Market-data capability ledger for deciding which datasets each analysis needs,
   whether the platform can acquire them reliably, and what must move into the
@@ -405,6 +405,106 @@ datasets:
     notes:
       - New external narrative source access must start with a stock-data-gateway change request.
       - FNI may keep local fixtures for deterministic tests but must not add direct crawling for new source expansion.
+
+  narrative_official_filings:
+    description: Provider-neutral official filing source events consumed from the gateway.
+    current_status: unstable
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields: &narrative_gateway_source_required_fields
+      - source_event_id
+      - source_type
+      - source_provider
+      - source_url
+      - title
+      - event_time
+      - fetched_at
+      - trust_tier
+      - source_quality
+      - license_scope
+      - retention_policy
+      - metadata_only
+      - degradation_events
+    freshness: source_event_time_window
+    primary_source:
+      provider: gateway
+      endpoint: narrative/source-events/official-filings
+      access_mode: normalized_gateway
+    fallback_sources: []
+    validation:
+      live_probe_capability: narrative_source_gateway_probe
+    risks: &narrative_gateway_source_risks
+      rate_limit: delegated_to_gateway
+      anti_bot: gateway_owned_not_fni
+      operational_cost: provider_permission_dependent
+    analysis_use_cases: &narrative_gateway_source_use_cases
+      - candidate_narrative_intake
+      - narrative_radar_service
+      - evidence_quality_review
+    notes:
+      - FNI validates and renders gateway source labels; gateway owns upstream SEC EDGAR access and source storage.
+      - Current FNI live-status probe records whether `MARKET_DATA_GATEWAY_URL` is configured and whether the route is mounted.
+
+  narrative_official_disclosures:
+    description: Provider-neutral official China disclosure source events consumed from the gateway.
+    current_status: unstable
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields: *narrative_gateway_source_required_fields
+    freshness: source_event_time_window
+    primary_source:
+      provider: gateway
+      endpoint: narrative/source-events/official-disclosures
+      access_mode: normalized_gateway
+    fallback_sources: []
+    validation:
+      live_probe_capability: narrative_source_gateway_probe
+    risks: *narrative_gateway_source_risks
+    analysis_use_cases: *narrative_gateway_source_use_cases
+    notes:
+      - FNI validates and renders gateway source labels; gateway owns upstream CNINFO/exchange disclosure access and source storage.
+
+  narrative_news_context:
+    description: Provider-neutral public or licensed news-context source events consumed from the gateway.
+    current_status: unstable
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields: *narrative_gateway_source_required_fields
+    freshness: source_event_time_window
+    primary_source:
+      provider: gateway
+      endpoint: narrative/source-events/news-context
+      access_mode: normalized_gateway
+    fallback_sources: []
+    validation:
+      live_probe_capability: narrative_source_gateway_probe
+    risks: *narrative_gateway_source_risks
+    analysis_use_cases: *narrative_gateway_source_use_cases
+    notes:
+      - News-context rows must disclose `context_only` or equivalent labels when they cannot satisfy trusted evidence requirements.
+      - FNI must not crawl or store news full text unless the gateway reports an explicit license and retention policy.
+
+  narrative_social_heat:
+    description: Provider-neutral social/community heat source events consumed from the gateway.
+    current_status: unstable
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields: *narrative_gateway_source_required_fields
+    freshness: intraday_or_time_window_snapshot
+    primary_source:
+      provider: gateway
+      endpoint: narrative/source-events/social-heat
+      access_mode: normalized_gateway
+    fallback_sources: []
+    validation:
+      live_probe_capability: narrative_source_gateway_probe
+    risks: *narrative_gateway_source_risks
+    analysis_use_cases:
+      - candidate_narrative_intake
+      - narrative_radar_service
+      - heat_signal_monitoring
+    notes:
+      - Social rows are heat signals only and cannot be promoted to trusted factual evidence without corroborating official or licensed evidence.
 
   cyq_chips:
     description: A-share daily cost-basis/chip distribution rows by price bucket.

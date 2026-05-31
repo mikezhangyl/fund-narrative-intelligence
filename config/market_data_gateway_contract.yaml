@@ -1,5 +1,5 @@
 version: market-data-gateway-contract-v1
-updated_at: "2026-05-27"
+updated_at: "2026-06-01"
 base_path: /api/v1/market-data
 description: >
   Contract expected by this project for a local market-data gateway. The gateway
@@ -758,3 +758,97 @@ endpoints:
         - provider
         - source_url
         - retrieved_at
+  - endpoint_id: gateway_narrative_official_filings
+    dataset_id: narrative_official_filings
+    provider: gateway
+    endpoint: narrative_source_events_official_filings
+    method: POST
+    path: /api/v1/market-data/narrative/source-events/official-filings
+    cache_policy: read_through_cache
+    required_request_fields:
+      - symbols
+      - query
+      - limit
+    sample_request:
+      json:
+        symbols:
+          - AAPL
+        query: "AI infrastructure"
+        limit: 5
+    response: &narrative_source_event_response
+      rows_path: data.rows
+      minimum_rows: 0
+      required_fields:
+        - source_event_id
+        - source_type
+        - source_provider
+        - source_url
+        - title
+        - event_time
+        - fetched_at
+        - trust_tier
+        - source_quality
+        - license_scope
+        - retention_policy
+        - metadata_only
+        - degradation_events
+      optional_fields:
+        - summary
+        - stock_codes
+        - narrative_hints
+        - evidence_claims
+        - source_document_id
+        - source_document_title
+        - source_document_url
+        - excerpt
+        - provider_metadata
+  - endpoint_id: gateway_narrative_official_disclosures
+    dataset_id: narrative_official_disclosures
+    provider: gateway
+    endpoint: narrative_source_events_official_disclosures
+    method: POST
+    path: /api/v1/market-data/narrative/source-events/official-disclosures
+    cache_policy: read_through_cache
+    required_request_fields:
+      - symbols
+      - query
+      - limit
+    sample_request:
+      json:
+        symbols:
+          - 000001.SZ
+        query: "股东会"
+        limit: 5
+    response: *narrative_source_event_response
+  - endpoint_id: gateway_narrative_news_context
+    dataset_id: narrative_news_context
+    provider: gateway
+    endpoint: narrative_source_events_news_context
+    method: POST
+    path: /api/v1/market-data/narrative/source-events/news-context
+    cache_policy: short_ttl
+    required_request_fields:
+      - query
+      - limit
+    sample_request:
+      json:
+        query: "半导体 A股"
+        limit: 10
+    response: *narrative_source_event_response
+  - endpoint_id: gateway_narrative_social_heat
+    dataset_id: narrative_social_heat
+    provider: gateway
+    endpoint: narrative_source_events_social_heat
+    method: POST
+    path: /api/v1/market-data/narrative/source-events/social-heat
+    cache_policy: short_ttl
+    required_request_fields:
+      - symbols
+      - limit
+    sample_request:
+      json:
+        symbols:
+          - AAPL
+        query: "Apple"
+        limit: 5
+    response: *narrative_source_event_response
