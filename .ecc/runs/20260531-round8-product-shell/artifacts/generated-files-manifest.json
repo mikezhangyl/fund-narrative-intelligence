@@ -1,0 +1,67 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "route_registry",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Concrete product shell route registry JSON for MIK-165."
+    },
+    {
+      "type": "route_registry_preview",
+      "path": "outputs/product_shell/round8-current/route_registry.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Human-readable Chinese route registry preview for MIK-165."
+    },
+    {
+      "type": "artifact_index",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Concrete artifact index JSON for MIK-166."
+    },
+    {
+      "type": "artifact_index_preview",
+      "path": "outputs/product_shell/round8-current/artifact_index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Human-readable Chinese artifact index preview for MIK-166."
+    },
+    {
+      "type": "product_home",
+      "path": "outputs/product_shell/round8-current/index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Static local product shell home for MIK-161."
+    },
+    {
+      "type": "artifact_browser",
+      "path": "outputs/product_shell/round8-current/artifact_browser.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Static local artifact browser for MIK-162."
+    },
+    {
+      "type": "acceptance_report",
+      "path": "docs/product/round8-product-shell-artifact-browser-acceptance-2026-05-31.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Canonical Chinese HTML acceptance report."
+    },
+    {
+      "type": "acceptance_note",
+      "path": "docs/product/round8-product-shell-artifact-browser-acceptance-2026-05-31.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Auxiliary Markdown note pointing to the canonical HTML acceptance report."
+    },
+    {
+      "type": "execution_plan",
+      "path": "docs/exec-plans/active/round8-product-shell.md",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Round 8 product shell implementation and verification plan."
+    }
+  ]
+}

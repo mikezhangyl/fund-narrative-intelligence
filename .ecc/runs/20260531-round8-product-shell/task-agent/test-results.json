@@ -1,0 +1,31 @@
+{
+  "commands": [
+    {
+      "command": "uv run pytest tests/test_product_shell.py -q",
+      "status": "passed",
+      "summary": "6 passed"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "passed"
+    },
+    {
+      "command": "uv run python -m compileall src services scripts tests",
+      "status": "passed"
+    },
+    {
+      "command": "uv run pytest -q",
+      "status": "passed",
+      "summary": "567 passed, 1 skipped"
+    },
+    {
+      "command": "uv run python scripts/build_product_shell.py --artifact-root outputs --output-dir outputs/product_shell/round8-current",
+      "status": "passed",
+      "summary": "route registry, artifact index, product shell, home HTML, and artifact browser HTML generated"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}
