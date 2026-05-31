@@ -1,0 +1,18 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "public_news_context_json",
+      "path": "outputs/public_news_context/2026-06-01-mik-237/public_news_context.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Live Google News RSS and Sina Finance roll context-only rows for query 半导体 A股."
+    },
+    {
+      "type": "public_news_context_html",
+      "path": "outputs/public_news_context/2026-06-01-mik-237/public_news_context.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese HTML public-news context cleanup report with source-quality labels and noise counts."
+    }
+  ]
+}
