@@ -20,6 +20,47 @@ The MVP should combine:
 3. derived search indexes later;
 4. derived vector indexes later, only when narrative retrieval needs them.
 
+## Local Runtime Decision For Mac Development
+
+Use two local runtime modes:
+
+1. Fast test mode: SQLite plus temporary filesystem directories.
+2. Integration mode: Docker Compose with Postgres plus an S3-compatible object
+   store such as MinIO.
+
+Do not require a bare host-installed database on the Mac. The Mac should run the
+containers, but the database and raw object store should have explicit volumes,
+ports, backup/reset commands, and environment variables.
+
+Why:
+
+- it keeps the developer Mac clean;
+- it makes the architecture closer to production without adding Kubernetes or
+  cloud deployment work;
+- it lets Developer run repeatable integration tests;
+- it keeps database/object-store boundaries visible instead of hiding everything
+  in random local folders;
+- it gives a clear future migration path from local Docker to cloud Postgres and
+  S3/MinIO/OSS.
+
+Recommended local services:
+
+```text
+Postgres
+  purpose: relational control plane for Silver/Gold tables
+  local port: 5432 or project-specific override
+  data: named Docker volume
+
+MinIO
+  purpose: Bronze raw object zone with S3-compatible API
+  local ports: 9000 API, 9001 console
+  data: named Docker volume or project-local bind mount
+```
+
+SQLite remains useful for unit tests and offline fixture mode, but the main
+developer integration profile should prove the repository contract against
+Postgres and raw object storage.
+
 ## Why This Is The Right Starting Point
 
 The current problem is not petabyte-scale storage. The current problem is source
@@ -47,7 +88,7 @@ Silver = normalized source documents/events/evidence/entities
 Gold   = narrative-ready evidence packs, digest rows, review state
 ```
 
-Local MVP:
+Fast local test mode:
 
 ```text
 data/narrative_lake/
@@ -70,11 +111,33 @@ data/narrative_lakehouse.sqlite
   source_quality_snapshots
 ```
 
+Docker integration mode:
+
+```text
+docker compose up narrative-postgres narrative-minio
+
+Postgres
+  source_registry
+  source_fetch_runs
+  source_documents
+  source_events
+  evidence_spans
+  entity_mentions
+  resolved_entities
+  candidate_narratives
+  evidence_packs
+  review_ledger
+  source_quality_snapshots
+
+MinIO bucket
+  narrative-bronze/{source_id}/{yyyy}/{mm}/{dd}/{sha256}.{ext}
+```
+
 Future production:
 
 ```text
-local filesystem -> S3 / MinIO / OSS
-SQLite           -> Postgres
+local filesystem / MinIO -> S3 / MinIO / OSS
+SQLite / local Postgres  -> managed Postgres
 SQLite FTS5      -> Postgres tsvector / OpenSearch
 optional vectors -> pgvector / Milvus / dedicated vector service
 ```
@@ -83,8 +146,8 @@ optional vectors -> pgvector / Milvus / dedicated vector service
 
 | Layer | Stores | Does not store | First implementation |
 | --- | --- | --- | --- |
-| Relational DB | IDs, relationships, metadata, normalized events, evidence spans, entity links, review decisions | large raw files or unauthorized full text | SQLite |
-| Raw zone | raw JSON, PDFs, HTML, article text, files, when permitted | source-of-truth relationships | local filesystem |
+| Relational DB | IDs, relationships, metadata, normalized events, evidence spans, entity links, review decisions | large raw files or unauthorized full text | SQLite for tests, Docker Postgres for integration |
+| Raw zone | raw JSON, PDFs, HTML, article text, files, when permitted | source-of-truth relationships | temp filesystem for tests, Docker MinIO/local object zone for integration |
 | Search index | permitted titles/excerpts/text for keyword search | authoritative source records | later SQLite FTS5 |
 | Vector index | embeddings for similar evidence/narrative retrieval | authoritative source records | deferred |
 
@@ -454,14 +517,17 @@ and permitted raw/excerpt storage.
 ## Developer Build Order
 
 1. `MIK-245`: accept the architecture spec.
-2. `MIK-246`: implement SQLite repository contract and core tables.
-3. `MIK-247`: implement local raw zone and blob manifest.
-4. Connect first source adapters:
+2. `MIK-249`: add Docker local lakehouse runtime profile.
+3. `MIK-246`: implement repository contract and core tables, with SQLite for
+   tests and Docker Postgres for integration.
+4. `MIK-247`: implement local raw zone and blob manifest, with filesystem test
+   mode and MinIO/object-store integration mode.
+5. Connect first source adapters:
    - `MIK-235` SEC EDGAR;
    - `MIK-236` CNINFO;
    - `MIK-237` public news context;
    - `MIK-238` Stocktwits heat pilot.
-5. `MIK-248`: add search/vector deferral plan; do not implement vector DB yet.
+6. `MIK-248`: add search/vector deferral plan; do not implement vector DB yet.
 
 ## Interview-Ready Explanation
 
@@ -481,8 +547,9 @@ separate layers with lineage between them.
 ## Non-Goals
 
 - No Hadoop/Spark/S3-first architecture now.
-- No production Postgres requirement for the first local slice.
+- No bare host-installed database requirement on the Mac.
+- No production Postgres or cloud object storage requirement for the first local
+  slice.
 - No vector DB in V0.
 - No full-text retention for paid/news/social sources unless permitted.
 - No source adapters bypassing source registry and retention policy.
-

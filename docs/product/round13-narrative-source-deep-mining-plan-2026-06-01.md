@@ -189,6 +189,7 @@ Each digest item must show:
 - `MIK-246`: Narrative storage MVP schema and repository contract.
 - `MIK-247`: Local raw zone layout and blob manifest MVP.
 - `MIK-248`: Search and vector index deferral plan.
+- `MIK-249`: Docker local lakehouse runtime profile.
 
 ## Dev-Ready Source Slices Created In Linear
 
@@ -226,8 +227,12 @@ Short version:
 - relational tables are the source of truth for source registry, fetch runs,
   normalized source events, evidence spans, entities, narratives, evidence
   packs, and review ledger;
-- filesystem/object storage keeps raw payloads and files only when retention and
-  license rules allow it;
+- Docker Postgres should be the local integration-mode relational store, while
+  SQLite remains useful for fast tests and offline fixture mode;
+- Docker MinIO or an equivalent object-store profile should back the local
+  Bronze raw zone, while temporary filesystem paths remain useful for tests;
+- raw payloads and files are persisted only when retention and license rules
+  allow it;
 - full-text search and embeddings are derived indexes, not the source of truth;
 - paid/news/social content should default to metadata and permitted excerpts
   unless a license explicitly allows full-text retention.
