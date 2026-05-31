@@ -167,6 +167,10 @@ python scripts/context_brief.py --max-words 900
 - Real providers: Eastmoney holdings/market/valuation/financial paths, CNINFO announcements, Google News RSS, Sina Finance headlines, optional Tushare and AKShare routing.
 - Future UI: web approval workspace remains deferred; current JSON artifacts should stay web-loadable.
 
+## Round 13 Narrative Source Deep Mining
+
+Round 13 planning is open in Linear under milestone `M19 - Narrative Source Deep Mining` and documented at `docs/product/round13-narrative-source-deep-mining-plan-2026-06-01.md`. Parent issues are `MIK-221` (PM) and `MIK-222` (Architect). Child issues are `MIK-223` through `MIK-234`, covering source acquisition matrix, paid provider evaluation, official disclosure intake, public web crawler pilot, community/social heat pilot, today's narrative digest, source governance, source-event schema v2, source reliability/risk scoring, crawler contract, digest pipeline, and entity resolution/dedupe. Recommended build order starts with `MIK-229 + MIK-231`, then `MIK-223`, then `MIK-230 + MIK-234`.
+
 ## Stable Product Loop
 
 `Fund -> Holdings -> Stock Mapping -> Narrative Aggregation -> Signal-backed Narrative State -> Evidence Report`
