@@ -327,3 +327,19 @@ python scripts/report_data_capabilities.py --format html --output outputs/data_c
 The same command supports `--format json` for machine-readable inventory and
 `--format markdown` for auxiliary text output. The HTML output is the canonical
 reader-facing surface for this inventory report.
+
+Round 8 product shell starts with a concrete route registry and artifact index,
+then renders a local product home and artifact browser:
+
+```bash
+uv run python scripts/build_product_shell.py --artifact-root outputs --output-dir outputs/product_shell/round8-current
+```
+
+The generated files are `route_registry.json/html`, `artifact_index.json/html`,
+`product_shell.json`, `index.html`, and `artifact_browser.html`. The shell only
+links existing APIs and generated artifacts; it does not recompute radar,
+quality, portfolio exposure, or provider data. Acceptance for `MIK-165`,
+`MIK-166`, `MIK-161`, and `MIK-162` is documented in
+`docs/product/round8-product-shell-artifact-browser-acceptance-2026-05-31.html`.
+The auxiliary Markdown note is
+`docs/product/round8-product-shell-artifact-browser-acceptance-2026-05-31.md`.

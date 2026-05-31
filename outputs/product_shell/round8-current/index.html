@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fund Narrative Intelligence 产品首页</title>
+<style>
+
+body { margin: 0; background: #f6f7f9; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 48px; }
+h1 { font-size: 30px; margin: 0 0 16px; }
+h2 { font-size: 20px; margin: 24px 0 12px; }
+.summary { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.card { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 14px; }
+.card h2 { margin-top: 0; font-size: 18px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d8dee8; border-radius: 8px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e5eaf1; padding: 10px; text-align: left; vertical-align: top; font-size: 14px; }
+th { background: #eef2f7; color: #323f4b; }
+
+</style>
+</head>
+<body>
+<main class="page">
+<h1>Fund Narrative Intelligence 产品首页</h1>
+<section class="summary">
+<p><strong>路由数:</strong> 7</p>
+<p><strong>产物数:</strong> 471</p>
+<p>不在页面内重算雷达、质量或组合指标；页面只读取服务 API 或生成产物。</p>
+</section>
+<section><h2>导航</h2><div class="cards"><article class="card"><h2>产品首页</h2><p>Product home</p><p><strong>Route:</strong> /</p><p><strong>Owner:</strong> FNI</p><p><strong>Data:</strong> generated_artifact / generated</p><p><strong>Source:</strong> route_registry + artifact_index</p></article><article class="card"><h2>叙事雷达</h2><p>Narrative Radar</p><p><strong>Route:</strong> /narratives/radar</p><p><strong>Owner:</strong> Narrative Service</p><p><strong>Data:</strong> live_api / service_reported</p><p><strong>Source:</strong> /api/v1/narratives/radar</p></article><article class="card"><h2>叙事质量审计</h2><p>Narrative quality audit</p><p><strong>Route:</strong> /narratives/quality</p><p><strong>Owner:</strong> Narrative Service</p><p><strong>Data:</strong> live_api / service_reported</p><p><strong>Source:</strong> /api/v1/narratives/quality/audit</p></article><article class="card"><h2>组合叙事工作台</h2><p>Portfolio narrative workspace</p><p><strong>Route:</strong> /workspace/portfolio</p><p><strong>Owner:</strong> FNI</p><p><strong>Data:</strong> generated_artifact / artifact_reported</p><p><strong>Source:</strong> outputs/portfolio_narrative_workspace/</p></article><article class="card"><h2>生产就绪助手</h2><p>Production readiness assistant</p><p><strong>Route:</strong> /ops/production-readiness</p><p><strong>Owner:</strong> FNI</p><p><strong>Data:</strong> generated_artifact / artifact_reported</p><p><strong>Source:</strong> outputs/production_readiness_assistant/</p></article><article class="card"><h2>产物浏览器</h2><p>Generated artifacts</p><p><strong>Route:</strong> /artifacts</p><p><strong>Owner:</strong> FNI</p><p><strong>Data:</strong> generated_artifact / generated</p><p><strong>Source:</strong> outputs/product_shell/round8-current/artifact_index.json</p></article><article class="card"><h2>配置与预检</h2><p>Configuration preflight</p><p><strong>Route:</strong> /ops/config-preflight</p><p><strong>Owner:</strong> FNI</p><p><strong>Data:</strong> fixture_demo / pending_round8_followup</p><p><strong>Source:</strong> future local release preflight</p></article></div></section>
+</main>
+</body>
+</html>

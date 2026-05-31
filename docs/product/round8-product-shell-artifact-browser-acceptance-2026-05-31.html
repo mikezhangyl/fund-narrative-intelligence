@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Round 8 产品壳与产物浏览器验收</title>
+  <style>
+    body { margin: 0; background: #f6f7f9; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { max-width: 980px; margin: 0 auto; padding: 32px 20px 48px; }
+    h1 { font-size: 30px; margin: 0 0 12px; }
+    h2 { font-size: 20px; margin: 28px 0 10px; }
+    section { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; margin-top: 16px; }
+    code { background: #eef2f7; border-radius: 4px; padding: 2px 5px; }
+    li { margin: 6px 0; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Round 8 产品壳与产物浏览器验收</h1>
+  <p>本轮先完成 MIK-165 / MIK-166 的实物合同，再完成 MIK-161 / MIK-162 的本地产品首页和产物浏览器。</p>
+
+  <section>
+    <h2>交付范围</h2>
+    <ul>
+      <li><code>product-shell-route-registry-v1</code>：声明页面、owner service、数据来源类型、新鲜度/降级标签和产品壳禁止逻辑。</li>
+      <li><code>product-shell-artifact-index-v1</code>：扫描现有 outputs，生成安全的 JSON/HTML 路径、状态、run id、source mode、freshness 和 superseded 标记。</li>
+      <li><code>product-shell-v1</code>：集成 route registry 和 artifact index，生成本地产品首页。</li>
+      <li>产物浏览器中文 HTML：从一个页面查看 Round 5/6/7/8 已有 JSON/HTML 产物。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>实物产物</h2>
+    <ul>
+      <li><code>outputs/product_shell/round8-current/route_registry.json</code></li>
+      <li><code>outputs/product_shell/round8-current/route_registry.html</code></li>
+      <li><code>outputs/product_shell/round8-current/artifact_index.json</code></li>
+      <li><code>outputs/product_shell/round8-current/artifact_index.html</code></li>
+      <li><code>outputs/product_shell/round8-current/index.html</code></li>
+      <li><code>outputs/product_shell/round8-current/artifact_browser.html</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>验收证据</h2>
+    <ul>
+      <li>测试：<code>tests/test_product_shell.py</code> 覆盖 route registry、artifact index、首页、artifact browser 和 CLI 输出。</li>
+      <li>命令：<code>uv run python scripts/build_product_shell.py --artifact-root outputs --output-dir outputs/product_shell/round8-current</code></li>
+      <li>本地实物索引结果：468 个 JSON 产物，62 个 HTML 链接。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>边界声明</h2>
+    <p>产品壳只做导航、索引和展示，不在页面内重算雷达热度、叙事质量分、组合暴露指标，也不直接访问 provider。</p>
+  </section>
+</main>
+</body>
+</html>

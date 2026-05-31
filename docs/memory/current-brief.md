@@ -126,6 +126,15 @@ Round 6/7 implementation on `codex/round6-round7-develop` was accepted by PM/Arc
 
 Round 8 planning is open in Linear under milestone `M14 - Interactive Product Shell & Release Packaging`. PM parent is `MIK-159`; Architect parent is `MIK-160`. The canonical handoff is `docs/product/round8-interactive-product-shell-release-plan-2026-05-30.md` and Linear document `Round 8 Interactive Product Shell & Release Packaging Plan`. Recommended first developer slice is `MIK-165 + MIK-166`, then `MIK-161 + MIK-162`, so route/data-source contracts and artifact indexing land before product shell UI.
 
+Round 8 first implementation slice is on branch `codex/round8-product-shell`.
+FNI now has `scripts/build_product_shell.py`, which emits a route registry,
+artifact index, product shell JSON, Chinese product home, route-registry
+preview, artifact-index preview, and artifact browser under
+`outputs/product_shell/round8-current/`. The shell only links existing APIs and
+generated artifacts; it must not recompute radar, quality, portfolio exposure,
+or provider data. Acceptance is recorded in
+`docs/product/round8-product-shell-artifact-browser-acceptance-2026-05-31.html`.
+
 Round 9-12 planning is open in Linear and documented at `docs/product/round-9-12-product-architecture-roadmap-2026-05-30.md` with Linear document `Round 9-12 Product + Architecture Roadmap`. New milestones: `M15 - Durable Workspace Persistence & Personalization`, `M16 - Narrative Research Workbench`, `M17 - Historical Replay & Evaluation Lab`, and `M18 - Collaboration Governance & Release Readiness`. Parent issues are `MIK-169`/`MIK-170`, `MIK-171`/`MIK-172`, `MIK-173`/`MIK-174`, and `MIK-175`/`MIK-176`. Recommended next developer slice after Round 8 is `MIK-180 + MIK-177`, then `MIK-181 + MIK-178`, to make the product shell stateful before deeper research and replay workflows.
 
 ## Default Context Budget
