@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>叙事服务数据源可行性验证 - 2026-06-01</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #5b6573;
+      --line: #d9dee7;
+      --soft: #f6f8fb;
+      --green: #0f7a4f;
+      --amber: #9a5b00;
+      --red: #a7332f;
+      --blue: #1f5f99;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #fff;
+      line-height: 1.55;
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 32px 0 12px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+    p {
+      margin: 8px 0;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .summary {
+      margin-top: 20px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 8px;
+    }
+    .summary strong {
+      color: var(--blue);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #eef2f7;
+      font-weight: 650;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .green { color: var(--green); background: #e8f5ef; }
+    .amber { color: var(--amber); background: #fff3d6; }
+    .red { color: var(--red); background: #fde8e7; }
+    .blue { color: var(--blue); background: #e8f0fa; }
+    .muted { color: var(--muted); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff;
+    }
+    .card h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+    ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+    li {
+      margin: 4px 0;
+    }
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      main {
+        padding: 24px 16px 40px;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>叙事服务数据源可行性验证</h1>
+  <p class="meta">生成时间：2026-06-01 | 角色：PM 前期探索 + Architect 边界校验 | 目标：先确认方向和可落地性，再交给 Developer 实现。</p>
+
+  <section class="summary">
+    <p><strong>结论：</strong>叙事服务不能只靠新闻，也不能只靠社区热度。可靠路径是“四层数据源”：官方事实源、授权新闻源、公开研究/行业上下文、社区/社媒热度源。</p>
+    <p><strong>开发闸门：</strong>Developer 只能接已经被 PM/Architect 标为 <span class="tag green">Can-Do</span>、<span class="tag amber">Paid Trial Ready</span> 或 <span class="tag blue">Controlled Pilot</span> 的源。高风险爬虫、未审查 TOS/robots、登录/验证码/付费墙内容，不能直接进入开发。</p>
+  </section>
+
+  <h2>一、分层判断</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>1. 可信事实源</h3>
+      <p>公告、交易所/监管、公司 IR、政策文件、SEC/CNINFO 等。用于确认“这件事是否真的发生”。</p>
+      <span class="tag green">优先开发</span>
+    </div>
+    <div class="card">
+      <h3>2. 授权新闻源</h3>
+      <p>Tushare news、Wind/Choice/iFinD、LSEG/Reuters、RavenPack、Benzinga 等。用于发现“今天/最近发生了什么”。</p>
+      <span class="tag amber">先试用验证</span>
+    </div>
+    <div class="card">
+      <h3>3. 公开上下文源</h3>
+      <p>财经门户、行业媒体、协会、部委、公司新闻页、RSS/sitemap。用于补上下文和线索。</p>
+      <span class="tag blue">合规爬虫试点</span>
+    </div>
+    <div class="card">
+      <h3>4. 社区/社媒热度源</h3>
+      <p>股吧、雪球、Stocktwits、Reddit、X、微博。只当热度和候选叙事，不能直接当事实。</p>
+      <span class="tag red">严格限制</span>
+    </div>
+  </div>
+
+  <h2>二、轻量 Smoke 结果</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>源</th>
+        <th>结果</th>
+        <th>PM 判断</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>SEC EDGAR submissions API</td>
+        <td>HTTP 200，约 1.24 秒，返回 Apple CIK 的 JSON，含 1000 条 recent filing metadata。</td>
+        <td><span class="tag green">Can-Do</span>，适合做全球/美股官方事实源。</td>
+      </tr>
+      <tr>
+        <td>Google News RSS</td>
+        <td>HTTP 200，约 1.41 秒，A 股半导体查询返回 100 条 RSS item。</td>
+        <td><span class="tag green">Can-Do</span>，但只能当上下文和召回源，不是可信事实源。</td>
+      </tr>
+      <tr>
+        <td>Stocktwits public symbol stream</td>
+        <td>HTTP 200，约 0.94 秒，AAPL symbol stream 返回 5 条 messages。</td>
+        <td><span class="tag blue">Controlled Pilot</span>，只做美股社交热度。</td>
+      </tr>
+      <tr>
+        <td>GDELT DOC API</td>
+        <td>HTTP 429，约 11.89 秒，返回限速提示：每 5 秒最多一次请求。</td>
+        <td><span class="tag amber">需要队列/缓存</span>，不能直接交给 Developer 做高频请求。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>三、数据源决策矩阵</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>源</th>
+        <th>角色</th>
+        <th>状态</th>
+        <th>是否可交给 Developer</th>
+        <th>下一步</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Tushare news</td>
+        <td>中国结构化新闻</td>
+        <td><span class="tag amber">权限 smoke</span></td>
+        <td>否</td>
+        <td>PM 先确认 token 是否有 `news` 权限，验证 sina/eastmoney/cls/yicai。</td>
+      </tr>
+      <tr>
+        <td>CNINFO</td>
+        <td>A 股可信公告事实源</td>
+        <td><span class="tag green">Can-Do</span></td>
+        <td>是</td>
+        <td>扩展事件类型：投资项目、订单合同、并购、产能扩张、监管风险等。</td>
+      </tr>
+      <tr>
+        <td>SEC EDGAR</td>
+        <td>美股/全球官方披露事实源</td>
+        <td><span class="tag green">Can-Do</span></td>
+        <td>是</td>
+        <td>建立 CIK/ticker 映射，把 8-K/10-Q/10-K/6-K 映射成叙事事件。</td>
+      </tr>
+      <tr>
+        <td>Google News RSS / Sina Finance</td>
+        <td>公开新闻上下文</td>
+        <td><span class="tag green">Can-Do，但低信任</span></td>
+        <td>是</td>
+        <td>加来源域名质量标签，禁止直接提升为可信事实。</td>
+      </tr>
+      <tr>
+        <td>STCN / 行业媒体 / 公司 IR</td>
+        <td>公开上下文和行业线索</td>
+        <td><span class="tag blue">Crawler Pilot</span></td>
+        <td>暂否</td>
+        <td>PM 先做 robots/TOS 检查和单页 parser smoke。</td>
+      </tr>
+      <tr>
+        <td>iFinD / Choice / Wind</td>
+        <td>中国付费终端和 API</td>
+        <td><span class="tag amber">Paid Trial Ready</span></td>
+        <td>暂否</td>
+        <td>PM 先拿试用/端点/报价，确认新闻、研报、公告标签、板块事件权限。</td>
+      </tr>
+      <tr>
+        <td>LSEG/Reuters</td>
+        <td>全球专业实时新闻</td>
+        <td><span class="tag amber">Paid Trial Ready</span></td>
+        <td>暂否</td>
+        <td>PM 先确认 redistribution、archive、实体标签、中文/中国覆盖。</td>
+      </tr>
+      <tr>
+        <td>RavenPack / Bigdata.com</td>
+        <td>新闻实体/事件/情绪/新颖度分析</td>
+        <td><span class="tag amber">Paid Trial Ready</span></td>
+        <td>暂否</td>
+        <td>PM 先验证 taxonomy 是否能映射到我们的 narrative schema。</td>
+      </tr>
+      <tr>
+        <td>Benzinga / Finnhub</td>
+        <td>开发者友好的新闻 API</td>
+        <td><span class="tag blue">Trial Candidate</span></td>
+        <td>暂否</td>
+        <td>验证全文、历史、ticker tags、速率、再分发条款。</td>
+      </tr>
+      <tr>
+        <td>GDELT</td>
+        <td>全球广覆盖发现源</td>
+        <td><span class="tag blue">Controlled Pilot</span></td>
+        <td>暂否</td>
+        <td>先设计 5 秒以上 pacing、缓存和队列。</td>
+      </tr>
+      <tr>
+        <td>Stocktwits / Reddit</td>
+        <td>社交热度</td>
+        <td><span class="tag blue">Controlled Pilot</span></td>
+        <td>暂否</td>
+        <td>明确 API/TOS、采样范围、只输出热度，不输出事实。</td>
+      </tr>
+      <tr>
+        <td>雪球 / 股吧 / 微博 / X</td>
+        <td>社交热度</td>
+        <td><span class="tag red">Not Ready</span></td>
+        <td>否</td>
+        <td>不做爬虫硬冲。先查官方/商业 API 和许可。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>四、Developer 闸门</h2>
+  <ul>
+    <li>可以开发：SEC EDGAR、CNINFO 扩展、Google/Sina/STCN 的来源质量标签，前提是加上 source registry 和 trust tier。</li>
+    <li>可以准备但不能直接上线：Tushare news 权限 smoke、iFinD/Choice/LSEG/RavenPack/Benzinga 的试用对接。</li>
+    <li>只能试点：GDELT、Stocktwits、Reddit，必须限速、缓存、只当热度。</li>
+    <li>暂时不要交给 Developer：雪球、股吧、微博、X 的非官方大规模抓取。</li>
+  </ul>
+
+  <h2>五、引用和依据</h2>
+  <ul>
+    <li><a href="https://www.tushare.pro/document/41?doc_id=143">Tushare news 文档</a>：`news` 接口需要单独权限，支持多主流新闻源和 6 年以上历史。</li>
+    <li><a href="https://www.sec.gov/edgar/sec-api-documentation">SEC EDGAR API 文档</a>：REST JSON API，无需认证，filing metadata 实时更新。</li>
+    <li><a href="https://www.cninfo.com.cn/">CNINFO</a>：A 股公告、深沪北交易所问询/监管/纪律处分等入口。</li>
+    <li><a href="https://ftwc.51ifind.com/gwstatic/static/ds_web/quantapi-web/help-center/faq.html">iFinD 数据接口 FAQ</a>：支持 SDK/HTTP，正式/试用权限和 QPS 限制明确。</li>
+    <li><a href="https://developers.lseg.com/en/api-catalog/refinitiv-data-platform/news-API">LSEG News API</a>：提供 Reuters 和第三方新闻的授权 API 入口。</li>
+    <li><a href="https://marketing-prod.ravenpack.com/products/edge/data/news-analytics">RavenPack News Analytics</a>：提供实体、事件、情绪、相关性、新颖度和影响分析。</li>
+    <li><a href="https://www.benzinga.com/apis/">Benzinga APIs</a>：提供新闻、分析师、电话会文字稿、Why Is It Moving 等金融 API 产品。</li>
+    <li><a href="https://docs.x.com/x-api/fundamentals/rate-limits">X API rate limits</a>：recent search/full archive/search stream 有明确限额。</li>
+    <li><a href="https://www.reddit.com/dev/api/">Reddit API 文档</a>：listing/search API 有分页和 limit 约束。</li>
+  </ul>
+</main>
+</body>
+</html>
