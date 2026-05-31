@@ -1,0 +1,64 @@
+{
+  "version": "source-registry-governance-fixture-v1",
+  "sources": [
+    {
+      "source_id": "sec_edgar_filings",
+      "display_name": "SEC EDGAR filings",
+      "acquisition_mode": "official_api",
+      "permission_status": "public_official",
+      "license_scope": "metadata_and_public_document_reference",
+      "retention_policy": "metadata_and_permitted_excerpt",
+      "redistribution_policy": "link_and_metadata_only",
+      "anti_bot_risk": "low",
+      "owner_service": "stock-data-gateway",
+      "robots_tos_review": {
+        "status": "not_required_official_api",
+        "reviewed_at": "2026-06-01",
+        "reviewer": "Architect"
+      },
+      "request_pacing_policy": {
+        "status": "defined",
+        "max_requests_per_minute": 10,
+        "cache_ttl_seconds": 3600
+      },
+      "prohibited_behaviors": [],
+      "allowed_product_use": ["trusted_fact_candidate"]
+    },
+    {
+      "source_id": "public_industry_media_candidate",
+      "display_name": "Public industry media candidate",
+      "acquisition_mode": "public_web_crawler",
+      "permission_status": "unreviewed",
+      "license_scope": "unknown",
+      "retention_policy": "metadata_only_until_reviewed",
+      "redistribution_policy": "unknown",
+      "anti_bot_risk": "medium",
+      "owner_service": "stock-data-gateway",
+      "robots_tos_review": {"status": "not_reviewed"},
+      "request_pacing_policy": {"status": "missing"},
+      "prohibited_behaviors": [],
+      "allowed_product_use": ["context_candidate_only"]
+    },
+    {
+      "source_id": "forbidden_social_scrape",
+      "display_name": "Forbidden social scrape",
+      "acquisition_mode": "community_page_crawler",
+      "permission_status": "not_permitted",
+      "license_scope": "none",
+      "retention_policy": "do_not_store",
+      "redistribution_policy": "do_not_display",
+      "anti_bot_risk": "high",
+      "owner_service": "stock-data-gateway",
+      "robots_tos_review": {"status": "not_reviewed"},
+      "request_pacing_policy": {"status": "missing"},
+      "prohibited_behaviors": [
+        "captcha_bypass",
+        "stealth_browser",
+        "residential_proxy_evasion",
+        "credential_sharing",
+        "login_only_scraping_without_permission"
+      ],
+      "allowed_product_use": []
+    }
+  ]
+}

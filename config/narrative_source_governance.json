@@ -1,0 +1,52 @@
+{
+  "version": "narrative-source-governance-v1",
+  "purpose": "Gate every narrative source before implementation or live smoke.",
+  "required_registry_fields": [
+    "source_id",
+    "display_name",
+    "acquisition_mode",
+    "permission_status",
+    "license_scope",
+    "retention_policy",
+    "redistribution_policy",
+    "anti_bot_risk",
+    "owner_service",
+    "allowed_product_use"
+  ],
+  "crawler_acquisition_modes": [
+    "public_web_crawler",
+    "rss_or_sitemap_crawler",
+    "industry_media_crawler",
+    "community_page_crawler"
+  ],
+  "crawler_required_gates": [
+    "robots_tos_review",
+    "request_pacing_policy"
+  ],
+  "prohibited_behaviors": [
+    "captcha_bypass",
+    "stealth_browser",
+    "residential_proxy_evasion",
+    "credential_sharing",
+    "login_only_scraping_without_permission"
+  ],
+  "prohibited_behavior_labels": {
+    "captcha_bypass": "CAPTCHA bypass",
+    "stealth_browser": "Stealth or anti-detect browser",
+    "residential_proxy_evasion": "Residential proxy evasion",
+    "credential_sharing": "Credential sharing",
+    "login_only_scraping_without_permission": "Scraping login-only content without permission"
+  },
+  "allowed_owner_services": [
+    "stock-data-gateway",
+    "narrative-service",
+    "FNI"
+  ],
+  "live_smoke_blocking_reason_labels": {
+    "missing_required_registry_field": "Missing required source registry field.",
+    "robots_tos_review_required": "Crawler source requires robots/TOS review before live smoke.",
+    "request_pacing_policy_required": "Crawler source requires request pacing policy before live smoke.",
+    "prohibited_behavior_declared": "Source entry declares prohibited acquisition behavior.",
+    "owner_service_invalid": "Source owner service is not recognized."
+  }
+}

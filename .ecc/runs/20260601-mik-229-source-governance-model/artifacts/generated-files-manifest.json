@@ -1,0 +1,34 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "source_governance_report_json",
+      "path": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable source governance evaluation showing one passed source and two blocked sources.",
+      "checksum_sha256": "0e9d451b4768fd8cf2fef155703ebf8f18a1445c5ea4445d7f084cc82acd172e",
+      "mtime_epoch": 1780250694,
+      "size_bytes": 3525
+    },
+    {
+      "type": "source_governance_report_html",
+      "path": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese HTML source governance report exposing required fields, crawler gates, and prohibited behaviors.",
+      "checksum_sha256": "32de95a6460937713fff867a8b258db5ba4102211dcf5afa412ef757df93d92c",
+      "mtime_epoch": 1780250694,
+      "size_bytes": 2608
+    },
+    {
+      "type": "source_registry_fixture",
+      "path": ".ecc/runs/20260601-mik-229-source-governance-model/artifacts/source_registry_fixture.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Fixture source registry covering an official source, an incomplete public crawler, and a prohibited social scrape.",
+      "checksum_sha256": "17063594b09ba0358d4f5ef42259372b739b948dd46c8af933e08100b1b3fa41",
+      "mtime_epoch": 1780250689,
+      "size_bytes": 2282
+    }
+  ]
+}
