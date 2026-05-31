@@ -1,0 +1,330 @@
+{
+  "data_quality": "fresh",
+  "degradation_events": [],
+  "events": [
+    {
+      "dedupe_key": "SEVT_A50FB1E06D0CA5CF",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_SEC_EDGAR_815E2F4AFF0917A1",
+      "event_time": "2026-05-29",
+      "evidence_claims": [
+        "SEC EDGAR filing metadata reports form 4 with accession 0001140361-26-023363."
+      ],
+      "evidence_granularity": "metadata_only",
+      "external_access_policy": "gateway_change_request_first",
+      "keywords": [
+        "official filing",
+        "ownership disclosure"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc."
+        }
+      ],
+      "narrative_hints": [
+        "official filing",
+        "ownership disclosure"
+      ],
+      "promotion_effect": "none",
+      "provider": "sec-edgar-submissions",
+      "provider_version": "sec-edgar-submissions-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "accession_number": "0001140361-26-023363",
+        "cik": "0000320193",
+        "company_name": "Apple Inc.",
+        "degradation_state": "ok",
+        "event_class": "insider_ownership",
+        "evidence_granularity": "metadata_only",
+        "fetched_at": "2026-05-31T17:23:00+00:00",
+        "filing_date": "2026-05-29",
+        "form_type": "4",
+        "permission_status": "public_api",
+        "primary_doc_description": "FORM 4",
+        "primary_document": "xslF345X06/form4.xml",
+        "provider": "sec-edgar-submissions",
+        "provider_preference": [
+          "sec_edgar_submissions"
+        ],
+        "provider_version": "sec-edgar-submissions-v1",
+        "raw_hash": "289dea2abff30216f393ec9f6a32fc48a506b9dcbdae3d7cf514a2214e784084",
+        "report_date": "2026-05-27",
+        "source_mode": "external_contract",
+        "source_trust_tier": "trusted_fact",
+        "ticker": "AAPL"
+      },
+      "source_trust_tier": "trusted_fact",
+      "source_type": "filing",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000114036126023363/0001140361-26-023363-index.html",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Apple Inc. filed 4 on SEC EDGAR. This event is metadata_only; no filing text or XBRL facts were parsed.",
+      "title": "AAPL 4 SEC filing 2026-05-29",
+      "trust_status": "candidate_untrusted"
+    },
+    {
+      "dedupe_key": "SEVT_B353413A012E97A6",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_SEC_EDGAR_D47A4731FFB868D6",
+      "event_time": "2026-05-28",
+      "evidence_claims": [
+        "SEC EDGAR filing metadata reports form SD with accession 0001140361-26-023149."
+      ],
+      "evidence_granularity": "metadata_only",
+      "external_access_policy": "gateway_change_request_first",
+      "keywords": [
+        "official filing"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc."
+        }
+      ],
+      "narrative_hints": [
+        "official filing"
+      ],
+      "promotion_effect": "none",
+      "provider": "sec-edgar-submissions",
+      "provider_version": "sec-edgar-submissions-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "accession_number": "0001140361-26-023149",
+        "cik": "0000320193",
+        "company_name": "Apple Inc.",
+        "degradation_state": "ok",
+        "event_class": "other_filing",
+        "evidence_granularity": "metadata_only",
+        "fetched_at": "2026-05-31T17:23:00+00:00",
+        "filing_date": "2026-05-28",
+        "form_type": "SD",
+        "permission_status": "public_api",
+        "primary_doc_description": "SD",
+        "primary_document": "ef20073373_sd.htm",
+        "provider": "sec-edgar-submissions",
+        "provider_preference": [
+          "sec_edgar_submissions"
+        ],
+        "provider_version": "sec-edgar-submissions-v1",
+        "raw_hash": "8bbec343e5036582a87d96ca3ed81b41a3c4b30c3dc166ac4c2fcee82ef1ab36",
+        "report_date": "",
+        "source_mode": "external_contract",
+        "source_trust_tier": "trusted_fact",
+        "ticker": "AAPL"
+      },
+      "source_trust_tier": "trusted_fact",
+      "source_type": "filing",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000114036126023149/0001140361-26-023149-index.html",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Apple Inc. filed SD on SEC EDGAR. This event is metadata_only; no filing text or XBRL facts were parsed.",
+      "title": "AAPL SD SEC filing 2026-05-28",
+      "trust_status": "candidate_untrusted"
+    },
+    {
+      "dedupe_key": "SEVT_C8137D6552F62458",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_SEC_EDGAR_66623B1E016743BB",
+      "event_time": "2026-05-27",
+      "evidence_claims": [
+        "SEC EDGAR filing metadata reports form 144 with accession 0001921094-26-000555."
+      ],
+      "evidence_granularity": "metadata_only",
+      "external_access_policy": "gateway_change_request_first",
+      "keywords": [
+        "official filing"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc."
+        }
+      ],
+      "narrative_hints": [
+        "official filing"
+      ],
+      "promotion_effect": "none",
+      "provider": "sec-edgar-submissions",
+      "provider_version": "sec-edgar-submissions-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "accession_number": "0001921094-26-000555",
+        "cik": "0000320193",
+        "company_name": "Apple Inc.",
+        "degradation_state": "ok",
+        "event_class": "other_filing",
+        "evidence_granularity": "metadata_only",
+        "fetched_at": "2026-05-31T17:23:00+00:00",
+        "filing_date": "2026-05-27",
+        "form_type": "144",
+        "permission_status": "public_api",
+        "primary_doc_description": "",
+        "primary_document": "xsl144X01/primary_doc.xml",
+        "provider": "sec-edgar-submissions",
+        "provider_preference": [
+          "sec_edgar_submissions"
+        ],
+        "provider_version": "sec-edgar-submissions-v1",
+        "raw_hash": "0eb17d12b8427ddcbc869ca64a0877a20716455d17fee07e681cb7d9d27216e3",
+        "report_date": "",
+        "source_mode": "external_contract",
+        "source_trust_tier": "trusted_fact",
+        "ticker": "AAPL"
+      },
+      "source_trust_tier": "trusted_fact",
+      "source_type": "filing",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000192109426000555/0001921094-26-000555-index.html",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Apple Inc. filed 144 on SEC EDGAR. This event is metadata_only; no filing text or XBRL facts were parsed.",
+      "title": "AAPL 144 SEC filing 2026-05-27",
+      "trust_status": "candidate_untrusted"
+    },
+    {
+      "dedupe_key": "SEVT_AEF8B00534CA3342",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_SEC_EDGAR_DD6F987282E98B9A",
+      "event_time": "2026-05-12",
+      "evidence_claims": [
+        "SEC EDGAR filing metadata reports form 4 with accession 0001140361-26-020871."
+      ],
+      "evidence_granularity": "metadata_only",
+      "external_access_policy": "gateway_change_request_first",
+      "keywords": [
+        "official filing",
+        "ownership disclosure"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc."
+        }
+      ],
+      "narrative_hints": [
+        "official filing",
+        "ownership disclosure"
+      ],
+      "promotion_effect": "none",
+      "provider": "sec-edgar-submissions",
+      "provider_version": "sec-edgar-submissions-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "accession_number": "0001140361-26-020871",
+        "cik": "0000320193",
+        "company_name": "Apple Inc.",
+        "degradation_state": "ok",
+        "event_class": "insider_ownership",
+        "evidence_granularity": "metadata_only",
+        "fetched_at": "2026-05-31T17:23:00+00:00",
+        "filing_date": "2026-05-12",
+        "form_type": "4",
+        "permission_status": "public_api",
+        "primary_doc_description": "FORM 4",
+        "primary_document": "xslF345X06/form4.xml",
+        "provider": "sec-edgar-submissions",
+        "provider_preference": [
+          "sec_edgar_submissions"
+        ],
+        "provider_version": "sec-edgar-submissions-v1",
+        "raw_hash": "2f2d425e5f937200fa7230adcdb12fb93dc6c0c8673796594e073d2638245931",
+        "report_date": "2026-05-08",
+        "source_mode": "external_contract",
+        "source_trust_tier": "trusted_fact",
+        "ticker": "AAPL"
+      },
+      "source_trust_tier": "trusted_fact",
+      "source_type": "filing",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000114036126020871/0001140361-26-020871-index.html",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Apple Inc. filed 4 on SEC EDGAR. This event is metadata_only; no filing text or XBRL facts were parsed.",
+      "title": "AAPL 4 SEC filing 2026-05-12",
+      "trust_status": "candidate_untrusted"
+    },
+    {
+      "dedupe_key": "SEVT_D366915AF0A658CE",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_SEC_EDGAR_0134CA12D7A026FF",
+      "event_time": "2026-05-08",
+      "evidence_claims": [
+        "SEC EDGAR filing metadata reports form 4 with accession 0001140361-26-020298."
+      ],
+      "evidence_granularity": "metadata_only",
+      "external_access_policy": "gateway_change_request_first",
+      "keywords": [
+        "official filing",
+        "ownership disclosure"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc."
+        }
+      ],
+      "narrative_hints": [
+        "official filing",
+        "ownership disclosure"
+      ],
+      "promotion_effect": "none",
+      "provider": "sec-edgar-submissions",
+      "provider_version": "sec-edgar-submissions-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "accession_number": "0001140361-26-020298",
+        "cik": "0000320193",
+        "company_name": "Apple Inc.",
+        "degradation_state": "ok",
+        "event_class": "insider_ownership",
+        "evidence_granularity": "metadata_only",
+        "fetched_at": "2026-05-31T17:23:00+00:00",
+        "filing_date": "2026-05-08",
+        "form_type": "4",
+        "permission_status": "public_api",
+        "primary_doc_description": "FORM 4",
+        "primary_document": "xslF345X06/form4.xml",
+        "provider": "sec-edgar-submissions",
+        "provider_preference": [
+          "sec_edgar_submissions"
+        ],
+        "provider_version": "sec-edgar-submissions-v1",
+        "raw_hash": "d33a04e9e6283017d3fc3349b6bdd0938b741f7f737fbead8f25299a6775f99c",
+        "report_date": "2026-05-06",
+        "source_mode": "external_contract",
+        "source_trust_tier": "trusted_fact",
+        "ticker": "AAPL"
+      },
+      "source_trust_tier": "trusted_fact",
+      "source_type": "filing",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000114036126020298/0001140361-26-020298-index.html",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Apple Inc. filed 4 on SEC EDGAR. This event is metadata_only; no filing text or XBRL facts were parsed.",
+      "title": "AAPL 4 SEC filing 2026-05-08",
+      "trust_status": "candidate_untrusted"
+    }
+  ],
+  "evidence_granularity": "metadata_only",
+  "fetched_at": "2026-05-31T17:23:00+00:00",
+  "provider_name": "sec-edgar-submissions",
+  "provider_version": "sec-edgar-submissions-v1",
+  "source_trust_tier": "trusted_fact",
+  "source_url": "https://data.sec.gov/submissions/CIK0000320193.json",
+  "summary": {
+    "degradation_count": 0,
+    "event_count": 5,
+    "requested_cik": "0000320193",
+    "skipped_filing_count": 0
+  },
+  "version": "sec-edgar-submissions-v1"
+}

@@ -15,6 +15,7 @@
   "supported_source_types": [
     "news",
     "announcement",
+    "filing",
     "manual",
     "social",
     "social_future"
@@ -31,6 +32,9 @@
       "gateway_announcements",
       "tushare_announcements",
       "cninfo_announcements"
+    ],
+    "filing": [
+      "sec_edgar_submissions"
     ],
     "manual": [
       "manual_research_note"

@@ -1,0 +1,18 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "sec_edgar_source_smoke_json",
+      "path": "outputs/sec_edgar_source_smoke/2026-06-01-mik-235/sec_edgar_source_smoke.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Live SEC EDGAR submissions smoke normalized to source-event rows for Apple CIK 0000320193."
+    },
+    {
+      "type": "sec_edgar_source_smoke_html",
+      "path": "outputs/sec_edgar_source_smoke/2026-06-01-mik-235/sec_edgar_source_smoke.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese HTML summary of the SEC EDGAR official filing metadata smoke."
+    }
+  ]
+}
