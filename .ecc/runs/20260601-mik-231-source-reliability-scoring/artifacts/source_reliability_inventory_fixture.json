@@ -1,0 +1,93 @@
+{
+  "version": "source-reliability-inventory-fixture-v1",
+  "sources": [
+    {
+      "source_id": "sec_edgar_filings",
+      "display_name": "SEC EDGAR filings",
+      "source_class": "official_disclosure",
+      "license_scope": "metadata_and_public_document_reference",
+      "anti_bot_risk": "low",
+      "governance_gate_status": "passed",
+      "corroborating_evidence": true,
+      "dimension_scores": {
+        "availability": 0.95,
+        "latency_freshness": 0.9,
+        "schema_stability": 0.9,
+        "completeness": 0.85,
+        "entity_tagging_quality": 0.8,
+        "license_clarity": 0.95,
+        "anti_bot_risk": 0.95,
+        "retry_recoverability": 0.8,
+        "historical_depth": 0.85,
+        "operational_cost": 0.9,
+        "contradiction_rate": 0.9
+      }
+    },
+    {
+      "source_id": "licensed_reuters_news",
+      "display_name": "Licensed Reuters news",
+      "source_class": "licensed_news",
+      "license_scope": "licensed_news_api",
+      "anti_bot_risk": "low",
+      "governance_gate_status": "passed",
+      "corroborating_evidence": true,
+      "dimension_scores": {
+        "availability": 0.85,
+        "latency_freshness": 0.9,
+        "schema_stability": 0.8,
+        "completeness": 0.8,
+        "entity_tagging_quality": 0.8,
+        "license_clarity": 0.9,
+        "anti_bot_risk": 0.9,
+        "retry_recoverability": 0.75,
+        "historical_depth": 0.8,
+        "operational_cost": 0.55,
+        "contradiction_rate": 0.8
+      }
+    },
+    {
+      "source_id": "stocktwits_heat",
+      "display_name": "Stocktwits heat",
+      "source_class": "social_community",
+      "license_scope": "metadata_and_permitted_excerpt",
+      "anti_bot_risk": "medium",
+      "governance_gate_status": "passed",
+      "corroborating_evidence": false,
+      "dimension_scores": {
+        "availability": 0.8,
+        "latency_freshness": 0.9,
+        "schema_stability": 0.75,
+        "completeness": 0.6,
+        "entity_tagging_quality": 0.6,
+        "license_clarity": 0.6,
+        "anti_bot_risk": 0.55,
+        "retry_recoverability": 0.7,
+        "historical_depth": 0.35,
+        "operational_cost": 0.8,
+        "contradiction_rate": 0.5
+      }
+    },
+    {
+      "source_id": "blocked_social_scrape",
+      "display_name": "Blocked social scrape",
+      "source_class": "social_community",
+      "license_scope": "none",
+      "anti_bot_risk": "high",
+      "governance_gate_status": "blocked",
+      "corroborating_evidence": false,
+      "dimension_scores": {
+        "availability": 0.2,
+        "latency_freshness": 0.2,
+        "schema_stability": 0.1,
+        "completeness": 0.1,
+        "entity_tagging_quality": 0.1,
+        "license_clarity": 0.0,
+        "anti_bot_risk": 0.0,
+        "retry_recoverability": 0.1,
+        "historical_depth": 0.0,
+        "operational_cost": 0.1,
+        "contradiction_rate": 0.1
+      }
+    }
+  ]
+}

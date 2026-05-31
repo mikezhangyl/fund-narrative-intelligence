@@ -1,0 +1,45 @@
+{
+  "version": "source-reliability-scoring-v1",
+  "dimensions": [
+    "availability",
+    "latency_freshness",
+    "schema_stability",
+    "completeness",
+    "entity_tagging_quality",
+    "license_clarity",
+    "anti_bot_risk",
+    "retry_recoverability",
+    "historical_depth",
+    "operational_cost",
+    "contradiction_rate"
+  ],
+  "weights": {
+    "availability": 0.12,
+    "latency_freshness": 0.08,
+    "schema_stability": 0.1,
+    "completeness": 0.1,
+    "entity_tagging_quality": 0.1,
+    "license_clarity": 0.14,
+    "anti_bot_risk": 0.12,
+    "retry_recoverability": 0.08,
+    "historical_depth": 0.06,
+    "operational_cost": 0.04,
+    "contradiction_rate": 0.06
+  },
+  "labels": [
+    "Trusted Fact",
+    "Licensed News",
+    "Research Context",
+    "Heat Signal",
+    "Experimental",
+    "Avoid"
+  ],
+  "label_thresholds": {
+    "trusted_fact": 0.78,
+    "licensed_news": 0.68,
+    "research_context": 0.55,
+    "experimental": 0.35
+  },
+  "social_without_corroboration_label": "Heat Signal",
+  "blocked_label": "Avoid"
+}

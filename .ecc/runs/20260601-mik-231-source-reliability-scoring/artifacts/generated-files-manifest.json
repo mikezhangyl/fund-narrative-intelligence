@@ -1,0 +1,34 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "source_reliability_report_json",
+      "path": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable source reliability report covering Trusted Fact, Licensed News, Heat Signal, and Avoid labels.",
+      "checksum_sha256": "92e64c84d8a3a51cd3f7c944b31b4e57b5ec7c3dc0fd616f7bdd5273dda9b894",
+      "mtime_epoch": 1780251291,
+      "size_bytes": 3877
+    },
+    {
+      "type": "source_reliability_report_html",
+      "path": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese HTML source reliability report showing deterministic labels and social-source corroboration warning.",
+      "checksum_sha256": "2bb9d1e6ebb3f83eefa228560ab199a106ffd5203b6abf088677ce1cbe4f4855",
+      "mtime_epoch": 1780251291,
+      "size_bytes": 2211
+    },
+    {
+      "type": "source_reliability_inventory_fixture",
+      "path": ".ecc/runs/20260601-mik-231-source-reliability-scoring/artifacts/source_reliability_inventory_fixture.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Fixture inventory for source reliability scoring with official, licensed, social heat, and blocked examples.",
+      "checksum_sha256": "16ad4234f7aca441fa557fa903d1103af4b5d9a202395b691d7466e10f2840c1",
+      "mtime_epoch": 1780251282,
+      "size_bytes": 2893
+    }
+  ]
+}
