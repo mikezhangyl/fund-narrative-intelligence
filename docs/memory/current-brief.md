@@ -169,7 +169,7 @@ python scripts/context_brief.py --max-words 900
 
 ## Round 13 Narrative Source Deep Mining
 
-Round 13 planning is open in Linear under milestone `M19 - Narrative Source Deep Mining` and documented at `docs/product/round13-narrative-source-deep-mining-plan-2026-06-01.md`. Parent issues are `MIK-221` (PM) and `MIK-222` (Architect). Child issues are `MIK-223` through `MIK-234`, covering source acquisition matrix, paid provider evaluation, official disclosure intake, public web crawler pilot, community/social heat pilot, today's narrative digest, source governance, source-event schema v2, source reliability/risk scoring, crawler contract, digest pipeline, and entity resolution/dedupe. Recommended build order starts with `MIK-229 + MIK-231`, then `MIK-223`, then `MIK-230 + MIK-234`.
+Round 13 planning is open in Linear under milestone `M19 - Narrative Source Deep Mining` and documented at `docs/product/round13-narrative-source-deep-mining-plan-2026-06-01.md`. Parent issues are `MIK-221` (PM) and `MIK-222` (Architect). `MIK-223` source acquisition matrix is Done with feasibility outputs under `outputs/narrative_source_feasibility/2026-06-01/`. Dev-ready source slices are `MIK-235` SEC EDGAR adapter, `MIK-236` CNINFO event classifier expansion, `MIK-237` public news context cleanup, and `MIK-238` Stocktwits controlled heat pilot. PM investigation backlog is `MIK-239` Tushare news permission smoke, `MIK-240` iFinD/Choice/Wind trial checklist, `MIK-241` global paid news analytics checklist, and `MIK-242` China community/social access investigation. Storage architecture is tracked by `MIK-243` and initial thesis `docs/product/narrative-evidence-storage-model-initial-thesis-2026-06-01.md`.
 
 ## Stable Product Loop
 

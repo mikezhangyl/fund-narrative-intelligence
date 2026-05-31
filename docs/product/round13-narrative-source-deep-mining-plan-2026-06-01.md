@@ -169,6 +169,10 @@ Each digest item must show:
 - `MIK-226`: Public web and industry media crawler pilot plan.
 - `MIK-227`: Community and social heat source pilot plan.
 - `MIK-228`: Today's narrative monitoring digest requirement.
+- `MIK-239`: Tushare news permission and live data smoke.
+- `MIK-240`: China paid provider trial checklist for iFinD, Choice, and Wind.
+- `MIK-241`: Global paid news analytics trial checklist.
+- `MIK-242`: China community and social source access investigation.
 
 ## Architecture Requirements Created In Linear
 
@@ -179,6 +183,47 @@ Each digest item must show:
 - `MIK-232`: Crawler adapter contract and robots/rate-limit policy.
 - `MIK-233`: Fresh narrative digest pipeline contract.
 - `MIK-234`: Entity resolution and deduplication contract.
+- `MIK-243`: Narrative evidence storage model feasibility.
+
+## Dev-Ready Source Slices Created In Linear
+
+These are directions where PM has verified live sample data can be fetched.
+They are not production stability certifications.
+
+- `MIK-235`: SEC EDGAR official filing source adapter MVP.
+- `MIK-236`: CNINFO official disclosure event classifier expansion.
+- `MIK-237`: Public news context cleanup and source-quality labels.
+- `MIK-238`: Stocktwits heat-signal controlled pilot.
+
+Evidence summary:
+
+- SEC EDGAR submissions API returned Apple filing metadata with 1000 recent
+  filing rows.
+- CNINFO returned two recent `000001` announcements for a 30-day window.
+- Google News RSS returned 100 results for an A-share semiconductor query.
+- Sina Finance returned rows, but the parser includes navigation noise that must
+  be cleaned.
+- Stocktwits public symbol stream returned five AAPL messages.
+- GDELT returned HTTP 429 and should not be handed to Developer until strict
+  queue/cache pacing is designed.
+
+## Storage Thesis
+
+Narrative ingestion produces raw files, provider payloads, article snippets,
+sentence-level evidence, entity mentions, candidate narratives, evidence packs,
+and review decisions. The initial storage thesis is documented in
+`docs/product/narrative-evidence-storage-model-initial-thesis-2026-06-01.md`.
+
+Short version:
+
+- relational tables are the source of truth for source registry, fetch runs,
+  normalized source events, evidence spans, entities, narratives, evidence
+  packs, and review ledger;
+- filesystem/object storage keeps raw payloads and files only when retention and
+  license rules allow it;
+- full-text search and embeddings are derived indexes, not the source of truth;
+- paid/news/social content should default to metadata and permitted excerpts
+  unless a license explicitly allows full-text retention.
 
 ## Recommended Build Order
 
@@ -205,4 +250,3 @@ Each digest item must show:
 - GDELT Cloud API: https://docs.gdeltcloud.com/api-reference
 - Reddit API documentation: https://www.reddit.com/dev/api/
 - X API rate limits: https://docs.x.com/x-api/fundamentals/rate-limits
-
