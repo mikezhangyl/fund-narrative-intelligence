@@ -2,6 +2,9 @@
 
 Linear issue: `MIK-243`
 
+Follow-up architecture plan:
+`docs/product/lightweight-narrative-lakehouse-architecture-2026-06-01.md`
+
 ## Plain-Language Answer
 
 Yes, narrative service needs a database. But it should not put every file,
@@ -317,4 +320,3 @@ text blobs.
 Architect should turn this thesis into a developer-ready schema plan under
 `MIK-243`. Developer should not build large-scale source ingestion until this
 storage contract is accepted.
-

@@ -184,6 +184,11 @@ Each digest item must show:
 - `MIK-233`: Fresh narrative digest pipeline contract.
 - `MIK-234`: Entity resolution and deduplication contract.
 - `MIK-243`: Narrative evidence storage model feasibility.
+- `MIK-244`: Lightweight lakehouse user scenarios and data classes.
+- `MIK-245`: Lightweight narrative lakehouse architecture spec.
+- `MIK-246`: Narrative storage MVP schema and repository contract.
+- `MIK-247`: Local raw zone layout and blob manifest MVP.
+- `MIK-248`: Search and vector index deferral plan.
 
 ## Dev-Ready Source Slices Created In Linear
 
@@ -213,6 +218,8 @@ Narrative ingestion produces raw files, provider payloads, article snippets,
 sentence-level evidence, entity mentions, candidate narratives, evidence packs,
 and review decisions. The initial storage thesis is documented in
 `docs/product/narrative-evidence-storage-model-initial-thesis-2026-06-01.md`.
+The concrete lightweight lakehouse architecture is documented in
+`docs/product/lightweight-narrative-lakehouse-architecture-2026-06-01.md`.
 
 Short version:
 
