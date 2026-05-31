@@ -1,0 +1,144 @@
+{
+  "data_quality": "fresh",
+  "degradation_events": [],
+  "events": [
+    {
+      "dedupe_key": "SEVT_1CAC586E9B6BFD3C",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_CNINFO_666C508EE255D709",
+      "event_time": "2026-05-22",
+      "evidence_claims": [
+        "CNINFO metadata reports 北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书 with category ."
+      ],
+      "evidence_granularity": "metadata_only",
+      "external_access_policy": "gateway_change_request_first",
+      "keywords": [
+        "股东大会/治理",
+        ""
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "000001",
+          "stock_name": "平安银行"
+        }
+      ],
+      "narrative_hints": [
+        "股东大会/治理",
+        ""
+      ],
+      "promotion_effect": "none",
+      "provider": "cninfo-announcement",
+      "provider_version": "cninfo-announcement-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "announcement_category": "",
+        "degradation_state": "ok",
+        "event_class": "shareholder_meeting_governance",
+        "event_label_zh": "股东大会/治理",
+        "evidence_granularity": "metadata_only",
+        "fetched_at": "2026-05-31T17:29:10+00:00",
+        "pdf_body_parsed": false,
+        "permission_status": "public_official_disclosure",
+        "provider": "cninfo-announcement",
+        "provider_preference": [
+          "gateway_announcements",
+          "tushare_announcements",
+          "cninfo_announcements"
+        ],
+        "provider_version": "cninfo-announcement-v1",
+        "raw_hash": "6139ac8ce73d4c27c435af01ac613eee8e346a754938a5a783ec55f5f5bb80d9",
+        "sentiment": "neutral",
+        "source_mode": "external_contract",
+        "source_trust_tier": "trusted_fact",
+        "stock_code": "000001",
+        "stock_name": "平安银行"
+      },
+      "source_trust_tier": "trusted_fact",
+      "source_type": "announcement",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2026-05-23/1225327041.PDF",
+      "stock_codes": [
+        "000001"
+      ],
+      "summary": "平安银行 CNINFO announcement metadata classified as shareholder_meeting_governance; PDF body was not parsed.",
+      "title": "北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书",
+      "trust_status": "candidate_untrusted"
+    },
+    {
+      "dedupe_key": "SEVT_A8C3C07B5EE41F24",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_CNINFO_9E989B17EB74A628",
+      "event_time": "2026-05-22",
+      "evidence_claims": [
+        "CNINFO metadata reports 2025年年度股东会决议公告 with category ."
+      ],
+      "evidence_granularity": "metadata_only",
+      "external_access_policy": "gateway_change_request_first",
+      "keywords": [
+        "股东大会/治理",
+        ""
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "000001",
+          "stock_name": "平安银行"
+        }
+      ],
+      "narrative_hints": [
+        "股东大会/治理",
+        ""
+      ],
+      "promotion_effect": "none",
+      "provider": "cninfo-announcement",
+      "provider_version": "cninfo-announcement-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "announcement_category": "",
+        "degradation_state": "ok",
+        "event_class": "shareholder_meeting_governance",
+        "event_label_zh": "股东大会/治理",
+        "evidence_granularity": "metadata_only",
+        "fetched_at": "2026-05-31T17:29:10+00:00",
+        "pdf_body_parsed": false,
+        "permission_status": "public_official_disclosure",
+        "provider": "cninfo-announcement",
+        "provider_preference": [
+          "gateway_announcements",
+          "tushare_announcements",
+          "cninfo_announcements"
+        ],
+        "provider_version": "cninfo-announcement-v1",
+        "raw_hash": "c4e88180298b44398bcf6869b786f60239349bf4decccfc9780355b0639ee279",
+        "sentiment": "neutral",
+        "source_mode": "external_contract",
+        "source_trust_tier": "trusted_fact",
+        "stock_code": "000001",
+        "stock_name": "平安银行"
+      },
+      "source_trust_tier": "trusted_fact",
+      "source_type": "announcement",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2026-05-23/1225327040.PDF",
+      "stock_codes": [
+        "000001"
+      ],
+      "summary": "平安银行 CNINFO announcement metadata classified as shareholder_meeting_governance; PDF body was not parsed.",
+      "title": "2025年年度股东会决议公告",
+      "trust_status": "candidate_untrusted"
+    }
+  ],
+  "evidence_granularity": "metadata_only",
+  "fetched_at": "2026-05-31T17:29:10+00:00",
+  "missing_stock_codes": [],
+  "provider_name": "cninfo-announcement",
+  "provider_version": "cninfo-announcement-v1",
+  "source_trust_tier": "trusted_fact",
+  "summary": {
+    "announcement_count": 2,
+    "event_count": 2,
+    "missing_stock_code_count": 0,
+    "source_quality": "fresh",
+    "unknown_category_count": 0
+  },
+  "version": "cninfo-disclosure-events-v1"
+}

@@ -1,0 +1,18 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "cninfo_disclosure_events_json",
+      "path": "outputs/cninfo_disclosure_events/2026-06-01-mik-236/cninfo_disclosure_events.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Live CNINFO official disclosure metadata classified into source-event rows for stock 000001."
+    },
+    {
+      "type": "cninfo_disclosure_events_html",
+      "path": "outputs/cninfo_disclosure_events/2026-06-01-mik-236/cninfo_disclosure_events.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese HTML summary of CNINFO official disclosure event classifications."
+    }
+  ]
+}

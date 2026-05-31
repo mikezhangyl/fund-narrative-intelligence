@@ -1,0 +1,37 @@
+{
+  "task_run_id": "20260601-mik-236-cninfo-event-classifier",
+  "task_state": "ready_for_quality",
+  "review_cycle": 0,
+  "branch": "codex/mik-236-cninfo-event-classifier",
+  "worktree": "/Users/mikezhang/Coding/AI-Learning/fund-narrative-intelligence",
+  "base_commit": "a274d6bd7a279c25af5adf7937ec5d6b85bbddab",
+  "head_commit": "commit-containing-this-run-state",
+  "merge_base": "32b1f1dfbf50dd9714ee71547a0a3d5b1de392da",
+  "quality_reviewed_commit": null,
+  "reviewed_snapshot_type": null,
+  "working_tree_dirty": false,
+  "task_type": "implementation",
+  "task_agent_required": true,
+  "quality_agent_required": true,
+  "final_decision": "commit_and_push",
+  "review_outcome": "Implemented MIK-236 CNINFO official disclosure metadata classifier, smoke CLI, Chinese HTML output, and live 000001 smoke. Targeted, lint, py_compile, full tests, and local browser DOM checks passed.",
+  "owning_task_agent": null,
+  "active_agent": null,
+  "active_agent_role": null,
+  "child_agents_allowed": false,
+  "same_task_role_agents_allowed": false,
+  "quality_agent_allowed_after_state": "ready_for_quality",
+  "artifacts": {
+    "live_smoke_json": "outputs/cninfo_disclosure_events/2026-06-01-mik-236/cninfo_disclosure_events.json",
+    "live_smoke_html": "outputs/cninfo_disclosure_events/2026-06-01-mik-236/cninfo_disclosure_events.html"
+  },
+  "verification": {
+    "red": "pytest tests/test_cninfo_disclosure_events.py -q failed before implementation because scripts.run_cninfo_disclosure_event_smoke and src.scanners.cninfo_disclosure_events did not exist",
+    "targeted": "pytest tests/test_cninfo_disclosure_events.py tests/test_cninfo_provider.py tests/test_announcement_evidence.py tests/test_source_event_schema.py -q -> 21 passed",
+    "lint": "ruff check src/scanners/cninfo_disclosure_events.py scripts/run_cninfo_disclosure_event_smoke.py tests/test_cninfo_disclosure_events.py -> passed",
+    "compile": "python -m py_compile src/scanners/cninfo_disclosure_events.py scripts/run_cninfo_disclosure_event_smoke.py -> passed",
+    "live_smoke": "python scripts/run_cninfo_disclosure_event_smoke.py --stock-code 000001 --as-of-date 2026-06-01 --start-date 2026-05-01 --output-dir outputs/cninfo_disclosure_events/2026-06-01-mik-236 -> fresh, 2 events",
+    "browser": "http://localhost:8768/cninfo_disclosure_events.html DOM check confirmed h1, trusted_fact, metadata_only, no PDF parsing notice, and shareholder governance class",
+    "full": "pytest -q -> 579 passed, 1 skipped"
+  }
+}
