@@ -1,0 +1,313 @@
+{
+  "data_quality": "fresh",
+  "degradation_events": [],
+  "events": [
+    {
+      "dedupe_key": "SEVT_D7990FCC2D0DC987",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_STOCKTWITS_291D05480377E14E",
+      "event_time": "2026-05-31T17:27:31Z",
+      "evidence_claims": [
+        "Stocktwits message 654904183 mentions AAPL; message content is heat-only."
+      ],
+      "external_access_policy": "gateway_change_request_first",
+      "heat_trust_tier": "heat_signal_only",
+      "keywords": [
+        "AAPL",
+        "social heat"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc"
+        }
+      ],
+      "narrative_hints": [
+        "AAPL",
+        "social heat"
+      ],
+      "promotion_effect": "none",
+      "provider": "stocktwits-symbol-stream",
+      "provider_version": "stocktwits-symbol-stream-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "body_excerpt": "$SPY $QQQ $AAPL Be Responsible.. The Planned Promise vs. The Shareholder RealityThe Pitch: Apple had roughly $252 billion stashed offshore to legally defer U.S. corporate taxes. W...",
+        "degradation_state": "ok",
+        "fetched_at": "2026-05-31T17:41:13+00:00",
+        "heat_trust_tier": "heat_signal_only",
+        "historical_backfill": false,
+        "message_id": "654904183",
+        "permission_status": "public_symbol_stream",
+        "provider": "stocktwits-symbol-stream",
+        "provider_preference": [
+          "social_future_reserved"
+        ],
+        "provider_version": "stocktwits-symbol-stream-v1",
+        "raw_hash": "b6f0181898834559c288fc1e6345c2c556a999c95ed720adb86df8d38a3a9c64",
+        "source_mode": "external_contract",
+        "symbol": "AAPL",
+        "user_id": "1309451",
+        "user_profiled": false,
+        "username": "Activetrader777"
+      },
+      "source_type": "social",
+      "source_url": "https://stocktwits.com/Activetrader777/message/654904183",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Stocktwits message metadata normalized as heat_signal_only; body is treated as social chatter, not fact evidence.",
+      "title": "AAPL Stocktwits heat message 654904183",
+      "trust_status": "candidate_untrusted"
+    },
+    {
+      "dedupe_key": "SEVT_10947DC11959CBC6",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_STOCKTWITS_724D2996D2F68815",
+      "event_time": "2026-05-31T16:34:10Z",
+      "evidence_claims": [
+        "Stocktwits message 654902539 mentions AAPL; message content is heat-only."
+      ],
+      "external_access_policy": "gateway_change_request_first",
+      "heat_trust_tier": "heat_signal_only",
+      "keywords": [
+        "AAPL",
+        "social heat"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc"
+        }
+      ],
+      "narrative_hints": [
+        "AAPL",
+        "social heat"
+      ],
+      "promotion_effect": "none",
+      "provider": "stocktwits-symbol-stream",
+      "provider_version": "stocktwits-symbol-stream-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "body_excerpt": "$AAPL comments?",
+        "degradation_state": "ok",
+        "fetched_at": "2026-05-31T17:41:13+00:00",
+        "heat_trust_tier": "heat_signal_only",
+        "historical_backfill": false,
+        "message_id": "654902539",
+        "permission_status": "public_symbol_stream",
+        "provider": "stocktwits-symbol-stream",
+        "provider_preference": [
+          "social_future_reserved"
+        ],
+        "provider_version": "stocktwits-symbol-stream-v1",
+        "raw_hash": "f3db258c8cd965ba4c955c2314e5de193c19db6f9410160ef93533528d0717a6",
+        "source_mode": "external_contract",
+        "symbol": "AAPL",
+        "user_id": "3367713",
+        "user_profiled": false,
+        "username": "DarkPoolMoneyMaker"
+      },
+      "source_type": "social",
+      "source_url": "https://stocktwits.com/DarkPoolMoneyMaker/message/654902539",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Stocktwits message metadata normalized as heat_signal_only; body is treated as social chatter, not fact evidence.",
+      "title": "AAPL Stocktwits heat message 654902539",
+      "trust_status": "candidate_untrusted"
+    },
+    {
+      "dedupe_key": "SEVT_F1039EDB3AAE5740",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_STOCKTWITS_AAF1BCBEBFBEFC2B",
+      "event_time": "2026-05-31T16:23:35Z",
+      "evidence_claims": [
+        "Stocktwits message 654902202 mentions AAPL; message content is heat-only."
+      ],
+      "external_access_policy": "gateway_change_request_first",
+      "heat_trust_tier": "heat_signal_only",
+      "keywords": [
+        "AAPL",
+        "social heat"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc"
+        }
+      ],
+      "narrative_hints": [
+        "AAPL",
+        "social heat"
+      ],
+      "promotion_effect": "none",
+      "provider": "stocktwits-symbol-stream",
+      "provider_version": "stocktwits-symbol-stream-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "body_excerpt": "$AAPL engaged LONG from our daily focus list on 5/7/26 , using this break above DT line price pattern with bullish MACD. The June 275 calls paid out +125%",
+        "degradation_state": "ok",
+        "fetched_at": "2026-05-31T17:41:13+00:00",
+        "heat_trust_tier": "heat_signal_only",
+        "historical_backfill": false,
+        "message_id": "654902202",
+        "permission_status": "public_symbol_stream",
+        "provider": "stocktwits-symbol-stream",
+        "provider_preference": [
+          "social_future_reserved"
+        ],
+        "provider_version": "stocktwits-symbol-stream-v1",
+        "raw_hash": "a6761844dc9865bc367cb2e3f89f79587651005dd9f0ed2ec43096bef774b092",
+        "source_mode": "external_contract",
+        "symbol": "AAPL",
+        "user_id": "23091",
+        "user_profiled": false,
+        "username": "FITZSTOCK2004"
+      },
+      "source_type": "social",
+      "source_url": "https://stocktwits.com/FITZSTOCK2004/message/654902202",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Stocktwits message metadata normalized as heat_signal_only; body is treated as social chatter, not fact evidence.",
+      "title": "AAPL Stocktwits heat message 654902202",
+      "trust_status": "candidate_untrusted"
+    },
+    {
+      "dedupe_key": "SEVT_B7F7075DF841BCC9",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_STOCKTWITS_6603E39BA57CCCD3",
+      "event_time": "2026-05-31T16:11:11Z",
+      "evidence_claims": [
+        "Stocktwits message 654901818 mentions AAPL; message content is heat-only."
+      ],
+      "external_access_policy": "gateway_change_request_first",
+      "heat_trust_tier": "heat_signal_only",
+      "keywords": [
+        "AAPL",
+        "social heat"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc"
+        }
+      ],
+      "narrative_hints": [
+        "AAPL",
+        "social heat"
+      ],
+      "promotion_effect": "none",
+      "provider": "stocktwits-symbol-stream",
+      "provider_version": "stocktwits-symbol-stream-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "body_excerpt": "$AAPL BULLISH | Anvesti Zapier StockTwits smoke test. View card: https://x.com/anvesti_/status/2060897942374936777. Educational only. Not",
+        "degradation_state": "ok",
+        "fetched_at": "2026-05-31T17:41:13+00:00",
+        "heat_trust_tier": "heat_signal_only",
+        "historical_backfill": false,
+        "message_id": "654901818",
+        "permission_status": "public_symbol_stream",
+        "provider": "stocktwits-symbol-stream",
+        "provider_preference": [
+          "social_future_reserved"
+        ],
+        "provider_version": "stocktwits-symbol-stream-v1",
+        "raw_hash": "9b8510e54e6ccce37049b5c73627f16094ed713f075144313c6750a9d6f4c089",
+        "source_mode": "external_contract",
+        "symbol": "AAPL",
+        "user_id": "561611",
+        "user_profiled": false,
+        "username": "anvesti"
+      },
+      "source_type": "social",
+      "source_url": "https://stocktwits.com/anvesti/message/654901818",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Stocktwits message metadata normalized as heat_signal_only; body is treated as social chatter, not fact evidence.",
+      "title": "AAPL Stocktwits heat message 654901818",
+      "trust_status": "candidate_untrusted"
+    },
+    {
+      "dedupe_key": "SEVT_F385A1825567EABF",
+      "direct_crawling_allowed": false,
+      "event_id": "EVT_STOCKTWITS_178EA84B5065E548",
+      "event_time": "2026-05-31T15:26:07Z",
+      "evidence_claims": [
+        "Stocktwits message 654900377 mentions AAPL; message content is heat-only."
+      ],
+      "external_access_policy": "gateway_change_request_first",
+      "heat_trust_tier": "heat_signal_only",
+      "keywords": [
+        "AAPL",
+        "social heat"
+      ],
+      "mentioned_stocks": [
+        {
+          "stock_code": "AAPL",
+          "stock_name": "Apple Inc"
+        }
+      ],
+      "narrative_hints": [
+        "AAPL",
+        "social heat"
+      ],
+      "promotion_effect": "none",
+      "provider": "stocktwits-symbol-stream",
+      "provider_version": "stocktwits-symbol-stream-v1",
+      "quality_gaps": [],
+      "schema_version": "source-event-schema-v1",
+      "source_metadata": {
+        "body_excerpt": "$DJT $SPY $TQQQ $DJIA $AAPL This has to be from a SNL skit.... ...",
+        "degradation_state": "ok",
+        "fetched_at": "2026-05-31T17:41:13+00:00",
+        "heat_trust_tier": "heat_signal_only",
+        "historical_backfill": false,
+        "message_id": "654900377",
+        "permission_status": "public_symbol_stream",
+        "provider": "stocktwits-symbol-stream",
+        "provider_preference": [
+          "social_future_reserved"
+        ],
+        "provider_version": "stocktwits-symbol-stream-v1",
+        "raw_hash": "ea50754bf2eb12d89e9cc4f5ec427085fefaf7bb5fe8ed59d282321959dfc7e2",
+        "source_mode": "external_contract",
+        "symbol": "AAPL",
+        "user_id": "10932234",
+        "user_profiled": false,
+        "username": "Sleepy_Don"
+      },
+      "source_type": "social",
+      "source_url": "https://stocktwits.com/Sleepy_Don/message/654900377",
+      "stock_codes": [
+        "AAPL"
+      ],
+      "summary": "Stocktwits message metadata normalized as heat_signal_only; body is treated as social chatter, not fact evidence.",
+      "title": "AAPL Stocktwits heat message 654900377",
+      "trust_status": "candidate_untrusted"
+    }
+  ],
+  "fetched_at": "2026-05-31T17:41:13+00:00",
+  "heat_trust_tier": "heat_signal_only",
+  "provider_name": "stocktwits-symbol-stream",
+  "provider_version": "stocktwits-symbol-stream-v1",
+  "request_policy": {
+    "cache_ttl_seconds": 300,
+    "enabled_by_default": false,
+    "rate_limit_policy": "bounded_symbol_smoke_only",
+    "timeout_seconds": 10
+  },
+  "summary": {
+    "degradation_count": 0,
+    "heat_trust_tier": "heat_signal_only",
+    "message_count": 5,
+    "requested_symbol_count": 1
+  },
+  "version": "stocktwits-heat-signal-v1"
+}

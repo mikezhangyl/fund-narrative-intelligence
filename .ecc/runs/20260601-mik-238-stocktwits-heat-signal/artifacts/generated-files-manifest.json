@@ -1,0 +1,18 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "stocktwits_heat_signal_json",
+      "path": "outputs/stocktwits_heat_signal/2026-06-01-mik-238/stocktwits_heat_signal.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Live Stocktwits AAPL symbol-stream heat_signal_only source events."
+    },
+    {
+      "type": "stocktwits_heat_signal_html",
+      "path": "outputs/stocktwits_heat_signal/2026-06-01-mik-238/stocktwits_heat_signal.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese HTML Stocktwits heat-signal smoke summary."
+    }
+  ]
+}
