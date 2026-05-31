@@ -1,0 +1,24 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "source_schema_v2_report_json",
+      "path": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Machine-readable schema v2 report listing SourceEvent, NarrativeFact, CandidateNarrative, EvidencePack, and SourceQuality contracts.",
+      "checksum_sha256": "5830169caa382b87769823c5afddd65440b0711316d3c08bc65465bc85e5f135",
+      "mtime_epoch": 1780251000,
+      "size_bytes": 2575
+    },
+    {
+      "type": "source_schema_v2_report_html",
+      "path": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese HTML schema v2 report showing required fields, source classes, and raw content policy.",
+      "checksum_sha256": "66b69a9493f1777cb09b6e7f4c3dc172c6300ddb5361a2a82f735d05e3a61bad",
+      "mtime_epoch": 1780251000,
+      "size_bytes": 2471
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "version": "narrative-source-schema-v2",
+  "purpose": "Auditable v2 source-event and fact contracts for heterogeneous narrative source ingestion.",
+  "supported_source_classes": [
+    "official_disclosure",
+    "licensed_news",
+    "public_web",
+    "social_community"
+  ],
+  "entities": {
+    "SourceEvent": {
+      "required_fields": [
+        "source_id",
+        "source_event_id",
+        "source_class",
+        "provider",
+        "source_url",
+        "fetched_at",
+        "published_at",
+        "license_scope",
+        "retention_policy",
+        "raw_content_policy",
+        "raw_hash",
+        "title",
+        "text_excerpt",
+        "entities",
+        "topics",
+        "event_type",
+        "extraction_method",
+        "confidence",
+        "source_trust_tier",
+        "freshness_bucket",
+        "evidence_ids",
+        "contradiction_flags",
+        "dispute_flags"
+      ]
+    },
+    "NarrativeFact": {
+      "required_fields": [
+        "fact_id",
+        "claim_text",
+        "claim_type",
+        "source_event_ids",
+        "evidence_ids",
+        "confidence",
+        "contradiction_flags",
+        "dispute_flags",
+        "created_at"
+      ]
+    },
+    "CandidateNarrative": {
+      "required_fields": [
+        "candidate_narrative_id",
+        "display_name",
+        "narrative_hints",
+        "source_event_ids",
+        "fact_ids",
+        "evidence_pack_ids",
+        "trust_status",
+        "review_status",
+        "promotion_effect"
+      ]
+    },
+    "EvidencePack": {
+      "required_fields": [
+        "evidence_pack_id",
+        "source_event_ids",
+        "fact_ids",
+        "source_quality_ids",
+        "freshness_bucket",
+        "source_diversity_count",
+        "contradiction_flags",
+        "dispute_flags"
+      ]
+    },
+    "SourceQuality": {
+      "required_fields": [
+        "source_quality_id",
+        "source_event_id",
+        "source_trust_tier",
+        "source_quality",
+        "license_scope",
+        "retention_policy",
+        "metadata_only",
+        "freshness_bucket",
+        "confidence",
+        "degradation_events"
+      ]
+    }
+  },
+  "source_class_to_v1_source_type": {
+    "official_disclosure": "filing",
+    "licensed_news": "news",
+    "public_web": "news",
+    "social_community": "social"
+  },
+  "trust_policy": {
+    "default_trust_status": "candidate_untrusted",
+    "promotion_effect": "none",
+    "automatic_trusted_promotion": false
+  },
+  "raw_content_policy_contract": {
+    "required_fields": [
+      "raw_retention_allowed",
+      "excerpt_retention_allowed"
+    ],
+    "optional_fields": [
+      "max_excerpt_chars",
+      "raw_storage_ref",
+      "retention_reason"
+    ]
+  }
+}
