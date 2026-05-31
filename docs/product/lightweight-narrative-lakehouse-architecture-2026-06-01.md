@@ -1,11 +1,17 @@
 # Lightweight Narrative Lakehouse Architecture - 2026-06-01
 
 Linear scope: `MIK-243`, `MIK-244`, `MIK-245`, `MIK-246`, `MIK-247`,
-`MIK-248`
+`MIK-248`, `MIK-249`
 
 ## Decision
 
 Use a lightweight lakehouse architecture for Narrative Service source ingestion.
+
+Boundary correction: the source-ingestion lakehouse belongs in
+`stock-data-gateway`, not in FNI. This document now describes the target
+gateway/source-platform architecture that FNI requests and consumes. FNI should
+not implement upstream source adapters, raw blob storage, source fetch runs, or
+canonical source-event persistence directly.
 
 This means:
 
@@ -31,6 +37,10 @@ Use two local runtime modes:
 Do not require a bare host-installed database on the Mac. The Mac should run the
 containers, but the database and raw object store should have explicit volumes,
 ports, backup/reset commands, and environment variables.
+
+This Docker runtime should be implemented by `stock-data-gateway`. FNI can run
+consumer/integration tests against gateway endpoints, but should not own the
+source storage runtime.
 
 Why:
 
@@ -514,20 +524,22 @@ No embeddings
 Search/vector indexes are always derived and rebuildable from relational tables
 and permitted raw/excerpt storage.
 
-## Developer Build Order
+## Gateway Build Order
 
 1. `MIK-245`: accept the architecture spec.
-2. `MIK-249`: add Docker local lakehouse runtime profile.
-3. `MIK-246`: implement repository contract and core tables, with SQLite for
-   tests and Docker Postgres for integration.
-4. `MIK-247`: implement local raw zone and blob manifest, with filesystem test
-   mode and MinIO/object-store integration mode.
-5. Connect first source adapters:
-   - `MIK-235` SEC EDGAR;
-   - `MIK-236` CNINFO;
-   - `MIK-237` public news context;
-   - `MIK-238` Stocktwits heat pilot.
-6. `MIK-248`: add search/vector deferral plan; do not implement vector DB yet.
+2. Gateway change request:
+   `/Users/mikezhang/Coding/AI-Learning/stock-data-gateway/docs/product/fni-narrative-source-lakehouse-capability-change-request-2026-06-01.md`
+3. Gateway adds Docker local lakehouse runtime profile.
+4. Gateway implements repository contract and core source tables.
+5. Gateway implements local raw zone and blob manifest.
+6. Gateway connects first source capabilities:
+   - SEC EDGAR;
+   - CNINFO official disclosures;
+   - public news context;
+   - Stocktwits heat pilot.
+7. FNI updates consumer contracts, client wrappers, conformance probes, and
+   report/UI source quality rendering after gateway routes exist.
+8. `MIK-248`: add search/vector deferral plan; do not implement vector DB yet.
 
 ## Interview-Ready Explanation
 

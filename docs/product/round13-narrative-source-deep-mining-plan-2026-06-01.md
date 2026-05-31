@@ -10,6 +10,22 @@ quality labels, freshness/trend state, and affected entities.
 This round is about source depth and trust. It is not a trading strategy, price
 prediction engine, or unbounded scraping project.
 
+## Boundary Correction - 2026-06-01
+
+External data-source access belongs in `stock-data-gateway`, not in FNI.
+
+FNI owns product requirements, consumer contracts, gateway change-request
+documents, gateway conformance probes, Chinese HTML/JSON reports, and Narrative
+Radar consumption surfaces.
+
+Gateway owns upstream source adapters, credentials, permissions, rate limits,
+retry, cache, fallback, raw/source storage, provider-specific normalization, and
+provider-neutral endpoints consumed by FNI.
+
+The gateway change request for this round is:
+
+`/Users/mikezhang/Coding/AI-Learning/stock-data-gateway/docs/product/fni-narrative-source-lakehouse-capability-change-request-2026-06-01.md`
+
 ## Core Product Position
 
 Narratives should come from a source pyramid:
@@ -35,12 +51,12 @@ corroborated by trusted evidence.
 | Existing structured news | Tushare `news` | Timely news | Can-Do / permission smoke | Gateway source, Narrative consumer | Permission and coverage |
 | China paid terminals | Wind, Choice, iFinD | China news/data/research | Paid Trial | Gateway/source adapter | Contract cost, API entitlement |
 | Global professional news | LSEG/Reuters, Dow Jones, Bloomberg, FactSet, S&P | Global breaking news | Paid Trial | Paid-provider adapter | Cost and redistribution rights |
-| News analytics | RavenPack / Bigdata.com, AlphaSense | Entity/event/sentiment/research search | Paid Trial | Narrative source adapter | Vendor lock-in, taxonomy fit |
+| News analytics | RavenPack / Bigdata.com, AlphaSense | Entity/event/sentiment/research search | Paid Trial | Gateway source adapter, FNI consumer | Vendor lock-in, taxonomy fit |
 | Developer news APIs | Benzinga, Finnhub, GDELT | Fast experiment / global coverage | Trial / Can-Do | Gateway or Narrative adapter | Coverage and full-text limits |
 | Official disclosures | CNINFO, SSE/SZSE, HKEX, SEC EDGAR, company IR | Trusted facts | Can-Do / Crawl Pilot | Gateway for market data, Narrative for source events | Entity mapping and document parsing |
-| Policy/regulator/industry | NDRC, MIIT, CSRC, ministries, associations | Trusted macro/industry facts | Crawl Pilot | Narrative source adapter | Page variance, update frequency |
-| Financial portals/industry media | EastMoney, Sina Finance, Securities Times, vertical tech/industry media | Context and early signals | Crawl Pilot | Narrative source adapter | Copyright, robots/TOS, anti-bot |
-| Community/social | EastMoney Guba, Xueqiu, Stocktwits, Reddit, X, Weibo | Heat and candidate discovery | Controlled Pilot | Narrative heat adapter | Terms, rate limits, misinformation |
+| Policy/regulator/industry | NDRC, MIIT, CSRC, ministries, associations | Trusted macro/industry facts | Crawl Pilot | Gateway source adapter, FNI consumer | Page variance, update frequency |
+| Financial portals/industry media | EastMoney, Sina Finance, Securities Times, vertical tech/industry media | Context and early signals | Crawl Pilot | Gateway source adapter, FNI consumer | Copyright, robots/TOS, anti-bot |
+| Community/social | EastMoney Guba, Xueqiu, Stocktwits, Reddit, X, Weibo | Heat and candidate discovery | Controlled Pilot | Gateway heat source, FNI consumer | Terms, rate limits, misinformation |
 
 ## Paid Source Strategy
 
@@ -190,11 +206,13 @@ Each digest item must show:
 - `MIK-247`: Local raw zone layout and blob manifest MVP.
 - `MIK-248`: Search and vector index deferral plan.
 - `MIK-249`: Docker local lakehouse runtime profile.
+- `MIK-250`: FNI narrative source gateway consumer contract and probes.
 
 ## Dev-Ready Source Slices Created In Linear
 
-These are directions where PM has verified live sample data can be fetched.
-They are not production stability certifications.
+These were initially created as direct FNI Dev-ready implementation slices, but
+that was a boundary mistake. They have been marked moved/canceled in Linear and
+converted into the gateway change request above.
 
 - `MIK-235`: SEC EDGAR official filing source adapter MVP.
 - `MIK-236`: CNINFO official disclosure event classifier expansion.
@@ -212,6 +230,16 @@ Evidence summary:
 - Stocktwits public symbol stream returned five AAPL messages.
 - GDELT returned HTTP 429 and should not be handed to Developer until strict
   queue/cache pacing is designed.
+
+Correct FNI follow-up after gateway implementation:
+
+- update FNI gateway consumer contract;
+- add provider-neutral client wrappers;
+- run conformance/live probes;
+- render source quality and trust labels;
+- do not add new direct external source adapters in FNI.
+
+The boundary-corrected FNI implementation issue is `MIK-250`.
 
 ## Storage Thesis
 
@@ -236,6 +264,11 @@ Short version:
 - full-text search and embeddings are derived indexes, not the source of truth;
 - paid/news/social content should default to metadata and permitted excerpts
   unless a license explicitly allows full-text retention.
+
+`MIK-246`, `MIK-247`, and `MIK-249` were also moved/canceled as direct FNI
+implementation items. Source-ingestion storage and Docker source lakehouse
+runtime belong in `stock-data-gateway`. FNI may still own consumer artifact
+storage and report outputs separately.
 
 ## Recommended Build Order
 

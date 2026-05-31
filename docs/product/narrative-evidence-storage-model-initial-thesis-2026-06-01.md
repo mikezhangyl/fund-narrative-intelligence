@@ -5,6 +5,12 @@ Linear issue: `MIK-243`
 Follow-up architecture plan:
 `docs/product/lightweight-narrative-lakehouse-architecture-2026-06-01.md`
 
+Boundary correction: source-ingestion storage and raw upstream data lakehouse
+belong in `stock-data-gateway`. FNI may store consumer artifacts, report
+outputs, review state, and gateway-derived evidence references, but it should
+not become the canonical store for external source fetches, raw payloads, or
+upstream provider adapters.
+
 ## Plain-Language Answer
 
 Yes, narrative service needs a database. But it should not put every file,
