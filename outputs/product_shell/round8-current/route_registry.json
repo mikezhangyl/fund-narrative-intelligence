@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-31T16:02:38.103446+00:00",
+  "generated_at": "2026-05-31T16:49:40.507978+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -57,6 +57,32 @@
       "owner_service": "Narrative Service",
       "path": "/narratives/radar",
       "route_id": "narrative_radar"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
+        "freshness_status": "generated",
+        "html_path": "outputs/product_shell/round8-current/narrative_data.html",
+        "json_path": "outputs/product_shell/round8-current/narrative_data.json",
+        "source": "Narrative Service artifacts + FNI reviewed registry",
+        "type": "generated_artifact"
+      },
+      "label_en": "Real narrative data",
+      "label_zh": "真实叙事数据",
+      "owner_service": "FNI",
+      "path": "/narratives/data",
+      "route_id": "narrative_data"
     },
     {
       "client_policy": {
@@ -192,9 +218,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 1,
-    "generated_artifact_route_count": 4,
+    "generated_artifact_route_count": 5,
     "live_api_route_count": 2,
-    "route_count": 7
+    "route_count": 8
   },
   "version": "product-shell-route-registry-v1"
 }

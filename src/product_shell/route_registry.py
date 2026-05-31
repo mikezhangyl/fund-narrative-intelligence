@@ -33,6 +33,18 @@ def build_product_shell_route_registry(
             freshness_status="service_reported",
         ),
         _route(
+            route_id="narrative_data",
+            path="/narratives/data",
+            label_zh="真实叙事数据",
+            label_en="Real narrative data",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="Narrative Service artifacts + FNI reviewed registry",
+            json_path="outputs/product_shell/round8-current/narrative_data.json",
+            html_path="outputs/product_shell/round8-current/narrative_data.html",
+            freshness_status="generated",
+        ),
+        _route(
             route_id="narrative_quality",
             path="/narratives/quality",
             label_zh="叙事质量审计",

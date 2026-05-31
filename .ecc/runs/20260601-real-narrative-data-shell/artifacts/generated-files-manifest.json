@@ -1,0 +1,67 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "product_shell_narrative_data_json",
+      "path": "outputs/product_shell/round8-current/narrative_data.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Machine-readable snapshot of existing Narrative Service / FNI narrative artifacts."
+    },
+    {
+      "type": "product_shell_narrative_data_html",
+      "path": "outputs/product_shell/round8-current/narrative_data.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese HTML preview of real narrative registry, mapping, quality, and service-health data."
+    },
+    {
+      "type": "product_shell_bundle",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Product shell payload updated with narrative data summary and snapshot."
+    },
+    {
+      "type": "product_shell_home",
+      "path": "outputs/product_shell/round8-current/index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Product home updated to expose real narrative data counts."
+    },
+    {
+      "type": "product_shell_route_registry",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Route registry updated with /narratives/data generated-artifact route."
+    },
+    {
+      "type": "product_shell_route_registry_html",
+      "path": "outputs/product_shell/round8-current/route_registry.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese route registry preview regenerated after adding the narrative data route."
+    },
+    {
+      "type": "product_shell_artifact_index",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Artifact index regenerated after adding product shell narrative outputs."
+    },
+    {
+      "type": "product_shell_artifact_index_html",
+      "path": "outputs/product_shell/round8-current/artifact_index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese artifact index preview regenerated."
+    },
+    {
+      "type": "product_shell_artifact_browser",
+      "path": "outputs/product_shell/round8-current/artifact_browser.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Artifact browser regenerated with current output inventory."
+    }
+  ]
+}

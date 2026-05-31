@@ -9,16 +9,24 @@ def build_product_shell_payload(
     *,
     route_registry: dict[str, Any],
     artifact_index: dict[str, Any],
+    narrative_data: dict[str, Any] | None = None,
     generated_at: str | None = None,
 ) -> dict[str, Any]:
     routes = _list(route_registry.get("routes"))
     artifacts = _list(artifact_index.get("artifacts"))
+    narrative_summary = _mapping(_mapping(narrative_data).get("summary"))
     return {
         "version": "product-shell-v1",
         "generated_at": generated_at or _utc_now(),
         "summary": {
             "route_count": len(routes),
             "artifact_count": len(artifacts),
+            "narrative_count": _int(narrative_summary.get("narrative_count")),
+            "candidate_narrative_count": _int(narrative_summary.get("candidate_narrative_count")),
+            "stock_mapping_count": _int(narrative_summary.get("stock_mapping_count")),
+            "evidence_pack_count": _int(narrative_summary.get("evidence_pack_count")),
+            "quality_issue_count": _int(narrative_summary.get("quality_issue_count")),
+            "extraction_issue_count": _int(narrative_summary.get("extraction_issue_count")),
             "live_api_route_count": _int(_mapping(route_registry.get("summary")).get("live_api_route_count")),
             "generated_artifact_route_count": _int(
                 _mapping(route_registry.get("summary")).get("generated_artifact_route_count")
@@ -26,6 +34,7 @@ def build_product_shell_payload(
         },
         "route_registry": route_registry,
         "artifact_index": artifact_index,
+        "narrative_data": narrative_data or {},
         "client_policy_notice": "不在页面内重算雷达、质量或组合指标；页面只读取服务 API 或生成产物。",
     }
 
@@ -53,6 +62,7 @@ def render_product_home_html(shell: dict[str, Any]) -> str:
             _html_kv("产物数", summary.get("artifact_count", 0)),
             f"<p>{_html_text(shell.get('client_policy_notice'))}</p>",
             "</section>",
+            _narrative_data_summary(shell),
             _route_cards(routes),
             "</main>",
             "</body>",
@@ -84,6 +94,26 @@ def render_artifact_browser_html(shell: dict[str, Any]) -> str:
             "</body>",
             "</html>",
         ]
+    )
+
+
+def _narrative_data_summary(shell: dict[str, Any]) -> str:
+    summary = _mapping(shell.get("summary"))
+    source_count = len(_list(_mapping(shell.get("narrative_data")).get("source_artifacts")))
+    return (
+        "<section>"
+        "<h2>真实叙事数据</h2>"
+        '<div class="facts">'
+        f"<p>正式叙事: {_html_text(summary.get('narrative_count', 0))}</p>"
+        f"<p>候选叙事: {_html_text(summary.get('candidate_narrative_count', 0))}</p>"
+        f"<p>股票映射: {_html_text(summary.get('stock_mapping_count', 0))}</p>"
+        f"<p>证据包: {_html_text(summary.get('evidence_pack_count', 0))}</p>"
+        f"<p>质量问题: {_html_text(summary.get('quality_issue_count', 0))}</p>"
+        f"<p>抽取复核项: {_html_text(summary.get('extraction_issue_count', 0))}</p>"
+        f"<p>来源 artifact: {_html_text(source_count)}</p>"
+        "</div>"
+        "<p>查看 narrative_data.html 获取现有 Narrative Service / registry artifact 明细。</p>"
+        "</section>"
     )
 
 
@@ -138,6 +168,8 @@ body { margin: 0; background: #f6f7f9; color: #1f2933; font-family: -apple-syste
 h1 { font-size: 30px; margin: 0 0 16px; }
 h2 { font-size: 20px; margin: 24px 0 12px; }
 .summary { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.facts p { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; margin: 0; padding: 12px; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 .card { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 14px; }
 .card h2 { margin-top: 0; font-size: 18px; }
