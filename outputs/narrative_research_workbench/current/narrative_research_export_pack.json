@@ -1,0 +1,416 @@
+{
+  "analyst_notes": [],
+  "citations": [
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001140361-26-023363",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-023363",
+      "source_id": "gateway_sec_edgar",
+      "title": "FORM 4"
+    },
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001140361-26-023149",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-023149",
+      "source_id": "gateway_sec_edgar",
+      "title": "SD"
+    },
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001921094-26-000555",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001921094-26-000555",
+      "source_id": "gateway_sec_edgar",
+      "title": "144 filing"
+    },
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001140361-26-020871",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-020871",
+      "source_id": "gateway_sec_edgar",
+      "title": "FORM 4"
+    },
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001140361-26-020298",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-020298",
+      "source_id": "gateway_sec_edgar",
+      "title": "FORM 4"
+    },
+    {
+      "citation_id": "CITE_cninfo:000001:000001:2026-05-22:北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书",
+      "quality_state": "trusted_fact",
+      "source_event_id": "cninfo:000001:000001:2026-05-22:北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书",
+      "source_id": "gateway_cninfo",
+      "title": "北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书"
+    },
+    {
+      "citation_id": "CITE_cninfo:000001:000001:2026-05-22:2025年年度股东会决议公告",
+      "quality_state": "trusted_fact",
+      "source_event_id": "cninfo:000001:000001:2026-05-22:2025年年度股东会决议公告",
+      "source_id": "gateway_cninfo",
+      "title": "2025年年度股东会决议公告"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "source_id": "gateway_tushare",
+      "title": "澳大利亚对进口自中国的地层钢锚杆作出反倾销终裁"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "source_id": "gateway_tushare",
+      "title": "国新能源：持股5%以上股东减持1.22%股份"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "source_id": "gateway_tushare",
+      "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "source_id": "gateway_tushare",
+      "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "source_id": "gateway_tushare",
+      "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+    }
+  ],
+  "comparisons": [
+    {
+      "contradictions": [],
+      "metrics": {
+        "contradiction_count": 0,
+        "shared_entity_count": 0,
+        "shared_event_count": 0
+      },
+      "narratives": [
+        "AI infrastructure",
+        "半导体 A股"
+      ],
+      "shared_concepts": [],
+      "shared_sectors": [],
+      "shared_source_event_ids": [],
+      "shared_tickers": []
+    }
+  ],
+  "contract": {
+    "auditable_user_artifacts": true,
+    "citation_required_for_export_items": true,
+    "notes_promote_trusted_state": false,
+    "provider_access_allowed": false
+  },
+  "export_manifest": {
+    "citation_ids": [
+      "CITE_sec_edgar:0000320193:0001140361-26-023363",
+      "CITE_sec_edgar:0000320193:0001140361-26-023149",
+      "CITE_sec_edgar:0000320193:0001921094-26-000555",
+      "CITE_sec_edgar:0000320193:0001140361-26-020871",
+      "CITE_sec_edgar:0000320193:0001140361-26-020298",
+      "CITE_cninfo:000001:000001:2026-05-22:北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书",
+      "CITE_cninfo:000001:000001:2026-05-22:2025年年度股东会决议公告",
+      "CITE_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "CITE_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "CITE_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "CITE_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "CITE_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7"
+    ],
+    "format": "json_html",
+    "linked_object_refs": [],
+    "non_promotional_note_policy": "notes are auditable user artifacts and do not change trusted state",
+    "source_artifacts": [
+      "outputs/narrative_research_workbench/current/narrative_timeline_search.json",
+      "outputs/narrative_research_workbench/current/narrative_evidence_graph.json"
+    ]
+  },
+  "generated_at": "2026-06-01T18:44:59.518524+00:00",
+  "narratives": [
+    "AI infrastructure",
+    "半导体 A股",
+    "股东会"
+  ],
+  "source_events": [
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001140361-26-023363",
+      "entities": {
+        "concepts": [
+          "AI infrastructure"
+        ],
+        "narratives": [
+          "AI infrastructure"
+        ],
+        "sectors": [],
+        "tickers": [
+          "AAPL"
+        ]
+      },
+      "published_at": "2026-05-29",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-023363",
+      "source_id": "gateway_sec_edgar",
+      "source_type": "filing",
+      "timeline_bucket": "2026-05-29",
+      "title": "FORM 4"
+    },
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001140361-26-023149",
+      "entities": {
+        "concepts": [
+          "AI infrastructure"
+        ],
+        "narratives": [
+          "AI infrastructure"
+        ],
+        "sectors": [],
+        "tickers": [
+          "AAPL"
+        ]
+      },
+      "published_at": "2026-05-28",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-023149",
+      "source_id": "gateway_sec_edgar",
+      "source_type": "filing",
+      "timeline_bucket": "2026-05-28",
+      "title": "SD"
+    },
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001921094-26-000555",
+      "entities": {
+        "concepts": [
+          "AI infrastructure"
+        ],
+        "narratives": [
+          "AI infrastructure"
+        ],
+        "sectors": [],
+        "tickers": [
+          "AAPL"
+        ]
+      },
+      "published_at": "2026-05-27",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001921094-26-000555",
+      "source_id": "gateway_sec_edgar",
+      "source_type": "filing",
+      "timeline_bucket": "2026-05-27",
+      "title": "144 filing"
+    },
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001140361-26-020871",
+      "entities": {
+        "concepts": [
+          "AI infrastructure"
+        ],
+        "narratives": [
+          "AI infrastructure"
+        ],
+        "sectors": [],
+        "tickers": [
+          "AAPL"
+        ]
+      },
+      "published_at": "2026-05-12",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-020871",
+      "source_id": "gateway_sec_edgar",
+      "source_type": "filing",
+      "timeline_bucket": "2026-05-12",
+      "title": "FORM 4"
+    },
+    {
+      "citation_id": "CITE_sec_edgar:0000320193:0001140361-26-020298",
+      "entities": {
+        "concepts": [
+          "AI infrastructure"
+        ],
+        "narratives": [
+          "AI infrastructure"
+        ],
+        "sectors": [],
+        "tickers": [
+          "AAPL"
+        ]
+      },
+      "published_at": "2026-05-08",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-020298",
+      "source_id": "gateway_sec_edgar",
+      "source_type": "filing",
+      "timeline_bucket": "2026-05-08",
+      "title": "FORM 4"
+    },
+    {
+      "citation_id": "CITE_cninfo:000001:000001:2026-05-22:北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书",
+      "entities": {
+        "concepts": [
+          "股东会"
+        ],
+        "narratives": [
+          "股东会"
+        ],
+        "sectors": [],
+        "tickers": [
+          "000001"
+        ]
+      },
+      "published_at": "2026-05-22",
+      "quality_state": "trusted_fact",
+      "source_event_id": "cninfo:000001:000001:2026-05-22:北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书",
+      "source_id": "gateway_cninfo",
+      "source_type": "announcement",
+      "timeline_bucket": "2026-05-22",
+      "title": "北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书"
+    },
+    {
+      "citation_id": "CITE_cninfo:000001:000001:2026-05-22:2025年年度股东会决议公告",
+      "entities": {
+        "concepts": [
+          "股东会"
+        ],
+        "narratives": [
+          "股东会"
+        ],
+        "sectors": [],
+        "tickers": [
+          "000001"
+        ]
+      },
+      "published_at": "2026-05-22",
+      "quality_state": "trusted_fact",
+      "source_event_id": "cninfo:000001:000001:2026-05-22:2025年年度股东会决议公告",
+      "source_id": "gateway_cninfo",
+      "source_type": "announcement",
+      "timeline_bucket": "2026-05-22",
+      "title": "2025年年度股东会决议公告"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "entities": {
+        "concepts": [
+          "半导体 A股"
+        ],
+        "narratives": [
+          "半导体 A股"
+        ],
+        "sectors": [],
+        "tickers": [
+          "半导体 A股"
+        ]
+      },
+      "published_at": "2026-06-01 16:44:44",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "source_id": "gateway_tushare",
+      "source_type": "news",
+      "timeline_bucket": "2026-06-01",
+      "title": "澳大利亚对进口自中国的地层钢锚杆作出反倾销终裁"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "entities": {
+        "concepts": [
+          "半导体 A股"
+        ],
+        "narratives": [
+          "半导体 A股"
+        ],
+        "sectors": [],
+        "tickers": [
+          "半导体 A股"
+        ]
+      },
+      "published_at": "2026-06-01 16:44:31",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "source_id": "gateway_tushare",
+      "source_type": "news",
+      "timeline_bucket": "2026-06-01",
+      "title": "国新能源：持股5%以上股东减持1.22%股份"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "entities": {
+        "concepts": [
+          "半导体 A股"
+        ],
+        "narratives": [
+          "半导体 A股"
+        ],
+        "sectors": [],
+        "tickers": [
+          "半导体 A股"
+        ]
+      },
+      "published_at": "2026-06-01 16:44:15",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "source_id": "gateway_tushare",
+      "source_type": "news",
+      "timeline_bucket": "2026-06-01",
+      "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "entities": {
+        "concepts": [
+          "半导体 A股"
+        ],
+        "narratives": [
+          "半导体 A股"
+        ],
+        "sectors": [],
+        "tickers": [
+          "半导体 A股"
+        ]
+      },
+      "published_at": "2026-06-01 16:44:15",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "source_id": "gateway_tushare",
+      "source_type": "news",
+      "timeline_bucket": "2026-06-01",
+      "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+    },
+    {
+      "citation_id": "CITE_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "entities": {
+        "concepts": [
+          "半导体 A股"
+        ],
+        "narratives": [
+          "半导体 A股"
+        ],
+        "sectors": [],
+        "tickers": [
+          "半导体 A股"
+        ]
+      },
+      "published_at": "2026-06-01 16:44:15",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "source_id": "gateway_tushare",
+      "source_type": "news",
+      "timeline_bucket": "2026-06-01",
+      "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+    }
+  ],
+  "summary": {
+    "citation_count": 12,
+    "comparison_count": 1,
+    "narrative_count": 3,
+    "note_count": 0,
+    "source_event_count": 12
+  },
+  "version": "narrative-research-export-pack-v1"
+}

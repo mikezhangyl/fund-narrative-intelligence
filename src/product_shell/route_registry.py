@@ -91,6 +91,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="narrative_research_export_pack",
+            path="/research/export-pack",
+            label_zh="研究导出包与分析师笔记",
+            label_en="Research export pack and analyst notes",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/narrative_research_workbench/current/",
+            json_path="outputs/narrative_research_workbench/current/narrative_research_export_pack.json",
+            html_path="outputs/narrative_research_workbench/current/narrative_research_export_pack.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",

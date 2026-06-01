@@ -1,0 +1,30 @@
+{
+  "red_test": {
+    "command": "uv run pytest tests/test_narrative_research_export_pack.py -q",
+    "result": "failed before implementation with ImportError for missing run_narrative_research_export_pack"
+  },
+  "focused_tests": [
+    {
+      "command": "uv run pytest tests/test_narrative_research_export_pack.py -q",
+      "result": "3 passed"
+    },
+    {
+      "command": "uv run pytest tests/test_narrative_research_export_pack.py tests/test_product_shell.py tests/test_product_shell_release.py tests/test_product_shell_source_quality.py -q",
+      "result": "23 passed"
+    }
+  ],
+  "quality_checks": [
+    {
+      "command": "uv run ruff check .",
+      "result": "passed"
+    },
+    {
+      "command": "uv run pytest",
+      "result": "636 passed, 1 skipped"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ]
+}

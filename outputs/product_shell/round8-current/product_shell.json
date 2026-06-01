@@ -6792,34 +6792,6 @@
         "warning_count": 0
       },
       {
-        "artifact_id": "ART_3d3de608cb",
-        "artifact_type": "release_manifest",
-        "freshness_status": "ok",
-        "generated_at": "2026-06-01T18:34:54.485296+00:00",
-        "html_path": "outputs/product_shell/round8-current/release_manifest.html",
-        "json_path": "outputs/product_shell/round8-current/release_manifest.json",
-        "run_id": "round8-current",
-        "source_mode": "generated_artifact",
-        "status": "ok",
-        "superseded": false,
-        "surface": "Release Manifest",
-        "warning_count": 0
-      },
-      {
-        "artifact_id": "ART_378d3db9f5",
-        "artifact_type": "acceptance_checklist",
-        "freshness_status": "pass",
-        "generated_at": "2026-06-01T18:34:54.485307+00:00",
-        "html_path": "outputs/product_shell/round8-current/acceptance_checklist.html",
-        "json_path": "outputs/product_shell/round8-current/acceptance_checklist.json",
-        "run_id": "round8-current",
-        "source_mode": "generated_artifact",
-        "status": "pass",
-        "superseded": false,
-        "surface": "Acceptance Checklist",
-        "warning_count": 0
-      },
-      {
         "artifact_id": "ART_db365f1d06",
         "artifact_type": "source_quality_dashboard",
         "freshness_status": "degraded",
@@ -6851,7 +6823,7 @@
         "artifact_id": "ART_c8e257234f",
         "artifact_type": "route_registry",
         "freshness_status": "unknown",
-        "generated_at": "2026-06-01T18:35:11.151620+00:00",
+        "generated_at": "2026-06-01T18:35:11.363929+00:00",
         "html_path": "outputs/product_shell/round8-current/route_registry.html",
         "json_path": "outputs/product_shell/round8-current/route_registry.json",
         "run_id": "round8-current",
@@ -6865,7 +6837,7 @@
         "artifact_id": "ART_7c5a672725",
         "artifact_type": "artifact_index",
         "freshness_status": "unknown",
-        "generated_at": "2026-06-01T18:35:11.298255+00:00",
+        "generated_at": "2026-06-01T18:35:11.504425+00:00",
         "html_path": "outputs/product_shell/round8-current/artifact_index.html",
         "json_path": "outputs/product_shell/round8-current/artifact_index.json",
         "run_id": "round8-current",
@@ -6873,13 +6845,13 @@
         "status": "unknown",
         "superseded": false,
         "surface": "Artifact index",
-        "warning_count": 36
+        "warning_count": 38
       },
       {
         "artifact_id": "ART_ede2f575bd",
         "artifact_type": "narrative_data",
         "freshness_status": "unknown",
-        "generated_at": "2026-06-01T18:35:11.299622+00:00",
+        "generated_at": "2026-06-01T18:35:11.505860+00:00",
         "html_path": "outputs/product_shell/round8-current/narrative_data.html",
         "json_path": "outputs/product_shell/round8-current/narrative_data.json",
         "run_id": "round8-current",
@@ -6890,10 +6862,24 @@
         "warning_count": 0
       },
       {
+        "artifact_id": "ART_bf6182f460",
+        "artifact_type": "product_shell",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T18:35:11.505960+00:00",
+        "html_path": "",
+        "json_path": "outputs/product_shell/round8-current/product_shell.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Product shell",
+        "warning_count": 0
+      },
+      {
         "artifact_id": "ART_095cab5d36",
         "artifact_type": "config_preflight",
         "freshness_status": "ok",
-        "generated_at": "2026-06-01T18:35:11.299800+00:00",
+        "generated_at": "2026-06-01T18:35:11.506091+00:00",
         "html_path": "outputs/product_shell/round8-current/config_preflight.html",
         "json_path": "outputs/product_shell/round8-current/config_preflight.json",
         "run_id": "round8-current",
@@ -6904,21 +6890,49 @@
         "warning_count": 0
       },
       {
-        "artifact_id": "ART_bf6182f460",
-        "artifact_type": "product_shell",
-        "freshness_status": "unknown",
-        "generated_at": "2026-06-01T18:35:11.301326+00:00",
-        "html_path": "",
-        "json_path": "outputs/product_shell/round8-current/product_shell.json",
+        "artifact_id": "ART_3d3de608cb",
+        "artifact_type": "release_manifest",
+        "freshness_status": "ok",
+        "generated_at": "2026-06-01T18:35:11.514560+00:00",
+        "html_path": "outputs/product_shell/round8-current/release_manifest.html",
+        "json_path": "outputs/product_shell/round8-current/release_manifest.json",
         "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "ok",
+        "superseded": false,
+        "surface": "Release Manifest",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_378d3db9f5",
+        "artifact_type": "acceptance_checklist",
+        "freshness_status": "pass",
+        "generated_at": "2026-06-01T18:35:11.514571+00:00",
+        "html_path": "outputs/product_shell/round8-current/acceptance_checklist.html",
+        "json_path": "outputs/product_shell/round8-current/acceptance_checklist.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "pass",
+        "superseded": false,
+        "surface": "Acceptance Checklist",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_819e66eee7",
+        "artifact_type": "narrative_research_export_pack",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T18:44:59.518524+00:00",
+        "html_path": "outputs/narrative_research_workbench/current/narrative_research_export_pack.html",
+        "json_path": "outputs/narrative_research_workbench/current/narrative_research_export_pack.json",
+        "run_id": "current",
         "source_mode": "generated_artifact",
         "status": "unknown",
         "superseded": false,
-        "surface": "Product shell",
+        "surface": "Narrative Research Export Pack",
         "warning_count": 0
       }
     ],
-    "generated_at": "2026-06-01T18:35:11.504425+00:00",
+    "generated_at": "2026-06-01T18:44:59.723489+00:00",
     "output_root": "outputs",
     "redaction_policy": {
       "excluded_path_categories": [
@@ -6927,16 +6941,16 @@
       ]
     },
     "summary": {
-      "artifact_count": 494,
-      "html_link_count": 86,
-      "json_link_count": 494,
+      "artifact_count": 495,
+      "html_link_count": 87,
+      "json_link_count": 495,
       "stale_or_superseded_count": 344,
-      "warning_count": 38
+      "warning_count": 40
     },
     "version": "product-shell-artifact-index-v1"
   },
   "client_policy_notice": "不在页面内重算雷达、质量或组合指标；页面只读取服务 API 或生成产物。",
-  "generated_at": "2026-06-01T18:35:11.505960+00:00",
+  "generated_at": "2026-06-01T18:44:59.726519+00:00",
   "narrative_data": {
     "candidate_narratives": [
       {
@@ -7520,7 +7534,7 @@
       }
     ],
     "formula_version": "evidence-quality-deterministic-v1",
-    "generated_at": "2026-06-01T18:35:11.505860+00:00",
+    "generated_at": "2026-06-01T18:44:59.724867+00:00",
     "narratives": [
       {
         "aliases": [
@@ -8815,7 +8829,7 @@
     ],
     "source_scope": {
       "mode": "existing_artifacts_only",
-      "output_root": "/Users/mikezhang/Coding/AI-Learning/fund-narrative-intelligence/outputs",
+      "output_root": "outputs",
       "project_root": "/Users/mikezhang/Coding/AI-Learning/fund-narrative-intelligence"
     },
     "stock_mappings": [
@@ -9562,7 +9576,7 @@
     "version": "product-shell-narrative-data-v1"
   },
   "route_registry": {
-    "generated_at": "2026-06-01T18:35:11.363929+00:00",
+    "generated_at": "2026-06-01T18:44:59.568044+00:00",
     "global_client_policy": {
       "business_logic_location": "service_or_artifact_only",
       "provider_access_allowed": false,
@@ -9766,6 +9780,32 @@
         "data_source": {
           "degradation_status": "ok",
           "freshness_status": "artifact_reported",
+          "html_path": "outputs/narrative_research_workbench/current/narrative_research_export_pack.html",
+          "json_path": "outputs/narrative_research_workbench/current/narrative_research_export_pack.json",
+          "source": "outputs/narrative_research_workbench/current/",
+          "type": "generated_artifact"
+        },
+        "label_en": "Research export pack and analyst notes",
+        "label_zh": "研究导出包与分析师笔记",
+        "owner_service": "FNI",
+        "path": "/research/export-pack",
+        "route_id": "narrative_research_export_pack"
+      },
+      {
+        "client_policy": {
+          "forbidden_logic": [
+            "provider_access",
+            "narrative_scoring",
+            "quality_scoring",
+            "portfolio_aggregation",
+            "trading_recommendation"
+          ],
+          "provider_access_allowed": false,
+          "score_recomputation_allowed": false
+        },
+        "data_source": {
+          "degradation_status": "ok",
+          "freshness_status": "artifact_reported",
           "html_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.html",
           "json_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
           "source": "outputs/portfolio_narrative_workspace/",
@@ -9911,25 +9951,92 @@
     "summary": {
       "degraded_route_count": 0,
       "fixture_demo_route_count": 0,
-      "generated_artifact_route_count": 11,
+      "generated_artifact_route_count": 12,
       "live_api_route_count": 2,
-      "route_count": 13
+      "route_count": 14
     },
     "version": "product-shell-route-registry-v1"
   },
   "summary": {
-    "artifact_count": 494,
+    "artifact_count": 495,
     "candidate_narrative_count": 2,
     "evidence_pack_count": 3,
     "extraction_issue_count": 3,
-    "generated_artifact_route_count": 11,
+    "generated_artifact_route_count": 12,
     "live_api_route_count": 2,
     "narrative_count": 15,
     "quality_issue_count": 2,
-    "route_count": 13,
+    "route_count": 14,
     "stock_mapping_count": 56,
-    "workspace_saved_view_count": 0
+    "workspace_saved_view_count": 1
   },
   "version": "product-shell-v1",
-  "workspace_state": {}
+  "workspace_state": {
+    "artifact_indexes": [],
+    "generated_at": "2026-06-01T18:03:11.242300+00:00",
+    "migration_contract": {
+      "authoritative_records_mutated": false,
+      "repository_interface": "WorkspaceRepository",
+      "schema_version": "workspace-state-schema-v1",
+      "supported_backends": [
+        "json_file",
+        "sqlite",
+        "postgres"
+      ]
+    },
+    "preferences": {
+      "default_mode": "demo",
+      "default_surface": "artifact_browser",
+      "default_watchlist": [
+        "000063",
+        "600519"
+      ],
+      "display_density": "comfortable",
+      "preferred_date_window": {
+        "preset": "30d"
+      },
+      "theme": "system"
+    },
+    "redaction_events": [
+      {
+        "action": "dropped",
+        "field_path": "preferences.password",
+        "reason": "secret_like_key"
+      }
+    ],
+    "saved_views": [
+      {
+        "created_at": "2026-06-02T02:30:00+08:00",
+        "filters": {
+          "freshness_status": "fresh"
+        },
+        "label": "当前产物复核",
+        "selected_route": "/artifacts",
+        "sorting": {
+          "direction": "desc",
+          "field": "generated_at"
+        },
+        "surface": "artifact_browser",
+        "updated_at": "2026-06-02T02:30:00+08:00",
+        "view_id": "current-artifact-review"
+      }
+    ],
+    "shell_state": {
+      "default_mode": "demo",
+      "selected_route": "/"
+    },
+    "storage_backend": "json_file",
+    "summary": {
+      "artifact_index_count": 0,
+      "preference_redaction_count": 1,
+      "saved_view_count": 1
+    },
+    "updated_at": "2026-06-02T02:50:00+08:00",
+    "validation_policy": {
+      "sensitive_values_allowed": false,
+      "trusted_market_data_allowed": false
+    },
+    "version": "product-shell-workspace-state-v1",
+    "workspace_id": "local-default"
+  }
 }

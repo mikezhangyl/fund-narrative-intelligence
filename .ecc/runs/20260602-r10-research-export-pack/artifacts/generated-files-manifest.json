@@ -1,0 +1,54 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/narrative_research_workbench/current/narrative_research_export_pack.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "0e7498b0950d57f69600f9a1383bf3a197254fd98bcb53e5a3a50729ec021d78",
+      "mtime_epoch": 1780339499,
+      "size_bytes": 14683,
+      "summary": "Cited research export pack generated from current timeline/search and evidence graph artifacts."
+    },
+    {
+      "type": "html",
+      "path": "outputs/narrative_research_workbench/current/narrative_research_export_pack.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "0dca5b3b8386e178c8e4246da6833ee0410d0b2f1aa71c84bdfd9606ea3b6372",
+      "mtime_epoch": 1780339499,
+      "size_bytes": 6592,
+      "summary": "Canonical Chinese readable research export report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "f7fbd1205fafad848837176344069cd1195742bb98acc3359d18bda90e3812b9",
+      "mtime_epoch": 1780339499,
+      "size_bytes": 13081,
+      "summary": "Product shell route registry including /research/export-pack."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "72a7235117fcda2cb9c07810b3492c51d94990d3a7688631c89eebf1984104b4",
+      "mtime_epoch": 1780339499,
+      "size_bytes": 391713,
+      "summary": "Product shell payload including research export route and artifact."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "6fbef9d21ecf285e8ced9d4bace9ffa2a8c99c440144e0535ea2544b36321fe2",
+      "mtime_epoch": 1780339499,
+      "size_bytes": 270857,
+      "summary": "Artifact index including narrative_research_export_pack JSON/HTML."
+    }
+  ]
+}
