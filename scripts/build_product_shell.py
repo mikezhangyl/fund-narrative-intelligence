@@ -36,6 +36,10 @@ from src.product_shell.source_quality import (  # noqa: E402
     build_source_quality_dashboard,
     render_source_quality_dashboard_html,
 )
+from src.product_shell.workspace_store import (  # noqa: E402
+    JsonWorkspaceRepository,
+    render_workspace_state_html,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -47,6 +51,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--output-dir",
         type=Path,
         default=DEFAULT_OUTPUT_DIR / "product_shell",
+    )
+    parser.add_argument(
+        "--workspace-store",
+        type=Path,
+        default=None,
+        help="Path to the local product-shell workspace state JSON store.",
     )
     return parser
 
@@ -76,10 +86,16 @@ def main(argv: list[str] | None = None) -> int:
         project_root=project_root,
         output_root=args.artifact_root,
     )
+    workspace_store_path = args.workspace_store or (output_dir / "workspace_state.json")
+    workspace_repository = JsonWorkspaceRepository(workspace_store_path)
+    workspace_state = workspace_repository.load()
+    if not workspace_store_path.exists():
+        workspace_repository.save(workspace_state)
     shell = build_product_shell_payload(
         route_registry=route_registry,
         artifact_index=artifact_index,
         narrative_data=narrative_data,
+        workspace_state=workspace_state,
     )
     _write_json(output_dir / "route_registry.json", route_registry)
     _write_text(output_dir / "route_registry.html", render_route_registry_preview(route_registry))
@@ -90,6 +106,8 @@ def main(argv: list[str] | None = None) -> int:
     _write_json(output_dir / "product_shell.json", shell)
     _write_text(output_dir / "index.html", render_product_home_html(shell))
     _write_text(output_dir / "artifact_browser.html", render_artifact_browser_html(shell))
+    _write_json(output_dir / "workspace_state.json", workspace_state)
+    _write_text(output_dir / "workspace_state.html", render_workspace_state_html(workspace_state))
     _write_json(output_dir / "config_preflight.json", preflight)
     _write_text(output_dir / "config_preflight.html", render_config_preflight_html(preflight))
     _write_json(output_dir / "source_quality_dashboard.json", source_quality)
@@ -109,6 +127,8 @@ def main(argv: list[str] | None = None) -> int:
                 "narrative_data_html": str(output_dir / "narrative_data.html"),
                 "home_html": str(output_dir / "index.html"),
                 "artifact_browser_html": str(output_dir / "artifact_browser.html"),
+                "workspace_state_json": str(output_dir / "workspace_state.json"),
+                "workspace_state_html": str(output_dir / "workspace_state.html"),
                 "config_preflight_json": str(output_dir / "config_preflight.json"),
                 "config_preflight_html": str(output_dir / "config_preflight.html"),
                 "source_quality_dashboard_json": str(output_dir / "source_quality_dashboard.json"),

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T17:49:12.784600+00:00",
+  "generated_at": "2026-06-01T18:03:28.724870+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -176,6 +176,32 @@
       },
       "data_source": {
         "degradation_status": "ok",
+        "freshness_status": "generated",
+        "html_path": "outputs/product_shell/round8-current/workspace_state.html",
+        "json_path": "outputs/product_shell/round8-current/workspace_state.json",
+        "source": "outputs/product_shell/round8-current/workspace_state.json",
+        "type": "generated_artifact"
+      },
+      "label_en": "Local workspace state",
+      "label_zh": "本地工作区状态",
+      "owner_service": "FNI",
+      "path": "/workspace/saved-views",
+      "route_id": "workspace_state"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
         "freshness_status": "artifact_reported",
         "html_path": "outputs/production_readiness_assistant/round7-final/production_readiness_assistant.html",
         "json_path": "outputs/production_readiness_assistant/round7-final/production_readiness_assistant.json",
@@ -270,9 +296,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 0,
-    "generated_artifact_route_count": 8,
+    "generated_artifact_route_count": 9,
     "live_api_route_count": 2,
-    "route_count": 10
+    "route_count": 11
   },
   "version": "product-shell-route-registry-v1"
 }

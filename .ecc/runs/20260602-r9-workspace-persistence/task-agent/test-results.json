@@ -1,0 +1,42 @@
+{
+  "commands": [
+    {
+      "command": "uv run pytest tests/test_product_shell_workspace_store.py -q",
+      "status": "failed_red",
+      "summary": "Expected RED: workspace_store module and manage_product_workspace CLI were missing."
+    },
+    {
+      "command": "uv run pytest tests/test_product_shell_workspace_store.py tests/test_product_shell.py tests/test_product_shell_release.py tests/test_product_shell_source_quality.py -q",
+      "status": "passed",
+      "summary": "26 passed"
+    },
+    {
+      "command": "uv run python scripts/manage_product_workspace.py save-view --store outputs/product_shell/round8-current/workspace_state.json --html outputs/product_shell/round8-current/workspace_state.html --view-id current-artifact-review --label 当前产物复核 --surface artifact_browser --selected-route /artifacts --filters-json '{\"freshness_status\":\"fresh\"}' --sorting-json '{\"field\":\"generated_at\",\"direction\":\"desc\"}' --updated-at 2026-06-02T02:30:00+08:00",
+      "status": "passed",
+      "summary": "Saved one local artifact-browser view and wrote workspace_state JSON/HTML."
+    },
+    {
+      "command": "uv run python scripts/build_product_shell.py --artifact-root outputs --output-dir outputs/product_shell/round8-current",
+      "status": "passed",
+      "summary": "Regenerated product shell outputs with workspace_state JSON/HTML."
+    },
+    {
+      "command": "uv run python scripts/run_product_shell_release_check.py --mode demo --output-dir outputs/product_shell/round8-current",
+      "status": "passed",
+      "summary": "status=pass"
+    },
+    {
+      "command": "uv run pytest",
+      "status": "passed",
+      "summary": "619 passed, 1 skipped"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}

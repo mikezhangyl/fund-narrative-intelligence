@@ -79,6 +79,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="workspace_state",
+            path="/workspace/saved-views",
+            label_zh="本地工作区状态",
+            label_en="Local workspace state",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/product_shell/round8-current/workspace_state.json",
+            json_path="outputs/product_shell/round8-current/workspace_state.json",
+            html_path="outputs/product_shell/round8-current/workspace_state.html",
+            freshness_status="generated",
+        ),
+        _route(
             route_id="production_readiness",
             path="/ops/production-readiness",
             label_zh="生产就绪助手",

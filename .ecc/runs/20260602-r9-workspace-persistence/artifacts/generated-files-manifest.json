@@ -1,0 +1,54 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/workspace_state.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "eeeb6e27912b45ccec9f2c933798b30502efe1f6d72c8cfb221f120cffb65746",
+      "mtime_epoch": 1780336991,
+      "size_bytes": 1216,
+      "summary": "Local product-shell workspace state with one saved artifact review view."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/workspace_state.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "b0f2b352377751b80381274672f18391d12ed62d6ff663201e24403ffe3b9540",
+      "mtime_epoch": 1780336991,
+      "size_bytes": 1794,
+      "summary": "Canonical Chinese local workspace state report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "74783249fd93b3b32b4531b17afd467455cdff14eb1872172480688fd3d9dced",
+      "mtime_epoch": 1780337008,
+      "size_bytes": 384393,
+      "summary": "Product shell payload including workspace state and saved-view summary."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "b7ea2536615731e97e6ca476def8417d81887377202a39dc09bcf5fd2c51e546",
+      "mtime_epoch": 1780337008,
+      "size_bytes": 10107,
+      "summary": "Product shell route registry including /workspace/saved-views."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "ae9a9ee1e30a51851e1a57c3670ab1c1beada49b22e48e118e2110353a4592cd",
+      "mtime_epoch": 1780337008,
+      "size_bytes": 5604,
+      "summary": "Chinese product home showing the local workspace saved-view count."
+    }
+  ]
+}

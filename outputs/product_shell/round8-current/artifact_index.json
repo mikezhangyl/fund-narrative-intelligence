@@ -6735,34 +6735,6 @@
       "warning_count": 0
     },
     {
-      "artifact_id": "ART_3d3de608cb",
-      "artifact_type": "release_manifest",
-      "freshness_status": "ok",
-      "generated_at": "2026-06-01T17:36:19.116336+00:00",
-      "html_path": "outputs/product_shell/round8-current/release_manifest.html",
-      "json_path": "outputs/product_shell/round8-current/release_manifest.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "ok",
-      "superseded": false,
-      "surface": "Release Manifest",
-      "warning_count": 0
-    },
-    {
-      "artifact_id": "ART_378d3db9f5",
-      "artifact_type": "acceptance_checklist",
-      "freshness_status": "pass",
-      "generated_at": "2026-06-01T17:36:19.116350+00:00",
-      "html_path": "outputs/product_shell/round8-current/acceptance_checklist.html",
-      "json_path": "outputs/product_shell/round8-current/acceptance_checklist.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "pass",
-      "superseded": false,
-      "surface": "Acceptance Checklist",
-      "warning_count": 0
-    },
-    {
       "artifact_id": "ART_5b7f4839c5",
       "artifact_type": "fresh_narrative_digest",
       "freshness_status": "ok",
@@ -6777,24 +6749,38 @@
       "warning_count": 0
     },
     {
-      "artifact_id": "ART_c8e257234f",
-      "artifact_type": "route_registry",
-      "freshness_status": "unknown",
-      "generated_at": "2026-06-01T17:49:05.941717+00:00",
-      "html_path": "outputs/product_shell/round8-current/route_registry.html",
-      "json_path": "outputs/product_shell/round8-current/route_registry.json",
+      "artifact_id": "ART_3d3de608cb",
+      "artifact_type": "release_manifest",
+      "freshness_status": "ok",
+      "generated_at": "2026-06-01T17:49:13.022488+00:00",
+      "html_path": "outputs/product_shell/round8-current/release_manifest.html",
+      "json_path": "outputs/product_shell/round8-current/release_manifest.json",
       "run_id": "round8-current",
       "source_mode": "generated_artifact",
-      "status": "unknown",
+      "status": "ok",
       "superseded": false,
-      "surface": "Product shell route registry",
+      "surface": "Release Manifest",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_378d3db9f5",
+      "artifact_type": "acceptance_checklist",
+      "freshness_status": "pass",
+      "generated_at": "2026-06-01T17:49:13.022501+00:00",
+      "html_path": "outputs/product_shell/round8-current/acceptance_checklist.html",
+      "json_path": "outputs/product_shell/round8-current/acceptance_checklist.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "pass",
+      "superseded": false,
+      "surface": "Acceptance Checklist",
       "warning_count": 0
     },
     {
       "artifact_id": "ART_db365f1d06",
       "artifact_type": "source_quality_dashboard",
       "freshness_status": "degraded",
-      "generated_at": "2026-06-01T17:49:06+00:00",
+      "generated_at": "2026-06-01T18:03:11+00:00",
       "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
       "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
       "run_id": "round8-current",
@@ -6805,10 +6791,38 @@
       "warning_count": 0
     },
     {
+      "artifact_id": "ART_92d0cf91d8",
+      "artifact_type": "workspace_state",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-01T18:03:11.242300+00:00",
+      "html_path": "outputs/product_shell/round8-current/workspace_state.html",
+      "json_path": "outputs/product_shell/round8-current/workspace_state.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Workspace State",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_c8e257234f",
+      "artifact_type": "route_registry",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-01T18:03:11.289267+00:00",
+      "html_path": "outputs/product_shell/round8-current/route_registry.html",
+      "json_path": "outputs/product_shell/round8-current/route_registry.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Product shell route registry",
+      "warning_count": 0
+    },
+    {
       "artifact_id": "ART_7c5a672725",
       "artifact_type": "artifact_index",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-01T17:49:06.216525+00:00",
+      "generated_at": "2026-06-01T18:03:11.556397+00:00",
       "html_path": "outputs/product_shell/round8-current/artifact_index.html",
       "json_path": "outputs/product_shell/round8-current/artifact_index.json",
       "run_id": "round8-current",
@@ -6816,13 +6830,13 @@
       "status": "unknown",
       "superseded": false,
       "surface": "Artifact index",
-      "warning_count": 12
+      "warning_count": 16
     },
     {
       "artifact_id": "ART_ede2f575bd",
       "artifact_type": "narrative_data",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-01T17:49:06.218597+00:00",
+      "generated_at": "2026-06-01T18:03:11.558333+00:00",
       "html_path": "outputs/product_shell/round8-current/narrative_data.html",
       "json_path": "outputs/product_shell/round8-current/narrative_data.json",
       "run_id": "round8-current",
@@ -6836,7 +6850,7 @@
       "artifact_id": "ART_095cab5d36",
       "artifact_type": "config_preflight",
       "freshness_status": "ok",
-      "generated_at": "2026-06-01T17:49:06.218779+00:00",
+      "generated_at": "2026-06-01T18:03:11.558507+00:00",
       "html_path": "outputs/product_shell/round8-current/config_preflight.html",
       "json_path": "outputs/product_shell/round8-current/config_preflight.json",
       "run_id": "round8-current",
@@ -6850,7 +6864,7 @@
       "artifact_id": "ART_bf6182f460",
       "artifact_type": "product_shell",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-01T17:49:06.220182+00:00",
+      "generated_at": "2026-06-01T18:03:11.560087+00:00",
       "html_path": "",
       "json_path": "outputs/product_shell/round8-current/product_shell.json",
       "run_id": "round8-current",
@@ -6861,7 +6875,7 @@
       "warning_count": 0
     }
   ],
-  "generated_at": "2026-06-01T17:49:13.011857+00:00",
+  "generated_at": "2026-06-01T18:03:28.959715+00:00",
   "output_root": "outputs",
   "redaction_policy": {
     "excluded_path_categories": [
@@ -6870,11 +6884,11 @@
     ]
   },
   "summary": {
-    "artifact_count": 490,
-    "html_link_count": 82,
-    "json_link_count": 490,
+    "artifact_count": 491,
+    "html_link_count": 83,
+    "json_link_count": 491,
     "stale_or_superseded_count": 344,
-    "warning_count": 14
+    "warning_count": 18
   },
   "version": "product-shell-artifact-index-v1"
 }

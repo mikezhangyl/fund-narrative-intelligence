@@ -10,11 +10,13 @@ def build_product_shell_payload(
     route_registry: dict[str, Any],
     artifact_index: dict[str, Any],
     narrative_data: dict[str, Any] | None = None,
+    workspace_state: dict[str, Any] | None = None,
     generated_at: str | None = None,
 ) -> dict[str, Any]:
     routes = _list(route_registry.get("routes"))
     artifacts = _list(artifact_index.get("artifacts"))
     narrative_summary = _mapping(_mapping(narrative_data).get("summary"))
+    workspace_summary = _mapping(_mapping(workspace_state).get("summary"))
     return {
         "version": "product-shell-v1",
         "generated_at": generated_at or _utc_now(),
@@ -31,10 +33,12 @@ def build_product_shell_payload(
             "generated_artifact_route_count": _int(
                 _mapping(route_registry.get("summary")).get("generated_artifact_route_count")
             ),
+            "workspace_saved_view_count": _int(workspace_summary.get("saved_view_count")),
         },
         "route_registry": route_registry,
         "artifact_index": artifact_index,
         "narrative_data": narrative_data or {},
+        "workspace_state": workspace_state or {},
         "client_policy_notice": "不在页面内重算雷达、质量或组合指标；页面只读取服务 API 或生成产物。",
     }
 
@@ -63,6 +67,7 @@ def render_product_home_html(shell: dict[str, Any]) -> str:
             f"<p>{_html_text(shell.get('client_policy_notice'))}</p>",
             "</section>",
             _narrative_data_summary(shell),
+            _workspace_state_summary(shell),
             _route_cards(routes),
             "</main>",
             "</body>",
@@ -94,6 +99,19 @@ def render_artifact_browser_html(shell: dict[str, Any]) -> str:
             "</body>",
             "</html>",
         ]
+    )
+
+
+def _workspace_state_summary(shell: dict[str, Any]) -> str:
+    summary = _mapping(shell.get("summary"))
+    return (
+        "<section>"
+        "<h2>本地工作区</h2>"
+        '<div class="facts">'
+        f"<p>保存视图: {_html_text(summary.get('workspace_saved_view_count', 0))}</p>"
+        "</div>"
+        "<p>查看 workspace_state.html 获取本地保存视图、过滤器、排序和迁移契约。</p>"
+        "</section>"
     )
 
 

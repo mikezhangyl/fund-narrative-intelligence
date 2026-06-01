@@ -1,0 +1,47 @@
+{
+  "artifact_indexes": [],
+  "generated_at": "2026-06-01T18:03:11.242300+00:00",
+  "migration_contract": {
+    "authoritative_records_mutated": false,
+    "repository_interface": "WorkspaceRepository",
+    "schema_version": "workspace-state-schema-v1",
+    "supported_backends": [
+      "json_file",
+      "sqlite",
+      "postgres"
+    ]
+  },
+  "saved_views": [
+    {
+      "created_at": "2026-06-02T02:30:00+08:00",
+      "filters": {
+        "freshness_status": "fresh"
+      },
+      "label": "当前产物复核",
+      "selected_route": "/artifacts",
+      "sorting": {
+        "direction": "desc",
+        "field": "generated_at"
+      },
+      "surface": "artifact_browser",
+      "updated_at": "2026-06-02T02:30:00+08:00",
+      "view_id": "current-artifact-review"
+    }
+  ],
+  "shell_state": {
+    "default_mode": "demo",
+    "selected_route": "/"
+  },
+  "storage_backend": "json_file",
+  "summary": {
+    "artifact_index_count": 0,
+    "saved_view_count": 1
+  },
+  "updated_at": "2026-06-02T02:30:00+08:00",
+  "validation_policy": {
+    "sensitive_values_allowed": false,
+    "trusted_market_data_allowed": false
+  },
+  "version": "product-shell-workspace-state-v1",
+  "workspace_id": "local-default"
+}

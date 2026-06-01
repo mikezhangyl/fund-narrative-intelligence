@@ -6736,34 +6736,6 @@
         "warning_count": 0
       },
       {
-        "artifact_id": "ART_3d3de608cb",
-        "artifact_type": "release_manifest",
-        "freshness_status": "ok",
-        "generated_at": "2026-06-01T17:36:19.116336+00:00",
-        "html_path": "outputs/product_shell/round8-current/release_manifest.html",
-        "json_path": "outputs/product_shell/round8-current/release_manifest.json",
-        "run_id": "round8-current",
-        "source_mode": "generated_artifact",
-        "status": "ok",
-        "superseded": false,
-        "surface": "Release Manifest",
-        "warning_count": 0
-      },
-      {
-        "artifact_id": "ART_378d3db9f5",
-        "artifact_type": "acceptance_checklist",
-        "freshness_status": "pass",
-        "generated_at": "2026-06-01T17:36:19.116350+00:00",
-        "html_path": "outputs/product_shell/round8-current/acceptance_checklist.html",
-        "json_path": "outputs/product_shell/round8-current/acceptance_checklist.json",
-        "run_id": "round8-current",
-        "source_mode": "generated_artifact",
-        "status": "pass",
-        "superseded": false,
-        "surface": "Acceptance Checklist",
-        "warning_count": 0
-      },
-      {
         "artifact_id": "ART_5b7f4839c5",
         "artifact_type": "fresh_narrative_digest",
         "freshness_status": "ok",
@@ -6778,24 +6750,38 @@
         "warning_count": 0
       },
       {
-        "artifact_id": "ART_c8e257234f",
-        "artifact_type": "route_registry",
-        "freshness_status": "unknown",
-        "generated_at": "2026-06-01T17:49:05.941717+00:00",
-        "html_path": "outputs/product_shell/round8-current/route_registry.html",
-        "json_path": "outputs/product_shell/round8-current/route_registry.json",
+        "artifact_id": "ART_3d3de608cb",
+        "artifact_type": "release_manifest",
+        "freshness_status": "ok",
+        "generated_at": "2026-06-01T17:49:13.022488+00:00",
+        "html_path": "outputs/product_shell/round8-current/release_manifest.html",
+        "json_path": "outputs/product_shell/round8-current/release_manifest.json",
         "run_id": "round8-current",
         "source_mode": "generated_artifact",
-        "status": "unknown",
+        "status": "ok",
         "superseded": false,
-        "surface": "Product shell route registry",
+        "surface": "Release Manifest",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_378d3db9f5",
+        "artifact_type": "acceptance_checklist",
+        "freshness_status": "pass",
+        "generated_at": "2026-06-01T17:49:13.022501+00:00",
+        "html_path": "outputs/product_shell/round8-current/acceptance_checklist.html",
+        "json_path": "outputs/product_shell/round8-current/acceptance_checklist.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "pass",
+        "superseded": false,
+        "surface": "Acceptance Checklist",
         "warning_count": 0
       },
       {
         "artifact_id": "ART_db365f1d06",
         "artifact_type": "source_quality_dashboard",
         "freshness_status": "degraded",
-        "generated_at": "2026-06-01T17:49:06+00:00",
+        "generated_at": "2026-06-01T18:03:11+00:00",
         "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
         "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
         "run_id": "round8-current",
@@ -6806,10 +6792,38 @@
         "warning_count": 0
       },
       {
+        "artifact_id": "ART_92d0cf91d8",
+        "artifact_type": "workspace_state",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T18:03:11.242300+00:00",
+        "html_path": "outputs/product_shell/round8-current/workspace_state.html",
+        "json_path": "outputs/product_shell/round8-current/workspace_state.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Workspace State",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_c8e257234f",
+        "artifact_type": "route_registry",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T18:03:11.289267+00:00",
+        "html_path": "outputs/product_shell/round8-current/route_registry.html",
+        "json_path": "outputs/product_shell/round8-current/route_registry.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Product shell route registry",
+        "warning_count": 0
+      },
+      {
         "artifact_id": "ART_7c5a672725",
         "artifact_type": "artifact_index",
         "freshness_status": "unknown",
-        "generated_at": "2026-06-01T17:49:06.216525+00:00",
+        "generated_at": "2026-06-01T18:03:11.556397+00:00",
         "html_path": "outputs/product_shell/round8-current/artifact_index.html",
         "json_path": "outputs/product_shell/round8-current/artifact_index.json",
         "run_id": "round8-current",
@@ -6817,13 +6831,13 @@
         "status": "unknown",
         "superseded": false,
         "surface": "Artifact index",
-        "warning_count": 12
+        "warning_count": 16
       },
       {
         "artifact_id": "ART_ede2f575bd",
         "artifact_type": "narrative_data",
         "freshness_status": "unknown",
-        "generated_at": "2026-06-01T17:49:06.218597+00:00",
+        "generated_at": "2026-06-01T18:03:11.558333+00:00",
         "html_path": "outputs/product_shell/round8-current/narrative_data.html",
         "json_path": "outputs/product_shell/round8-current/narrative_data.json",
         "run_id": "round8-current",
@@ -6837,7 +6851,7 @@
         "artifact_id": "ART_095cab5d36",
         "artifact_type": "config_preflight",
         "freshness_status": "ok",
-        "generated_at": "2026-06-01T17:49:06.218779+00:00",
+        "generated_at": "2026-06-01T18:03:11.558507+00:00",
         "html_path": "outputs/product_shell/round8-current/config_preflight.html",
         "json_path": "outputs/product_shell/round8-current/config_preflight.json",
         "run_id": "round8-current",
@@ -6851,7 +6865,7 @@
         "artifact_id": "ART_bf6182f460",
         "artifact_type": "product_shell",
         "freshness_status": "unknown",
-        "generated_at": "2026-06-01T17:49:06.220182+00:00",
+        "generated_at": "2026-06-01T18:03:11.560087+00:00",
         "html_path": "",
         "json_path": "outputs/product_shell/round8-current/product_shell.json",
         "run_id": "round8-current",
@@ -6862,7 +6876,7 @@
         "warning_count": 0
       }
     ],
-    "generated_at": "2026-06-01T17:49:13.011857+00:00",
+    "generated_at": "2026-06-01T18:03:28.959715+00:00",
     "output_root": "outputs",
     "redaction_policy": {
       "excluded_path_categories": [
@@ -6871,16 +6885,16 @@
       ]
     },
     "summary": {
-      "artifact_count": 490,
-      "html_link_count": 82,
-      "json_link_count": 490,
+      "artifact_count": 491,
+      "html_link_count": 83,
+      "json_link_count": 491,
       "stale_or_superseded_count": 344,
-      "warning_count": 14
+      "warning_count": 18
     },
     "version": "product-shell-artifact-index-v1"
   },
   "client_policy_notice": "不在页面内重算雷达、质量或组合指标；页面只读取服务 API 或生成产物。",
-  "generated_at": "2026-06-01T17:49:13.013743+00:00",
+  "generated_at": "2026-06-01T18:03:28.961836+00:00",
   "narrative_data": {
     "candidate_narratives": [
       {
@@ -7464,7 +7478,7 @@
       }
     ],
     "formula_version": "evidence-quality-deterministic-v1",
-    "generated_at": "2026-06-01T17:49:13.013670+00:00",
+    "generated_at": "2026-06-01T18:03:28.961760+00:00",
     "narratives": [
       {
         "aliases": [
@@ -9506,7 +9520,7 @@
     "version": "product-shell-narrative-data-v1"
   },
   "route_registry": {
-    "generated_at": "2026-06-01T17:49:12.784600+00:00",
+    "generated_at": "2026-06-01T18:03:28.724870+00:00",
     "global_client_policy": {
       "business_logic_location": "service_or_artifact_only",
       "provider_access_allowed": false,
@@ -9683,6 +9697,32 @@
         },
         "data_source": {
           "degradation_status": "ok",
+          "freshness_status": "generated",
+          "html_path": "outputs/product_shell/round8-current/workspace_state.html",
+          "json_path": "outputs/product_shell/round8-current/workspace_state.json",
+          "source": "outputs/product_shell/round8-current/workspace_state.json",
+          "type": "generated_artifact"
+        },
+        "label_en": "Local workspace state",
+        "label_zh": "本地工作区状态",
+        "owner_service": "FNI",
+        "path": "/workspace/saved-views",
+        "route_id": "workspace_state"
+      },
+      {
+        "client_policy": {
+          "forbidden_logic": [
+            "provider_access",
+            "narrative_scoring",
+            "quality_scoring",
+            "portfolio_aggregation",
+            "trading_recommendation"
+          ],
+          "provider_access_allowed": false,
+          "score_recomputation_allowed": false
+        },
+        "data_source": {
+          "degradation_status": "ok",
           "freshness_status": "artifact_reported",
           "html_path": "outputs/production_readiness_assistant/round7-final/production_readiness_assistant.html",
           "json_path": "outputs/production_readiness_assistant/round7-final/production_readiness_assistant.json",
@@ -9777,23 +9817,25 @@
     "summary": {
       "degraded_route_count": 0,
       "fixture_demo_route_count": 0,
-      "generated_artifact_route_count": 8,
+      "generated_artifact_route_count": 9,
       "live_api_route_count": 2,
-      "route_count": 10
+      "route_count": 11
     },
     "version": "product-shell-route-registry-v1"
   },
   "summary": {
-    "artifact_count": 490,
+    "artifact_count": 491,
     "candidate_narrative_count": 2,
     "evidence_pack_count": 3,
     "extraction_issue_count": 3,
-    "generated_artifact_route_count": 8,
+    "generated_artifact_route_count": 9,
     "live_api_route_count": 2,
     "narrative_count": 15,
     "quality_issue_count": 2,
-    "route_count": 10,
-    "stock_mapping_count": 56
+    "route_count": 11,
+    "stock_mapping_count": 56,
+    "workspace_saved_view_count": 0
   },
-  "version": "product-shell-v1"
+  "version": "product-shell-v1",
+  "workspace_state": {}
 }

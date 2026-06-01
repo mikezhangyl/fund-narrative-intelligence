@@ -115,7 +115,7 @@ def test_route_registry_config_preflight_points_to_generated_preflight_artifact(
         "outputs/product_shell/round8-current/config_preflight.html"
     )
     assert route["data_source"]["source"] == "product shell release preflight"
-    assert registry["summary"]["generated_artifact_route_count"] == 8
+    assert registry["summary"]["generated_artifact_route_count"] == 9
     assert registry["summary"]["fixture_demo_route_count"] == 0
 
 
