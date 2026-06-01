@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Metrics are first-pass stability indicators over current replay artifact coverage.",
+    "Alert usefulness and noise metrics are intentionally deferred to MIK-191/194."
+  ]
+}

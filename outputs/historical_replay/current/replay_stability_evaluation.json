@@ -1,0 +1,54 @@
+{
+  "contract": {
+    "metrics_scope": "system_quality_only",
+    "portfolio_optimization_allowed": false,
+    "return_prediction_allowed": false,
+    "trading_backtest_allowed": false
+  },
+  "formula_versions": {
+    "quality": "narrative-quality-audit-v1",
+    "radar_heat": "fresh-narrative-digest-v1",
+    "source_event": "narrative-timeline-search-v1"
+  },
+  "generated_at": "2026-06-01T18:58:05.634689+00:00",
+  "metrics": [
+    {
+      "description": "Radar event-count spread across replay snapshots.",
+      "metric_id": "radar_event_count_variability",
+      "scope": "system_quality",
+      "value": 3
+    },
+    {
+      "description": "Quality findings per radar snapshot.",
+      "metric_id": "quality_issue_density",
+      "scope": "system_quality",
+      "value": 0.6667
+    },
+    {
+      "description": "Share of source events inside the recent freshness band.",
+      "metric_id": "source_freshness_coverage",
+      "scope": "system_quality",
+      "value": 0.8333
+    },
+    {
+      "description": "Count of declared formula versions used by replay.",
+      "metric_id": "formula_version_coverage",
+      "scope": "system_quality",
+      "value": 3
+    }
+  ],
+  "source_window": {
+    "end_date": "2026-06-02",
+    "start_date": "2026-05-08"
+  },
+  "summary": {
+    "metric_count": 4,
+    "quality_finding_count": 2,
+    "radar_snapshot_count": 3,
+    "source_event_count": 12,
+    "stale_source_event_count": 2,
+    "warning_count": 0
+  },
+  "version": "replay-stability-evaluation-v1",
+  "warnings": []
+}

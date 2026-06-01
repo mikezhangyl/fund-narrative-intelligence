@@ -1,0 +1,24 @@
+{
+  "red_test": {
+    "command": "uv run pytest tests/test_replay_stability_evaluation.py -q",
+    "result": "failed before implementation with ImportError for missing run_replay_stability_evaluation"
+  },
+  "focused_tests": {
+    "command": "uv run pytest tests/test_replay_stability_evaluation.py tests/test_product_shell.py tests/test_product_shell_release.py tests/test_product_shell_source_quality.py -q",
+    "result": "23 passed"
+  },
+  "quality_checks": [
+    {
+      "command": "uv run ruff check .",
+      "result": "passed"
+    },
+    {
+      "command": "uv run pytest",
+      "result": "642 passed, 1 skipped"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ]
+}

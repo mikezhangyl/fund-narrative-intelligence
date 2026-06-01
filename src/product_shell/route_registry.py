@@ -115,6 +115,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="replay_stability_evaluation",
+            path="/evaluation/stability",
+            label_zh="雷达与质量稳定性评估",
+            label_en="Radar and quality stability evaluation",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/historical_replay/current/",
+            json_path="outputs/historical_replay/current/replay_stability_evaluation.json",
+            html_path="outputs/historical_replay/current/replay_stability_evaluation.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",

@@ -1,0 +1,54 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/historical_replay/current/replay_stability_evaluation.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "c5a84427e841f3d47b5ddeb7f639a61931cf539a6beec319e4b5868198d15012",
+      "mtime_epoch": 1780340285,
+      "size_bytes": 1526,
+      "summary": "Replay stability evaluation JSON."
+    },
+    {
+      "type": "html",
+      "path": "outputs/historical_replay/current/replay_stability_evaluation.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "2de9d3d5a64b6f6c64c09435306521af59c847e9945d42f4f9d679bc9b2ecf25",
+      "mtime_epoch": 1780340285,
+      "size_bytes": 1817,
+      "summary": "Canonical Chinese stability evaluation report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "210b38e07edaefac23b8cb92a6a304a0d634c34b26f550b47bce27dd8633ed7d",
+      "mtime_epoch": 1780340285,
+      "size_bytes": 14970,
+      "summary": "Product shell route registry including /evaluation/stability."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "0db0d2ad932df2707cf5e4fd46db3f30937f69ea4f63d6737adbdcb3c8ff8b6f",
+      "mtime_epoch": 1780340285,
+      "size_bytes": 394890,
+      "summary": "Product shell payload including stability evaluation artifact."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "1cf4283092daa60105b67ac7cc0b7015f37fcc782842978b6beb6c677c116eac",
+      "mtime_epoch": 1780340285,
+      "size_bytes": 271985,
+      "summary": "Artifact index including replay stability evaluation."
+    }
+  ]
+}
