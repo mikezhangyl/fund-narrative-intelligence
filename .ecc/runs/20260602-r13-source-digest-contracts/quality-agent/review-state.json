@@ -1,0 +1,11 @@
+{
+  "review_id": "20260602-r13-source-digest-contracts",
+  "status": "passed",
+  "reviewed_at": "2026-06-02T02:00:00+08:00",
+  "reviewed_snapshot_type": "committed",
+  "quality_reviewed_commit": "6754983375bdc118b8b86f13d9135df7fe78a281",
+  "working_tree_dirty": false,
+  "fix_required_before_next_phase": false,
+  "findings_count": 0,
+  "unresolved_findings_count": 0
+}

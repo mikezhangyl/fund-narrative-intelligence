@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T17:36:18.829724+00:00",
+  "generated_at": "2026-06-01T17:49:12.784600+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -109,6 +109,32 @@
       "owner_service": "Narrative Service",
       "path": "/narratives/quality",
       "route_id": "narrative_quality"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
+        "freshness_status": "artifact_reported",
+        "html_path": "outputs/fresh_narrative_digest/current/fresh_narrative_digest.html",
+        "json_path": "outputs/fresh_narrative_digest/current/fresh_narrative_digest.json",
+        "source": "outputs/fresh_narrative_digest/current/",
+        "type": "generated_artifact"
+      },
+      "label_en": "Fresh narrative digest",
+      "label_zh": "今日叙事监控摘要",
+      "owner_service": "FNI",
+      "path": "/narratives/digest",
+      "route_id": "fresh_narrative_digest"
     },
     {
       "client_policy": {
@@ -244,9 +270,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 0,
-    "generated_artifact_route_count": 7,
+    "generated_artifact_route_count": 8,
     "live_api_route_count": 2,
-    "route_count": 9
+    "route_count": 10
   },
   "version": "product-shell-route-registry-v1"
 }

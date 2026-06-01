@@ -1,0 +1,64 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/fresh_narrative_digest/current/fresh_narrative_digest.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "bc7d1b80087856a7afe539fd822565ea49d259006e24a32f326afb3bb9ae78ad",
+      "mtime_epoch": 1780336072,
+      "size_bytes": 7691,
+      "summary": "Fresh narrative digest JSON generated from the current gateway source-event probe artifact."
+    },
+    {
+      "type": "html",
+      "path": "outputs/fresh_narrative_digest/current/fresh_narrative_digest.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "582f6b73b58eb562e7c118b104161a39ca9741305dc5ecdd5fb3ec94e856506d",
+      "mtime_epoch": 1780336072,
+      "size_bytes": 2519,
+      "summary": "Canonical Chinese fresh narrative digest report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "cd0b0912323ae58f1ee2583445a2b7ecb5e29f3b773c78e47582e11a17f1cd2a",
+      "mtime_epoch": 1780336153,
+      "size_bytes": 9193,
+      "summary": "Product shell route registry including the fresh narrative digest route."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/route_registry.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "03034ee21ca15c9567cf3faa70cf0f153ba94dfda9801f2b3a9a4f98ea2c880d",
+      "mtime_epoch": 1780336153,
+      "size_bytes": 2786,
+      "summary": "Chinese product shell route registry preview including the digest route."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "5cb70d4cf814dc95560613dfd5e00e84c20770620537409c8e276af79018a4e6",
+      "mtime_epoch": 1780336153,
+      "size_bytes": 267985,
+      "summary": "Product shell artifact index with the fresh narrative digest outputs discoverable."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/artifact_index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "0065d88b83eb0a915bde5b9df73042d6d6f52385e60079417273616989aaee70",
+      "mtime_epoch": 1780336153,
+      "size_bytes": 119512,
+      "summary": "Chinese artifact browser preview with digest output links."
+    }
+  ]
+}

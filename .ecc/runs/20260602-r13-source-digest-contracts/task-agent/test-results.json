@@ -1,0 +1,42 @@
+{
+  "commands": [
+    {
+      "command": "uv run pytest tests/test_fresh_narrative_digest.py -q",
+      "status": "failed_red",
+      "summary": "Expected RED: module and CLI did not exist before implementation."
+    },
+    {
+      "command": "uv run python scripts/run_fresh_narrative_digest.py --input outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json --output-dir outputs/fresh_narrative_digest/current --window-start 2026-06-01T00:00:00+00:00 --window-end 2026-06-02T23:59:59+00:00",
+      "status": "passed",
+      "summary": "status=ok; digest_item_count=3; generated JSON and Chinese HTML."
+    },
+    {
+      "command": "uv run python scripts/build_product_shell.py --artifact-root outputs --output-dir outputs/product_shell/round8-current",
+      "status": "passed",
+      "summary": "Regenerated product shell route registry, artifact index, and shell payloads."
+    },
+    {
+      "command": "uv run python scripts/run_product_shell_release_check.py --mode demo --output-dir outputs/product_shell/round8-current",
+      "status": "passed",
+      "summary": "Demo release check regenerated release, preflight, acceptance, and source-quality artifacts."
+    },
+    {
+      "command": "uv run pytest tests/test_fresh_narrative_digest.py tests/test_product_shell.py tests/test_product_shell_release.py tests/test_product_shell_source_quality.py -q",
+      "status": "passed",
+      "summary": "25 passed"
+    },
+    {
+      "command": "uv run pytest",
+      "status": "passed",
+      "summary": "613 passed, 1 skipped"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}

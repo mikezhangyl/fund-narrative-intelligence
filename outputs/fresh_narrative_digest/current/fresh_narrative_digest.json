@@ -1,0 +1,257 @@
+{
+  "contract": {
+    "mode_support": [
+      "fixture",
+      "live_gateway_probe"
+    ],
+    "provider_access_allowed": false,
+    "supported_candidate_states": [
+      "new",
+      "accelerating",
+      "persistent",
+      "cooling",
+      "disputed"
+    ],
+    "trading_claims_allowed": false
+  },
+  "crawler_adapter_contract": {
+    "dynamic_browser_rendering_allowed": false,
+    "network_required_for_fixture_tests": false,
+    "required_fields": [
+      "max_concurrency",
+      "per_domain_pacing_seconds",
+      "timeout_seconds",
+      "retry_backoff_seconds",
+      "cache_ttl_seconds",
+      "content_hash",
+      "parser_version",
+      "robots_tos_metadata",
+      "failure_reason"
+    ],
+    "structured_failure_reasons": [
+      "robots_tos_not_approved",
+      "rate_limited",
+      "timeout",
+      "parse_error",
+      "unsupported_dynamic_rendering",
+      "permission_missing"
+    ]
+  },
+  "dedupe_contract": {
+    "near_duplicate_policy": "same provider/title/day or explicit dedupe_key",
+    "stable_id_inputs": [
+      "source_event_id",
+      "dedupe_key",
+      "provider",
+      "normalized_title",
+      "published_at"
+    ]
+  },
+  "entity_resolution_contract": {
+    "alias_inputs": [
+      "ticker",
+      "stock_code",
+      "name_zh",
+      "name_en",
+      "provider_entity_id"
+    ],
+    "ambiguous_entity_policy": "keep_candidate_with_alias_context",
+    "stable_entity_id_format": "<ENTITY_TYPE>_<CANONICAL_CODE_OR_HASH>"
+  },
+  "fixture_mode": false,
+  "generated_at": "2026-06-01T17:47:52+00:00",
+  "items": [
+    {
+      "candidate_state": "accelerating",
+      "degradation_events": [],
+      "display_name": "半导体 A股",
+      "entities": {
+        "concepts": [
+          {
+            "name": "半导体 A股",
+            "stable_entity_id": "CONCEPT_CA978112CA"
+          }
+        ],
+        "stocks": [
+          {
+            "display_name": "半导体 A股",
+            "stable_entity_id": "STOCK_半导体 A股",
+            "stock_code": "半导体 A股"
+          }
+        ]
+      },
+      "event_count": 3,
+      "evidence_links": [
+        {
+          "event_time": "2026-06-01 16:44:44",
+          "provider": "gateway_tushare",
+          "source_event_id": "tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+          "title": "澳大利亚对进口自中国的地层钢锚杆作出反倾销终裁"
+        },
+        {
+          "event_time": "2026-06-01 16:44:31",
+          "provider": "gateway_tushare",
+          "source_event_id": "tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+          "title": "国新能源：持股5%以上股东减持1.22%股份"
+        },
+        {
+          "event_time": "2026-06-01 16:44:15",
+          "provider": "gateway_tushare",
+          "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+          "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+        }
+      ],
+      "in_window_event_count": 3,
+      "narrative_key": "a",
+      "reason_for_inclusion": "3 source events in the selected window.",
+      "source_quality_metadata": {
+        "best_trust_tier": "candidate_untrusted",
+        "license_scopes": [
+          "context_only"
+        ],
+        "retention_policies": [
+          "metadata_only"
+        ],
+        "source_quality_labels": [
+          "candidate_untrusted"
+        ]
+      },
+      "stable_digest_id": "NDIG_CA978112CA",
+      "trust_state": "candidate_untrusted"
+    },
+    {
+      "candidate_state": "cooling",
+      "degradation_events": [],
+      "display_name": "AI infrastructure",
+      "entities": {
+        "concepts": [
+          {
+            "name": "AI infrastructure",
+            "stable_entity_id": "CONCEPT_1FAE1EA41E"
+          }
+        ],
+        "stocks": [
+          {
+            "display_name": "AAPL",
+            "stable_entity_id": "STOCK_AAPL",
+            "stock_code": "AAPL"
+          }
+        ]
+      },
+      "event_count": 5,
+      "evidence_links": [
+        {
+          "event_time": "2026-05-29",
+          "provider": "gateway_sec_edgar",
+          "source_event_id": "sec_edgar:0000320193:0001140361-26-023363",
+          "title": "FORM 4"
+        },
+        {
+          "event_time": "2026-05-28",
+          "provider": "gateway_sec_edgar",
+          "source_event_id": "sec_edgar:0000320193:0001140361-26-023149",
+          "title": "SD"
+        },
+        {
+          "event_time": "2026-05-27",
+          "provider": "gateway_sec_edgar",
+          "source_event_id": "sec_edgar:0000320193:0001921094-26-000555",
+          "title": "144 filing"
+        },
+        {
+          "event_time": "2026-05-12",
+          "provider": "gateway_sec_edgar",
+          "source_event_id": "sec_edgar:0000320193:0001140361-26-020871",
+          "title": "FORM 4"
+        },
+        {
+          "event_time": "2026-05-08",
+          "provider": "gateway_sec_edgar",
+          "source_event_id": "sec_edgar:0000320193:0001140361-26-020298",
+          "title": "FORM 4"
+        }
+      ],
+      "in_window_event_count": 0,
+      "narrative_key": "ai-infrastructure",
+      "reason_for_inclusion": "0 source events in the selected window.",
+      "source_quality_metadata": {
+        "best_trust_tier": "candidate_untrusted",
+        "license_scopes": [
+          "public_filing"
+        ],
+        "retention_policies": [
+          "metadata_and_raw_payload"
+        ],
+        "source_quality_labels": [
+          "candidate_untrusted"
+        ]
+      },
+      "stable_digest_id": "NDIG_1FAE1EA41E",
+      "trust_state": "candidate_untrusted"
+    },
+    {
+      "candidate_state": "cooling",
+      "degradation_events": [],
+      "display_name": "股东会",
+      "entities": {
+        "concepts": [
+          {
+            "name": "股东会",
+            "stable_entity_id": "CONCEPT_26E13C7A6D"
+          }
+        ],
+        "stocks": [
+          {
+            "display_name": "000001",
+            "stable_entity_id": "STOCK_000001",
+            "stock_code": "000001"
+          }
+        ]
+      },
+      "event_count": 2,
+      "evidence_links": [
+        {
+          "event_time": "2026-05-22",
+          "provider": "gateway_cninfo",
+          "source_event_id": "cninfo:000001:000001:2026-05-22:北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书",
+          "title": "北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书"
+        },
+        {
+          "event_time": "2026-05-22",
+          "provider": "gateway_cninfo",
+          "source_event_id": "cninfo:000001:000001:2026-05-22:2025年年度股东会决议公告",
+          "title": "2025年年度股东会决议公告"
+        }
+      ],
+      "in_window_event_count": 0,
+      "narrative_key": "narrative_076605fb87",
+      "reason_for_inclusion": "0 source events in the selected window.",
+      "source_quality_metadata": {
+        "best_trust_tier": "candidate_untrusted",
+        "license_scopes": [
+          "public_disclosure_metadata"
+        ],
+        "retention_policies": [
+          "metadata_only"
+        ],
+        "source_quality_labels": [
+          "candidate_untrusted"
+        ]
+      },
+      "stable_digest_id": "NDIG_26E13C7A6D",
+      "trust_state": "candidate_untrusted"
+    }
+  ],
+  "status": "ok",
+  "summary": {
+    "deduped_event_count": 10,
+    "degraded_item_count": 0,
+    "digest_item_count": 3,
+    "raw_event_count": 12
+  },
+  "version": "fresh-narrative-digest-v1",
+  "window": {
+    "end": "2026-06-02T23:59:59+00:00",
+    "start": "2026-06-01T00:00:00+00:00"
+  }
+}

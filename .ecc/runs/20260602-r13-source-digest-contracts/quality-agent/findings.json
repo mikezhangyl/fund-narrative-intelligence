@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Freshness depends on the gateway source-event artifact supplied to the digest runner.",
+    "Crawler policy is represented as an FNI consumer contract; Gateway remains responsible for enforcing live provider crawling, robots/TOS, and rate-limit behavior."
+  ]
+}

@@ -55,6 +55,18 @@ def build_product_shell_route_registry(
             freshness_status="service_reported",
         ),
         _route(
+            route_id="fresh_narrative_digest",
+            path="/narratives/digest",
+            label_zh="今日叙事监控摘要",
+            label_en="Fresh narrative digest",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/fresh_narrative_digest/current/",
+            json_path="outputs/fresh_narrative_digest/current/fresh_narrative_digest.json",
+            html_path="outputs/fresh_narrative_digest/current/fresh_narrative_digest.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",
