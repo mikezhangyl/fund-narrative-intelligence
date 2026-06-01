@@ -1,0 +1,44 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/narrative_research_workbench/current/narrative_evidence_graph.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "860399d46264fdfcd2a95946e46df01381807851b8c25dcdaf1f3ece0c5cb96d",
+      "mtime_epoch": 1780338911,
+      "size_bytes": 16289,
+      "summary": "Narrative comparison and evidence graph JSON generated from current timeline/search source events."
+    },
+    {
+      "type": "html",
+      "path": "outputs/narrative_research_workbench/current/narrative_evidence_graph.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "249283836ffdf988622eaa31c49a2739e7685b2ece84bebc918d2753bbff4bf8",
+      "mtime_epoch": 1780338911,
+      "size_bytes": 6429,
+      "summary": "Canonical Chinese evidence graph report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "212b3d02bccdbeab5491b54b521ed2240c845e0a9b1eca5dd5a6b54d5e545706",
+      "mtime_epoch": 1780338911,
+      "size_bytes": 12082,
+      "summary": "Route registry including /research/evidence-graph."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "3fe18e7574f3a4cfb7b904dcf11cdaac26aca650c91c6d15e3beeafa20c0b218",
+      "mtime_epoch": 1780338911,
+      "size_bytes": 388278,
+      "summary": "Product shell payload including evidence graph route and artifact."
+    }
+  ]
+}

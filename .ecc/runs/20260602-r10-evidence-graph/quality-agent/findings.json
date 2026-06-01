@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Graph coverage depends on timeline/search source-event input fields.",
+    "Unsupported inferred relationships are excluded by design."
+  ]
+}

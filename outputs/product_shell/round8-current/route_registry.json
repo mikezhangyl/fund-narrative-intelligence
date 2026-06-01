@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T18:24:35.239408+00:00",
+  "generated_at": "2026-06-01T18:35:11.363929+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -177,6 +177,32 @@
       "data_source": {
         "degradation_status": "ok",
         "freshness_status": "artifact_reported",
+        "html_path": "outputs/narrative_research_workbench/current/narrative_evidence_graph.html",
+        "json_path": "outputs/narrative_research_workbench/current/narrative_evidence_graph.json",
+        "source": "outputs/narrative_research_workbench/current/",
+        "type": "generated_artifact"
+      },
+      "label_en": "Narrative comparison and evidence graph",
+      "label_zh": "叙事比较与证据图谱",
+      "owner_service": "FNI",
+      "path": "/research/evidence-graph",
+      "route_id": "narrative_evidence_graph"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
+        "freshness_status": "artifact_reported",
         "html_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.html",
         "json_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
         "source": "outputs/portfolio_narrative_workspace/",
@@ -322,9 +348,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 0,
-    "generated_artifact_route_count": 10,
+    "generated_artifact_route_count": 11,
     "live_api_route_count": 2,
-    "route_count": 12
+    "route_count": 13
   },
   "version": "product-shell-route-registry-v1"
 }

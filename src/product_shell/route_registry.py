@@ -79,6 +79,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="narrative_evidence_graph",
+            path="/research/evidence-graph",
+            label_zh="叙事比较与证据图谱",
+            label_en="Narrative comparison and evidence graph",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/narrative_research_workbench/current/",
+            json_path="outputs/narrative_research_workbench/current/narrative_evidence_graph.json",
+            html_path="outputs/narrative_research_workbench/current/narrative_evidence_graph.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",

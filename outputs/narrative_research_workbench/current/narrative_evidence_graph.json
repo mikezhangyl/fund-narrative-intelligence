@@ -1,0 +1,369 @@
+{
+  "comparisons": [
+    {
+      "contradictions": [],
+      "metrics": {
+        "contradiction_count": 0,
+        "shared_entity_count": 0,
+        "shared_event_count": 0
+      },
+      "narratives": [
+        "AI infrastructure",
+        "半导体 A股"
+      ],
+      "shared_concepts": [],
+      "shared_sectors": [],
+      "shared_source_event_ids": [],
+      "shared_tickers": []
+    }
+  ],
+  "contract": {
+    "confidence_policy": "explicit_event_or_entity_only",
+    "edge_provenance_required": true,
+    "provider_access_allowed": false,
+    "unsupported_inferred_links_allowed": false
+  },
+  "edges": [
+    {
+      "confidence": 1.0,
+      "edge_id": "NARRATIVE_AI infrastructure->supported_by_event->EVENT_sec_edgar:0000320193:0001140361-26-023363->sec_edgar:0000320193:0001140361-26-023363",
+      "edge_type": "supported_by_event",
+      "from_node_id": "NARRATIVE_AI infrastructure",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-023363"
+      },
+      "to_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-023363"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001140361-26-023363->mentions_stock->STOCK_AAPL->sec_edgar:0000320193:0001140361-26-023363",
+      "edge_type": "mentions_stock",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-023363",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-023363"
+      },
+      "to_node_id": "STOCK_AAPL"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001140361-26-023363->mentions_concept->CONCEPT_AI infrastructure->sec_edgar:0000320193:0001140361-26-023363",
+      "edge_type": "mentions_concept",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-023363",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-023363"
+      },
+      "to_node_id": "CONCEPT_AI infrastructure"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "NARRATIVE_AI infrastructure->supported_by_event->EVENT_sec_edgar:0000320193:0001140361-26-023149->sec_edgar:0000320193:0001140361-26-023149",
+      "edge_type": "supported_by_event",
+      "from_node_id": "NARRATIVE_AI infrastructure",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-023149"
+      },
+      "to_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-023149"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001140361-26-023149->mentions_stock->STOCK_AAPL->sec_edgar:0000320193:0001140361-26-023149",
+      "edge_type": "mentions_stock",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-023149",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-023149"
+      },
+      "to_node_id": "STOCK_AAPL"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001140361-26-023149->mentions_concept->CONCEPT_AI infrastructure->sec_edgar:0000320193:0001140361-26-023149",
+      "edge_type": "mentions_concept",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-023149",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-023149"
+      },
+      "to_node_id": "CONCEPT_AI infrastructure"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "NARRATIVE_AI infrastructure->supported_by_event->EVENT_sec_edgar:0000320193:0001921094-26-000555->sec_edgar:0000320193:0001921094-26-000555",
+      "edge_type": "supported_by_event",
+      "from_node_id": "NARRATIVE_AI infrastructure",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001921094-26-000555"
+      },
+      "to_node_id": "EVENT_sec_edgar:0000320193:0001921094-26-000555"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001921094-26-000555->mentions_stock->STOCK_AAPL->sec_edgar:0000320193:0001921094-26-000555",
+      "edge_type": "mentions_stock",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001921094-26-000555",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001921094-26-000555"
+      },
+      "to_node_id": "STOCK_AAPL"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001921094-26-000555->mentions_concept->CONCEPT_AI infrastructure->sec_edgar:0000320193:0001921094-26-000555",
+      "edge_type": "mentions_concept",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001921094-26-000555",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001921094-26-000555"
+      },
+      "to_node_id": "CONCEPT_AI infrastructure"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "NARRATIVE_AI infrastructure->supported_by_event->EVENT_sec_edgar:0000320193:0001140361-26-020871->sec_edgar:0000320193:0001140361-26-020871",
+      "edge_type": "supported_by_event",
+      "from_node_id": "NARRATIVE_AI infrastructure",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-020871"
+      },
+      "to_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-020871"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001140361-26-020871->mentions_stock->STOCK_AAPL->sec_edgar:0000320193:0001140361-26-020871",
+      "edge_type": "mentions_stock",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-020871",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-020871"
+      },
+      "to_node_id": "STOCK_AAPL"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001140361-26-020871->mentions_concept->CONCEPT_AI infrastructure->sec_edgar:0000320193:0001140361-26-020871",
+      "edge_type": "mentions_concept",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-020871",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-020871"
+      },
+      "to_node_id": "CONCEPT_AI infrastructure"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "NARRATIVE_AI infrastructure->supported_by_event->EVENT_sec_edgar:0000320193:0001140361-26-020298->sec_edgar:0000320193:0001140361-26-020298",
+      "edge_type": "supported_by_event",
+      "from_node_id": "NARRATIVE_AI infrastructure",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-020298"
+      },
+      "to_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-020298"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001140361-26-020298->mentions_stock->STOCK_AAPL->sec_edgar:0000320193:0001140361-26-020298",
+      "edge_type": "mentions_stock",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-020298",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-020298"
+      },
+      "to_node_id": "STOCK_AAPL"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_sec_edgar:0000320193:0001140361-26-020298->mentions_concept->CONCEPT_AI infrastructure->sec_edgar:0000320193:0001140361-26-020298",
+      "edge_type": "mentions_concept",
+      "from_node_id": "EVENT_sec_edgar:0000320193:0001140361-26-020298",
+      "provenance": {
+        "source_event_id": "sec_edgar:0000320193:0001140361-26-020298"
+      },
+      "to_node_id": "CONCEPT_AI infrastructure"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "NARRATIVE_半导体 A股->supported_by_event->EVENT_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52->tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "edge_type": "supported_by_event",
+      "from_node_id": "NARRATIVE_半导体 A股",
+      "provenance": {
+        "source_event_id": "tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52"
+      },
+      "to_node_id": "EVENT_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52->mentions_stock->STOCK_半导体 A股->tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "edge_type": "mentions_stock",
+      "from_node_id": "EVENT_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "provenance": {
+        "source_event_id": "tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52"
+      },
+      "to_node_id": "STOCK_半导体 A股"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52->mentions_concept->CONCEPT_半导体 A股->tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "edge_type": "mentions_concept",
+      "from_node_id": "EVENT_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "provenance": {
+        "source_event_id": "tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52"
+      },
+      "to_node_id": "CONCEPT_半导体 A股"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "NARRATIVE_半导体 A股->supported_by_event->EVENT_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f->tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "edge_type": "supported_by_event",
+      "from_node_id": "NARRATIVE_半导体 A股",
+      "provenance": {
+        "source_event_id": "tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f"
+      },
+      "to_node_id": "EVENT_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f->mentions_stock->STOCK_半导体 A股->tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "edge_type": "mentions_stock",
+      "from_node_id": "EVENT_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "provenance": {
+        "source_event_id": "tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f"
+      },
+      "to_node_id": "STOCK_半导体 A股"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f->mentions_concept->CONCEPT_半导体 A股->tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "edge_type": "mentions_concept",
+      "from_node_id": "EVENT_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "provenance": {
+        "source_event_id": "tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f"
+      },
+      "to_node_id": "CONCEPT_半导体 A股"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "NARRATIVE_半导体 A股->supported_by_event->EVENT_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7->tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "edge_type": "supported_by_event",
+      "from_node_id": "NARRATIVE_半导体 A股",
+      "provenance": {
+        "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7"
+      },
+      "to_node_id": "EVENT_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7->mentions_stock->STOCK_半导体 A股->tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "edge_type": "mentions_stock",
+      "from_node_id": "EVENT_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "provenance": {
+        "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7"
+      },
+      "to_node_id": "STOCK_半导体 A股"
+    },
+    {
+      "confidence": 1.0,
+      "edge_id": "EVENT_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7->mentions_concept->CONCEPT_半导体 A股->tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "edge_type": "mentions_concept",
+      "from_node_id": "EVENT_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "provenance": {
+        "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7"
+      },
+      "to_node_id": "CONCEPT_半导体 A股"
+    }
+  ],
+  "generated_at": "2026-06-01T18:35:11.102825+00:00",
+  "narratives": [
+    "AI infrastructure",
+    "半导体 A股"
+  ],
+  "nodes": [
+    {
+      "label": "AI infrastructure",
+      "node_id": "NARRATIVE_AI infrastructure",
+      "node_type": "narrative"
+    },
+    {
+      "label": "半导体 A股",
+      "node_id": "NARRATIVE_半导体 A股",
+      "node_type": "narrative"
+    },
+    {
+      "label": "FORM 4",
+      "node_id": "EVENT_sec_edgar:0000320193:0001140361-26-023363",
+      "node_type": "source_event",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-023363"
+    },
+    {
+      "label": "AAPL",
+      "node_id": "STOCK_AAPL",
+      "node_type": "stock"
+    },
+    {
+      "label": "AI infrastructure",
+      "node_id": "CONCEPT_AI infrastructure",
+      "node_type": "concept"
+    },
+    {
+      "label": "SD",
+      "node_id": "EVENT_sec_edgar:0000320193:0001140361-26-023149",
+      "node_type": "source_event",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-023149"
+    },
+    {
+      "label": "144 filing",
+      "node_id": "EVENT_sec_edgar:0000320193:0001921094-26-000555",
+      "node_type": "source_event",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001921094-26-000555"
+    },
+    {
+      "label": "FORM 4",
+      "node_id": "EVENT_sec_edgar:0000320193:0001140361-26-020871",
+      "node_type": "source_event",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-020871"
+    },
+    {
+      "label": "FORM 4",
+      "node_id": "EVENT_sec_edgar:0000320193:0001140361-26-020298",
+      "node_type": "source_event",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-020298"
+    },
+    {
+      "label": "澳大利亚对进口自中国的地层钢锚杆作出反倾销终裁",
+      "node_id": "EVENT_tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "node_type": "source_event",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52"
+    },
+    {
+      "label": "半导体 A股",
+      "node_id": "STOCK_半导体 A股",
+      "node_type": "stock"
+    },
+    {
+      "label": "半导体 A股",
+      "node_id": "CONCEPT_半导体 A股",
+      "node_type": "concept"
+    },
+    {
+      "label": "国新能源：持股5%以上股东减持1.22%股份",
+      "node_id": "EVENT_tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "node_type": "source_event",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f"
+    },
+    {
+      "label": "伊朗战事推高能源成本，巴基斯坦通胀升温",
+      "node_id": "EVENT_tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "node_type": "source_event",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7"
+    }
+  ],
+  "summary": {
+    "edge_count": 24,
+    "event_count": 10,
+    "narrative_count": 2,
+    "node_count": 14,
+    "unsupported_inference_count": 0
+  },
+  "version": "narrative-evidence-graph-v1"
+}
