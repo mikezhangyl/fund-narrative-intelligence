@@ -7,6 +7,9 @@ from scripts import build_product_shell, manage_product_workspace
 from src.product_shell.workspace_store import (
     JsonWorkspaceRepository,
     build_default_workspace_state,
+    build_workspace_export_package,
+    import_workspace_export_package,
+    render_workspace_export_html,
     render_workspace_state_html,
     save_workspace_view,
     update_workspace_preferences,
@@ -277,3 +280,135 @@ def test_manage_product_workspace_cli_sets_preferences_and_renders_them(tmp_path
     assert "drop-me" not in json.dumps(state, ensure_ascii=False)
     assert "偏好设置" in html
     assert "artifact_browser" in html
+
+
+def test_workspace_export_package_excludes_sensitive_artifact_indexes(tmp_path):
+    repository = JsonWorkspaceRepository(tmp_path / "workspace_state.json")
+    state = repository.upsert_saved_view(
+        {
+            "view_id": "artifact-review",
+            "label": "产物复核",
+            "surface": "artifact_browser",
+            "selected_route": "/artifacts",
+        },
+        updated_at="2026-06-02T03:10:00+08:00",
+    )
+    artifact_index = {
+        "version": "product-shell-artifact-index-v1",
+        "artifacts": [
+            {
+                "surface": "Safe report",
+                "json_path": "outputs/report/report.json",
+                "html_path": "outputs/report/report.html",
+            },
+            {
+                "surface": "Secret log",
+                "json_path": "outputs/provider_secret_logs/api_token.json",
+                "api_key": "must-not-export",
+            },
+        ],
+    }
+
+    package = build_workspace_export_package(
+        workspace_state=state,
+        artifact_index=artifact_index,
+        generated_at="2026-06-02T03:11:00+08:00",
+    )
+
+    assert package["version"] == "product-shell-workspace-export-v1"
+    assert package["manifest"]["restore_policy"]["authoritative_records_mutated"] is False
+    assert package["manifest"]["contents"] == ["workspace_state", "artifact_index"]
+    assert package["artifact_index"]["summary"]["artifact_count"] == 1
+    assert package["manifest"]["excluded_secret_paths"] == ["artifact_index.artifacts[1]"]
+    assert "must-not-export" not in json.dumps(package, ensure_ascii=False)
+
+
+def test_workspace_export_import_restores_state_deterministically(tmp_path):
+    source_store = tmp_path / "source_workspace.json"
+    target_store = tmp_path / "target_workspace.json"
+    source_state = JsonWorkspaceRepository(source_store).set_preferences(
+        {
+            "default_surface": "narrative_radar",
+            "default_watchlist": ["000063"],
+            "preferred_date_window": {"preset": "7d"},
+            "display_density": "compact",
+            "theme": "dark",
+            "default_mode": "demo",
+        },
+        updated_at="2026-06-02T03:12:00+08:00",
+    )
+    package = build_workspace_export_package(
+        workspace_state=source_state,
+        generated_at="2026-06-02T03:13:00+08:00",
+    )
+
+    restored = import_workspace_export_package(
+        package,
+        JsonWorkspaceRepository(target_store),
+        imported_at="2026-06-02T03:14:00+08:00",
+    )
+
+    assert target_store.exists()
+    assert restored["preferences"] == source_state["preferences"]
+    assert restored["import_metadata"]["source_export_id"] == package["manifest"]["export_id"]
+    assert restored["migration_contract"]["authoritative_records_mutated"] is False
+
+
+def test_workspace_export_cli_writes_json_html_and_imports(tmp_path):
+    store_path = tmp_path / "workspace_state.json"
+    package_path = tmp_path / "workspace_export.json"
+    html_path = tmp_path / "workspace_export.html"
+    imported_store_path = tmp_path / "imported_workspace.json"
+    imported_html_path = tmp_path / "imported_workspace.html"
+    JsonWorkspaceRepository(store_path).set_preferences(
+        {"default_surface": "artifact_browser", "default_watchlist": ["600519"]},
+        updated_at="2026-06-02T03:15:00+08:00",
+    )
+
+    export_exit = manage_product_workspace.main(
+        [
+            "export",
+            "--store",
+            str(store_path),
+            "--package",
+            str(package_path),
+            "--html",
+            str(html_path),
+            "--generated-at",
+            "2026-06-02T03:16:00+08:00",
+        ]
+    )
+    import_exit = manage_product_workspace.main(
+        [
+            "import",
+            "--store",
+            str(imported_store_path),
+            "--package",
+            str(package_path),
+            "--html",
+            str(imported_html_path),
+            "--imported-at",
+            "2026-06-02T03:17:00+08:00",
+        ]
+    )
+
+    imported = json.loads(imported_store_path.read_text())
+
+    assert export_exit == 0
+    assert import_exit == 0
+    assert json.loads(package_path.read_text())["manifest"]["schema_version"] == "workspace-export-schema-v1"
+    assert "<h1>工作区导出包</h1>" in html_path.read_text()
+    assert "<h1>本地工作区状态</h1>" in imported_html_path.read_text()
+    assert imported["preferences"]["default_watchlist"] == ["600519"]
+
+
+def test_render_workspace_export_html_is_chinese():
+    package = build_workspace_export_package(
+        workspace_state=build_default_workspace_state(),
+        generated_at="2026-06-02T03:18:00+08:00",
+    )
+
+    html = render_workspace_export_html(package)
+
+    assert "<h1>工作区导出包</h1>" in html
+    assert "不会覆盖可信服务记录" in html

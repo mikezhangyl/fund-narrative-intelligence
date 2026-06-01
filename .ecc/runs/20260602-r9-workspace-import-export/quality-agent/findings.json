@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "The export package is JSON-only in this slice; a compressed portable archive can reuse the manifest later.",
+    "Import restores local workspace state only, not generated service artifacts."
+  ]
+}

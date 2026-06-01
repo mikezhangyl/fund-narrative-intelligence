@@ -13,7 +13,10 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.config import DEFAULT_OUTPUT_DIR  # noqa: E402
 from src.product_shell.workspace_store import (  # noqa: E402
     JsonWorkspaceRepository,
+    build_workspace_export_package,
+    import_workspace_export_package,
     render_workspace_state_html,
+    write_workspace_export_package,
 )
 
 
@@ -43,6 +46,17 @@ def build_parser() -> argparse.ArgumentParser:
     set_preferences.add_argument("--default-mode", default=None)
     set_preferences.add_argument("--preferences-json", default="{}")
     set_preferences.add_argument("--updated-at", default=None)
+    export_parser = subparsers.add_parser("export", help="Export local workspace state.")
+    export_parser.add_argument("--store", type=Path, default=DEFAULT_OUTPUT_DIR / "product_shell" / "workspace_state.json")
+    export_parser.add_argument("--artifact-index", type=Path, default=None)
+    export_parser.add_argument("--package", type=Path, required=True)
+    export_parser.add_argument("--html", type=Path, default=None)
+    export_parser.add_argument("--generated-at", default=None)
+    import_parser = subparsers.add_parser("import", help="Import local workspace state.")
+    import_parser.add_argument("--store", type=Path, default=DEFAULT_OUTPUT_DIR / "product_shell" / "workspace_state.json")
+    import_parser.add_argument("--package", type=Path, required=True)
+    import_parser.add_argument("--html", type=Path, default=None)
+    import_parser.add_argument("--imported-at", default=None)
     return parser
 
 
@@ -52,6 +66,10 @@ def main(argv: list[str] | None = None) -> int:
         return _save_view(args)
     if args.command == "set-preferences":
         return _set_preferences(args)
+    if args.command == "export":
+        return _export_workspace(args)
+    if args.command == "import":
+        return _import_workspace(args)
     return 2
 
 
@@ -78,6 +96,57 @@ def _save_view(args: argparse.Namespace) -> int:
                 "store": str(args.store),
                 "html": str(html_path),
                 "saved_view_count": state["summary"]["saved_view_count"],
+            },
+            ensure_ascii=False,
+        )
+    )
+    return 0
+
+
+def _export_workspace(args: argparse.Namespace) -> int:
+    repository = JsonWorkspaceRepository(args.store)
+    artifact_index = _read_json(args.artifact_index) if args.artifact_index is not None else None
+    package = build_workspace_export_package(
+        workspace_state=repository.load(),
+        artifact_index=artifact_index,
+        generated_at=args.generated_at,
+    )
+    write_workspace_export_package(
+        package_path=args.package,
+        package=package,
+        html_path=args.html,
+    )
+    print(
+        json.dumps(
+            {
+                "status": "exported",
+                "package": str(args.package),
+                "html": str(args.html) if args.html is not None else "",
+                "export_id": package["manifest"]["export_id"],
+            },
+            ensure_ascii=False,
+        )
+    )
+    return 0
+
+
+def _import_workspace(args: argparse.Namespace) -> int:
+    package = _read_json(args.package)
+    state = import_workspace_export_package(
+        package,
+        JsonWorkspaceRepository(args.store),
+        imported_at=args.imported_at,
+    )
+    if args.html is not None:
+        args.html.parent.mkdir(parents=True, exist_ok=True)
+        args.html.write_text(render_workspace_state_html(state), encoding="utf-8")
+    print(
+        json.dumps(
+            {
+                "status": "imported",
+                "store": str(args.store),
+                "html": str(args.html) if args.html is not None else "",
+                "source_export_id": state["import_metadata"]["source_export_id"],
             },
             ensure_ascii=False,
         )
@@ -121,6 +190,13 @@ def _set_preferences(args: argparse.Namespace) -> int:
         )
     )
     return 0
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise SystemExit(f"{path} must contain a JSON object")
+    return payload
 
 
 def _json_object(value: str, option_name: str) -> dict[str, Any]:

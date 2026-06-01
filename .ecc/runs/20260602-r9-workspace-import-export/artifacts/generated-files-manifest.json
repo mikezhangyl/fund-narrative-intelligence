@@ -1,0 +1,44 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/workspace_export.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "aba1e820213f55156b648cf9092fd6f239f1a13f6d0f66b74f0a72647f995a78",
+      "mtime_epoch": 1780337787,
+      "size_bytes": 284507,
+      "summary": "Workspace export package with manifest, workspace state, and non-sensitive artifact index."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/workspace_export.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "656f98b61c8d3e634d619078f40e3c4a414dc5b3afa6b68ebbb28cab420e04db",
+      "mtime_epoch": 1780337787,
+      "size_bytes": 1252,
+      "summary": "Canonical Chinese workspace export package summary."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "5a41735287e3452d3a047998fb5d27ad69c36b9974f3f5c6bcc52864ba041974",
+      "mtime_epoch": 1780337787,
+      "size_bytes": 384966,
+      "summary": "Product shell payload regenerated after workspace export package creation."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "35a606684e469b1e37bf598164998bd623538b7d41d7f8932bf78ac0993dbded",
+      "mtime_epoch": 1780337787,
+      "size_bytes": 269071,
+      "summary": "Artifact index including the workspace export package outputs."
+    }
+  ]
+}

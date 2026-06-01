@@ -1,0 +1,16 @@
+scripts/manage_product_workspace.py
+src/product_shell/workspace_store.py
+tests/test_product_shell_workspace_store.py
+outputs/product_shell/round8-current/workspace_export.json
+outputs/product_shell/round8-current/workspace_export.html
+outputs/product_shell/round8-current/product_shell.json
+outputs/product_shell/round8-current/artifact_index.json
+outputs/product_shell/round8-current/artifact_index.html
+outputs/product_shell/round8-current/artifact_browser.html
+outputs/product_shell/round8-current/config_preflight.json
+outputs/product_shell/round8-current/acceptance_checklist.json
+outputs/product_shell/round8-current/release_manifest.json
+outputs/product_shell/round8-current/source_quality_dashboard.json
+outputs/product_shell/round8-current/narrative_data.json
+outputs/product_shell/round8-current/index.html
+outputs/product_shell/round8-current/route_registry.json

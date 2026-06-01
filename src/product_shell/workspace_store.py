@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from copy import deepcopy
@@ -9,6 +10,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 WORKSPACE_STATE_VERSION = "product-shell-workspace-state-v1"
+WORKSPACE_EXPORT_VERSION = "product-shell-workspace-export-v1"
 ALLOWED_SURFACES = {
     "narrative_radar",
     "narrative_quality",
@@ -170,6 +172,99 @@ def update_workspace_preferences(
     return next_state
 
 
+def build_workspace_export_package(
+    *,
+    workspace_state: dict[str, Any],
+    artifact_index: dict[str, Any] | None = None,
+    generated_at: str | None = None,
+) -> dict[str, Any]:
+    validate_workspace_state(workspace_state)
+    exported_at = generated_at or _utc_now()
+    sanitized_index, excluded_paths = _sanitize_artifact_index(artifact_index)
+    contents = ["workspace_state"]
+    if sanitized_index is not None:
+        contents.append("artifact_index")
+    manifest = {
+        "schema_version": "workspace-export-schema-v1",
+        "export_id": _stable_export_id(workspace_state, exported_at),
+        "exported_at": exported_at,
+        "contents": contents,
+        "excluded_secret_paths": excluded_paths,
+        "compatibility": {
+            "workspace_state_version": WORKSPACE_STATE_VERSION,
+            "min_supported_schema_version": "workspace-state-schema-v1",
+        },
+        "restore_policy": {
+            "deterministic": True,
+            "restore_target": "workspace_state_only",
+            "authoritative_records_mutated": False,
+            "overwrite_service_records_allowed": False,
+        },
+    }
+    package = {
+        "version": WORKSPACE_EXPORT_VERSION,
+        "manifest": manifest,
+        "workspace_state": deepcopy(workspace_state),
+    }
+    if sanitized_index is not None:
+        package["artifact_index"] = sanitized_index
+    return package
+
+
+def write_workspace_export_package(
+    *,
+    package_path: Path,
+    package: dict[str, Any],
+    html_path: Path | None = None,
+) -> None:
+    validate_workspace_export_package(package)
+    package_path.parent.mkdir(parents=True, exist_ok=True)
+    package_path.write_text(
+        json.dumps(package, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    if html_path is not None:
+        html_path.parent.mkdir(parents=True, exist_ok=True)
+        html_path.write_text(render_workspace_export_html(package), encoding="utf-8")
+
+
+def import_workspace_export_package(
+    package: dict[str, Any],
+    repository: WorkspaceRepository,
+    *,
+    imported_at: str | None = None,
+) -> dict[str, Any]:
+    validate_workspace_export_package(package)
+    manifest = _mapping(package.get("manifest"))
+    restored = deepcopy(_mapping(package.get("workspace_state")))
+    restored["updated_at"] = imported_at or _utc_now()
+    restored["import_metadata"] = {
+        "source_export_id": str(manifest.get("export_id") or ""),
+        "imported_at": restored["updated_at"],
+        "restore_policy": "workspace_state_only",
+    }
+    restored["summary"] = _summary(restored)
+    validate_workspace_state(restored)
+    return repository.save(restored)
+
+
+def validate_workspace_export_package(package: dict[str, Any]) -> None:
+    if not isinstance(package, dict):
+        raise ValueError("workspace export package must be a mapping")
+    if package.get("version") != WORKSPACE_EXPORT_VERSION:
+        raise ValueError("workspace export package version is unsupported")
+    manifest = _mapping(package.get("manifest"))
+    if manifest.get("schema_version") != "workspace-export-schema-v1":
+        raise ValueError("workspace export schema version is unsupported")
+    restore_policy = _mapping(manifest.get("restore_policy"))
+    if restore_policy.get("authoritative_records_mutated") is not False:
+        raise ValueError("workspace export package must not mutate authoritative records")
+    validate_workspace_state(_mapping(package.get("workspace_state")))
+    for artifact in _list(_mapping(package.get("artifact_index")).get("artifacts")):
+        if _contains_secret_key(artifact) or _artifact_has_sensitive_path(_mapping(artifact)):
+            raise ValueError("workspace export package artifact index must not include secret-like data")
+
+
 def validate_workspace_state(state: dict[str, Any]) -> None:
     if not isinstance(state, dict):
         raise ValueError("workspace state must be a mapping")
@@ -211,6 +306,40 @@ def render_workspace_state_html(state: dict[str, Any]) -> str:
             "</section>",
             _preferences_table(_mapping(state.get("preferences"))),
             _saved_views_table(saved_views),
+            "</main>",
+            "</body>",
+            "</html>",
+        ]
+    )
+
+
+def render_workspace_export_html(package: dict[str, Any]) -> str:
+    validate_workspace_export_package(package)
+    manifest = _mapping(package.get("manifest"))
+    workspace_summary = _mapping(_mapping(package.get("workspace_state")).get("summary"))
+    artifact_summary = _mapping(_mapping(package.get("artifact_index")).get("summary"))
+    return "\n".join(
+        [
+            "<!doctype html>",
+            '<html lang="zh-CN">',
+            "<head>",
+            '<meta charset="utf-8" />',
+            '<meta name="viewport" content="width=device-width, initial-scale=1" />',
+            "<title>工作区导出包</title>",
+            "<style>",
+            _html_styles(),
+            "</style>",
+            "</head>",
+            "<body>",
+            '<main class="page">',
+            "<h1>工作区导出包</h1>",
+            '<section class="summary">',
+            _html_kv("Export ID", manifest.get("export_id")),
+            _html_kv("保存视图", workspace_summary.get("saved_view_count", 0)),
+            _html_kv("产物索引", artifact_summary.get("artifact_count", 0)),
+            _html_kv("排除敏感路径", len(_list(manifest.get("excluded_secret_paths")))),
+            "<p>导入只恢复本地 workspace_state，不会覆盖可信服务记录。</p>",
+            "</section>",
             "</main>",
             "</body>",
             "</html>",
@@ -319,6 +448,52 @@ def _contains_secret_key(value: Any) -> bool:
     if isinstance(value, list):
         return any(_contains_secret_key(item) for item in value)
     return False
+
+
+def _sanitize_artifact_index(artifact_index: dict[str, Any] | None) -> tuple[dict[str, Any] | None, list[str]]:
+    if artifact_index is None:
+        return None, []
+    safe_artifacts = []
+    excluded_paths = []
+    for index, artifact in enumerate(_list(_mapping(artifact_index).get("artifacts"))):
+        artifact_row = _mapping(artifact)
+        if _contains_secret_key(artifact_row) or _artifact_has_sensitive_path(artifact_row):
+            excluded_paths.append(f"artifact_index.artifacts[{index}]")
+            continue
+        safe_artifacts.append(deepcopy(artifact_row))
+    return (
+        {
+            "version": "product-shell-artifact-index-export-v1",
+            "summary": {
+                "artifact_count": len(safe_artifacts),
+            },
+            "artifacts": safe_artifacts,
+        },
+        excluded_paths,
+    )
+
+
+def _artifact_has_sensitive_path(artifact: dict[str, Any]) -> bool:
+    path_values = [
+        str(artifact.get("json_path") or ""),
+        str(artifact.get("html_path") or ""),
+    ]
+    return any(SECRET_KEY_PATTERN.search(path) for path in path_values)
+
+
+def _stable_export_id(workspace_state: dict[str, Any], exported_at: str) -> str:
+    digest = hashlib.sha256(
+        json.dumps(
+            {
+                "workspace_id": workspace_state.get("workspace_id"),
+                "updated_at": workspace_state.get("updated_at"),
+                "exported_at": exported_at,
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        ).encode("utf-8")
+    ).hexdigest()[:16]
+    return f"WEXP_{digest}"
 
 
 def _preferences_table(preferences: dict[str, Any]) -> str:

@@ -1,0 +1,32 @@
+{
+  "commands": [
+    {
+      "command": "uv run pytest tests/test_product_shell_workspace_store.py::test_workspace_export_package_excludes_sensitive_artifact_indexes -q",
+      "status": "failed_red",
+      "summary": "Expected RED: workspace export package builder was missing."
+    },
+    {
+      "command": "uv run pytest tests/test_product_shell_workspace_store.py tests/test_product_shell.py tests/test_product_shell_release.py tests/test_product_shell_source_quality.py -q",
+      "status": "passed",
+      "summary": "33 passed"
+    },
+    {
+      "command": "uv run python scripts/manage_product_workspace.py export --store outputs/product_shell/round8-current/workspace_state.json --artifact-index outputs/product_shell/round8-current/artifact_index.json --package outputs/product_shell/round8-current/workspace_export.json --html outputs/product_shell/round8-current/workspace_export.html --generated-at 2026-06-02T03:20:00+08:00",
+      "status": "passed",
+      "summary": "Exported workspace package WEXP_d320028b3346bfc1."
+    },
+    {
+      "command": "uv run pytest",
+      "status": "passed",
+      "summary": "626 passed, 1 skipped"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}

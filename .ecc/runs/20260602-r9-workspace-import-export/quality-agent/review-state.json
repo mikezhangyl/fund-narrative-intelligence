@@ -1,0 +1,11 @@
+{
+  "review_id": "20260602-r9-workspace-import-export",
+  "status": "passed",
+  "reviewed_at": "2026-06-02T03:25:00+08:00",
+  "reviewed_snapshot_type": "committed",
+  "quality_reviewed_commit": "31dbae0f4d27bbdef25b241ddbcd8a2fe0d9ab47",
+  "working_tree_dirty": false,
+  "fix_required_before_next_phase": false,
+  "findings_count": 0,
+  "unresolved_findings_count": 0
+}
