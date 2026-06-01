@@ -1,0 +1,54 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/historical_replay/current/historical_replay_run.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "57d8432822334381c6c3fafbfa7935adbea81c2c7f87394f5e8ebd64e89514de",
+      "mtime_epoch": 1780339999,
+      "size_bytes": 9269,
+      "summary": "Historical replay run JSON generated from current local artifacts."
+    },
+    {
+      "type": "html",
+      "path": "outputs/historical_replay/current/historical_replay_run.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "afc0c3a768d8b167093fa4df6e059f46fbf163fccc41fb9df352cce3399481a5",
+      "mtime_epoch": 1780339999,
+      "size_bytes": 4138,
+      "summary": "Canonical Chinese historical replay report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "ef4f5805420fa0fe9e19d97b56cfce3e5c5e354fc1eab586e4310719255e552e",
+      "mtime_epoch": 1780340004,
+      "size_bytes": 14016,
+      "summary": "Product shell route registry including /evaluation/historical-replay."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "201470d5da58726bdcaf525850a4b214a00c88abdcc4ad852e82fc824e2ea6d4",
+      "mtime_epoch": 1780340004,
+      "size_bytes": 393280,
+      "summary": "Product shell payload including historical replay artifact."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "dc2e9e369d05a09a6e16def2ab27dd0ef17bd41469719336ef9b035ba4cee003",
+      "mtime_epoch": 1780340004,
+      "size_bytes": 271409,
+      "summary": "Artifact index including historical replay JSON/HTML."
+    }
+  ]
+}

@@ -103,6 +103,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="historical_replay",
+            path="/evaluation/historical-replay",
+            label_zh="历史回放与评估运行",
+            label_en="Historical replay and evaluation run",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/historical_replay/current/",
+            json_path="outputs/historical_replay/current/historical_replay_run.json",
+            html_path="outputs/historical_replay/current/historical_replay_run.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",

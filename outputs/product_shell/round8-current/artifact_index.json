@@ -6791,20 +6791,6 @@
       "warning_count": 0
     },
     {
-      "artifact_id": "ART_db365f1d06",
-      "artifact_type": "source_quality_dashboard",
-      "freshness_status": "degraded",
-      "generated_at": "2026-06-01T18:35:11+00:00",
-      "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
-      "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "degraded",
-      "superseded": false,
-      "surface": "Source Quality Dashboard",
-      "warning_count": 0
-    },
-    {
       "artifact_id": "ART_f028caf326",
       "artifact_type": "narrative_evidence_graph",
       "freshness_status": "unknown",
@@ -6816,76 +6802,6 @@
       "status": "unknown",
       "superseded": false,
       "surface": "Narrative Evidence Graph",
-      "warning_count": 0
-    },
-    {
-      "artifact_id": "ART_c8e257234f",
-      "artifact_type": "route_registry",
-      "freshness_status": "unknown",
-      "generated_at": "2026-06-01T18:35:11.363929+00:00",
-      "html_path": "outputs/product_shell/round8-current/route_registry.html",
-      "json_path": "outputs/product_shell/round8-current/route_registry.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "unknown",
-      "superseded": false,
-      "surface": "Product shell route registry",
-      "warning_count": 0
-    },
-    {
-      "artifact_id": "ART_7c5a672725",
-      "artifact_type": "artifact_index",
-      "freshness_status": "unknown",
-      "generated_at": "2026-06-01T18:35:11.504425+00:00",
-      "html_path": "outputs/product_shell/round8-current/artifact_index.html",
-      "json_path": "outputs/product_shell/round8-current/artifact_index.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "unknown",
-      "superseded": false,
-      "surface": "Artifact index",
-      "warning_count": 38
-    },
-    {
-      "artifact_id": "ART_ede2f575bd",
-      "artifact_type": "narrative_data",
-      "freshness_status": "unknown",
-      "generated_at": "2026-06-01T18:35:11.505860+00:00",
-      "html_path": "outputs/product_shell/round8-current/narrative_data.html",
-      "json_path": "outputs/product_shell/round8-current/narrative_data.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "unknown",
-      "superseded": false,
-      "surface": "Narrative Data",
-      "warning_count": 0
-    },
-    {
-      "artifact_id": "ART_bf6182f460",
-      "artifact_type": "product_shell",
-      "freshness_status": "unknown",
-      "generated_at": "2026-06-01T18:35:11.505960+00:00",
-      "html_path": "",
-      "json_path": "outputs/product_shell/round8-current/product_shell.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "unknown",
-      "superseded": false,
-      "surface": "Product shell",
-      "warning_count": 0
-    },
-    {
-      "artifact_id": "ART_095cab5d36",
-      "artifact_type": "config_preflight",
-      "freshness_status": "ok",
-      "generated_at": "2026-06-01T18:35:11.506091+00:00",
-      "html_path": "outputs/product_shell/round8-current/config_preflight.html",
-      "json_path": "outputs/product_shell/round8-current/config_preflight.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "ok",
-      "superseded": false,
-      "surface": "Config Preflight",
       "warning_count": 0
     },
     {
@@ -6929,9 +6845,107 @@
       "superseded": false,
       "surface": "Narrative Research Export Pack",
       "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_c8e257234f",
+      "artifact_type": "route_registry",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-01T18:52:41.938028+00:00",
+      "html_path": "outputs/product_shell/round8-current/route_registry.html",
+      "json_path": "outputs/product_shell/round8-current/route_registry.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Product shell route registry",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_db365f1d06",
+      "artifact_type": "source_quality_dashboard",
+      "freshness_status": "degraded",
+      "generated_at": "2026-06-01T18:52:42+00:00",
+      "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
+      "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "degraded",
+      "superseded": false,
+      "surface": "Source Quality Dashboard",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_7c5a672725",
+      "artifact_type": "artifact_index",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-01T18:52:42.094904+00:00",
+      "html_path": "outputs/product_shell/round8-current/artifact_index.html",
+      "json_path": "outputs/product_shell/round8-current/artifact_index.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Artifact index",
+      "warning_count": 42
+    },
+    {
+      "artifact_id": "ART_ede2f575bd",
+      "artifact_type": "narrative_data",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-01T18:52:42.097627+00:00",
+      "html_path": "outputs/product_shell/round8-current/narrative_data.html",
+      "json_path": "outputs/product_shell/round8-current/narrative_data.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Narrative Data",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_095cab5d36",
+      "artifact_type": "config_preflight",
+      "freshness_status": "ok",
+      "generated_at": "2026-06-01T18:52:42.098819+00:00",
+      "html_path": "outputs/product_shell/round8-current/config_preflight.html",
+      "json_path": "outputs/product_shell/round8-current/config_preflight.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "ok",
+      "superseded": false,
+      "surface": "Config Preflight",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_bf6182f460",
+      "artifact_type": "product_shell",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-01T18:52:42.101056+00:00",
+      "html_path": "",
+      "json_path": "outputs/product_shell/round8-current/product_shell.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Product shell",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_74bdb7189e",
+      "artifact_type": "historical_replay_run",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-01T18:53:19.996802+00:00",
+      "html_path": "outputs/historical_replay/current/historical_replay_run.html",
+      "json_path": "outputs/historical_replay/current/historical_replay_run.json",
+      "run_id": "current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Historical Replay Run",
+      "warning_count": 0
     }
   ],
-  "generated_at": "2026-06-01T18:44:59.723489+00:00",
+  "generated_at": "2026-06-01T18:53:24.226310+00:00",
   "output_root": "outputs",
   "redaction_policy": {
     "excluded_path_categories": [
@@ -6940,11 +6954,11 @@
     ]
   },
   "summary": {
-    "artifact_count": 495,
-    "html_link_count": 87,
-    "json_link_count": 495,
+    "artifact_count": 496,
+    "html_link_count": 88,
+    "json_link_count": 496,
     "stale_or_superseded_count": 344,
-    "warning_count": 40
+    "warning_count": 44
   },
   "version": "product-shell-artifact-index-v1"
 }

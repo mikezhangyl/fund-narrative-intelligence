@@ -1,0 +1,27 @@
+{
+  "artifacts": {
+    "portfolio_alerts": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
+    "quality": "outputs/narrative_quality/round5_final/narrative_quality_audit.json",
+    "radar_snapshots": "outputs/fresh_narrative_digest/current/fresh_narrative_digest.json",
+    "source_events": "outputs/narrative_research_workbench/current/narrative_timeline_search.json"
+  },
+  "bounds": {
+    "max_alerts": 50,
+    "max_source_events": 200
+  },
+  "formula_versions": {
+    "quality": "narrative-quality-audit-v1",
+    "radar_heat": "fresh-narrative-digest-v1",
+    "source_event": "narrative-timeline-search-v1"
+  },
+  "resume": {
+    "checkpoint_id": "current-artifact-replay",
+    "completed_steps": []
+  },
+  "source_mode": "artifact",
+  "version": "historical-replay-input-v1",
+  "window": {
+    "end_date": "2026-06-02",
+    "start_date": "2026-05-08"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T18:44:59.568044+00:00",
+  "generated_at": "2026-06-01T18:53:24.069293+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -229,6 +229,32 @@
       "data_source": {
         "degradation_status": "ok",
         "freshness_status": "artifact_reported",
+        "html_path": "outputs/historical_replay/current/historical_replay_run.html",
+        "json_path": "outputs/historical_replay/current/historical_replay_run.json",
+        "source": "outputs/historical_replay/current/",
+        "type": "generated_artifact"
+      },
+      "label_en": "Historical replay and evaluation run",
+      "label_zh": "历史回放与评估运行",
+      "owner_service": "FNI",
+      "path": "/evaluation/historical-replay",
+      "route_id": "historical_replay"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
+        "freshness_status": "artifact_reported",
         "html_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.html",
         "json_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
         "source": "outputs/portfolio_narrative_workspace/",
@@ -374,9 +400,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 0,
-    "generated_artifact_route_count": 12,
+    "generated_artifact_route_count": 13,
     "live_api_route_count": 2,
-    "route_count": 14
+    "route_count": 15
   },
   "version": "product-shell-route-registry-v1"
 }

@@ -1,0 +1,264 @@
+{
+  "contract": {
+    "metrics_scope": "system_quality_only",
+    "provider_access_allowed": false,
+    "return_prediction_allowed": false,
+    "trading_backtest_allowed": false
+  },
+  "generated_at": "2026-06-01T18:53:19.996802+00:00",
+  "output_manifest": {
+    "formula_versions": {
+      "quality": "narrative-quality-audit-v1",
+      "radar_heat": "fresh-narrative-digest-v1",
+      "source_event": "narrative-timeline-search-v1"
+    },
+    "generated_artifacts": [
+      "historical_replay_run.json",
+      "historical_replay_run.html"
+    ],
+    "input_artifacts": {
+      "portfolio_alerts": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
+      "quality": "outputs/narrative_quality/round5_final/narrative_quality_audit.json",
+      "radar_snapshots": "outputs/fresh_narrative_digest/current/fresh_narrative_digest.json",
+      "source_events": "outputs/narrative_research_workbench/current/narrative_timeline_search.json"
+    },
+    "source_mode": "artifact",
+    "source_window": {
+      "end_date": "2026-06-02",
+      "start_date": "2026-05-08"
+    }
+  },
+  "portfolio_alerts": [
+    {
+      "alert_type": "dominant_narrative_added",
+      "current_value": 0.42,
+      "delta": 0.16,
+      "narrative_id": "N_AI_INFRA",
+      "narrative_name": "AI 基础设施",
+      "non_advice_disclosure": "Observational narrative monitoring only; not investment advice, trading guidance, price prediction, or automatic decisioning.",
+      "previous_value": 0.26,
+      "rule_id": "dominant_narrative_added-v1",
+      "source_diagnostics": [],
+      "trigger_reason": "Narrative crossed the dominant exposure threshold.",
+      "watchlist_id": "wl-core-growth"
+    },
+    {
+      "alert_type": "large_exposure_change",
+      "current_value": 0.42,
+      "delta": 0.16,
+      "narrative_id": "N_AI_INFRA",
+      "narrative_name": "AI 基础设施",
+      "non_advice_disclosure": "Observational narrative monitoring only; not investment advice, trading guidance, price prediction, or automatic decisioning.",
+      "previous_value": 0.26,
+      "rule_id": "large_exposure_change-v1",
+      "source_diagnostics": [],
+      "trigger_reason": "Narrative exposure changed beyond the configured threshold.",
+      "watchlist_id": "wl-core-growth"
+    },
+    {
+      "alert_type": "quality_degradation",
+      "current_value": 0.24,
+      "delta": 0.02,
+      "narrative_id": "N_SEMI_CAPEX",
+      "narrative_name": "半导体景气",
+      "non_advice_disclosure": "Observational narrative monitoring only; not investment advice, trading guidance, price prediction, or automatic decisioning.",
+      "previous_value": 0.22,
+      "rule_id": "quality_degradation-v1",
+      "source_diagnostics": [],
+      "trigger_reason": "Narrative trust or quality status weakened.",
+      "watchlist_id": "wl-core-growth"
+    },
+    {
+      "affected_watchlist_count": 2,
+      "alert_type": "heating_radar_overlap",
+      "narrative_id": "N_AI_INFRA",
+      "narrative_name": "AI 基础设施",
+      "non_advice_disclosure": "Observational narrative monitoring only; not investment advice, trading guidance, price prediction, or automatic decisioning.",
+      "rule_id": "radar-overlap-v1",
+      "source_diagnostics": [
+        {
+          "field": "holdings",
+          "source_service": "Gateway",
+          "status": "fresh"
+        },
+        {
+          "field": "narrative_quality",
+          "source_service": "Narrative Service",
+          "status": "fresh"
+        },
+        {
+          "field": "holdings",
+          "source_service": "Gateway",
+          "status": "fresh"
+        }
+      ],
+      "trigger_reason": "Heating radar narrative overlaps watched holdings."
+    }
+  ],
+  "quality_findings": [
+    {
+      "evidence_refs": [],
+      "issue_code": "LOW_EXTRACTION_CONFIDENCE",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "narrative_name": "高端白酒消费",
+      "quality_score": 79.2,
+      "source_event_ids": [
+        "EVT_NEWS_BAIJIU_CHANNEL_20260528"
+      ]
+    },
+    {
+      "evidence_refs": [],
+      "issue_code": "LOW_SOURCE_DIVERSITY",
+      "narrative_id": "N_BAIJIU_CONSUMPTION",
+      "narrative_name": "高端白酒消费",
+      "quality_score": 79.2,
+      "source_event_ids": [
+        "EVT_NEWS_BAIJIU_CHANNEL_20260528"
+      ]
+    }
+  ],
+  "radar_snapshots": [
+    {
+      "display_name": "半导体 A股",
+      "event_count": 3,
+      "snapshot_id": "NDIG_CA978112CA"
+    },
+    {
+      "display_name": "AI infrastructure",
+      "event_count": 5,
+      "snapshot_id": "NDIG_1FAE1EA41E"
+    },
+    {
+      "display_name": "股东会",
+      "event_count": 2,
+      "snapshot_id": "NDIG_26E13C7A6D"
+    }
+  ],
+  "replay_input": {
+    "artifacts": {
+      "portfolio_alerts": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
+      "quality": "outputs/narrative_quality/round5_final/narrative_quality_audit.json",
+      "radar_snapshots": "outputs/fresh_narrative_digest/current/fresh_narrative_digest.json",
+      "source_events": "outputs/narrative_research_workbench/current/narrative_timeline_search.json"
+    },
+    "bounds": {
+      "max_alerts": 50,
+      "max_source_events": 200
+    },
+    "formula_versions": {
+      "quality": "narrative-quality-audit-v1",
+      "radar_heat": "fresh-narrative-digest-v1",
+      "source_event": "narrative-timeline-search-v1"
+    },
+    "resume": {
+      "checkpoint_id": "current-artifact-replay",
+      "completed_steps": []
+    },
+    "source_mode": "artifact",
+    "version": "historical-replay-input-v1",
+    "window": {
+      "end_date": "2026-06-02",
+      "start_date": "2026-05-08"
+    }
+  },
+  "run": {
+    "bounded": true,
+    "deterministic": true,
+    "resumable": true,
+    "resume_metadata": {
+      "checkpoint_id": "current-artifact-replay",
+      "completed_steps": [
+        "load_artifacts",
+        "filter_window",
+        "summarize_outputs",
+        "write_manifest"
+      ]
+    },
+    "run_id": "replay_bf7fb494ec04",
+    "status": "completed"
+  },
+  "source_events": [
+    {
+      "published_at": "2026-05-29",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-023363",
+      "title": "FORM 4"
+    },
+    {
+      "published_at": "2026-05-28",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-023149",
+      "title": "SD"
+    },
+    {
+      "published_at": "2026-05-27",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001921094-26-000555",
+      "title": "144 filing"
+    },
+    {
+      "published_at": "2026-05-12",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-020871",
+      "title": "FORM 4"
+    },
+    {
+      "published_at": "2026-05-08",
+      "quality_state": "trusted_fact",
+      "source_event_id": "sec_edgar:0000320193:0001140361-26-020298",
+      "title": "FORM 4"
+    },
+    {
+      "published_at": "2026-05-22",
+      "quality_state": "trusted_fact",
+      "source_event_id": "cninfo:000001:000001:2026-05-22:北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书",
+      "title": "北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书"
+    },
+    {
+      "published_at": "2026-05-22",
+      "quality_state": "trusted_fact",
+      "source_event_id": "cninfo:000001:000001:2026-05-22:2025年年度股东会决议公告",
+      "title": "2025年年度股东会决议公告"
+    },
+    {
+      "published_at": "2026-06-01 16:44:44",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
+      "title": "澳大利亚对进口自中国的地层钢锚杆作出反倾销终裁"
+    },
+    {
+      "published_at": "2026-06-01 16:44:31",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
+      "title": "国新能源：持股5%以上股东减持1.22%股份"
+    },
+    {
+      "published_at": "2026-06-01 16:44:15",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+    },
+    {
+      "published_at": "2026-06-01 16:44:15",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+    },
+    {
+      "published_at": "2026-06-01 16:44:15",
+      "quality_state": "context_only",
+      "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
+      "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
+    }
+  ],
+  "summary": {
+    "input_artifact_count": 4,
+    "portfolio_alert_count": 4,
+    "quality_finding_count": 2,
+    "radar_snapshot_count": 3,
+    "source_event_count": 12,
+    "warning_count": 0
+  },
+  "version": "historical-replay-run-v1",
+  "warnings": []
+}
