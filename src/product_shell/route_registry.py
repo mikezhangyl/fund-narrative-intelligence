@@ -79,6 +79,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="source_quality",
+            path="/sources/quality",
+            label_zh="来源质量仪表盘",
+            label_en="Source quality dashboard",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="source governance + reliability + schema + gateway probe artifacts",
+            json_path="outputs/product_shell/round8-current/source_quality_dashboard.json",
+            html_path="outputs/product_shell/round8-current/source_quality_dashboard.html",
+            freshness_status="generated",
+        ),
+        _route(
             route_id="artifacts",
             path="/artifacts",
             label_zh="产物浏览器",
@@ -96,9 +108,11 @@ def build_product_shell_route_registry(
             label_zh="配置与预检",
             label_en="Configuration preflight",
             owner_service="FNI",
-            data_source_type="fixture_demo",
-            source="future local release preflight",
-            freshness_status="pending_round8_followup",
+            data_source_type="generated_artifact",
+            source="product shell release preflight",
+            json_path="outputs/product_shell/round8-current/config_preflight.json",
+            html_path="outputs/product_shell/round8-current/config_preflight.html",
+            freshness_status="generated",
         ),
     ]
     return {

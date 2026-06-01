@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>配置与预检</title>
+<style>
+
+body { margin: 0; background: #f6f7f9; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 48px; }
+h1 { font-size: 30px; margin: 0 0 16px; }
+h2 { font-size: 20px; margin: 24px 0 12px; }
+.summary { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d8dee8; border-radius: 8px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e5eaf1; padding: 10px; text-align: left; vertical-align: top; font-size: 14px; }
+th { background: #eef2f7; color: #323f4b; }
+
+</style>
+</head>
+<body>
+<main class="page">
+<h1>配置与预检</h1>
+<section class="summary">
+<p><strong>模式:</strong> demo</p>
+<p><strong>状态:</strong> ok</p>
+<p><strong>检查项:</strong> 4</p>
+<p><strong>降级项:</strong> </p>
+<p><strong>已脱敏配置:</strong> </p>
+<p>预检不是 provider smoke；它不会访问 Tushare、CNINFO、新闻站点或社交来源。</p>
+</section>
+<section><h2>检查结果</h2><table><thead><tr><th>检查</th><th>状态</th><th>配置名</th><th>值</th><th>说明</th></tr></thead><tbody><tr><td>Market data gateway URL</td><td>optional_missing</td><td>MARKET_DATA_GATEWAY_URL</td><td>http://127.0.0.1:8700</td><td>demo 模式不要求服务已启动；展示默认本地 URL 作为启动提示。</td></tr><tr><td>Narrative Service URL</td><td>optional_missing</td><td>NARRATIVE_SERVICE_URL</td><td>http://127.0.0.1:8800</td><td>demo 模式不要求服务已启动；展示默认本地 URL 作为启动提示。</td></tr><tr><td>Output root</td><td>ok</td><td></td><td>outputs</td><td>路径会由 release check 或 shell build 自动创建。</td></tr><tr><td>Product shell output</td><td>ok</td><td></td><td>outputs/product_shell</td><td>路径会由 release check 或 shell build 自动创建。</td></tr></tbody></table></section>
+<section><h2>安全命令</h2><ul><li>uv run python scripts/build_product_shell.py --output-dir outputs/product_shell/round8-current</li><li>uv run python scripts/run_product_shell_release_check.py --mode demo</li></ul></section>
+<section><h2>Runbook</h2><ul><li>docs/product/round8-interactive-product-shell-release-plan-2026-05-30.md</li><li>docs/product/stock-narrative-service-runbook.md</li><li>docs/product/market-data-gateway-boundary.md</li></ul></section>
+</main>
+</body>
+</html>

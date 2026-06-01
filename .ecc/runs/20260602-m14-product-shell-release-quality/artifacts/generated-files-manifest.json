@@ -1,0 +1,60 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/config_preflight.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Redacted demo-mode release preflight payload."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/config_preflight.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese configuration preflight panel."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/release_manifest.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "One-command local release manifest."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/release_manifest.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese release manifest."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/acceptance_checklist.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Runnable product shell acceptance checklist payload."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/acceptance_checklist.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese product shell acceptance checklist."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Source quality dashboard payload over generated governance/reliability/schema/probe artifacts."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "summary": "Chinese source quality dashboard."
+    }
+  ]
+}

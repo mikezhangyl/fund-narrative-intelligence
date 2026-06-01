@@ -1,0 +1,41 @@
+{
+  "checks": [
+    {
+      "check_id": "product_shell_opens",
+      "message": "产品首页可打开。",
+      "responsible_surface": "fund-narrative-intelligence product shell",
+      "status": "pass"
+    },
+    {
+      "check_id": "major_routes_render",
+      "message": "主要路由有生成数据或预检产物。",
+      "responsible_surface": "FNI product shell",
+      "status": "pass"
+    },
+    {
+      "check_id": "artifact_browser_links",
+      "message": "产物浏览器和索引均已生成。",
+      "responsible_surface": "FNI artifact browser",
+      "status": "pass"
+    },
+    {
+      "check_id": "config_preflight_redacts_secrets",
+      "message": "配置预检已生成，且不会执行 provider smoke。",
+      "responsible_surface": "FNI config preflight",
+      "status": "pass"
+    },
+    {
+      "check_id": "release_manifest_generated",
+      "message": "发布 manifest 已生成。",
+      "responsible_surface": "FNI release package",
+      "status": "pass"
+    }
+  ],
+  "generated_at": "2026-06-01T17:36:19.116350+00:00",
+  "status": "pass",
+  "summary": {
+    "check_count": 5,
+    "failed_count": 0
+  },
+  "version": "product-shell-acceptance-checklist-v1"
+}

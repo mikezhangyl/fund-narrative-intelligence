@@ -6557,7 +6557,7 @@
         "artifact_id": "ART_c8e257234f",
         "artifact_type": "route_registry",
         "freshness_status": "unknown",
-        "generated_at": "2026-05-31T16:48:13.860878+00:00",
+        "generated_at": "2026-05-31T16:49:40.507978+00:00",
         "html_path": "outputs/product_shell/round8-current/route_registry.html",
         "json_path": "outputs/product_shell/round8-current/route_registry.json",
         "run_id": "round8-current",
@@ -6571,7 +6571,7 @@
         "artifact_id": "ART_7c5a672725",
         "artifact_type": "artifact_index",
         "freshness_status": "unknown",
-        "generated_at": "2026-05-31T16:48:14.090874+00:00",
+        "generated_at": "2026-05-31T16:49:40.662084+00:00",
         "html_path": "outputs/product_shell/round8-current/artifact_index.html",
         "json_path": "outputs/product_shell/round8-current/artifact_index.json",
         "run_id": "round8-current",
@@ -6579,13 +6579,13 @@
         "status": "unknown",
         "superseded": false,
         "surface": "Artifact index",
-        "warning_count": 6
+        "warning_count": 8
       },
       {
         "artifact_id": "ART_ede2f575bd",
         "artifact_type": "narrative_data",
         "freshness_status": "unknown",
-        "generated_at": "2026-05-31T16:48:14.092820+00:00",
+        "generated_at": "2026-05-31T16:49:40.663412+00:00",
         "html_path": "outputs/product_shell/round8-current/narrative_data.html",
         "json_path": "outputs/product_shell/round8-current/narrative_data.json",
         "run_id": "round8-current",
@@ -6599,7 +6599,7 @@
         "artifact_id": "ART_bf6182f460",
         "artifact_type": "product_shell",
         "freshness_status": "unknown",
-        "generated_at": "2026-05-31T16:48:14.092894+00:00",
+        "generated_at": "2026-05-31T16:49:40.663483+00:00",
         "html_path": "",
         "json_path": "outputs/product_shell/round8-current/product_shell.json",
         "run_id": "round8-current",
@@ -6608,9 +6608,191 @@
         "superseded": false,
         "surface": "Product shell",
         "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_3cb975bcaa",
+        "artifact_type": "narrative_source_gateway_probe",
+        "freshness_status": "unknown",
+        "generated_at": "2026-05-31T17:56:53+00:00",
+        "html_path": "outputs/narrative_source_gateway_probe/2026-06-01-mik-250-fixture/narrative_source_gateway_probe.html",
+        "json_path": "outputs/narrative_source_gateway_probe/2026-06-01-mik-250-fixture/narrative_source_gateway_probe.json",
+        "run_id": "2026-06-01-mik-250-fixture",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": true,
+        "surface": "Narrative Source Gateway Probe",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_8d988ccb0e",
+        "artifact_type": "narrative_source_gateway_probe",
+        "freshness_status": "unknown",
+        "generated_at": "2026-05-31T17:56:53+00:00",
+        "html_path": "outputs/narrative_source_gateway_probe/2026-06-01-mik-250-live-status/narrative_source_gateway_probe.html",
+        "json_path": "outputs/narrative_source_gateway_probe/2026-06-01-mik-250-live-status/narrative_source_gateway_probe.json",
+        "run_id": "2026-06-01-mik-250-live-status",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": true,
+        "surface": "Narrative Source Gateway Probe",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_86beed8dfe",
+        "artifact_type": "source_governance_report",
+        "freshness_status": "unknown",
+        "generated_at": "2026-05-31T18:04:54+00:00",
+        "html_path": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.html",
+        "json_path": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.json",
+        "run_id": "2026-06-01-mik-229",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Source Governance Report",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_ec4fcd13e8",
+        "artifact_type": "source_schema_v2_report",
+        "freshness_status": "unknown",
+        "generated_at": "2026-05-31T18:10:00+00:00",
+        "html_path": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.html",
+        "json_path": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.json",
+        "run_id": "2026-06-01-mik-230",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Source Schema V2 Report",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_07ae81fefd",
+        "artifact_type": "source_reliability_report",
+        "freshness_status": "unknown",
+        "generated_at": "2026-05-31T18:14:51+00:00",
+        "html_path": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.html",
+        "json_path": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.json",
+        "run_id": "2026-06-01-mik-231",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Source Reliability Report",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_a4ec7f0a50",
+        "artifact_type": "source_feasibility_matrix",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T00:00:00+08:00",
+        "html_path": "",
+        "json_path": "outputs/narrative_source_feasibility/2026-06-01/source_feasibility_matrix.json",
+        "run_id": "2026-06-01",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Source Feasibility Matrix",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_3ffbdb7283",
+        "artifact_type": "narrative_source_gateway_probe",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T16:14:10+00:00",
+        "html_path": "outputs/narrative_source_gateway_probe/2026-06-02-gateway-compat-local/narrative_source_gateway_probe.html",
+        "json_path": "outputs/narrative_source_gateway_probe/2026-06-02-gateway-compat-local/narrative_source_gateway_probe.json",
+        "run_id": "2026-06-02-gateway-compat-local",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": true,
+        "surface": "Narrative Source Gateway Probe",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_1b4fca214e",
+        "artifact_type": "narrative_source_gateway_probe",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T16:19:25+00:00",
+        "html_path": "outputs/narrative_source_gateway_probe/2026-06-01-gateway-live/narrative_source_gateway_probe.html",
+        "json_path": "outputs/narrative_source_gateway_probe/2026-06-01-gateway-live/narrative_source_gateway_probe.json",
+        "run_id": "2026-06-01-gateway-live",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": true,
+        "surface": "Narrative Source Gateway Probe",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_f249605889",
+        "artifact_type": "narrative_source_gateway_probe",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T16:44:49+00:00",
+        "html_path": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.html",
+        "json_path": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json",
+        "run_id": "current",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Narrative Source Gateway Probe",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_8b1158740e",
+        "artifact_type": "cninfo_disclosure_events",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T17:09:46.782228+00:00",
+        "html_path": "outputs/cninfo_disclosure_events/2026-06-01-mik-236/cninfo_disclosure_events.html",
+        "json_path": "outputs/cninfo_disclosure_events/2026-06-01-mik-236/cninfo_disclosure_events.json",
+        "run_id": "2026-06-01-mik-236",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Cninfo Disclosure Events",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_09302688c1",
+        "artifact_type": "public_news_context",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T17:09:46.786318+00:00",
+        "html_path": "outputs/public_news_context/2026-06-01-mik-237/public_news_context.html",
+        "json_path": "outputs/public_news_context/2026-06-01-mik-237/public_news_context.json",
+        "run_id": "2026-06-01-mik-237",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Public News Context",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_df05d4d101",
+        "artifact_type": "sec_edgar_source_smoke",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T17:09:46.786740+00:00",
+        "html_path": "outputs/sec_edgar_source_smoke/2026-06-01-mik-235/sec_edgar_source_smoke.html",
+        "json_path": "outputs/sec_edgar_source_smoke/2026-06-01-mik-235/sec_edgar_source_smoke.json",
+        "run_id": "2026-06-01-mik-235",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Sec Edgar Source Smoke",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_cd03f0a3db",
+        "artifact_type": "stocktwits_heat_signal",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-01T17:09:46.787582+00:00",
+        "html_path": "outputs/stocktwits_heat_signal/2026-06-01-mik-238/stocktwits_heat_signal.html",
+        "json_path": "outputs/stocktwits_heat_signal/2026-06-01-mik-238/stocktwits_heat_signal.json",
+        "run_id": "2026-06-01-mik-238",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Stocktwits Heat Signal",
+        "warning_count": 0
       }
     ],
-    "generated_at": "2026-05-31T16:49:40.662084+00:00",
+    "generated_at": "2026-06-01T17:36:19.104407+00:00",
     "output_root": "outputs",
     "redaction_policy": {
       "excluded_path_categories": [
@@ -6619,16 +6801,16 @@
       ]
     },
     "summary": {
-      "artifact_count": 472,
-      "html_link_count": 65,
-      "json_link_count": 472,
-      "stale_or_superseded_count": 340,
-      "warning_count": 8
+      "artifact_count": 485,
+      "html_link_count": 77,
+      "json_link_count": 485,
+      "stale_or_superseded_count": 344,
+      "warning_count": 10
     },
     "version": "product-shell-artifact-index-v1"
   },
   "client_policy_notice": "不在页面内重算雷达、质量或组合指标；页面只读取服务 API 或生成产物。",
-  "generated_at": "2026-05-31T16:49:40.663483+00:00",
+  "generated_at": "2026-06-01T17:36:19.106940+00:00",
   "narrative_data": {
     "candidate_narratives": [
       {
@@ -7212,7 +7394,7 @@
       }
     ],
     "formula_version": "evidence-quality-deterministic-v1",
-    "generated_at": "2026-05-31T16:49:40.663412+00:00",
+    "generated_at": "2026-06-01T17:36:19.106853+00:00",
     "narratives": [
       {
         "aliases": [
@@ -8507,7 +8689,7 @@
     ],
     "source_scope": {
       "mode": "existing_artifacts_only",
-      "output_root": "outputs",
+      "output_root": "/Users/mikezhang/Coding/AI-Learning/fund-narrative-intelligence/outputs",
       "project_root": "/Users/mikezhang/Coding/AI-Learning/fund-narrative-intelligence"
     },
     "stock_mappings": [
@@ -9254,7 +9436,7 @@
     "version": "product-shell-narrative-data-v1"
   },
   "route_registry": {
-    "generated_at": "2026-05-31T16:49:40.507978+00:00",
+    "generated_at": "2026-06-01T17:36:18.829724+00:00",
     "global_client_policy": {
       "business_logic_location": "service_or_artifact_only",
       "provider_access_allowed": false,
@@ -9432,6 +9614,32 @@
         "data_source": {
           "degradation_status": "ok",
           "freshness_status": "generated",
+          "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
+          "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
+          "source": "source governance + reliability + schema + gateway probe artifacts",
+          "type": "generated_artifact"
+        },
+        "label_en": "Source quality dashboard",
+        "label_zh": "来源质量仪表盘",
+        "owner_service": "FNI",
+        "path": "/sources/quality",
+        "route_id": "source_quality"
+      },
+      {
+        "client_policy": {
+          "forbidden_logic": [
+            "provider_access",
+            "narrative_scoring",
+            "quality_scoring",
+            "portfolio_aggregation",
+            "trading_recommendation"
+          ],
+          "provider_access_allowed": false,
+          "score_recomputation_allowed": false
+        },
+        "data_source": {
+          "degradation_status": "ok",
+          "freshness_status": "generated",
           "html_path": "artifact_browser.html",
           "json_path": "outputs/product_shell/round8-current/artifact_index.json",
           "source": "outputs/product_shell/round8-current/artifact_index.json",
@@ -9457,11 +9665,11 @@
         },
         "data_source": {
           "degradation_status": "ok",
-          "freshness_status": "pending_round8_followup",
-          "html_path": "",
-          "json_path": "",
-          "source": "future local release preflight",
-          "type": "fixture_demo"
+          "freshness_status": "generated",
+          "html_path": "outputs/product_shell/round8-current/config_preflight.html",
+          "json_path": "outputs/product_shell/round8-current/config_preflight.json",
+          "source": "product shell release preflight",
+          "type": "generated_artifact"
         },
         "label_en": "Configuration preflight",
         "label_zh": "配置与预检",
@@ -9472,23 +9680,23 @@
     ],
     "summary": {
       "degraded_route_count": 0,
-      "fixture_demo_route_count": 1,
-      "generated_artifact_route_count": 5,
+      "fixture_demo_route_count": 0,
+      "generated_artifact_route_count": 7,
       "live_api_route_count": 2,
-      "route_count": 8
+      "route_count": 9
     },
     "version": "product-shell-route-registry-v1"
   },
   "summary": {
-    "artifact_count": 472,
+    "artifact_count": 485,
     "candidate_narrative_count": 2,
     "evidence_pack_count": 3,
     "extraction_issue_count": 3,
-    "generated_artifact_route_count": 5,
+    "generated_artifact_route_count": 7,
     "live_api_route_count": 2,
     "narrative_count": 15,
     "quality_issue_count": 2,
-    "route_count": 8,
+    "route_count": 9,
     "stock_mapping_count": 56
   },
   "version": "product-shell-v1"

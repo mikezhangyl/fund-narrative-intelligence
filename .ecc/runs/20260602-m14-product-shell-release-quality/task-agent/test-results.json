@@ -1,0 +1,27 @@
+{
+  "commands": [
+    {
+      "command": "uv run pytest tests/test_product_shell.py tests/test_product_shell_release.py tests/test_product_shell_source_quality.py tests/test_source_governance_model.py tests/test_source_reliability_scoring.py tests/test_source_schema_v2.py tests/test_narrative_source_gateway_consumer.py -q",
+      "status": "passed",
+      "summary": "44 passed"
+    },
+    {
+      "command": "uv run python scripts/run_product_shell_release_check.py --mode demo --output-dir outputs/product_shell/round8-current",
+      "status": "passed",
+      "summary": "status=pass; generated release_manifest, acceptance_checklist, config_preflight, source_quality_dashboard"
+    },
+    {
+      "command": "uv run pytest",
+      "status": "passed",
+      "summary": "608 passed, 1 skipped"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}

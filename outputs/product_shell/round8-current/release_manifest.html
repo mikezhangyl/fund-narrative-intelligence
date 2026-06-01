@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>本地发布包 Manifest</title>
+<style>
+
+body { margin: 0; background: #f6f7f9; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 48px; }
+h1 { font-size: 30px; margin: 0 0 16px; }
+h2 { font-size: 20px; margin: 24px 0 12px; }
+.summary { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d8dee8; border-radius: 8px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e5eaf1; padding: 10px; text-align: left; vertical-align: top; font-size: 14px; }
+th { background: #eef2f7; color: #323f4b; }
+
+</style>
+</head>
+<body>
+<main class="page">
+<h1>本地发布包 Manifest</h1>
+<section class="summary">
+<p><strong>模式:</strong> demo</p>
+<p><strong>状态:</strong> ok</p>
+<p><strong>预期产物:</strong> 16</p>
+<p><strong>缺失产物:</strong> </p>
+</section>
+<section><h2>产物</h2><table><thead><tr><th>产物</th><th>路径</th><th>存在</th></tr></thead><tbody><tr><td>product_home_html</td><td>index.html</td><td>True</td></tr><tr><td>artifact_browser_html</td><td>artifact_browser.html</td><td>True</td></tr><tr><td>route_registry_json</td><td>route_registry.json</td><td>True</td></tr><tr><td>route_registry_html</td><td>route_registry.html</td><td>True</td></tr><tr><td>artifact_index_json</td><td>artifact_index.json</td><td>True</td></tr><tr><td>artifact_index_html</td><td>artifact_index.html</td><td>True</td></tr><tr><td>narrative_data_json</td><td>narrative_data.json</td><td>True</td></tr><tr><td>narrative_data_html</td><td>narrative_data.html</td><td>True</td></tr><tr><td>config_preflight_json</td><td>config_preflight.json</td><td>True</td></tr><tr><td>config_preflight_html</td><td>config_preflight.html</td><td>True</td></tr><tr><td>source_quality_dashboard_json</td><td>source_quality_dashboard.json</td><td>True</td></tr><tr><td>source_quality_dashboard_html</td><td>source_quality_dashboard.html</td><td>True</td></tr><tr><td>release_manifest_json</td><td>release_manifest.json</td><td>True</td></tr><tr><td>release_manifest_html</td><td>release_manifest.html</td><td>True</td></tr><tr><td>acceptance_checklist_json</td><td>acceptance_checklist.json</td><td>True</td></tr><tr><td>acceptance_checklist_html</td><td>acceptance_checklist.html</td><td>True</td></tr></tbody></table></section>
+<section><h2>命令</h2><ul><li>uv run python scripts/build_product_shell.py --output-dir outputs/product_shell/round8-current</li><li>uv run python scripts/run_product_shell_release_check.py --mode demo</li></ul></section>
+</main>
+</body>
+</html>

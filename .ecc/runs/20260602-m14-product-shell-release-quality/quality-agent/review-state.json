@@ -1,0 +1,11 @@
+{
+  "review_id": "20260602-m14-product-shell-release-quality",
+  "status": "passed",
+  "reviewed_at": "2026-06-02T00:00:00+08:00",
+  "reviewed_snapshot_type": "committed",
+  "quality_reviewed_commit": "c00e7d58d1cebb85744b3dcc61f347be38a3ca29",
+  "working_tree_dirty": false,
+  "fix_required_before_next_phase": false,
+  "findings_count": 0,
+  "unresolved_findings_count": 0
+}

@@ -1,0 +1,133 @@
+{
+  "artifacts": [
+    {
+      "artifact_id": "governance",
+      "generated_at": "2026-05-31T18:04:54+00:00",
+      "html_path": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.html",
+      "json_path": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.json",
+      "status": "available"
+    },
+    {
+      "artifact_id": "reliability",
+      "generated_at": "2026-05-31T18:14:51+00:00",
+      "html_path": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.html",
+      "json_path": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.json",
+      "status": "available"
+    },
+    {
+      "artifact_id": "schema_v2",
+      "generated_at": "2026-05-31T18:10:00+00:00",
+      "html_path": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.html",
+      "json_path": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.json",
+      "status": "available"
+    },
+    {
+      "artifact_id": "gateway_probe",
+      "generated_at": "2026-06-01T16:44:49+00:00",
+      "html_path": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.html",
+      "json_path": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json",
+      "status": "available"
+    }
+  ],
+  "consumer_policy": {
+    "owner_boundary": "Gateway owns acquisition; FNI displays generated contracts, probes, and reports.",
+    "provider_access_allowed": false,
+    "reliability_recomputation_allowed": false
+  },
+  "generated_at": "2026-06-01T17:36:19+00:00",
+  "review_source": "docs/product/pm-architect-stage-review-round4-round13-2026-06-02.html",
+  "sources": [
+    {
+      "anti_bot_risk": "low",
+      "artifact_paths": {
+        "gateway_probe_html": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.html",
+        "gateway_probe_json": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json",
+        "governance_html": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.html",
+        "governance_json": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.json",
+        "reliability_html": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.html",
+        "reliability_json": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.json",
+        "schema_v2_html": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.html",
+        "schema_v2_json": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.json"
+      },
+      "degradation_events": [],
+      "display_name": "SEC EDGAR filings",
+      "last_generated_at": "2026-06-01T16:44:49+00:00",
+      "license_scope": "metadata_and_public_document_reference",
+      "owner_service": "stock-data-gateway",
+      "retention_policy": "metadata_and_permitted_excerpt",
+      "source_group": "official_filings",
+      "source_id": "sec_edgar_filings",
+      "source_quality_label": "Trusted Fact",
+      "source_type": "official_disclosure",
+      "status": "ok",
+      "trust_tier": "trusted_fact"
+    },
+    {
+      "anti_bot_risk": "medium",
+      "artifact_paths": {
+        "gateway_probe_html": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.html",
+        "gateway_probe_json": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json",
+        "governance_html": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.html",
+        "governance_json": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.json",
+        "reliability_html": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.html",
+        "reliability_json": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.json",
+        "schema_v2_html": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.html",
+        "schema_v2_json": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.json"
+      },
+      "degradation_events": [
+        "robots_tos_review_required",
+        "request_pacing_policy_required"
+      ],
+      "display_name": "Public industry media candidate",
+      "last_generated_at": "2026-06-01T16:44:49+00:00",
+      "license_scope": "unknown",
+      "owner_service": "stock-data-gateway",
+      "retention_policy": "metadata_only_until_reviewed",
+      "source_group": "generated_artifacts",
+      "source_id": "public_industry_media_candidate",
+      "source_quality_label": "unknown",
+      "source_type": "public_web_crawler",
+      "status": "blocked",
+      "trust_tier": "candidate_untrusted"
+    },
+    {
+      "anti_bot_risk": "high",
+      "artifact_paths": {
+        "gateway_probe_html": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.html",
+        "gateway_probe_json": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json",
+        "governance_html": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.html",
+        "governance_json": "outputs/source_governance/2026-06-01-mik-229/source_governance_report.json",
+        "reliability_html": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.html",
+        "reliability_json": "outputs/source_reliability/2026-06-01-mik-231/source_reliability_report.json",
+        "schema_v2_html": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.html",
+        "schema_v2_json": "outputs/source_schema_v2/2026-06-01-mik-230/source_schema_v2_report.json"
+      },
+      "degradation_events": [
+        "missing_required_registry_field",
+        "robots_tos_review_required",
+        "request_pacing_policy_required",
+        "prohibited_behavior_declared"
+      ],
+      "display_name": "Forbidden social scrape",
+      "last_generated_at": "2026-06-01T16:44:49+00:00",
+      "license_scope": "none",
+      "owner_service": "stock-data-gateway",
+      "retention_policy": "do_not_store",
+      "source_group": "social_heat",
+      "source_id": "forbidden_social_scrape",
+      "source_quality_label": "unknown",
+      "source_type": "community_page_crawler",
+      "status": "blocked",
+      "trust_tier": "candidate_untrusted"
+    }
+  ],
+  "status": "degraded",
+  "summary": {
+    "degraded_source_count": 2,
+    "missing_artifact_count": 0,
+    "source_count": 3,
+    "stale_artifact_count": 0,
+    "trusted_fact_count": 1
+  },
+  "version": "product-shell-source-quality-dashboard-v1"
+}

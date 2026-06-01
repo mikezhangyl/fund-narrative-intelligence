@@ -581,7 +581,7 @@
     }
   ],
   "formula_version": "evidence-quality-deterministic-v1",
-  "generated_at": "2026-05-31T16:49:40.663412+00:00",
+  "generated_at": "2026-06-01T17:36:19.106853+00:00",
   "narratives": [
     {
       "aliases": [
@@ -1876,7 +1876,7 @@
   ],
   "source_scope": {
     "mode": "existing_artifacts_only",
-    "output_root": "outputs",
+    "output_root": "/Users/mikezhang/Coding/AI-Learning/fund-narrative-intelligence/outputs",
     "project_root": "/Users/mikezhang/Coding/AI-Learning/fund-narrative-intelligence"
   },
   "stock_mappings": [

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-31T16:49:40.507978+00:00",
+  "generated_at": "2026-06-01T17:36:18.829724+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -177,6 +177,32 @@
       "data_source": {
         "degradation_status": "ok",
         "freshness_status": "generated",
+        "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
+        "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
+        "source": "source governance + reliability + schema + gateway probe artifacts",
+        "type": "generated_artifact"
+      },
+      "label_en": "Source quality dashboard",
+      "label_zh": "来源质量仪表盘",
+      "owner_service": "FNI",
+      "path": "/sources/quality",
+      "route_id": "source_quality"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
+        "freshness_status": "generated",
         "html_path": "artifact_browser.html",
         "json_path": "outputs/product_shell/round8-current/artifact_index.json",
         "source": "outputs/product_shell/round8-current/artifact_index.json",
@@ -202,11 +228,11 @@
       },
       "data_source": {
         "degradation_status": "ok",
-        "freshness_status": "pending_round8_followup",
-        "html_path": "",
-        "json_path": "",
-        "source": "future local release preflight",
-        "type": "fixture_demo"
+        "freshness_status": "generated",
+        "html_path": "outputs/product_shell/round8-current/config_preflight.html",
+        "json_path": "outputs/product_shell/round8-current/config_preflight.json",
+        "source": "product shell release preflight",
+        "type": "generated_artifact"
       },
       "label_en": "Configuration preflight",
       "label_zh": "配置与预检",
@@ -217,10 +243,10 @@
   ],
   "summary": {
     "degraded_route_count": 0,
-    "fixture_demo_route_count": 1,
-    "generated_artifact_route_count": 5,
+    "fixture_demo_route_count": 0,
+    "generated_artifact_route_count": 7,
     "live_api_route_count": 2,
-    "route_count": 8
+    "route_count": 9
   },
   "version": "product-shell-route-registry-v1"
 }

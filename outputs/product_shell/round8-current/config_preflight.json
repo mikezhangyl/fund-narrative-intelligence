@@ -1,0 +1,88 @@
+{
+  "checks": [
+    {
+      "check_id": "market_data_gateway_url",
+      "env_name": "MARKET_DATA_GATEWAY_URL",
+      "label": "Market data gateway URL",
+      "message": "demo 模式不要求服务已启动；展示默认本地 URL 作为启动提示。",
+      "required_in_demo": false,
+      "required_in_live": false,
+      "status": "optional_missing",
+      "value": "http://127.0.0.1:8700"
+    },
+    {
+      "check_id": "narrative_service_url",
+      "env_name": "NARRATIVE_SERVICE_URL",
+      "label": "Narrative Service URL",
+      "message": "demo 模式不要求服务已启动；展示默认本地 URL 作为启动提示。",
+      "required_in_demo": false,
+      "required_in_live": false,
+      "status": "optional_missing",
+      "value": "http://127.0.0.1:8800"
+    },
+    {
+      "check_id": "output_root",
+      "label": "Output root",
+      "message": "路径会由 release check 或 shell build 自动创建。",
+      "required_in_demo": true,
+      "required_in_live": true,
+      "status": "ok",
+      "value": "outputs"
+    },
+    {
+      "check_id": "product_shell_output",
+      "label": "Product shell output",
+      "message": "路径会由 release check 或 shell build 自动创建。",
+      "required_in_demo": true,
+      "required_in_live": true,
+      "status": "ok",
+      "value": "outputs/product_shell"
+    }
+  ],
+  "generated_at": "2026-06-01T17:36:19.107088+00:00",
+  "mode": "demo",
+  "provider_smoke_policy": {
+    "message": "预检不是 provider smoke；它只检查配置、路径和可运行命令，不访问外部 provider。",
+    "preflight_is_provider_smoke": false
+  },
+  "runbooks": [
+    "docs/product/round8-interactive-product-shell-release-plan-2026-05-30.md",
+    "docs/product/stock-narrative-service-runbook.md",
+    "docs/product/market-data-gateway-boundary.md"
+  ],
+  "safe_commands": [
+    "uv run python scripts/build_product_shell.py --output-dir outputs/product_shell/round8-current",
+    "uv run python scripts/run_product_shell_release_check.py --mode demo"
+  ],
+  "startup_order": [
+    {
+      "required_in_demo": false,
+      "required_in_live": true,
+      "service": "stock-data-gateway",
+      "step": 1
+    },
+    {
+      "required_in_demo": false,
+      "required_in_live": true,
+      "service": "stock-narrative-service",
+      "step": 2
+    },
+    {
+      "required_in_demo": true,
+      "required_in_live": true,
+      "service": "fund-narrative-intelligence product shell",
+      "step": 3
+    }
+  ],
+  "status": "ok",
+  "summary": {
+    "check_count": 4,
+    "degraded_count": 0,
+    "missing_count": 0,
+    "optional_missing_count": 2,
+    "provider_smoke_executed": false,
+    "secret_redaction_count": 0
+  },
+  "validation_command": "uv run python scripts/run_product_shell_release_check.py --mode demo",
+  "version": "product-shell-release-preflight-v1"
+}

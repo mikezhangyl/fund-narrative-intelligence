@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>产品壳验收清单</title>
+<style>
+
+body { margin: 0; background: #f6f7f9; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 48px; }
+h1 { font-size: 30px; margin: 0 0 16px; }
+h2 { font-size: 20px; margin: 24px 0 12px; }
+.summary { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d8dee8; border-radius: 8px; overflow: hidden; }
+th, td { border-bottom: 1px solid #e5eaf1; padding: 10px; text-align: left; vertical-align: top; font-size: 14px; }
+th { background: #eef2f7; color: #323f4b; }
+
+</style>
+</head>
+<body>
+<main class="page">
+<h1>产品壳验收清单</h1>
+<section class="summary">
+<p><strong>状态:</strong> pass</p>
+<p><strong>检查项:</strong> 5</p>
+<p><strong>失败项:</strong> </p>
+</section>
+<section><h2>验收项</h2><table><thead><tr><th>检查</th><th>状态</th><th>责任面</th><th>说明</th></tr></thead><tbody><tr><td>product_shell_opens</td><td>pass</td><td>fund-narrative-intelligence product shell</td><td>产品首页可打开。</td></tr><tr><td>major_routes_render</td><td>pass</td><td>FNI product shell</td><td>主要路由有生成数据或预检产物。</td></tr><tr><td>artifact_browser_links</td><td>pass</td><td>FNI artifact browser</td><td>产物浏览器和索引均已生成。</td></tr><tr><td>config_preflight_redacts_secrets</td><td>pass</td><td>FNI config preflight</td><td>配置预检已生成，且不会执行 provider smoke。</td></tr><tr><td>release_manifest_generated</td><td>pass</td><td>FNI release package</td><td>发布 manifest 已生成。</td></tr></tbody></table></section>
+</main>
+</body>
+</html>

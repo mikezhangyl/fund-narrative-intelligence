@@ -1,0 +1,122 @@
+{
+  "commands": {
+    "build_shell": "uv run python scripts/build_product_shell.py --output-dir outputs/product_shell/round8-current",
+    "release_check": "uv run python scripts/run_product_shell_release_check.py --mode demo"
+  },
+  "expected_artifacts": [
+    {
+      "artifact_id": "product_home_html",
+      "exists": true,
+      "path": "index.html"
+    },
+    {
+      "artifact_id": "artifact_browser_html",
+      "exists": true,
+      "path": "artifact_browser.html"
+    },
+    {
+      "artifact_id": "route_registry_json",
+      "exists": true,
+      "path": "route_registry.json"
+    },
+    {
+      "artifact_id": "route_registry_html",
+      "exists": true,
+      "path": "route_registry.html"
+    },
+    {
+      "artifact_id": "artifact_index_json",
+      "exists": true,
+      "path": "artifact_index.json"
+    },
+    {
+      "artifact_id": "artifact_index_html",
+      "exists": true,
+      "path": "artifact_index.html"
+    },
+    {
+      "artifact_id": "narrative_data_json",
+      "exists": true,
+      "path": "narrative_data.json"
+    },
+    {
+      "artifact_id": "narrative_data_html",
+      "exists": true,
+      "path": "narrative_data.html"
+    },
+    {
+      "artifact_id": "config_preflight_json",
+      "exists": true,
+      "path": "config_preflight.json"
+    },
+    {
+      "artifact_id": "config_preflight_html",
+      "exists": true,
+      "path": "config_preflight.html"
+    },
+    {
+      "artifact_id": "source_quality_dashboard_json",
+      "exists": true,
+      "path": "source_quality_dashboard.json"
+    },
+    {
+      "artifact_id": "source_quality_dashboard_html",
+      "exists": true,
+      "path": "source_quality_dashboard.html"
+    },
+    {
+      "artifact_id": "release_manifest_json",
+      "exists": true,
+      "path": "release_manifest.json"
+    },
+    {
+      "artifact_id": "release_manifest_html",
+      "exists": true,
+      "path": "release_manifest.html"
+    },
+    {
+      "artifact_id": "acceptance_checklist_json",
+      "exists": true,
+      "path": "acceptance_checklist.json"
+    },
+    {
+      "artifact_id": "acceptance_checklist_html",
+      "exists": true,
+      "path": "acceptance_checklist.html"
+    }
+  ],
+  "generated_at": "2026-06-01T17:36:19.116336+00:00",
+  "mode": "demo",
+  "preflight": {
+    "degraded_count": 0,
+    "provider_smoke_executed": false,
+    "status": "ok"
+  },
+  "startup_order": [
+    {
+      "required_in_demo": false,
+      "required_in_live": true,
+      "service": "stock-data-gateway",
+      "step": 1
+    },
+    {
+      "required_in_demo": false,
+      "required_in_live": true,
+      "service": "stock-narrative-service",
+      "step": 2
+    },
+    {
+      "required_in_demo": true,
+      "required_in_live": true,
+      "service": "fund-narrative-intelligence product shell",
+      "step": 3
+    }
+  ],
+  "status": "ok",
+  "summary": {
+    "expected_artifact_count": 16,
+    "missing_expected_artifact_count": 0,
+    "preflight_status": "ok"
+  },
+  "version": "product-shell-release-manifest-v1"
+}

@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "The source quality dashboard is only as current as the generated source governance/reliability/schema/probe artifacts.",
+    "Live mode requires local gateway and Narrative Service URLs; demo mode remains deterministic without credentials."
+  ]
+}

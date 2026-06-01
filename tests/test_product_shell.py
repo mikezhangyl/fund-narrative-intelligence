@@ -38,14 +38,15 @@ def test_route_registry_declares_product_pages_and_data_sources():
         "narrative_quality",
         "portfolio_workspace",
         "production_readiness",
+        "source_quality",
         "artifacts",
         "config_preflight",
     ]
     assert registry["summary"] == {
-        "route_count": 8,
+        "route_count": 9,
         "live_api_route_count": 2,
-        "generated_artifact_route_count": 5,
-        "fixture_demo_route_count": 1,
+        "generated_artifact_route_count": 7,
+        "fixture_demo_route_count": 0,
         "degraded_route_count": 0,
     }
     assert registry["routes"][2]["owner_service"] == "FNI"
@@ -255,7 +256,7 @@ def test_product_shell_home_and_artifact_browser_use_registry_and_index(tmp_path
     browser = render_artifact_browser_html(shell)
 
     assert shell["version"] == "product-shell-v1"
-    assert shell["summary"]["route_count"] == 8
+    assert shell["summary"]["route_count"] == 9
     assert shell["summary"]["artifact_count"] == 1
     assert shell["summary"]["narrative_count"] == 2
     assert "<h1>Fund Narrative Intelligence 产品首页</h1>" in home
@@ -291,7 +292,7 @@ def test_build_product_shell_cli_writes_registry_index_home_and_browser(tmp_path
     )
 
     assert exit_code == 0
-    assert json.loads((shell_dir / "route_registry.json").read_text())["summary"]["route_count"] == 8
+    assert json.loads((shell_dir / "route_registry.json").read_text())["summary"]["route_count"] == 9
     assert json.loads((shell_dir / "artifact_index.json").read_text())["summary"]["artifact_count"] == 1
     assert (shell_dir / "narrative_data.json").exists()
     assert (shell_dir / "narrative_data.html").exists()
@@ -300,6 +301,7 @@ def test_build_product_shell_cli_writes_registry_index_home_and_browser(tmp_path
     assert "<h1>产品壳路由注册表</h1>" in (shell_dir / "route_registry.html").read_text()
     assert "<h1>产物索引预览</h1>" in (shell_dir / "artifact_index.html").read_text()
     assert "<h1>真实叙事数据</h1>" in (shell_dir / "narrative_data.html").read_text()
+    assert "<h1>来源质量仪表盘</h1>" in (shell_dir / "source_quality_dashboard.html").read_text()
 
 
 def _write_artifact_pair(
