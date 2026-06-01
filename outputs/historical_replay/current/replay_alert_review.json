@@ -1,0 +1,123 @@
+{
+  "alerts": [
+    {
+      "alert_type": "dominant_narrative_added",
+      "current_value": 0.42,
+      "delta": 0.16,
+      "narrative_id": "N_AI_INFRA",
+      "narrative_name": "AI 基础设施",
+      "non_advice_disclosure": "Observational narrative monitoring only; not investment advice, trading guidance, price prediction, or automatic decisioning.",
+      "previous_value": 0.26,
+      "rule_id": "dominant_narrative_added-v1",
+      "source_diagnostics": [],
+      "trigger_reason": "Narrative crossed the dominant exposure threshold.",
+      "watchlist_id": "wl-core-growth"
+    },
+    {
+      "alert_type": "large_exposure_change",
+      "current_value": 0.42,
+      "delta": 0.16,
+      "narrative_id": "N_AI_INFRA",
+      "narrative_name": "AI 基础设施",
+      "non_advice_disclosure": "Observational narrative monitoring only; not investment advice, trading guidance, price prediction, or automatic decisioning.",
+      "previous_value": 0.26,
+      "rule_id": "large_exposure_change-v1",
+      "source_diagnostics": [],
+      "trigger_reason": "Narrative exposure changed beyond the configured threshold.",
+      "watchlist_id": "wl-core-growth"
+    },
+    {
+      "alert_type": "quality_degradation",
+      "current_value": 0.24,
+      "delta": 0.02,
+      "narrative_id": "N_SEMI_CAPEX",
+      "narrative_name": "半导体景气",
+      "non_advice_disclosure": "Observational narrative monitoring only; not investment advice, trading guidance, price prediction, or automatic decisioning.",
+      "previous_value": 0.22,
+      "rule_id": "quality_degradation-v1",
+      "source_diagnostics": [],
+      "trigger_reason": "Narrative trust or quality status weakened.",
+      "watchlist_id": "wl-core-growth"
+    },
+    {
+      "affected_watchlist_count": 2,
+      "alert_type": "heating_radar_overlap",
+      "narrative_id": "N_AI_INFRA",
+      "narrative_name": "AI 基础设施",
+      "non_advice_disclosure": "Observational narrative monitoring only; not investment advice, trading guidance, price prediction, or automatic decisioning.",
+      "rule_id": "radar-overlap-v1",
+      "source_diagnostics": [
+        {
+          "field": "holdings",
+          "source_service": "Gateway",
+          "status": "fresh"
+        },
+        {
+          "field": "narrative_quality",
+          "source_service": "Narrative Service",
+          "status": "fresh"
+        },
+        {
+          "field": "holdings",
+          "source_service": "Gateway",
+          "status": "fresh"
+        }
+      ],
+      "trigger_reason": "Heating radar narrative overlaps watched holdings."
+    }
+  ],
+  "contract": {
+    "feedback_scope": "system-quality feedback",
+    "provider_access_allowed": false,
+    "trading_performance_allowed": false
+  },
+  "generated_at": "2026-06-01T19:05:20.634455+00:00",
+  "job_snapshot": {
+    "generated_artifacts": [
+      "historical_replay_run.json",
+      "historical_replay_run.html"
+    ],
+    "resume_metadata": {
+      "checkpoint_id": "current-artifact-replay",
+      "completed_steps": [
+        "load_artifacts",
+        "filter_window",
+        "summarize_outputs",
+        "write_manifest"
+      ]
+    },
+    "run_id": "replay_bf7fb494ec04",
+    "status": "completed"
+  },
+  "job_storage_contract": {
+    "current_production_state_mutation_allowed": false,
+    "status_values": [
+      "pending",
+      "running",
+      "completed",
+      "failed",
+      "resumable"
+    ],
+    "stores_failure_reason": true,
+    "stores_progress": true,
+    "stores_resume_metadata": true
+  },
+  "noise_reviews": [
+    {
+      "alert_type": "quality_degradation",
+      "delta": 0.02,
+      "narrative_name": "半导体景气",
+      "reason": "repeated trigger or low-magnitude replay delta",
+      "recommendation": "review_threshold",
+      "rule_id": "quality_degradation-v1"
+    }
+  ],
+  "summary": {
+    "alert_count": 4,
+    "disabled_threshold_candidate_count": 1,
+    "missed_change_candidate_count": 0,
+    "repeated_trigger_count": 0,
+    "warning_count": 0
+  },
+  "version": "replay-alert-review-v1"
+}

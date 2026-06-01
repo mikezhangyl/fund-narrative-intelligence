@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Alert noise heuristics require operator review before any rule changes."
+  ]
+}

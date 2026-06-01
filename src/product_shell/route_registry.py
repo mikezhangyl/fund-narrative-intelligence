@@ -127,6 +127,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="replay_alert_review",
+            path="/evaluation/alerts",
+            label_zh="历史告警有效性与噪声复盘",
+            label_en="Replay alert usefulness and noise review",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/historical_replay/current/",
+            json_path="outputs/historical_replay/current/replay_alert_review.json",
+            html_path="outputs/historical_replay/current/replay_alert_review.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",

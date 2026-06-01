@@ -1,0 +1,54 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/historical_replay/current/replay_alert_review.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "8989b75f2d589d4b9ec493e8701ccb5e3af87e56f02af9fec60ff502cde679c7",
+      "mtime_epoch": 1780340720,
+      "size_bytes": 4046,
+      "summary": "Replay alert review JSON."
+    },
+    {
+      "type": "html",
+      "path": "outputs/historical_replay/current/replay_alert_review.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "c4c410cc2186c0571806e78966db2e620339e3015cf2dd38aa6130e9f5439d40",
+      "mtime_epoch": 1780340720,
+      "size_bytes": 1521,
+      "summary": "Canonical Chinese replay alert review report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "8798b50dcdc1ea5c3e504e2bdc100b89ec3e4079a0f791be929d047738795eb7",
+      "mtime_epoch": 1780340720,
+      "size_bytes": 15905,
+      "summary": "Product shell route registry including replay alert review."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "4acb7e2a7d736afbf6ef4df9ed91217409c2a8b31b9eb5897e4a0c7eafd67bd0",
+      "mtime_epoch": 1780340720,
+      "size_bytes": 396449,
+      "summary": "Product shell payload including alert review artifact."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "cb69dfcda47ee2ee489055cae45bbb41e2f169214cd72fb49bb548c3db2ef66b",
+      "mtime_epoch": 1780340720,
+      "size_bytes": 272529,
+      "summary": "Artifact index including replay alert review."
+    }
+  ]
+}
