@@ -1,0 +1,44 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/narrative_research_workbench/current/narrative_timeline_search.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "bc79eb96e928b1539c2c026dc9e57cb37e5c845885a52fd4f5b5774fb05e123c",
+      "mtime_epoch": 1780338274,
+      "size_bytes": 13444,
+      "summary": "Narrative timeline/source-event search JSON generated from the current gateway source-event probe."
+    },
+    {
+      "type": "html",
+      "path": "outputs/narrative_research_workbench/current/narrative_timeline_search.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "284f80f00bab6b7c632088d7f031d012aadf2da9b0dced606fac80d4385fe4d1",
+      "mtime_epoch": 1780338274,
+      "size_bytes": 2963,
+      "summary": "Canonical Chinese timeline/search report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "e32d82b631e8c8870ede3edb856f512e597e7b848bfcbb985ed603d993eb688b",
+      "mtime_epoch": 1780338275,
+      "size_bytes": 11103,
+      "summary": "Route registry including /research/timeline-search."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "a7e62a42d38065da54eb5a5c2d020742b60e34bc924c6fad49356dcbc69a92d5",
+      "mtime_epoch": 1780338275,
+      "size_bytes": 386633,
+      "summary": "Product shell payload including the timeline/search route and artifact."
+    }
+  ]
+}

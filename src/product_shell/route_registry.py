@@ -67,6 +67,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="narrative_timeline_search",
+            path="/research/timeline-search",
+            label_zh="叙事时间线与来源事件搜索",
+            label_en="Narrative timeline and source-event search",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/narrative_research_workbench/current/",
+            json_path="outputs/narrative_research_workbench/current/narrative_timeline_search.json",
+            html_path="outputs/narrative_research_workbench/current/narrative_timeline_search.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",

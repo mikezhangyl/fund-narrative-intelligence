@@ -1,0 +1,32 @@
+{
+  "commands": [
+    {
+      "command": "uv run pytest tests/test_narrative_timeline_search.py -q",
+      "status": "failed_red",
+      "summary": "Expected RED: timeline/search scanner and CLI were missing."
+    },
+    {
+      "command": "uv run pytest tests/test_narrative_timeline_search.py tests/test_product_shell.py tests/test_product_shell_release.py tests/test_product_shell_source_quality.py -q",
+      "status": "passed",
+      "summary": "24 passed"
+    },
+    {
+      "command": "uv run python scripts/run_narrative_timeline_search.py --input outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json --output-dir outputs/narrative_research_workbench/current --page-size 50",
+      "status": "passed",
+      "summary": "matched_event_count=12"
+    },
+    {
+      "command": "uv run pytest",
+      "status": "passed",
+      "summary": "630 passed, 1 skipped"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}

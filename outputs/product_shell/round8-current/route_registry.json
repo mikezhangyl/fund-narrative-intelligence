@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T18:16:27.812092+00:00",
+  "generated_at": "2026-06-01T18:24:35.239408+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -135,6 +135,32 @@
       "owner_service": "FNI",
       "path": "/narratives/digest",
       "route_id": "fresh_narrative_digest"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
+        "freshness_status": "artifact_reported",
+        "html_path": "outputs/narrative_research_workbench/current/narrative_timeline_search.html",
+        "json_path": "outputs/narrative_research_workbench/current/narrative_timeline_search.json",
+        "source": "outputs/narrative_research_workbench/current/",
+        "type": "generated_artifact"
+      },
+      "label_en": "Narrative timeline and source-event search",
+      "label_zh": "叙事时间线与来源事件搜索",
+      "owner_service": "FNI",
+      "path": "/research/timeline-search",
+      "route_id": "narrative_timeline_search"
     },
     {
       "client_policy": {
@@ -296,9 +322,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 0,
-    "generated_artifact_route_count": 9,
+    "generated_artifact_route_count": 10,
     "live_api_route_count": 2,
-    "route_count": 11
+    "route_count": 12
   },
   "version": "product-shell-route-registry-v1"
 }
