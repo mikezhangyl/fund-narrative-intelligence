@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PM/Architect 阶段复审 - Round 4 到 Round 13 - 2026-06-02</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18212f;
+      --muted: #5f6b7a;
+      --line: #d9e0e8;
+      --soft: #f6f8fb;
+      --accent: #0f766e;
+      --warn: #b45309;
+      --danger: #b91c1c;
+    }
+    body {
+      margin: 0;
+      background: #ffffff;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.62;
+    }
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px 24px 64px;
+    }
+    h1, h2 {
+      line-height: 1.25;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 32px;
+    }
+    h2 {
+      margin-top: 36px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      font-size: 22px;
+    }
+    p, li {
+      font-size: 15px;
+    }
+    .meta {
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .decision {
+      border-left: 4px solid var(--accent);
+      background: #eefaf7;
+      padding: 14px 18px;
+      margin: 20px 0;
+    }
+    .caveat {
+      border-left: 4px solid var(--warn);
+      background: #fff8ed;
+      padding: 14px 18px;
+      margin: 20px 0;
+    }
+    code {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+    pre {
+      background: #111827;
+      color: #eef2ff;
+      padding: 16px;
+      border-radius: 8px;
+      overflow: auto;
+      font-size: 13px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: var(--soft);
+    }
+    .done {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .rewrite {
+      color: var(--danger);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>PM/Architect 阶段复审：Round 4 到 Round 13</h1>
+    <p class="meta">日期：2026-06-02；对象：当前本地 <code>main</code>；结论：可作为阶段 checkpoint 接受，但还不是完整产品闭环。</p>
+
+    <section class="decision">
+      <strong>一句话结论：</strong>这次合并后的方向是对的。FNI 已经从“自己抓外部数据源”退回到正确边界：消费 gateway 提供的数据、展示报告和探针结果、维护产品壳和验收口径。接下来不要在 FNI 里继续写 SEC/CNINFO/news/social 直连适配器。
+    </section>
+
+    <h2>复审范围</h2>
+    <p>本次复审覆盖产品壳、artifact browser、真实 artifact 展示、source governance/schema/reliability、gateway consumer contract，以及外部 source-event 采集迁回 <code>stock-data-gateway</code> 的边界清理。</p>
+
+    <h2>验证结果</h2>
+    <pre><code>uv run pytest tests/test_product_shell.py \
+  tests/test_narrative_source_gateway_consumer.py \
+  tests/test_source_governance_model.py \
+  tests/test_source_schema_v2.py \
+  tests/test_source_reliability_scoring.py -q
+
+uv run ruff check src/product_shell \
+  src/market_data/providers/narrative_source_gateway.py \
+  src/scanners/source_governance.py \
+  src/scanners/source_schema_v2.py \
+  src/scanners/source_reliability.py \
+  tests/test_product_shell.py \
+  tests/test_narrative_source_gateway_consumer.py \
+  tests/test_source_governance_model.py \
+  tests/test_source_schema_v2.py \
+  tests/test_source_reliability_scoring.py</code></pre>
+    <p>结果：<code>33 passed</code>，<code>ruff</code> 通过。</p>
+
+    <h2>建议标记 Done</h2>
+    <table>
+      <thead>
+        <tr><th>Linear</th><th>结论</th><th>原因</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>MIK-165</code></td><td class="done">Done</td><td>route/data-source contract 已落到产品壳 route registry。</td></tr>
+        <tr><td><code>MIK-166</code></td><td class="done">Done</td><td>artifact index 和 manifest contract 已生成 JSON/中文 HTML。</td></tr>
+        <tr><td><code>MIK-161</code></td><td class="done">Done</td><td>本地产品壳导航已能呈现主要 surface，并标注数据模式和 ownership。</td></tr>
+        <tr><td><code>MIK-162</code></td><td class="done">Done</td><td>artifact browser 能索引并链接生成的 JSON/HTML 产物。</td></tr>
+        <tr><td><code>MIK-229</code></td><td class="done">Done</td><td>source governance/compliance model 已实现并测试。</td></tr>
+        <tr><td><code>MIK-230</code></td><td class="done">Done</td><td>source-event/schema v2 已包含质量、信任和降级字段。</td></tr>
+        <tr><td><code>MIK-231</code></td><td class="done">Done</td><td>source reliability、license、anti-bot risk scoring 已实现为确定性逻辑。</td></tr>
+        <tr><td><code>MIK-250</code></td><td class="done">Done</td><td>FNI provider-neutral gateway consumer contract 和 probes 已存在。</td></tr>
+      </tbody>
+    </table>
+
+    <h2>只是底座，还不能算产品完成</h2>
+    <table>
+      <thead>
+        <tr><th>区域</th><th>当前状态</th><th>还缺什么</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Round 8 config/preflight</td><td>route 和 artifact 底座已完成。</td><td>还需要可见的、脱敏的 gateway/Narrative/FNI 配置检查面板。</td></tr>
+        <tr><td>Round 8 release packaging</td><td>已有构建 shell artifact 的命令。</td><td>还需要一条本地 demo/release 验收命令和 checklist。</td></tr>
+        <tr><td>Narrative Radar UI</td><td>已有 contract 和 preview artifact。</td><td>还缺正式气泡图、趋势变化和产品壳内导航体验。</td></tr>
+        <tr><td>今日/近期叙事 digest</td><td>需求已定义。</td><td>还缺基于 gateway source events 的可见工作流。</td></tr>
+        <tr><td>Source governance UI</td><td>治理、schema、reliability 逻辑已存在。</td><td>还缺一个统一的操作员视角 dashboard。</td></tr>
+        <tr><td>Live gateway source checks</td><td>FNI consumer contract/probes 已有。</td><td>等 gateway source-event routes 实装后再跑 live conformance。</td></tr>
+      </tbody>
+    </table>
+
+    <h2>需要改写或迁出 FNI</h2>
+    <table>
+      <thead>
+        <tr><th>Linear</th><th>建议</th><th>原因</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>MIK-235</code> 到 <code>MIK-238</code></td><td class="rewrite">关闭/迁到 gateway</td><td>SEC、CNINFO、news、Stocktwits/social 的采集不应由 FNI 直连实现。</td></tr>
+        <tr><td><code>MIK-246</code>、<code>MIK-247</code>、<code>MIK-249</code></td><td class="rewrite">关闭/替换为 gateway/lakehouse 工作</td><td>raw zone、blob manifest、Docker lakehouse runtime 是 gateway/lakehouse 基础设施。</td></tr>
+        <tr><td><code>MIK-224</code> 到 <code>MIK-227</code></td><td>保留为 PM 调研</td><td>付费 provider、公网上游、社区源要先证明可行性和授权边界。</td></tr>
+        <tr><td><code>MIK-239</code> 到 <code>MIK-242</code></td><td>保留为 PM 调研</td><td>live smoke/trial/access investigation 不应直接变成 FNI dev 任务。</td></tr>
+      </tbody>
+    </table>
+
+    <h2>下一批 Developer 顺序</h2>
+    <ol>
+      <li>先收尾 Round 8：<code>MIK-167</code>、<code>MIK-163</code>、<code>MIK-168</code>、<code>MIK-164</code>。</li>
+      <li>把 source governance/reliability/schema 做成产品壳里的统一 source-quality dashboard。</li>
+      <li>等 gateway 实装 narrative source-event routes 后，用 <code>MIK-250</code> 的 probe 做 live conformance，并把结果呈现在 artifact browser/product shell。</li>
+      <li>Round 8 完整闭环后，再进入 Round 9：<code>MIK-180</code> + <code>MIK-177</code>。</li>
+    </ol>
+
+    <section class="caveat">
+      <strong>注意：</strong>本次没有跑 live gateway/provider checks。复审验证的是 FNI 侧 contract、产品壳 artifact、source governance 逻辑和边界清理。当前本地 <code>main</code> 也仍然 ahead of <code>origin/main</code>。
+    </section>
+
+    <h2>最终验收决定</h2>
+    <p>本阶段接受为 checkpoint。现在应该关闭已经可验收的 issue，保留还缺产品可见面的 issue，外部数据源继续由 <code>stock-data-gateway</code> 承担，FNI 接下来做产品壳、source quality 展示、gateway conformance 和 workspace persistence。</p>
+  </main>
+</body>
+</html>

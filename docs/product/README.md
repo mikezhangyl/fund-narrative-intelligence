@@ -343,3 +343,11 @@ quality, portfolio exposure, or provider data. Acceptance for `MIK-165`,
 `docs/product/round8-product-shell-artifact-browser-acceptance-2026-05-31.html`.
 The auxiliary Markdown note is
 `docs/product/round8-product-shell-artifact-browser-acceptance-2026-05-31.md`.
+
+The Round 4 to Round 13 PM/Architect stage review is documented in
+`docs/product/pm-architect-stage-review-round4-round13-2026-06-02.html`.
+It accepts the current local `main` as a stage checkpoint, recommends closing
+completed Linear issues, keeps partial shell/release items open, and reaffirms
+that real external source-event collection belongs in `stock-data-gateway`.
+The auxiliary Markdown note is
+`docs/product/pm-architect-stage-review-round4-round13-2026-06-02.md`.
