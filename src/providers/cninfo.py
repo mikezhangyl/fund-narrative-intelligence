@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import json
 import re
 from datetime import datetime, timezone
 from html import unescape
 from typing import Any, Callable
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
 
 from src.validation import validate_announcement_payload
 
@@ -23,7 +20,7 @@ class CNInfoAnnouncementProvider:
     data_quality = "fresh"
 
     def __init__(self, fetcher: CNInfoFetcher | None = None):
-        self.fetcher = fetcher or _fetch_cninfo_json
+        self.fetcher = fetcher
         self.degradation_events: list[dict[str, str]] = []
 
     def get_announcements(
@@ -53,6 +50,19 @@ class CNInfoAnnouncementProvider:
                 start_date=start_date or as_of_date,
                 end_date=as_of_date,
             )
+            if self.fetcher is None:
+                self.degradation_events.append(
+                    {
+                        "type": "gateway_owned_source",
+                        "provider_name": self.provider_name,
+                        "reason": (
+                            "CNINFO live acquisition is owned by stock-data-gateway; "
+                            "FNI only supports injected fixtures for this legacy provider."
+                        ),
+                    }
+                )
+                missing_stock_codes.append(stock_code)
+                continue
             try:
                 response = self.fetcher(
                     CNINFO_ANNOUNCEMENT_QUERY_URL,
@@ -144,17 +154,6 @@ def normalize_cninfo_announcement_response(
         for item in announcements
         if isinstance(item, dict)
     ]
-
-
-def _fetch_cninfo_json(
-    url: str,
-    form_data: dict[str, object],
-    headers: dict[str, str],
-) -> dict[str, Any]:
-    body = urlencode(form_data).encode("utf-8")
-    request = Request(url, data=body, headers=headers, method="POST")
-    with urlopen(request, timeout=10) as response:
-        return json.loads(response.read().decode("utf-8"))
 
 
 def _default_headers() -> dict[str, str]:

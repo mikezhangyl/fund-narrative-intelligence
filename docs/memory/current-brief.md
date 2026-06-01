@@ -171,6 +171,8 @@ python scripts/context_brief.py --max-words 900
 
 Round 13 planning is open in Linear under milestone `M19 - Narrative Source Deep Mining` and documented at `docs/product/round13-narrative-source-deep-mining-plan-2026-06-01.md`. Boundary correction on 2026-06-01: external data-source access, source lakehouse storage, raw blobs, source fetch runs, and provider adapters belong in `stock-data-gateway`, not FNI. FNI issues `MIK-235` through `MIK-238` and `MIK-246`, `MIK-247`, `MIK-249` were marked moved/canceled as direct FNI implementation items. Gateway change request: `/Users/mikezhang/Coding/AI-Learning/stock-data-gateway/docs/product/fni-narrative-source-lakehouse-capability-change-request-2026-06-01.md`. FNI should now own only consumer contracts, gateway conformance probes, provider-neutral client wrappers after routes exist, and Chinese HTML/JSON reports/source-quality rendering.
 
+On 2026-06-02, after gateway acceptance runner/capability reporting passed, FNI removed the Round 13 direct source pilot artifacts for SEC EDGAR, CNINFO disclosure classification, public-news context, and Stocktwits heat smoke. FNI retains `src/market_data/providers/narrative_source_gateway.py`, `scripts/run_narrative_source_gateway_probe.py`, and fixture/consumer tests as the narrative source integration surface. The legacy `src/providers/cninfo.py` remains only for historical fixture-compatible announcement payload normalization and no longer performs live CNINFO acquisition unless a test/legacy caller injects a fetcher; real CNINFO acquisition is gateway-owned.
+
 ## Stable Product Loop
 
 `Fund -> Holdings -> Stock Mapping -> Narrative Aggregation -> Signal-backed Narrative State -> Evidence Report`
