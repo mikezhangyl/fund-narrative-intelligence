@@ -1,0 +1,32 @@
+{
+  "commands": [
+    {
+      "command": "uv run pytest tests/test_product_shell_workspace_store.py::test_update_workspace_preferences_sets_defaults_and_redacts_secret_keys -q",
+      "status": "failed_red",
+      "summary": "Expected RED: update_workspace_preferences was missing."
+    },
+    {
+      "command": "uv run pytest tests/test_product_shell_workspace_store.py tests/test_product_shell.py tests/test_product_shell_release.py tests/test_product_shell_source_quality.py -q",
+      "status": "passed",
+      "summary": "29 passed"
+    },
+    {
+      "command": "uv run python scripts/manage_product_workspace.py set-preferences --store outputs/product_shell/round8-current/workspace_state.json --html outputs/product_shell/round8-current/workspace_state.html --default-surface artifact_browser --default-watchlist 000063,600519 --date-window-preset 30d --display-density comfortable --theme system --default-mode demo --preferences-json '{\"password\":\"drop-me\"}' --updated-at 2026-06-02T02:50:00+08:00",
+      "status": "passed",
+      "summary": "Persisted preferences and recorded one dropped secret-like preference key."
+    },
+    {
+      "command": "uv run pytest",
+      "status": "passed",
+      "summary": "622 passed, 1 skipped"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/workspace_state.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "99e625fb12fb0c56d6de5710451f89df83dcd392bec8ae4e7eea817b2fb50715",
+      "mtime_epoch": 1780337459,
+      "size_bytes": 1679,
+      "summary": "Workspace state JSON with local preferences, watchlist, and redaction event."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/workspace_state.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "38bca607993261f92fd1951f2d0ffc4ea6cb3ca7157e5d43347164ab80320893",
+      "mtime_epoch": 1780337459,
+      "size_bytes": 2227,
+      "summary": "Canonical Chinese workspace state report showing preferences."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "95571f17692961dc8178b7ab1486184afce0d20e2af22e171ecf14a32abc35b9",
+      "mtime_epoch": 1780337459,
+      "size_bytes": 384393,
+      "summary": "Product shell payload carrying the updated workspace preferences."
+    }
+  ]
+}

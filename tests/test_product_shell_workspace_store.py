@@ -9,6 +9,7 @@ from src.product_shell.workspace_store import (
     build_default_workspace_state,
     render_workspace_state_html,
     save_workspace_view,
+    update_workspace_preferences,
 )
 
 
@@ -189,3 +190,90 @@ def test_manage_product_workspace_cli_saves_view_and_writes_html(tmp_path):
     assert state["saved_views"][0]["view_id"] == "artifact-stale"
     assert state["saved_views"][0]["filters"] == {"freshness_status": "stale"}
     assert "<h1>本地工作区状态</h1>" in html_path.read_text()
+
+
+def test_update_workspace_preferences_sets_defaults_and_redacts_secret_keys():
+    state = build_default_workspace_state(generated_at="2026-06-02T02:45:00+08:00")
+
+    updated = update_workspace_preferences(
+        state,
+        {
+            "default_surface": "narrative_radar",
+            "default_watchlist": ["000063", "600519"],
+            "preferred_date_window": {"preset": "7d"},
+            "display_density": "compact",
+            "theme": "dark",
+            "default_mode": "live",
+            "api_token": "must-not-persist",
+        },
+        updated_at="2026-06-02T02:46:00+08:00",
+    )
+
+    assert state["preferences"]["default_surface"] == "artifact_browser"
+    assert updated["preferences"] == {
+        "default_surface": "narrative_radar",
+        "default_watchlist": ["000063", "600519"],
+        "preferred_date_window": {"preset": "7d"},
+        "display_density": "compact",
+        "theme": "dark",
+        "default_mode": "live",
+    }
+    assert updated["shell_state"]["default_mode"] == "live"
+    assert updated["summary"]["preference_redaction_count"] == 1
+    assert updated["redaction_events"][0]["field_path"] == "preferences.api_token"
+    assert "must-not-persist" not in json.dumps(updated, ensure_ascii=False)
+
+
+def test_update_workspace_preferences_validates_option_sets():
+    state = build_default_workspace_state()
+
+    with pytest.raises(ValueError, match="default_surface"):
+        update_workspace_preferences(state, {"default_surface": "provider_admin"})
+
+    with pytest.raises(ValueError, match="display_density"):
+        update_workspace_preferences(state, {"display_density": "huge"})
+
+    with pytest.raises(ValueError, match="default_mode"):
+        update_workspace_preferences(state, {"default_mode": "prod"})
+
+
+def test_manage_product_workspace_cli_sets_preferences_and_renders_them(tmp_path):
+    store_path = tmp_path / "workspace_state.json"
+    html_path = tmp_path / "workspace_state.html"
+
+    exit_code = manage_product_workspace.main(
+        [
+            "set-preferences",
+            "--store",
+            str(store_path),
+            "--html",
+            str(html_path),
+            "--default-surface",
+            "artifact_browser",
+            "--default-watchlist",
+            "000063,600519",
+            "--date-window-preset",
+            "30d",
+            "--display-density",
+            "comfortable",
+            "--theme",
+            "system",
+            "--default-mode",
+            "demo",
+            "--preferences-json",
+            '{"password":"drop-me"}',
+            "--updated-at",
+            "2026-06-02T02:47:00+08:00",
+        ]
+    )
+
+    state = json.loads(store_path.read_text())
+    html = html_path.read_text()
+
+    assert exit_code == 0
+    assert state["preferences"]["default_watchlist"] == ["000063", "600519"]
+    assert state["preferences"]["preferred_date_window"] == {"preset": "30d"}
+    assert state["summary"]["preference_redaction_count"] == 1
+    assert "drop-me" not in json.dumps(state, ensure_ascii=False)
+    assert "偏好设置" in html
+    assert "artifact_browser" in html

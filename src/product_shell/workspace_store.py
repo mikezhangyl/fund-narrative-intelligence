@@ -18,6 +18,17 @@ ALLOWED_SURFACES = {
     "source_quality",
     "fresh_narrative_digest",
 }
+ALLOWED_DISPLAY_DENSITIES = {"compact", "comfortable"}
+ALLOWED_THEMES = {"system", "light", "dark"}
+ALLOWED_DEFAULT_MODES = {"demo", "live"}
+DEFAULT_PREFERENCES = {
+    "default_surface": "artifact_browser",
+    "default_watchlist": [],
+    "preferred_date_window": {"preset": "7d"},
+    "display_density": "comfortable",
+    "theme": "system",
+    "default_mode": "demo",
+}
 SECRET_KEY_PATTERN = re.compile(
     r"(api[_-]?key|token|secret|password|credential|private[_-]?key)",
     re.IGNORECASE,
@@ -61,6 +72,19 @@ class JsonWorkspaceRepository:
         state = save_workspace_view(self.load(), view, updated_at=updated_at)
         return self.save(state)
 
+    def set_preferences(
+        self,
+        preferences: dict[str, Any],
+        *,
+        updated_at: str | None = None,
+    ) -> dict[str, Any]:
+        state = update_workspace_preferences(
+            self.load(),
+            preferences,
+            updated_at=updated_at,
+        )
+        return self.save(state)
+
 
 def build_default_workspace_state(
     *,
@@ -82,8 +106,10 @@ def build_default_workspace_state(
             "selected_route": "/",
             "default_mode": "demo",
         },
+        "preferences": deepcopy(DEFAULT_PREFERENCES),
         "saved_views": [],
         "artifact_indexes": [],
+        "redaction_events": [],
         "validation_policy": {
             "sensitive_values_allowed": False,
             "trusted_market_data_allowed": False,
@@ -121,6 +147,29 @@ def save_workspace_view(
     return next_state
 
 
+def update_workspace_preferences(
+    state: dict[str, Any],
+    preferences: dict[str, Any],
+    *,
+    updated_at: str | None = None,
+) -> dict[str, Any]:
+    validate_workspace_state(state)
+    sanitized, redaction_events = _redact_secret_keys(preferences, path=("preferences",))
+    normalized = _normalize_preferences(sanitized)
+    next_state = deepcopy(state)
+    existing_events = [_mapping(event) for event in _list(next_state.get("redaction_events"))]
+    next_state["preferences"] = normalized
+    next_state["shell_state"] = {
+        **_mapping(next_state.get("shell_state")),
+        "default_mode": normalized["default_mode"],
+    }
+    next_state["redaction_events"] = [*existing_events, *redaction_events]
+    next_state["updated_at"] = updated_at or _utc_now()
+    next_state["summary"] = _summary(next_state)
+    validate_workspace_state(next_state)
+    return next_state
+
+
 def validate_workspace_state(state: dict[str, Any]) -> None:
     if not isinstance(state, dict):
         raise ValueError("workspace state must be a mapping")
@@ -128,6 +177,7 @@ def validate_workspace_state(state: dict[str, Any]) -> None:
         raise ValueError("workspace state version is unsupported")
     if _contains_secret_key(state):
         raise ValueError("workspace state must not persist secret-like keys")
+    _normalize_preferences(_mapping(state.get("preferences")) or deepcopy(DEFAULT_PREFERENCES))
     for view in _list(state.get("saved_views")):
         _normalize_view(_mapping(view), updated_at=_mapping(view).get("updated_at"))
 
@@ -153,11 +203,13 @@ def render_workspace_state_html(state: dict[str, Any]) -> str:
             "<h1>本地工作区状态</h1>",
             '<section class="summary">',
             _html_kv("保存视图", summary.get("saved_view_count", 0)),
+            _html_kv("偏好脱敏", summary.get("preference_redaction_count", 0)),
             _html_kv("存储后端", state.get("storage_backend")),
             _html_kv("更新时间", state.get("updated_at")),
             "<p>本地工作区状态只保存页面选择、过滤器、排序和非敏感索引；不保存密钥。</p>",
             "<p>该状态不会修改可信市场数据或 Narrative Service 记录。</p>",
             "</section>",
+            _preferences_table(_mapping(state.get("preferences"))),
             _saved_views_table(saved_views),
             "</main>",
             "</body>",
@@ -189,11 +241,72 @@ def _normalize_view(view: dict[str, Any], *, updated_at: str | None = None) -> d
     }
 
 
+def _normalize_preferences(preferences: dict[str, Any]) -> dict[str, Any]:
+    merged = {**deepcopy(DEFAULT_PREFERENCES), **_mapping(preferences)}
+    default_surface = str(merged.get("default_surface") or "")
+    if default_surface not in ALLOWED_SURFACES:
+        raise ValueError(f"default_surface is unsupported: {default_surface}")
+    display_density = str(merged.get("display_density") or "")
+    if display_density not in ALLOWED_DISPLAY_DENSITIES:
+        raise ValueError(f"display_density is unsupported: {display_density}")
+    theme = str(merged.get("theme") or "")
+    if theme not in ALLOWED_THEMES:
+        raise ValueError(f"theme is unsupported: {theme}")
+    default_mode = str(merged.get("default_mode") or "")
+    if default_mode not in ALLOWED_DEFAULT_MODES:
+        raise ValueError(f"default_mode is unsupported: {default_mode}")
+    watchlist = [
+        str(item).strip()
+        for item in _list(merged.get("default_watchlist"))
+        if str(item).strip()
+    ]
+    return {
+        "default_surface": default_surface,
+        "default_watchlist": watchlist,
+        "preferred_date_window": _sorted_mapping(_mapping(merged.get("preferred_date_window"))),
+        "display_density": display_density,
+        "theme": theme,
+        "default_mode": default_mode,
+    }
+
+
 def _summary(state: dict[str, Any]) -> dict[str, int]:
     return {
         "saved_view_count": len(_list(state.get("saved_views"))),
         "artifact_index_count": len(_list(state.get("artifact_indexes"))),
+        "preference_redaction_count": len(_list(state.get("redaction_events"))),
     }
+
+
+def _redact_secret_keys(value: Any, *, path: tuple[str, ...]) -> tuple[Any, list[dict[str, str]]]:
+    if isinstance(value, dict):
+        sanitized: dict[str, Any] = {}
+        events: list[dict[str, str]] = []
+        for key, nested in value.items():
+            key_text = str(key)
+            field_path = (*path, key_text)
+            if SECRET_KEY_PATTERN.search(key_text):
+                events.append(
+                    {
+                        "field_path": ".".join(field_path),
+                        "action": "dropped",
+                        "reason": "secret_like_key",
+                    }
+                )
+                continue
+            sanitized_value, nested_events = _redact_secret_keys(nested, path=field_path)
+            sanitized[key_text] = sanitized_value
+            events.extend(nested_events)
+        return sanitized, events
+    if isinstance(value, list):
+        sanitized_items = []
+        events = []
+        for index, item in enumerate(value):
+            sanitized_item, item_events = _redact_secret_keys(item, path=(*path, str(index)))
+            sanitized_items.append(sanitized_item)
+            events.extend(item_events)
+        return sanitized_items, events
+    return value, []
 
 
 def _contains_secret_key(value: Any) -> bool:
@@ -206,6 +319,25 @@ def _contains_secret_key(value: Any) -> bool:
     if isinstance(value, list):
         return any(_contains_secret_key(item) for item in value)
     return False
+
+
+def _preferences_table(preferences: dict[str, Any]) -> str:
+    rows = _normalize_preferences(preferences)
+    body = "".join(
+        "<tr>"
+        f"<td>{_html_text(label)}</td>"
+        f"<td>{_html_text(value)}</td>"
+        "</tr>"
+        for label, value in (
+            ("默认页面", rows["default_surface"]),
+            ("默认观察列表", ", ".join(rows["default_watchlist"])),
+            ("日期窗口", json.dumps(rows["preferred_date_window"], ensure_ascii=False, sort_keys=True)),
+            ("显示密度", rows["display_density"]),
+            ("主题", rows["theme"]),
+            ("默认模式", rows["default_mode"]),
+        )
+    )
+    return f"<section><h2>偏好设置</h2><table><tbody>{body}</tbody></table></section>"
 
 
 def _saved_views_table(saved_views: list[dict[str, Any]]) -> str:

@@ -11,6 +11,26 @@
       "postgres"
     ]
   },
+  "preferences": {
+    "default_mode": "demo",
+    "default_surface": "artifact_browser",
+    "default_watchlist": [
+      "000063",
+      "600519"
+    ],
+    "display_density": "comfortable",
+    "preferred_date_window": {
+      "preset": "30d"
+    },
+    "theme": "system"
+  },
+  "redaction_events": [
+    {
+      "action": "dropped",
+      "field_path": "preferences.password",
+      "reason": "secret_like_key"
+    }
+  ],
   "saved_views": [
     {
       "created_at": "2026-06-02T02:30:00+08:00",
@@ -35,9 +55,10 @@
   "storage_backend": "json_file",
   "summary": {
     "artifact_index_count": 0,
+    "preference_redaction_count": 1,
     "saved_view_count": 1
   },
-  "updated_at": "2026-06-02T02:30:00+08:00",
+  "updated_at": "2026-06-02T02:50:00+08:00",
   "validation_policy": {
     "sensitive_values_allowed": false,
     "trusted_market_data_allowed": false
