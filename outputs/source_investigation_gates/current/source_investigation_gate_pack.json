@@ -4,7 +4,7 @@
     "Do not crawl login-only, CAPTCHA-protected, or anti-bot-heavy community pages.",
     "Social/community sources remain heat_signal_only and never trusted_fact."
   ],
-  "generated_at": "2026-06-02T05:22:57+00:00",
+  "generated_at": "2026-06-02T06:54:02+00:00",
   "issue_sections": [
     {
       "candidates": [

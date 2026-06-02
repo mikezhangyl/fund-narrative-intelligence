@@ -189,13 +189,17 @@ def test_source_decision_matrix_html_is_chinese_and_names_boundaries():
 
     assert "<h1>叙事来源决策矩阵</h1>" in html
     assert "不绕过 CAPTCHA" in html
-    assert "Gateway-owned" in html
-    assert "PM investigation required" in html
-    assert "Provider trial/API 评估" in html
+    assert "采集由 stock-data-gateway 负责" in html
+    assert "需 PM 调查" in html
+    assert "供应商试用与接口评估" in html
     assert "choiceinfo@eastmoney.com" in html
     assert "apisupport@alphasense.com" in html
     assert "社交/社区仅作为热度或候选信号" in html
-    assert "FNI 不直接访问 provider" in html
+    assert "FNI 不直接访问外部供应商" in html
+    assert "Provider / source" not in html
+    assert "decision_label" not in html
+    assert "PM investigation required" not in html
+    assert "Gateway-owned" not in html
 
 
 def test_source_decision_matrix_cli_writes_json_and_html(tmp_path):

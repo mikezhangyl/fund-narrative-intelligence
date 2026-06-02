@@ -7,6 +7,48 @@ from pathlib import Path
 from typing import Any
 
 REVIEW_SOURCE = "docs/product/pm-architect-stage-review-round4-round13-2026-06-02.html"
+VALUE_DISPLAY = {
+    "ok": "正常",
+    "degraded": "已降级",
+    "blocked": "已阻塞",
+    "missing": "缺失",
+    "available": "可用",
+    "stale": "过期",
+    "official_filings": "官方披露文件",
+    "official_disclosures": "官方公告披露",
+    "generated_artifacts": "生成产物",
+    "social_heat": "社交热度",
+    "news_context": "新闻上下文",
+    "official_disclosure": "官方披露",
+    "public_web_crawler": "公网爬虫",
+    "community_page_crawler": "社区页面爬虫",
+    "trusted_fact": "可信事实",
+    "Trusted Fact": "可信事实",
+    "candidate_untrusted": "未验证候选",
+    "unknown": "未知",
+    "none": "无",
+    "metadata_and_public_document_reference": "元数据与公开文档引用",
+    "metadata_and_permitted_excerpt": "元数据与允许展示的摘要",
+    "metadata_only_until_reviewed": "复核前仅元数据",
+    "do_not_store": "不留存",
+    "low": "低",
+    "medium": "中",
+    "high": "高",
+    "robots_tos_review_required": "需要 robots/服务条款评审",
+    "request_pacing_policy_required": "需要请求节奏策略",
+    "missing_required_registry_field": "缺少注册表必填字段",
+    "prohibited_behavior_declared": "声明了禁止行为",
+    "SEC EDGAR filings": "SEC EDGAR 披露文件",
+    "Public industry media candidate": "公网行业媒体候选",
+    "Forbidden social scrape": "禁止的社交来源爬取",
+    "governance": "来源治理",
+    "reliability": "来源可靠性",
+    "schema_v2": "来源结构 v2",
+    "gateway_probe": "网关探测",
+    "Gateway owns acquisition; FNI displays generated contracts, probes, and reports.": (
+        "采集由 stock-data-gateway 负责；FNI 只展示生成后的契约、探测和报告。"
+    ),
+}
 ARTIFACT_SPECS = (
     (
         "governance",
@@ -111,9 +153,9 @@ def render_source_quality_dashboard_html(dashboard: dict[str, Any]) -> str:
             _html_kv("可信事实来源", summary.get("trusted_fact_count", 0)),
             _html_kv("降级来源", summary.get("degraded_source_count", 0)),
             _html_kv("缺失产物", summary.get("missing_artifact_count", 0)),
-            f"<p>{_html_text(policy.get('owner_boundary'))}</p>",
-            "<p>产品壳不重新计算来源可靠性分，也不调用外部 provider。</p>",
-            f"<p>Review source: {_html_text(dashboard.get('review_source'))}</p>",
+            f"<p>{_html_text(_display_value(policy.get('owner_boundary')))}</p>",
+            "<p>产品壳不重新计算来源可靠性分，也不调用外部供应商。</p>",
+            f"<p>复核来源: {_html_text(dashboard.get('review_source'))}</p>",
             "</section>",
             _source_table(_list(dashboard.get("sources"))),
             _artifact_table(_list(dashboard.get("artifacts"))),
@@ -319,24 +361,24 @@ def _safe_relative_path(path: Path, project_root: Path) -> str:
 def _source_table(sources: list[Any]) -> str:
     rows = [_mapping(source) for source in sources]
     if not rows:
-        return "<section><h2>来源</h2><p>没有可展示来源；请先生成 source governance/reliability artifacts。</p></section>"
+        return "<section><h2>来源</h2><p>没有可展示来源；请先生成来源治理与可靠性产物。</p></section>"
     header = "".join(
         f"<th>{_html_text(label)}</th>"
-        for label in ("来源", "分组", "类型", "Owner", "Trust", "Quality", "License", "Retention", "Anti-bot", "状态", "降级")
+        for label in ("来源", "分组", "类型", "负责人", "信任层级", "质量", "授权", "留存", "反爬", "状态", "降级")
     )
     body = "".join(
         "<tr>"
-        f"<td>{_html_text(row.get('display_name'))}</td>"
-        f"<td>{_html_text(row.get('source_group'))}</td>"
-        f"<td>{_html_text(row.get('source_type'))}</td>"
+        f"<td>{_html_text(_display_value(row.get('display_name')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('source_group')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('source_type')))}</td>"
         f"<td>{_html_text(row.get('owner_service'))}</td>"
-        f"<td>{_html_text(row.get('trust_tier'))}</td>"
-        f"<td>{_html_text(row.get('source_quality_label'))}</td>"
-        f"<td>{_html_text(row.get('license_scope'))}</td>"
-        f"<td>{_html_text(row.get('retention_policy'))}</td>"
-        f"<td>{_html_text(row.get('anti_bot_risk'))}</td>"
-        f"<td>{_html_text(row.get('status'))}</td>"
-        f"<td>{_html_text(' | '.join(_strings(row.get('degradation_events'))))}</td>"
+        f"<td>{_html_text(_display_value(row.get('trust_tier')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('source_quality_label')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('license_scope')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('retention_policy')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('anti_bot_risk')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('status')))}</td>"
+        f"<td>{_html_text(_display_degradation_events(row.get('degradation_events')))}</td>"
         "</tr>"
         for row in rows
     )
@@ -351,8 +393,8 @@ def _artifact_table(artifacts: list[Any]) -> str:
     )
     body = "".join(
         "<tr>"
-        f"<td>{_html_text(row.get('artifact_id'))}</td>"
-        f"<td>{_html_text(row.get('status'))}</td>"
+        f"<td>{_html_text(_display_value(row.get('artifact_id')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('status')))}</td>"
         f"<td>{_html_text(row.get('json_path'))}</td>"
         f"<td>{_html_text(row.get('html_path'))}</td>"
         f"<td>{_html_text(row.get('generated_at'))}</td>"
@@ -363,7 +405,18 @@ def _artifact_table(artifacts: list[Any]) -> str:
 
 
 def _html_kv(label: str, value: Any) -> str:
-    return f"<p><strong>{_html_text(label)}:</strong> {_html_text(value)}</p>"
+    return f"<p><strong>{_html_text(label)}:</strong> {_html_text(_display_value(value))}</p>"
+
+
+def _display_degradation_events(value: Any) -> str:
+    return "；".join(_display_value(event) for event in _strings(value))
+
+
+def _display_value(value: Any) -> str:
+    if isinstance(value, bool):
+        return "是" if value else "否"
+    text = str(value or "")
+    return VALUE_DISPLAY.get(text, text)
 
 
 def _html_styles() -> str:

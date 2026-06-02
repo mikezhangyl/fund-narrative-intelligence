@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T05:23:06.149975+00:00",
+  "generated_at": "2026-06-02T07:00:17.448629+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -521,7 +521,7 @@
         "type": "generated_artifact"
       },
       "label_en": "Tushare news permission smoke",
-      "label_zh": "Tushare news 权限与 live smoke",
+      "label_zh": "Tushare 新闻权限与实时检查",
       "owner_service": "FNI",
       "path": "/sources/tushare-news-smoke",
       "route_id": "tushare_news_permission_smoke"
@@ -547,7 +547,7 @@
         "type": "generated_artifact"
       },
       "label_en": "R13 source investigation gates",
-      "label_zh": "R13 来源调查 Gate Pack",
+      "label_zh": "R13 来源调查准入包",
       "owner_service": "FNI",
       "path": "/sources/investigation-gates",
       "route_id": "source_investigation_gates"

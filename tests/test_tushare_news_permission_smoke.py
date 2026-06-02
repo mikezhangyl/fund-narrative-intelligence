@@ -125,11 +125,14 @@ def test_tushare_news_permission_smoke_html_is_chinese_and_actionable():
         )
     )
 
-    assert "<h1>Tushare news 权限与 live smoke</h1>" in html
-    assert "Dev-Ready" in html
-    assert "<strong>Dev-Ready:</strong> 0" in html
-    assert "Paid Permission Required" in html
+    assert "<h1>Tushare 新闻权限与实时检查</h1>" in html
+    assert "开发就绪" in html
+    assert "<strong>开发就绪:</strong> 0" in html
+    assert "需要付费或权限" in html
     assert "不新增认证机制" in html
+    assert "Dev-Ready" not in html
+    assert "Paid Permission Required" not in html
+    assert "Rows" not in html
 
 
 def test_tushare_news_permission_smoke_cli_writes_json_and_html(monkeypatch, tmp_path):
@@ -166,6 +169,6 @@ def test_tushare_news_permission_smoke_cli_writes_json_and_html(monkeypatch, tmp
 
     assert exit_code == 0
     assert payload["status"] == "Dev-Ready"
-    assert "<h1>Tushare news 权限与 live smoke</h1>" in (
+    assert "<h1>Tushare 新闻权限与实时检查</h1>" in (
         tmp_path / "tushare_news_permission_smoke.html"
     ).read_text()

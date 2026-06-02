@@ -87,22 +87,22 @@ def render_tushare_news_permission_smoke_html(report: dict[str, Any]) -> str:
             "<head>",
             '<meta charset="utf-8" />',
             '<meta name="viewport" content="width=device-width, initial-scale=1" />',
-            "<title>Tushare news 权限与 live smoke</title>",
+            "<title>Tushare 新闻权限与实时检查</title>",
             "<style>",
             _html_styles(),
             "</style>",
             "</head>",
             "<body>",
             '<main class="page">',
-            "<h1>Tushare news 权限与 live smoke</h1>",
+            "<h1>Tushare 新闻权限与实时检查</h1>",
             '<section class="summary">',
-            _html_kv("总体状态", report.get("status")),
-            _html_kv("src 数", summary.get("src_count", 0)),
-            _html_kv("Dev-Ready", summary.get("dev_ready_count", 0)),
-            _html_kv("Paid Permission Required", summary.get("paid_permission_required_count", 0)),
-            _html_kv("Blocked", summary.get("blocked_count", 0)),
-            _html_kv("No Data", summary.get("no_data_count", 0)),
-            "<p>本检查只使用现有本地 env/token 与 Gateway news briefs 路径，不新增认证机制，不把 news integration 直接放进 FNI。</p>",
+            _html_kv("总体状态", _display_status(report.get("status"))),
+            _html_kv("来源参数数", summary.get("src_count", 0)),
+            _html_kv("开发就绪", summary.get("dev_ready_count", 0)),
+            _html_kv("需要付费或权限", summary.get("paid_permission_required_count", 0)),
+            _html_kv("已阻塞", summary.get("blocked_count", 0)),
+            _html_kv("无数据", summary.get("no_data_count", 0)),
+            "<p>本检查只使用现有本地环境变量、令牌与 stock-data-gateway 新闻摘要路径，不新增认证机制，也不把新闻接入直接放进 FNI。</p>",
             "</section>",
             _results_table(_list(report.get("src_results"))),
             "</main>",
@@ -237,19 +237,44 @@ def _results_table(results: list[Any]) -> str:
     rows = [_mapping(result) for result in results]
     header = "".join(
         f"<th>{_html_text(label)}</th>"
-        for label in ("src", "状态", "Rows", "失败原因", "样例标题")
+        for label in ("来源参数", "状态", "行数", "失败原因", "样例标题")
     )
     body = "".join(
         "<tr>"
         f"<td>{_html_text(row.get('src'))}</td>"
-        f"<td>{_html_text(row.get('status'))}</td>"
+        f"<td>{_html_text(_display_status(row.get('status')))}</td>"
         f"<td>{_html_text(row.get('row_count'))}</td>"
-        f"<td>{_html_text(row.get('failure_reason'))}</td>"
+        f"<td>{_html_text(_display_failure_reason(row.get('failure_reason')))}</td>"
         f"<td>{_html_text(_sample_titles(_list(row.get('sample_rows'))))}</td>"
         "</tr>"
         for row in rows
     )
-    return f"<section><h2>src smoke 结果</h2><table><thead><tr>{header}</tr></thead><tbody>{body}</tbody></table></section>"
+    return f"<section><h2>来源参数检查结果</h2><table><thead><tr>{header}</tr></thead><tbody>{body}</tbody></table></section>"
+
+
+def _display_status(value: Any) -> str:
+    return {
+        "Dev-Ready": "开发就绪",
+        "Paid Permission Required": "需要付费或权限",
+        "Blocked": "已阻塞",
+        "No Data": "无数据",
+    }.get(str(value or ""), str(value or ""))
+
+
+def _display_failure_reason(value: Any) -> str:
+    reason = str(value or "")
+    if not reason:
+        return ""
+    lower = reason.casefold()
+    if "market_data_gateway_url is not configured" in lower:
+        return "未配置 MARKET_DATA_GATEWAY_URL，无法触达 stock-data-gateway 来源边界。"
+    if "connection refused" in lower:
+        return "本地 stock-data-gateway 未响应，连接被拒绝。"
+    if "provider_permission_required" in lower or "permission" in lower:
+        return "供应商权限不足或该端点需要额外授权。"
+    if "no provider succeeded for news_briefs" in lower:
+        return "新闻摘要能力没有可用供应商返回成功结果。"
+    return reason
 
 
 def _sample_titles(rows: list[Any]) -> str:

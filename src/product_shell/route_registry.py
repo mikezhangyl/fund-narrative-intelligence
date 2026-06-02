@@ -4,6 +4,21 @@ from datetime import UTC, datetime
 from html import escape
 from typing import Any
 
+VALUE_DISPLAY = {
+    "ok": "正常",
+    "degraded": "已降级",
+    "generated": "已生成",
+    "artifact_reported": "产物报告",
+    "service_reported": "服务报告",
+    "generated_artifact": "生成产物",
+    "live_api": "实时 API",
+    "fixture_demo": "示例产物",
+    "route_registry + artifact_index": "路由注册表与产物索引",
+    "Narrative Service artifacts + FNI reviewed registry": "叙事服务产物与 FNI 已复核注册表",
+    "source governance + reliability + schema + gateway probe artifacts": "来源治理、可靠性、结构与网关探测产物",
+    "product shell release preflight": "产品壳发布预检",
+}
+
 
 def build_product_shell_route_registry(
     *,
@@ -237,7 +252,7 @@ def build_product_shell_route_registry(
         _route(
             route_id="tushare_news_permission_smoke",
             path="/sources/tushare-news-smoke",
-            label_zh="Tushare news 权限与 live smoke",
+            label_zh="Tushare 新闻权限与实时检查",
             label_en="Tushare news permission smoke",
             owner_service="FNI",
             data_source_type="generated_artifact",
@@ -249,7 +264,7 @@ def build_product_shell_route_registry(
         _route(
             route_id="source_investigation_gates",
             path="/sources/investigation-gates",
-            label_zh="R13 来源调查 Gate Pack",
+            label_zh="R13 来源调查准入包",
             label_en="R13 source investigation gates",
             owner_service="FNI",
             data_source_type="generated_artifact",
@@ -315,8 +330,8 @@ def render_route_registry_preview(registry: dict[str, Any]) -> str:
             "<h1>产品壳路由注册表</h1>",
             '<section class="summary">',
             _html_kv("路由数", summary.get("route_count", 0)),
-            _html_kv("Live API", summary.get("live_api_route_count", 0)),
-            _html_kv("Generated artifacts", summary.get("generated_artifact_route_count", 0)),
+            _html_kv("实时 API", summary.get("live_api_route_count", 0)),
+            _html_kv("生成产物", summary.get("generated_artifact_route_count", 0)),
             "<p>产品壳只负责导航和展示数据来源，不在产品壳内重算评分、雷达热度、质量分或组合指标。</p>",
             "</section>",
             _routes_table(_list(registry.get("routes"))),
@@ -395,16 +410,16 @@ def _routes_table(routes: list[Any]) -> str:
     rows = [_mapping(route) for route in routes]
     header = "".join(
         f"<th>{_html_text(label)}</th>"
-        for label in ("路由", "页面", "Owner", "数据来源", "新鲜度", "状态")
+        for label in ("路由", "页面", "负责人", "数据来源", "新鲜度", "状态")
     )
     body = "".join(
         "<tr>"
         f"<td>{_html_text(row.get('path'))}</td>"
         f"<td>{_html_text(row.get('label_zh'))}</td>"
         f"<td>{_html_text(row.get('owner_service'))}</td>"
-        f"<td>{_html_text(_mapping(row.get('data_source')).get('type'))}</td>"
-        f"<td>{_html_text(_mapping(row.get('data_source')).get('freshness_status'))}</td>"
-        f"<td>{_html_text(_mapping(row.get('data_source')).get('degradation_status'))}</td>"
+        f"<td>{_html_text(_display_value(_mapping(row.get('data_source')).get('type')))}</td>"
+        f"<td>{_html_text(_display_value(_mapping(row.get('data_source')).get('freshness_status')))}</td>"
+        f"<td>{_html_text(_display_value(_mapping(row.get('data_source')).get('degradation_status')))}</td>"
         "</tr>"
         for row in rows
     )
@@ -413,6 +428,13 @@ def _routes_table(routes: list[Any]) -> str:
 
 def _html_kv(label: str, value: Any) -> str:
     return f"<p><strong>{_html_text(label)}:</strong> {_html_text(value)}</p>"
+
+
+def _display_value(value: Any) -> str:
+    if isinstance(value, bool):
+        return "是" if value else "否"
+    text = str(value or "")
+    return VALUE_DISPLAY.get(text, text)
 
 
 def _html_styles() -> str:

@@ -72,10 +72,12 @@ def test_source_quality_dashboard_html_is_chinese_and_cites_review_source(tmp_pa
     )
 
     assert "<h1>来源质量仪表盘</h1>" in html
-    assert "SEC EDGAR filings" in html
-    assert "Gateway owns acquisition" in html
+    assert "SEC EDGAR 披露文件" in html
+    assert "采集由 stock-data-gateway 负责" in html
     assert "pm-architect-stage-review-round4-round13-2026-06-02.html" in html
     assert "不重新计算来源可靠性分" in html
+    assert "Owner" not in html
+    assert "official_filings" not in html
 
 
 def test_route_registry_includes_source_quality_dashboard_route():

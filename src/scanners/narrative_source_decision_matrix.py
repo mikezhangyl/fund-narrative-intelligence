@@ -8,6 +8,152 @@ from src.scanners.narrative_source_provider_evaluations import (
     licensed_provider_evaluation,
 )
 
+_COLUMN_LABELS = {
+    "group_id": "来源组ID",
+    "name_zh": "来源组",
+    "decision_label": "决策标签",
+    "owner_service": "负责服务",
+    "boundary_decision": "边界判断",
+    "output_role": "输出角色",
+    "provider_id": "供应商ID",
+    "name": "名称",
+    "anti_bot_risk": "反爬风险",
+    "blocking_gate": "阻塞关口",
+    "provider": "供应商",
+    "trial_contact_path": "试用/联系路径",
+    "api_availability": "接口可用性",
+    "cost_contract_notes": "成本与合同说明",
+    "dataset_categories": "数据类别",
+    "official_source_links": "官方来源链接",
+    "field": "契约项",
+    "value": "要求字段",
+}
+
+_VALUE_DISPLAY = {
+    "Provider / source": "供应商/来源",
+    "Can-Do": "可做",
+    "Crawl Pilot": "爬虫试点",
+    "Paid Trial": "付费试用",
+    "Backlog": "暂缓",
+    "Avoid": "避免",
+    "PM investigation required": "需 PM 调查",
+    "Not allowed by crawler policy": "爬虫策略不允许",
+    "PM_then_stock-data-gateway": "PM 先调查，随后由 stock-data-gateway 承接",
+    "PM_then_gateway": "PM 先调查，随后由网关承接",
+    "stock-data-gateway": "stock-data-gateway",
+    "none": "无",
+    "third_party_paid_provider_owned_until_gateway_contract": "第三方付费供应商，待网关契约确认后接入",
+    "gateway_owned": "由 stock-data-gateway 负责",
+    "gateway_owned_after_permission_review": "权限评审后由 stock-data-gateway 负责",
+    "gateway_owned_crawl_pilot": "由 stock-data-gateway 做爬虫试点",
+    "paid_provider_or_gateway_after_contract": "付费供应商，合同后由网关承接",
+    "consumer_display_only": "仅消费与展示",
+    "timely_news_or_news_analytics": "及时新闻或新闻分析",
+    "timely_news_research_context": "及时新闻与研究上下文",
+    "timely_news": "及时新闻",
+    "raw_news": "原始新闻",
+    "machine_readable_news": "机器可读新闻",
+    "machine_readable_news_analytics": "机器可读新闻分析",
+    "event_sentiment_analytics": "事件/情绪分析",
+    "research_transcripts_context": "研究与电话会文本上下文",
+    "broker_research": "券商研究",
+    "filings": "披露文件",
+    "market_data_context": "市场数据上下文",
+    "trusted_fact": "可信事实",
+    "trusted_fact_or_context": "可信事实或上下文",
+    "trusted_fact_or_policy_context": "可信事实或政策上下文",
+    "source_event_only": "仅来源事件",
+    "heat_signal_only": "仅热度信号",
+    "not_applicable": "不适用",
+    "context_or_candidate": "上下文或候选信号",
+    "contract_required": "需要合同",
+    "permission_required": "需要权限",
+    "public_disclosure_reference": "公开披露引用",
+    "public_page_reference_after_tos_review": "服务条款评审后的公开页面引用",
+    "not_allowed": "不允许",
+    "low": "低",
+    "medium": "中",
+    "high": "高",
+    "critical": "严重",
+    "source_registry_required_fields": "来源注册表必填字段",
+    "source_event_v2_required_fields": "来源事件 v2 必填字段",
+    "narrative_fact_required_fields": "叙事事实必填字段",
+    "candidate_narrative_required_fields": "候选叙事必填字段",
+    "verification_gates": "验证关口",
+    "source_id": "来源ID",
+    "source_group": "来源组",
+    "permission_status": "权限状态",
+    "license_scope": "授权范围",
+    "freshness_sla": "新鲜度 SLA",
+    "trust_tier": "信任层级",
+    "anti_bot_risk": "反爬风险",
+    "retry_policy": "重试策略",
+    "cache_ttl": "缓存时长",
+    "owner_service": "负责服务",
+    "gateway_boundary": "网关边界",
+    "source_event_id": "来源事件ID",
+    "source_url": "来源 URL",
+    "published_at": "发布时间",
+    "retrieved_at": "抓取时间",
+    "entity_refs": "实体引用",
+    "event_type": "事件类型",
+    "raw_title": "原始标题",
+    "permitted_excerpt": "允许展示的摘要",
+    "language": "语言",
+    "retention_policy": "留存策略",
+    "acquisition_run_id": "采集运行ID",
+    "content_hash": "内容哈希",
+    "degraded_reason": "降级原因",
+    "fact_id": "事实ID",
+    "claim_text": "主张文本",
+    "fact_time": "事实时间",
+    "confidence_label": "置信标签",
+    "review_status": "复核状态",
+    "candidate_narrative_id": "候选叙事ID",
+    "title": "标题",
+    "theme": "主题",
+    "supporting_source_event_ids": "支撑来源事件ID",
+    "heat_signal_ids": "热度信号ID",
+    "trusted_fact_count": "可信事实数",
+    "freshness_bucket": "新鲜度分桶",
+    "promotion_status": "晋级状态",
+    "live_smoke": "实时检查",
+    "schema_drift_check": "结构漂移检查",
+    "dedupe_check": "去重检查",
+    "source_quality_report": "来源质量报告",
+    "degraded_semantics_check": "降级语义检查",
+}
+
+_PHRASE_DISPLAY = {
+    "Apply for trial / sales contact through Wind product pages or Service@wind.com.cn.": "通过 Wind 产品页或 Service@wind.com.cn 申请试用/联系销售。",
+    "Wind Client API and enterprise data API are advertised for accessing Wind financial data.": "公开资料显示 Wind Client API 和企业数据 API 可访问 Wind 金融数据。",
+    "Enterprise contract required; pricing and news entitlements require sales confirmation.": "需要企业合同；价格与新闻权限需销售确认。",
+    "Contact Choice data service at choiceinfo@eastmoney.com or 400-620-1818.": "通过 choiceinfo@eastmoney.com 或 400-620-1818 联系 Choice 数据服务。",
+    "Choice Quant API is advertised with function-call access and Python/C++ support.": "公开资料显示 Choice Quant API 支持函数调用，并支持 Python/C++。",
+    "Contract package required; confirm news, research, and API quota entitlements.": "需要合同包；需确认新闻、研究与 API 配额权限。",
+    "Use iFinD partner/cooperation channel first; PM must obtain vendor contact and package details.": "优先走 iFinD 合作渠道；PM 需获取供应商联系人与套餐细节。",
+    "iFinD quant/data API documentation exists; exact package and entitlement require vendor confirmation.": "iFinD 量化/数据 API 文档存在；具体套餐与权限需供应商确认。",
+    "Enterprise contract required; confirm Linux/API availability and news/research entitlements.": "需要企业合同；需确认 Linux/API 可用性与新闻/研究权限。",
+    "Request details / free trial through LSEG product and developer portal pages.": "通过 LSEG 产品页和开发者门户申请详情或免费试用。",
+    "Reuters/LSEG News Service supports structured JSON, streaming, and request-response API surfaces.": "Reuters/LSEG News Service 支持结构化 JSON、流式和请求响应接口。",
+    "Enterprise contract and entitlement required; archives and redistribution terms must be confirmed.": "需要企业合同与授权；归档和转发条款必须确认。",
+    "Request a trial from RavenPack News Analytics product page.": "通过 RavenPack News Analytics 产品页申请试用。",
+    "News analytics product provides entity/event analytics; API/package details require trial confirmation.": "新闻分析产品提供实体/事件分析；接口与套餐细节需试用确认。",
+    "Enterprise contract required; confirm source coverage, history, redistribution, and usage limits.": "需要企业合同；需确认来源覆盖、历史数据、转发和使用限制。",
+    "Contact AlphaSense sales/support; API docs say to reach apisupport@alphasense.com to begin a trial.": "联系 AlphaSense 销售/支持；接口文档要求通过 apisupport@alphasense.com 开始试用。",
+    "AlphaSense developer docs describe API access; platform also lists ingestion API/connectors.": "AlphaSense 开发者文档描述了 API 访问方式，平台也列出摄取 API/连接器。",
+    "Subscription/package required; confirm API availability, content export rights, and broker research access.": "需要订阅/套餐；需确认 API 可用性、内容导出权利和券商研究访问。",
+    "Email licensing@benzinga.com, call 877-440-9464, or request access from Benzinga API pages.": "发送邮件到 licensing@benzinga.com、拨打 877-440-9464，或通过 Benzinga API 页面申请访问。",
+    "REST, TCP push, websocket, and documented newsfeed endpoints are available by subscription.": "订阅后可使用 REST、TCP 推送、websocket 和已文档化的新闻流端点。",
+    "Subscription/API key required; confirm redistribution, display rights, and endpoint entitlements.": "需要订阅/API key；需确认转发、展示权利和端点权限。",
+    "Start from Finnhub self-serve API key and pricing page; contact sales for production tiers.": "从 Finnhub 自助 API key 与价格页开始，生产级套餐联系销售。",
+    "Documented REST market-news endpoint and SDK examples are available.": "已有文档化的 REST 市场新闻端点和 SDK 示例。",
+    "Published self-serve and paid tiers exist; confirm news and transcript permissions for production use.": "已有公开自助与付费套餐；生产使用前需确认新闻与电话会文本权限。",
+    "PM must verify Tushare account score/permission and whether target news endpoints are enabled.": "PM 必须确认 Tushare 账号积分/权限，以及目标新闻端点是否开通。",
+    "Tushare Pro API availability is score/permission gated by endpoint.": "Tushare Pro API 按端点受积分/权限控制。",
+    "Permission points and frequency tiers apply; endpoint-specific news rights need live smoke confirmation.": "适用积分与频率档位；具体新闻端点权利需要实时检查确认。",
+}
+
 
 def build_narrative_source_decision_matrix(
     *,
@@ -111,13 +257,13 @@ def render_narrative_source_decision_matrix_html(matrix: dict[str, Any]) -> str:
             "<h1>叙事来源决策矩阵</h1>",
             '<section class="summary">',
             _html_kv("来源组", summary.get("source_group_count", 0)),
-            _html_kv("Provider / source", summary.get("provider_count", 0)),
-            _html_kv("Can-Do / Crawl Pilot", summary.get("can_do_or_crawl_pilot_count", 0)),
-            _html_kv("Paid Trial", summary.get("paid_trial_count", 0)),
-            _html_kv("PM investigation required", summary.get("pm_investigation_required_count", 0)),
-            "<p>FNI 不直接访问 provider；Gateway-owned 的 acquisition 由 stock-data-gateway 负责，FNI 只展示决策矩阵并消费治理后的 source events。</p>",
-            "<p>爬虫边界：不绕过 CAPTCHA，不使用 stealth browser，不做 proxy evasion，不采集 login-only 内容。</p>",
-            "<p>社交/社区仅作为热度或候选信号，不能在没有 trusted fact 支撑时 promoted 为事实。</p>",
+            _html_kv("供应商/来源", summary.get("provider_count", 0)),
+            _html_kv("可做或爬虫试点", summary.get("can_do_or_crawl_pilot_count", 0)),
+            _html_kv("付费试用", summary.get("paid_trial_count", 0)),
+            _html_kv("需 PM 调查", summary.get("pm_investigation_required_count", 0)),
+            "<p>FNI 不直接访问外部供应商；采集由 stock-data-gateway 负责，FNI 只展示决策矩阵并消费治理后的来源事件。</p>",
+            "<p>爬虫边界：不绕过 CAPTCHA，不使用隐身浏览器，不做代理规避，不采集仅登录可见内容。</p>",
+            "<p>社交/社区仅作为热度或候选信号，不能在没有可信事实支撑时晋级为事实。</p>",
             "</section>",
             _groups_table(_list(matrix.get("source_groups"))),
             _providers_table(_list(matrix.get("source_groups"))),
@@ -583,7 +729,7 @@ def _providers_table(groups: list[Any]) -> str:
         for provider in _list(_mapping(group).get("providers"))
     ]
     return _table(
-        "Provider / source 评估",
+        "供应商/来源评估",
         [_mapping(provider) for provider in providers],
         ("provider_id", "name", "decision_label", "owner_service", "output_role", "anti_bot_risk", "blocking_gate"),
     )
@@ -605,11 +751,11 @@ def _licensed_evaluation_table(groups: list[Any]) -> str:
         rows.append(
             {
                 "provider": mapped.get("name"),
-                "trial_contact_path": evaluation.get("trial_contact_path"),
-                "api_availability": evaluation.get("api_availability"),
-                "cost_contract_notes": evaluation.get("cost_contract_notes"),
+                "trial_contact_path": _display_text(evaluation.get("trial_contact_path")),
+                "api_availability": _display_text(evaluation.get("api_availability")),
+                "cost_contract_notes": _display_text(evaluation.get("cost_contract_notes")),
                 "dataset_categories": ", ".join(
-                    str(category) for category in _list(evaluation.get("dataset_categories"))
+                    _display_text(category) for category in _list(evaluation.get("dataset_categories"))
                 ),
                 "official_source_links": ", ".join(
                     str(_mapping(link).get("url"))
@@ -618,7 +764,7 @@ def _licensed_evaluation_table(groups: list[Any]) -> str:
             }
         )
     return _table(
-        "Provider trial/API 评估",
+        "供应商试用与接口评估",
         rows,
         (
             "provider",
@@ -633,7 +779,7 @@ def _licensed_evaluation_table(groups: list[Any]) -> str:
 
 def _contract_table(contract: dict[str, Any]) -> str:
     rows = [
-        {"field": key, "value": ", ".join(str(item) for item in value)}
+        {"field": _display_text(key), "value": "，".join(_display_text(item) for item in value)}
         for key, value in contract.items()
         if isinstance(value, list)
     ]
@@ -641,14 +787,23 @@ def _contract_table(contract: dict[str, Any]) -> str:
 
 
 def _table(title: str, rows: list[dict[str, Any]], columns: tuple[str, ...]) -> str:
-    header = "".join(f"<th>{_html_text(column)}</th>" for column in columns)
+    header = "".join(f"<th>{_html_text(_COLUMN_LABELS.get(column, column))}</th>" for column in columns)
     body = "".join(
         "<tr>"
-        + "".join(f"<td>{_html_text(row.get(column))}</td>" for column in columns)
+        + "".join(f"<td>{_html_text(_display_text(row.get(column)))}</td>" for column in columns)
         + "</tr>"
         for row in rows
     )
     return f"<section><h2>{_html_text(title)}</h2><table><thead><tr>{header}</tr></thead><tbody>{body}</tbody></table></section>"
+
+
+def _display_text(value: Any) -> str:
+    if isinstance(value, bool):
+        return "是" if value else "否"
+    if isinstance(value, list):
+        return "，".join(_display_text(item) for item in value)
+    text = str(value or "")
+    return _PHRASE_DISPLAY.get(text, _VALUE_DISPLAY.get(text, text))
 
 
 def _html_kv(label: str, value: Any) -> str:

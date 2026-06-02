@@ -4,6 +4,40 @@ from datetime import UTC, datetime
 from html import escape
 from typing import Any
 
+_TEXT_DISPLAY = {
+    "Trial First": "优先试用",
+    "Later": "稍后评估",
+    "Analytics Candidate": "新闻分析候选",
+    "Do Not Implement": "暂不实现",
+    "Controlled Pilot": "受控试点",
+    "High-risk/Do Not Crawl": "高风险/不要爬取",
+    "Unknown": "未确认",
+    "Official API": "官方 API",
+    "Commercial Access": "商业授权",
+    "vendor_quote_required": "需要供应商报价",
+    "endpoint entitlement list": "端点授权清单",
+    "qps/rate limit": "QPS 与限流规则",
+    "historical depth": "历史深度",
+    "redistribution/display terms": "转发与展示条款",
+    "cost band/vendor quote": "成本区间或供应商报价",
+    "credentialed API docs": "需凭证访问的 API 文档",
+    "news entitlement package": "新闻权限包",
+    "credentialed docs": "需凭证访问的文档",
+    "trial credentials": "试用凭证",
+    "production pricing": "生产价格",
+    "redistribution/display rights": "转发与展示权利",
+    "China coverage sample": "中国覆盖样例",
+    "Credentials, API docs, entitlement package, redistribution terms, and vendor quote are required.": (
+        "需要凭证、接口文档、授权包、转发条款和供应商报价。"
+    ),
+    "Provider docs, credentials, entitled endpoints, and display/redistribution rights are required.": (
+        "需要供应商文档、凭证、已授权端点，以及展示与转发权利。"
+    ),
+    "No crawler implementation until permission, robots/TOS, login, anti-bot, and retention status are confirmed.": (
+        "在权限、robots/服务条款、登录、反爬和留存状态确认前，不做爬虫实现。"
+    ),
+}
+
 
 def build_source_investigation_gate_pack(
     *,
@@ -53,21 +87,21 @@ def render_source_investigation_gate_pack_html(pack: dict[str, Any]) -> str:
             "<head>",
             '<meta charset="utf-8" />',
             '<meta name="viewport" content="width=device-width, initial-scale=1" />',
-            "<title>R13 来源调查 Gate Pack</title>",
+            "<title>R13 来源调查准入包</title>",
             "<style>",
             _html_styles(),
             "</style>",
             "</head>",
             "<body>",
             '<main class="page">',
-            "<h1>R13 来源调查 Gate Pack</h1>",
+            "<h1>R13 来源调查准入包</h1>",
             '<section class="summary">',
-            _html_kv("Issue", summary.get("issue_count")),
+            _html_kv("需求数", summary.get("issue_count")),
             _html_kv("候选来源", summary.get("candidate_count")),
-            _html_kv("Trial First", summary.get("trial_first_count")),
-            _html_kv("Controlled Pilot", summary.get("controlled_pilot_count")),
-            _html_kv("Developer work is blocked", summary.get("developer_blocked_count")),
-            "<p>决策过程：公开官方信息只能形成 trial gate，不足以派发 provider adapter 实现；缺 credentials、合同、权限、redistribution/display rights 时，developer work is blocked。</p>",
+            _html_kv("优先试用", summary.get("trial_first_count")),
+            _html_kv("受控试点", summary.get("controlled_pilot_count")),
+            _html_kv("开发接入暂不派发", summary.get("developer_blocked_count")),
+            "<p>决策过程：公开官方信息只能形成试用准入判断，不足以派发供应商适配器实现；缺少凭证、合同、权限、转发与展示条款时，开发接入暂不派发。</p>",
             "</section>",
             *[_section_html(_mapping(section)) for section in _list(pack.get("issue_sections"))],
             "</main>",
@@ -393,9 +427,9 @@ def _section_html(section: dict[str, Any]) -> str:
     rows = [_mapping(candidate) for candidate in _list(section.get("candidates"))]
     recommendation = _mapping(section.get("recommendation"))
     parts = [
-        f"<section><h2>{_html_text(section.get('linear_id'))}: {_html_text(section.get('title'))}</h2>",
-        f"<p><strong>Recommendation:</strong> {_html_text(recommendation)}</p>",
-        f"<p><strong>Developer work is blocked:</strong> {_html_text(_mapping(section.get('developer_gate')).get('reason'))}</p>",
+        f"<section><h2>{_html_text(section.get('linear_id'))}: {_html_text(_display_title(section.get('title')))}</h2>",
+        f"<p><strong>建议:</strong> {_html_text(_recommendation_text(recommendation))}</p>",
+        f"<p><strong>开发接入暂不派发:</strong> {_html_text(_display_text(_mapping(section.get('developer_gate')).get('reason')))}</p>",
         _candidate_table(rows),
         "</section>",
     ]
@@ -403,15 +437,48 @@ def _section_html(section: dict[str, Any]) -> str:
 
 
 def _candidate_table(rows: list[dict[str, Any]]) -> str:
-    columns = ("source_id", "name", "decision_label", "access_label", "cost_band", "missing_information")
-    header = "".join(f"<th>{_html_text(column)}</th>" for column in columns)
+    columns = (
+        ("source_id", "来源ID"),
+        ("name", "名称"),
+        ("decision_label", "决策标签"),
+        ("access_label", "访问标签"),
+        ("cost_band", "成本口径"),
+        ("missing_information", "缺口信息"),
+    )
+    header = "".join(f"<th>{_html_text(label)}</th>" for _, label in columns)
     body = "".join(
         "<tr>"
-        + "".join(f"<td>{_html_text(_cell(row.get(column)))}</td>" for column in columns)
+        + "".join(f"<td>{_html_text(_display_text(_cell(row.get(column))))}</td>" for column, _ in columns)
         + "</tr>"
         for row in rows
     )
     return f"<table><thead><tr>{header}</tr></thead><tbody>{body}</tbody></table>"
+
+
+def _display_title(value: Any) -> str:
+    return {
+        "China paid provider trial checklist: iFinD, Choice, Wind": "中国付费数据服务试用清单：iFinD、Choice、Wind",
+        "Global paid news analytics trial checklist": "全球付费新闻与新闻分析试用清单",
+        "China community and social source access investigation": "中国社区与社交来源准入调查",
+    }.get(str(value or ""), str(value or ""))
+
+
+def _recommendation_text(recommendation: dict[str, Any]) -> str:
+    decision = str(recommendation.get("decision") or "")
+    if decision == "trial_first":
+        return "优先试用 Choice。公开联系路径与 API 能力证据较清楚，但 PM 仍需补齐供应商报价、转发条款和需凭证访问的文档。"
+    if decision == "ranked_trial_targets":
+        return "全球付费新闻按三类推进：LSEG / Reuters 用于专业原始新闻，RavenPack 用于事件分析，Benzinga 作为成本较低的开发者接口候选。"
+    if decision == "controlled_pilot_only_for_weibo_official_api":
+        return "只有官方 API 或商业授权可进入受控热度信号试点；雪球与东方财富股吧在权限确认前不做爬虫实现。"
+    return _display_text(recommendation)
+
+
+def _display_text(value: Any) -> str:
+    if isinstance(value, list):
+        return "，".join(_display_text(item) for item in value)
+    text = str(value or "")
+    return _TEXT_DISPLAY.get(text, text)
 
 
 def _cell(value: Any) -> str:

@@ -114,13 +114,17 @@ def test_investigation_gate_pack_html_is_chinese_and_records_decisions():
         build_source_investigation_gate_pack()
     )
 
-    assert "<h1>R13 来源调查 Gate Pack</h1>" in html
+    assert "<h1>R13 来源调查准入包</h1>" in html
     assert "MIK-240" in html
     assert "Choice" in html
     assert "LSEG / Reuters" in html
     assert "雪球" in html
-    assert "Developer work is blocked" in html
+    assert "开发接入暂不派发" in html
     assert "决策过程" in html
+    assert "Developer work is blocked" not in html
+    assert "Trial First" not in html
+    assert "decision_label" not in html
+    assert "Recommendation" not in html
 
 
 def test_source_investigation_gate_pack_cli_writes_json_and_html(tmp_path):
@@ -131,7 +135,7 @@ def test_source_investigation_gate_pack_cli_writes_json_and_html(tmp_path):
 
     assert exit_code == 0
     assert payload["summary"]["issue_count"] == 3
-    assert "<h1>R13 来源调查 Gate Pack</h1>" in (
+    assert "<h1>R13 来源调查准入包</h1>" in (
         tmp_path / "source_investigation_gate_pack.html"
     ).read_text()
 

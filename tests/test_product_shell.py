@@ -84,6 +84,8 @@ def test_route_registry_preview_is_human_readable_chinese_html():
     assert "叙事质量审计" in html
     assert "数据来源" in html
     assert "不在产品壳内重算评分" in html
+    assert "Generated artifacts" not in html
+    assert "live_api" not in html
 
 
 def test_narrative_data_snapshot_reads_existing_service_artifacts(tmp_path):
@@ -227,9 +229,11 @@ def test_artifact_index_html_preview_lists_artifacts_in_chinese(tmp_path):
     )
 
     assert "<h1>产物索引预览</h1>" in html
-    assert "Narrative quality audit" in html
+    assert "叙事质量审计" in html
     assert "HTML 路径" in html
     assert "JSON 路径" in html
+    assert "Surface" not in html
+    assert "Status" not in html
 
 
 def test_product_shell_home_and_artifact_browser_use_registry_and_index(tmp_path):
@@ -276,10 +280,13 @@ def test_product_shell_home_and_artifact_browser_use_registry_and_index(tmp_path
     assert "<h1>Fund Narrative Intelligence 产品首页</h1>" in home
     assert "真实叙事数据" in home
     assert "正式叙事: 2" in home
-    assert "Generated artifacts" in home
+    assert "生成产物" in home
     assert "<h1>产物浏览器</h1>" in browser
     assert "portfolio_narrative_workspace.html" in browser
     assert "不在页面内重算雷达、质量或组合指标" in home
+    assert "Generated artifacts" not in home
+    assert "Surface" not in browser
+    assert "Status" not in browser
 
 
 def test_build_product_shell_cli_writes_registry_index_home_and_browser(tmp_path):

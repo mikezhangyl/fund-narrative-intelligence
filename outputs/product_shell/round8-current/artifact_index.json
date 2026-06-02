@@ -6931,24 +6931,24 @@
       "warning_count": 0
     },
     {
-      "artifact_id": "ART_6cdb951aec",
-      "artifact_type": "narrative_source_decision_matrix",
+      "artifact_id": "ART_086b2ce5af",
+      "artifact_type": "source_investigation_gate_pack",
       "freshness_status": "completed",
-      "generated_at": "2026-06-02T02:28:36.959841+00:00",
-      "html_path": "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.html",
-      "json_path": "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.json",
+      "generated_at": "2026-06-02T06:54:02+00:00",
+      "html_path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.html",
+      "json_path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.json",
       "run_id": "current",
       "source_mode": "generated_artifact",
       "status": "completed",
       "superseded": false,
-      "surface": "Narrative Source Decision Matrix",
+      "surface": "Source Investigation Gate Pack",
       "warning_count": 0
     },
     {
       "artifact_id": "ART_ba964c02c5",
       "artifact_type": "tushare_news_permission_smoke",
       "freshness_status": "Blocked",
-      "generated_at": "2026-06-02T05:10:36+00:00",
+      "generated_at": "2026-06-02T06:54:02+00:00",
       "html_path": "outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.html",
       "json_path": "outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.json",
       "run_id": "current",
@@ -6959,10 +6959,24 @@
       "warning_count": 0
     },
     {
+      "artifact_id": "ART_6cdb951aec",
+      "artifact_type": "narrative_source_decision_matrix",
+      "freshness_status": "completed",
+      "generated_at": "2026-06-02T06:54:02.093693+00:00",
+      "html_path": "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.html",
+      "json_path": "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.json",
+      "run_id": "current",
+      "source_mode": "generated_artifact",
+      "status": "completed",
+      "superseded": false,
+      "surface": "Narrative Source Decision Matrix",
+      "warning_count": 0
+    },
+    {
       "artifact_id": "ART_db365f1d06",
       "artifact_type": "source_quality_dashboard",
       "freshness_status": "degraded",
-      "generated_at": "2026-06-02T05:11:22+00:00",
+      "generated_at": "2026-06-02T06:59:15+00:00",
       "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
       "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
       "run_id": "round8-current",
@@ -6976,7 +6990,7 @@
       "artifact_id": "ART_c8e257234f",
       "artifact_type": "route_registry",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-02T05:11:22.009666+00:00",
+      "generated_at": "2026-06-02T06:59:15.356582+00:00",
       "html_path": "outputs/product_shell/round8-current/route_registry.html",
       "json_path": "outputs/product_shell/round8-current/route_registry.json",
       "run_id": "round8-current",
@@ -6990,7 +7004,7 @@
       "artifact_id": "ART_7c5a672725",
       "artifact_type": "artifact_index",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-02T05:11:22.285460+00:00",
+      "generated_at": "2026-06-02T06:59:15.594985+00:00",
       "html_path": "outputs/product_shell/round8-current/artifact_index.html",
       "json_path": "outputs/product_shell/round8-current/artifact_index.json",
       "run_id": "round8-current",
@@ -6998,13 +7012,13 @@
       "status": "unknown",
       "superseded": false,
       "surface": "Artifact index",
-      "warning_count": 62
+      "warning_count": 70
     },
     {
       "artifact_id": "ART_ede2f575bd",
       "artifact_type": "narrative_data",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-02T05:11:22.287545+00:00",
+      "generated_at": "2026-06-02T06:59:15.596877+00:00",
       "html_path": "outputs/product_shell/round8-current/narrative_data.html",
       "json_path": "outputs/product_shell/round8-current/narrative_data.json",
       "run_id": "round8-current",
@@ -7018,7 +7032,7 @@
       "artifact_id": "ART_095cab5d36",
       "artifact_type": "config_preflight",
       "freshness_status": "ok",
-      "generated_at": "2026-06-02T05:11:22.287725+00:00",
+      "generated_at": "2026-06-02T06:59:15.597064+00:00",
       "html_path": "outputs/product_shell/round8-current/config_preflight.html",
       "json_path": "outputs/product_shell/round8-current/config_preflight.json",
       "run_id": "round8-current",
@@ -7032,7 +7046,7 @@
       "artifact_id": "ART_bf6182f460",
       "artifact_type": "product_shell",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-02T05:11:22.289360+00:00",
+      "generated_at": "2026-06-02T06:59:15.598676+00:00",
       "html_path": "",
       "json_path": "outputs/product_shell/round8-current/product_shell.json",
       "run_id": "round8-current",
@@ -7041,23 +7055,9 @@
       "superseded": false,
       "surface": "Product shell",
       "warning_count": 0
-    },
-    {
-      "artifact_id": "ART_086b2ce5af",
-      "artifact_type": "source_investigation_gate_pack",
-      "freshness_status": "completed",
-      "generated_at": "2026-06-02T05:22:57+00:00",
-      "html_path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.html",
-      "json_path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.json",
-      "run_id": "current",
-      "source_mode": "generated_artifact",
-      "status": "completed",
-      "superseded": false,
-      "surface": "Source Investigation Gate Pack",
-      "warning_count": 0
     }
   ],
-  "generated_at": "2026-06-02T05:23:06.433328+00:00",
+  "generated_at": "2026-06-02T07:00:17.681392+00:00",
   "output_root": "outputs",
   "redaction_policy": {
     "excluded_path_categories": [
@@ -7070,7 +7070,7 @@
     "html_link_count": 95,
     "json_link_count": 504,
     "stale_or_superseded_count": 344,
-    "warning_count": 64
+    "warning_count": 72
   },
   "version": "product-shell-artifact-index-v1"
 }

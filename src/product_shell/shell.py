@@ -4,6 +4,74 @@ from datetime import UTC, datetime
 from html import escape
 from typing import Any
 
+VALUE_DISPLAY = {
+    "unknown": "未知",
+    "completed": "已完成",
+    "ok": "正常",
+    "passed": "通过",
+    "pass": "通过",
+    "partial": "部分完成",
+    "degraded": "已降级",
+    "Blocked": "已阻塞",
+    "blocked": "已阻塞",
+    "missing": "缺失",
+    "fresh": "新鲜",
+    "breached": "已超期",
+    "generated": "已生成",
+    "artifact_reported": "产物报告",
+    "service_reported": "服务报告",
+    "generated_artifact": "生成产物",
+    "live_api": "实时 API",
+    "fixture_demo": "示例产物",
+    "narrative_service": "叙事服务",
+    "Narrative quality audit": "叙事质量审计",
+    "Portfolio narrative workspace": "组合叙事工作台",
+    "Production readiness assistant": "生产就绪助手",
+    "Product shell": "产品壳",
+    "Product shell route registry": "产品壳路由注册表",
+    "Artifact index": "产物索引",
+    "Source Investigation Gate Pack": "来源调查准入包",
+    "Tushare News Permission Smoke": "Tushare 新闻权限实时检查",
+    "Narrative Source Decision Matrix": "叙事来源决策矩阵",
+    "Source Quality Dashboard": "来源质量仪表盘",
+    "Narrative Data": "真实叙事数据",
+    "Config Preflight": "配置与预检",
+    "Workspace State": "本地工作区状态",
+    "Workspace Export": "工作区导出包",
+    "Real Fund Smoke Summary": "真实基金冒烟摘要",
+    "Announcement Evidence Smoke Summary": "公告证据冒烟摘要",
+    "Candidate Review Action Act Reject Persist Test Persistence": "候选复核拒绝操作持久化测试",
+    "Narrative Governance Audit Export": "叙事治理审计导出",
+    "Narrative Service Provider Smoke": "叙事服务供应商冒烟",
+    "Narrative Service Conformance Report": "叙事服务契约符合性报告",
+    "Fund Holding Exposure Report": "基金持仓暴露报告",
+    "Acceptance Summary": "验收摘要",
+    "Review Actions": "复核操作",
+    "Live Validation Dashboard": "实时验证仪表盘",
+    "Narrative Source Gateway Probe": "叙事来源网关探测",
+    "Source Governance Report": "来源治理报告",
+    "Source Schema V2 Report": "来源结构 v2 报告",
+    "Source Reliability Report": "来源可靠性报告",
+    "Source Feasibility Matrix": "来源可行性矩阵",
+    "Cninfo Disclosure Events": "巨潮公告事件",
+    "Public News Context": "公共新闻上下文",
+    "Sec Edgar Source Smoke": "SEC EDGAR 来源冒烟",
+    "Stocktwits Heat Signal": "Stocktwits 热度信号",
+    "Fresh Narrative Digest": "最新叙事摘要",
+    "Narrative Timeline Search": "叙事时间线搜索",
+    "Narrative Evidence Graph": "叙事证据图谱",
+    "Release Manifest": "发布清单",
+    "Acceptance Checklist": "验收检查表",
+    "Narrative Research Export Pack": "叙事研究导出包",
+    "Historical Replay Run": "历史回放运行",
+    "Replay Stability Evaluation": "回放稳定性评估",
+    "Replay Alert Review": "回放告警复核",
+    "Collaboration Handoff Bundle": "协作交接包",
+    "Backup Restore Archive Manifest": "备份恢复归档清单",
+    "Operator Release Readiness": "操作员发布就绪",
+    "persisted": "已持久化",
+}
+
 
 def build_product_shell_payload(
     *,
@@ -143,11 +211,10 @@ def _route_cards(routes: list[Any]) -> str:
         cards.append(
             '<article class="card">'
             f"<h2>{_html_text(row.get('label_zh'))}</h2>"
-            f"<p>{_html_text(row.get('label_en'))}</p>"
-            f"<p><strong>Route:</strong> {_html_text(row.get('path'))}</p>"
-            f"<p><strong>Owner:</strong> {_html_text(row.get('owner_service'))}</p>"
-            f"<p><strong>Data:</strong> {_html_text(data_source.get('type'))} / {_html_text(data_source.get('freshness_status'))}</p>"
-            f"<p><strong>Source:</strong> {_html_text(data_source.get('source'))}</p>"
+            f"<p><strong>路由:</strong> {_html_text(row.get('path'))}</p>"
+            f"<p><strong>负责人:</strong> {_html_text(row.get('owner_service'))}</p>"
+            f"<p><strong>数据:</strong> {_html_text(_display_value(data_source.get('type')))} / {_html_text(_display_value(data_source.get('freshness_status')))}</p>"
+            f"<p><strong>来源:</strong> {_html_text(data_source.get('source'))}</p>"
             "</article>"
         )
     return f"<section><h2>导航</h2><div class=\"cards\">{''.join(cards)}</div></section>"
@@ -159,14 +226,14 @@ def _artifact_table(artifacts: list[Any]) -> str:
         return "<section><h2>产物列表</h2><p>没有找到可展示产物。</p></section>"
     header = "".join(
         f"<th>{_html_text(label)}</th>"
-        for label in ("Surface", "Run", "Status", "Freshness", "HTML", "JSON")
+        for label in ("产物", "运行", "状态", "新鲜度", "HTML", "JSON")
     )
     body = "".join(
         "<tr>"
-        f"<td>{_html_text(row.get('surface'))}</td>"
+        f"<td>{_html_text(_display_value(row.get('surface')))}</td>"
         f"<td>{_html_text(row.get('run_id'))}</td>"
-        f"<td>{_html_text(row.get('status'))}</td>"
-        f"<td>{_html_text(row.get('freshness_status'))}</td>"
+        f"<td>{_html_text(_display_value(row.get('status')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('freshness_status')))}</td>"
         f"<td>{_html_text(row.get('html_path'))}</td>"
         f"<td>{_html_text(row.get('json_path'))}</td>"
         "</tr>"
@@ -177,6 +244,35 @@ def _artifact_table(artifacts: list[Any]) -> str:
 
 def _html_kv(label: str, value: Any) -> str:
     return f"<p><strong>{_html_text(label)}:</strong> {_html_text(value)}</p>"
+
+
+def _display_value(value: Any) -> str:
+    if isinstance(value, bool):
+        return "是" if value else "否"
+    text = str(value or "")
+    fund_surface = _fund_surface_display(text)
+    if fund_surface:
+        return fund_surface
+    return VALUE_DISPLAY.get(text, text)
+
+
+def _fund_surface_display(text: str) -> str:
+    parts = text.split()
+    if len(parts) >= 3 and parts[0] == "Fund" and parts[1].isdigit():
+        suffix = " ".join(parts[2:])
+        suffix_display = {
+            "Raw": "原始数据",
+            "Scoring": "评分",
+            "Review Queue": "复核队列",
+            "Manifest": "清单",
+            "Source Table": "来源表",
+            "Workspace Snapshot": "工作区快照",
+            "Signal Trace": "信号追踪",
+            "Demo": "演示页",
+        }.get(suffix)
+        if suffix_display:
+            return f"基金 {parts[1]} {suffix_display}"
+    return ""
 
 
 def _html_styles() -> str:
