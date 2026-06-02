@@ -1,0 +1,54 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/operator_release_readiness/current/operator_release_readiness.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "2b96d2324a12423bb03b3f487b57a792ffede9a4ee29a67e6b615628c14eb36f",
+      "mtime_epoch": 1780362435,
+      "size_bytes": 3463,
+      "summary": "Operator release readiness JSON."
+    },
+    {
+      "type": "html",
+      "path": "outputs/operator_release_readiness/current/operator_release_readiness.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "07ab343465e0903ed00ddb63716bd79885d011e49e765c0cef3002b1bd059816",
+      "mtime_epoch": 1780362435,
+      "size_bytes": 2719,
+      "summary": "Canonical Chinese operator release readiness report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "954386bc9b9cedd619fad32910b8dd6d22a7c09ef175bf13530883081769a2db",
+      "mtime_epoch": 1780362435,
+      "size_bytes": 18820,
+      "summary": "Product shell route registry including /governance/release-readiness."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "565a496631260670e1bf861d4f8917383cae9a1eb70cb5725c02d260853c553b",
+      "mtime_epoch": 1780362435,
+      "size_bytes": 401309,
+      "summary": "Product shell payload including release readiness artifact."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "48f4c239289841f899a3d056be0ed2a846c3d014ad0dcc41139756e433557d7c",
+      "mtime_epoch": 1780362435,
+      "size_bytes": 274234,
+      "summary": "Artifact index including operator release readiness outputs."
+    }
+  ]
+}

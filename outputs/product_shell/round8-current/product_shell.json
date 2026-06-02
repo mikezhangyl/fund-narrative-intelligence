@@ -6904,24 +6904,10 @@
         "warning_count": 0
       },
       {
-        "artifact_id": "ART_c8e257234f",
-        "artifact_type": "route_registry",
-        "freshness_status": "unknown",
-        "generated_at": "2026-06-02T00:40:35.985278+00:00",
-        "html_path": "outputs/product_shell/round8-current/route_registry.html",
-        "json_path": "outputs/product_shell/round8-current/route_registry.json",
-        "run_id": "round8-current",
-        "source_mode": "generated_artifact",
-        "status": "unknown",
-        "superseded": false,
-        "surface": "Product shell route registry",
-        "warning_count": 0
-      },
-      {
         "artifact_id": "ART_db365f1d06",
         "artifact_type": "source_quality_dashboard",
         "freshness_status": "degraded",
-        "generated_at": "2026-06-02T00:40:36+00:00",
+        "generated_at": "2026-06-02T00:53:10+00:00",
         "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
         "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
         "run_id": "round8-current",
@@ -6929,62 +6915,6 @@
         "status": "degraded",
         "superseded": false,
         "surface": "Source Quality Dashboard",
-        "warning_count": 0
-      },
-      {
-        "artifact_id": "ART_7c5a672725",
-        "artifact_type": "artifact_index",
-        "freshness_status": "unknown",
-        "generated_at": "2026-06-02T00:40:36.274135+00:00",
-        "html_path": "outputs/product_shell/round8-current/artifact_index.html",
-        "json_path": "outputs/product_shell/round8-current/artifact_index.json",
-        "run_id": "round8-current",
-        "source_mode": "generated_artifact",
-        "status": "unknown",
-        "superseded": false,
-        "surface": "Artifact index",
-        "warning_count": 50
-      },
-      {
-        "artifact_id": "ART_ede2f575bd",
-        "artifact_type": "narrative_data",
-        "freshness_status": "unknown",
-        "generated_at": "2026-06-02T00:40:36.276340+00:00",
-        "html_path": "outputs/product_shell/round8-current/narrative_data.html",
-        "json_path": "outputs/product_shell/round8-current/narrative_data.json",
-        "run_id": "round8-current",
-        "source_mode": "generated_artifact",
-        "status": "unknown",
-        "superseded": false,
-        "surface": "Narrative Data",
-        "warning_count": 0
-      },
-      {
-        "artifact_id": "ART_095cab5d36",
-        "artifact_type": "config_preflight",
-        "freshness_status": "ok",
-        "generated_at": "2026-06-02T00:40:36.276537+00:00",
-        "html_path": "outputs/product_shell/round8-current/config_preflight.html",
-        "json_path": "outputs/product_shell/round8-current/config_preflight.json",
-        "run_id": "round8-current",
-        "source_mode": "generated_artifact",
-        "status": "ok",
-        "superseded": false,
-        "surface": "Config Preflight",
-        "warning_count": 0
-      },
-      {
-        "artifact_id": "ART_bf6182f460",
-        "artifact_type": "product_shell",
-        "freshness_status": "unknown",
-        "generated_at": "2026-06-02T00:40:36.278294+00:00",
-        "html_path": "",
-        "json_path": "outputs/product_shell/round8-current/product_shell.json",
-        "run_id": "round8-current",
-        "source_mode": "generated_artifact",
-        "status": "unknown",
-        "superseded": false,
-        "surface": "Product shell",
         "warning_count": 0
       },
       {
@@ -7000,9 +6930,93 @@
         "superseded": false,
         "surface": "Backup Restore Archive Manifest",
         "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_c8e257234f",
+        "artifact_type": "route_registry",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-02T00:53:10.562002+00:00",
+        "html_path": "outputs/product_shell/round8-current/route_registry.html",
+        "json_path": "outputs/product_shell/round8-current/route_registry.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Product shell route registry",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_7c5a672725",
+        "artifact_type": "artifact_index",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-02T00:53:10.853911+00:00",
+        "html_path": "outputs/product_shell/round8-current/artifact_index.html",
+        "json_path": "outputs/product_shell/round8-current/artifact_index.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Artifact index",
+        "warning_count": 52
+      },
+      {
+        "artifact_id": "ART_ede2f575bd",
+        "artifact_type": "narrative_data",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-02T00:53:10.855917+00:00",
+        "html_path": "outputs/product_shell/round8-current/narrative_data.html",
+        "json_path": "outputs/product_shell/round8-current/narrative_data.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Narrative Data",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_095cab5d36",
+        "artifact_type": "config_preflight",
+        "freshness_status": "ok",
+        "generated_at": "2026-06-02T00:53:10.856130+00:00",
+        "html_path": "outputs/product_shell/round8-current/config_preflight.html",
+        "json_path": "outputs/product_shell/round8-current/config_preflight.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "ok",
+        "superseded": false,
+        "surface": "Config Preflight",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_bf6182f460",
+        "artifact_type": "product_shell",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-02T00:53:10.857775+00:00",
+        "html_path": "",
+        "json_path": "outputs/product_shell/round8-current/product_shell.json",
+        "run_id": "round8-current",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Product shell",
+        "warning_count": 0
+      },
+      {
+        "artifact_id": "ART_07844a5128",
+        "artifact_type": "operator_release_readiness",
+        "freshness_status": "unknown",
+        "generated_at": "2026-06-02T01:07:15.042619+00:00",
+        "html_path": "outputs/operator_release_readiness/current/operator_release_readiness.html",
+        "json_path": "outputs/operator_release_readiness/current/operator_release_readiness.json",
+        "run_id": "current",
+        "source_mode": "generated_artifact",
+        "status": "unknown",
+        "superseded": false,
+        "surface": "Operator Release Readiness",
+        "warning_count": 0
       }
     ],
-    "generated_at": "2026-06-02T00:53:10.853911+00:00",
+    "generated_at": "2026-06-02T01:07:15.370796+00:00",
     "output_root": "outputs",
     "redaction_policy": {
       "excluded_path_categories": [
@@ -7011,16 +7025,16 @@
       ]
     },
     "summary": {
-      "artifact_count": 500,
-      "html_link_count": 91,
-      "json_link_count": 500,
+      "artifact_count": 501,
+      "html_link_count": 92,
+      "json_link_count": 501,
       "stale_or_superseded_count": 344,
-      "warning_count": 52
+      "warning_count": 54
     },
     "version": "product-shell-artifact-index-v1"
   },
   "client_policy_notice": "不在页面内重算雷达、质量或组合指标；页面只读取服务 API 或生成产物。",
-  "generated_at": "2026-06-02T00:53:10.857775+00:00",
+  "generated_at": "2026-06-02T01:07:15.375007+00:00",
   "narrative_data": {
     "candidate_narratives": [
       {
@@ -7604,7 +7618,7 @@
       }
     ],
     "formula_version": "evidence-quality-deterministic-v1",
-    "generated_at": "2026-06-02T00:53:10.855917+00:00",
+    "generated_at": "2026-06-02T01:07:15.372970+00:00",
     "narratives": [
       {
         "aliases": [
@@ -9646,7 +9660,7 @@
     "version": "product-shell-narrative-data-v1"
   },
   "route_registry": {
-    "generated_at": "2026-06-02T00:53:10.562002+00:00",
+    "generated_at": "2026-06-02T01:07:15.096247+00:00",
     "global_client_policy": {
       "business_logic_location": "service_or_artifact_only",
       "provider_access_allowed": false,
@@ -10006,6 +10020,32 @@
         "data_source": {
           "degradation_status": "ok",
           "freshness_status": "artifact_reported",
+          "html_path": "outputs/operator_release_readiness/current/operator_release_readiness.html",
+          "json_path": "outputs/operator_release_readiness/current/operator_release_readiness.json",
+          "source": "outputs/operator_release_readiness/current/",
+          "type": "generated_artifact"
+        },
+        "label_en": "Operator onboarding and release notes",
+        "label_zh": "操作员上线指引与发布说明",
+        "owner_service": "FNI",
+        "path": "/governance/release-readiness",
+        "route_id": "operator_release_readiness"
+      },
+      {
+        "client_policy": {
+          "forbidden_logic": [
+            "provider_access",
+            "narrative_scoring",
+            "quality_scoring",
+            "portfolio_aggregation",
+            "trading_recommendation"
+          ],
+          "provider_access_allowed": false,
+          "score_recomputation_allowed": false
+        },
+        "data_source": {
+          "degradation_status": "ok",
+          "freshness_status": "artifact_reported",
           "html_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.html",
           "json_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
           "source": "outputs/portfolio_narrative_workspace/",
@@ -10151,22 +10191,22 @@
     "summary": {
       "degraded_route_count": 0,
       "fixture_demo_route_count": 0,
-      "generated_artifact_route_count": 17,
+      "generated_artifact_route_count": 18,
       "live_api_route_count": 2,
-      "route_count": 19
+      "route_count": 20
     },
     "version": "product-shell-route-registry-v1"
   },
   "summary": {
-    "artifact_count": 500,
+    "artifact_count": 501,
     "candidate_narrative_count": 2,
     "evidence_pack_count": 3,
     "extraction_issue_count": 3,
-    "generated_artifact_route_count": 17,
+    "generated_artifact_route_count": 18,
     "live_api_route_count": 2,
     "narrative_count": 15,
     "quality_issue_count": 2,
-    "route_count": 19,
+    "route_count": 20,
     "stock_mapping_count": 56,
     "workspace_saved_view_count": 1
   },

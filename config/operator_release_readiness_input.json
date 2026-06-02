@@ -1,0 +1,9 @@
+{
+  "release_id": "r12-collaboration-readiness-local",
+  "source_artifacts": [
+    "outputs/collaboration_handoff/current/collaboration_handoff_bundle.json",
+    "outputs/backup_restore_archive/current/backup_restore_archive_manifest.json",
+    "outputs/backup_restore_archive/current/backup_restore_archive.zip"
+  ],
+  "version": "2026.06.02"
+}

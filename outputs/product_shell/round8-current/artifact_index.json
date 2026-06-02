@@ -6903,24 +6903,10 @@
       "warning_count": 0
     },
     {
-      "artifact_id": "ART_c8e257234f",
-      "artifact_type": "route_registry",
-      "freshness_status": "unknown",
-      "generated_at": "2026-06-02T00:40:35.985278+00:00",
-      "html_path": "outputs/product_shell/round8-current/route_registry.html",
-      "json_path": "outputs/product_shell/round8-current/route_registry.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "unknown",
-      "superseded": false,
-      "surface": "Product shell route registry",
-      "warning_count": 0
-    },
-    {
       "artifact_id": "ART_db365f1d06",
       "artifact_type": "source_quality_dashboard",
       "freshness_status": "degraded",
-      "generated_at": "2026-06-02T00:40:36+00:00",
+      "generated_at": "2026-06-02T00:53:10+00:00",
       "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
       "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
       "run_id": "round8-current",
@@ -6928,62 +6914,6 @@
       "status": "degraded",
       "superseded": false,
       "surface": "Source Quality Dashboard",
-      "warning_count": 0
-    },
-    {
-      "artifact_id": "ART_7c5a672725",
-      "artifact_type": "artifact_index",
-      "freshness_status": "unknown",
-      "generated_at": "2026-06-02T00:40:36.274135+00:00",
-      "html_path": "outputs/product_shell/round8-current/artifact_index.html",
-      "json_path": "outputs/product_shell/round8-current/artifact_index.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "unknown",
-      "superseded": false,
-      "surface": "Artifact index",
-      "warning_count": 50
-    },
-    {
-      "artifact_id": "ART_ede2f575bd",
-      "artifact_type": "narrative_data",
-      "freshness_status": "unknown",
-      "generated_at": "2026-06-02T00:40:36.276340+00:00",
-      "html_path": "outputs/product_shell/round8-current/narrative_data.html",
-      "json_path": "outputs/product_shell/round8-current/narrative_data.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "unknown",
-      "superseded": false,
-      "surface": "Narrative Data",
-      "warning_count": 0
-    },
-    {
-      "artifact_id": "ART_095cab5d36",
-      "artifact_type": "config_preflight",
-      "freshness_status": "ok",
-      "generated_at": "2026-06-02T00:40:36.276537+00:00",
-      "html_path": "outputs/product_shell/round8-current/config_preflight.html",
-      "json_path": "outputs/product_shell/round8-current/config_preflight.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "ok",
-      "superseded": false,
-      "surface": "Config Preflight",
-      "warning_count": 0
-    },
-    {
-      "artifact_id": "ART_bf6182f460",
-      "artifact_type": "product_shell",
-      "freshness_status": "unknown",
-      "generated_at": "2026-06-02T00:40:36.278294+00:00",
-      "html_path": "",
-      "json_path": "outputs/product_shell/round8-current/product_shell.json",
-      "run_id": "round8-current",
-      "source_mode": "generated_artifact",
-      "status": "unknown",
-      "superseded": false,
-      "surface": "Product shell",
       "warning_count": 0
     },
     {
@@ -6999,9 +6929,93 @@
       "superseded": false,
       "surface": "Backup Restore Archive Manifest",
       "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_c8e257234f",
+      "artifact_type": "route_registry",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-02T00:53:10.562002+00:00",
+      "html_path": "outputs/product_shell/round8-current/route_registry.html",
+      "json_path": "outputs/product_shell/round8-current/route_registry.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Product shell route registry",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_7c5a672725",
+      "artifact_type": "artifact_index",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-02T00:53:10.853911+00:00",
+      "html_path": "outputs/product_shell/round8-current/artifact_index.html",
+      "json_path": "outputs/product_shell/round8-current/artifact_index.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Artifact index",
+      "warning_count": 52
+    },
+    {
+      "artifact_id": "ART_ede2f575bd",
+      "artifact_type": "narrative_data",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-02T00:53:10.855917+00:00",
+      "html_path": "outputs/product_shell/round8-current/narrative_data.html",
+      "json_path": "outputs/product_shell/round8-current/narrative_data.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Narrative Data",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_095cab5d36",
+      "artifact_type": "config_preflight",
+      "freshness_status": "ok",
+      "generated_at": "2026-06-02T00:53:10.856130+00:00",
+      "html_path": "outputs/product_shell/round8-current/config_preflight.html",
+      "json_path": "outputs/product_shell/round8-current/config_preflight.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "ok",
+      "superseded": false,
+      "surface": "Config Preflight",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_bf6182f460",
+      "artifact_type": "product_shell",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-02T00:53:10.857775+00:00",
+      "html_path": "",
+      "json_path": "outputs/product_shell/round8-current/product_shell.json",
+      "run_id": "round8-current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Product shell",
+      "warning_count": 0
+    },
+    {
+      "artifact_id": "ART_07844a5128",
+      "artifact_type": "operator_release_readiness",
+      "freshness_status": "unknown",
+      "generated_at": "2026-06-02T01:07:15.042619+00:00",
+      "html_path": "outputs/operator_release_readiness/current/operator_release_readiness.html",
+      "json_path": "outputs/operator_release_readiness/current/operator_release_readiness.json",
+      "run_id": "current",
+      "source_mode": "generated_artifact",
+      "status": "unknown",
+      "superseded": false,
+      "surface": "Operator Release Readiness",
+      "warning_count": 0
     }
   ],
-  "generated_at": "2026-06-02T00:53:10.853911+00:00",
+  "generated_at": "2026-06-02T01:07:15.370796+00:00",
   "output_root": "outputs",
   "redaction_policy": {
     "excluded_path_categories": [
@@ -7010,11 +7024,11 @@
     ]
   },
   "summary": {
-    "artifact_count": 500,
-    "html_link_count": 91,
-    "json_link_count": 500,
+    "artifact_count": 501,
+    "html_link_count": 92,
+    "json_link_count": 501,
     "stale_or_superseded_count": 344,
-    "warning_count": 52
+    "warning_count": 54
   },
   "version": "product-shell-artifact-index-v1"
 }

@@ -1,0 +1,112 @@
+{
+  "compatibility_table": [
+    {
+      "compatibility": "compatible",
+      "component": "product_shell",
+      "version": "round8-current"
+    },
+    {
+      "compatibility": "new_non_breaking",
+      "component": "collaboration_handoff",
+      "version": "collaboration-handoff-bundle-v1"
+    },
+    {
+      "compatibility": "new_non_breaking",
+      "component": "backup_restore_archive",
+      "version": "backup-restore-archive-v1"
+    }
+  ],
+  "contract": {
+    "breaking_change_disclosure_required": true,
+    "external_identity_provider_required": false,
+    "hosted_saas_deployment_required": false,
+    "local_deterministic_mode_preserved": true
+  },
+  "generated_at": "2026-06-02T01:07:15.042619+00:00",
+  "known_limitations": [
+    {
+      "description": "Roles are local placeholders, not external identity enforcement.",
+      "limitation_id": "local-role-placeholders",
+      "severity": "expected"
+    },
+    {
+      "description": "Backup archive contains selected readiness artifacts, not every historical output.",
+      "limitation_id": "selected-archive-scope",
+      "severity": "expected"
+    },
+    {
+      "description": "Restore overwrite is documented as a validation contract and remains manual.",
+      "limitation_id": "manual-restore",
+      "severity": "expected"
+    }
+  ],
+  "release_metadata": {
+    "release_id": "r12-collaboration-readiness-local",
+    "source_artifacts": [
+      "outputs/collaboration_handoff/current/collaboration_handoff_bundle.json",
+      "outputs/backup_restore_archive/current/backup_restore_archive_manifest.json",
+      "outputs/backup_restore_archive/current/backup_restore_archive.zip"
+    ],
+    "version": "2026.06.02"
+  },
+  "release_notes": [
+    {
+      "change_type": "non_breaking",
+      "description": "r12-collaboration-readiness-local adds collaboration handoff bundle artifacts.",
+      "note_id": "release-collaboration-handoff"
+    },
+    {
+      "change_type": "non_breaking",
+      "description": "Adds portable backup archive manifest, HTML report, and zip artifact.",
+      "note_id": "release-backup-restore"
+    },
+    {
+      "change_type": "no_breaking_change",
+      "description": "Local deterministic mode remains the default operating mode.",
+      "note_id": "release-local-mode"
+    }
+  ],
+  "summary": {
+    "known_limitation_count": 3,
+    "release_note_count": 3,
+    "support_runbook_count": 4,
+    "verification_command_count": 4
+  },
+  "support_runbooks": [
+    {
+      "runbook_id": "support-handoff-review",
+      "topic": "Review collaboration handoff bundle"
+    },
+    {
+      "runbook_id": "support-backup-restore",
+      "topic": "Validate and inspect portable backup archive"
+    },
+    {
+      "runbook_id": "support-product-shell",
+      "topic": "Regenerate product shell artifacts"
+    },
+    {
+      "runbook_id": "support-verification",
+      "topic": "Run local verification commands"
+    }
+  ],
+  "verification_commands": [
+    {
+      "command": "uv run pytest",
+      "purpose": "full Python regression suite"
+    },
+    {
+      "command": "uv run ruff check .",
+      "purpose": "lint and import hygiene"
+    },
+    {
+      "command": "uv run python scripts/run_collaboration_handoff_bundle.py",
+      "purpose": "regenerate handoff artifacts"
+    },
+    {
+      "command": "uv run python scripts/run_backup_restore_archive.py",
+      "purpose": "regenerate backup archive artifacts"
+    }
+  ],
+  "version": "operator-release-readiness-v1"
+}

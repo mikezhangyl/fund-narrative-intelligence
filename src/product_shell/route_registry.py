@@ -163,6 +163,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="operator_release_readiness",
+            path="/governance/release-readiness",
+            label_zh="操作员上线指引与发布说明",
+            label_en="Operator onboarding and release notes",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/operator_release_readiness/current/",
+            json_path="outputs/operator_release_readiness/current/operator_release_readiness.json",
+            html_path="outputs/operator_release_readiness/current/operator_release_readiness.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",

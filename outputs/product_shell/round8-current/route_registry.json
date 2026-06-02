@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T00:53:10.562002+00:00",
+  "generated_at": "2026-06-02T01:07:15.096247+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -359,6 +359,32 @@
       "data_source": {
         "degradation_status": "ok",
         "freshness_status": "artifact_reported",
+        "html_path": "outputs/operator_release_readiness/current/operator_release_readiness.html",
+        "json_path": "outputs/operator_release_readiness/current/operator_release_readiness.json",
+        "source": "outputs/operator_release_readiness/current/",
+        "type": "generated_artifact"
+      },
+      "label_en": "Operator onboarding and release notes",
+      "label_zh": "操作员上线指引与发布说明",
+      "owner_service": "FNI",
+      "path": "/governance/release-readiness",
+      "route_id": "operator_release_readiness"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
+        "freshness_status": "artifact_reported",
         "html_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.html",
         "json_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
         "source": "outputs/portfolio_narrative_workspace/",
@@ -504,9 +530,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 0,
-    "generated_artifact_route_count": 17,
+    "generated_artifact_route_count": 18,
     "live_api_route_count": 2,
-    "route_count": 19
+    "route_count": 20
   },
   "version": "product-shell-route-registry-v1"
 }

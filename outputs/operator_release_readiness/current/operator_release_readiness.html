@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>操作员上线指引与发布说明</title>
+<style>
+body { margin: 0; background: #f6f7f9; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 48px; }
+h1 { font-size: 30px; margin: 0 0 16px; }
+h2 { font-size: 20px; margin: 24px 0 12px; }
+.summary { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d8dee8; border-radius: 8px; overflow: hidden; }
+th, td { border-bottom: 1px solid #edf0f5; padding: 10px 12px; text-align: left; vertical-align: top; }
+th { background: #eef2f7; font-size: 13px; }
+td { font-size: 13px; }
+</style>
+</head>
+<body>
+<main class="page">
+<h1>操作员上线指引与发布说明</h1>
+<section class="summary">
+<p><strong>发布说明:</strong> 3</p>
+<p><strong>验证命令:</strong> 4</p>
+<p><strong>已知限制:</strong> 3</p>
+<p><strong>支持 runbook:</strong> 4</p>
+</section>
+<section><h2>验证命令</h2><table><thead><tr><th>command</th><th>purpose</th></tr></thead><tbody><tr><td>uv run pytest</td><td>full Python regression suite</td></tr><tr><td>uv run ruff check .</td><td>lint and import hygiene</td></tr><tr><td>uv run python scripts/run_collaboration_handoff_bundle.py</td><td>regenerate handoff artifacts</td></tr><tr><td>uv run python scripts/run_backup_restore_archive.py</td><td>regenerate backup archive artifacts</td></tr></tbody></table></section>
+<section><h2>已知限制</h2><table><thead><tr><th>limitation_id</th><th>severity</th><th>description</th></tr></thead><tbody><tr><td>local-role-placeholders</td><td>expected</td><td>Roles are local placeholders, not external identity enforcement.</td></tr><tr><td>selected-archive-scope</td><td>expected</td><td>Backup archive contains selected readiness artifacts, not every historical output.</td></tr><tr><td>manual-restore</td><td>expected</td><td>Restore overwrite is documented as a validation contract and remains manual.</td></tr></tbody></table></section>
+<section><h2>支持 runbook</h2><table><thead><tr><th>runbook_id</th><th>topic</th></tr></thead><tbody><tr><td>support-handoff-review</td><td>Review collaboration handoff bundle</td></tr><tr><td>support-backup-restore</td><td>Validate and inspect portable backup archive</td></tr><tr><td>support-product-shell</td><td>Regenerate product shell artifacts</td></tr><tr><td>support-verification</td><td>Run local verification commands</td></tr></tbody></table></section>
+</main>
+</body>
+</html>
