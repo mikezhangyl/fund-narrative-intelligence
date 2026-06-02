@@ -139,6 +139,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="collaboration_handoff",
+            path="/governance/handoff",
+            label_zh="协作评审交接包",
+            label_en="Collaboration review handoff bundle",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/collaboration_handoff/current/",
+            json_path="outputs/collaboration_handoff/current/collaboration_handoff_bundle.json",
+            html_path="outputs/collaboration_handoff/current/collaboration_handoff_bundle.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",

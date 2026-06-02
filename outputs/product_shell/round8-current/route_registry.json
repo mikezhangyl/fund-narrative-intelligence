@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T19:05:20.686765+00:00",
+  "generated_at": "2026-06-02T00:40:35.985278+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -307,6 +307,32 @@
       "data_source": {
         "degradation_status": "ok",
         "freshness_status": "artifact_reported",
+        "html_path": "outputs/collaboration_handoff/current/collaboration_handoff_bundle.html",
+        "json_path": "outputs/collaboration_handoff/current/collaboration_handoff_bundle.json",
+        "source": "outputs/collaboration_handoff/current/",
+        "type": "generated_artifact"
+      },
+      "label_en": "Collaboration review handoff bundle",
+      "label_zh": "协作评审交接包",
+      "owner_service": "FNI",
+      "path": "/governance/handoff",
+      "route_id": "collaboration_handoff"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
+        "freshness_status": "artifact_reported",
         "html_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.html",
         "json_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
         "source": "outputs/portfolio_narrative_workspace/",
@@ -452,9 +478,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 0,
-    "generated_artifact_route_count": 15,
+    "generated_artifact_route_count": 16,
     "live_api_route_count": 2,
-    "route_count": 17
+    "route_count": 18
   },
   "version": "product-shell-route-registry-v1"
 }

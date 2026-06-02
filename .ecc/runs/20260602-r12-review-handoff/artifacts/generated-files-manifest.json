@@ -1,0 +1,54 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/collaboration_handoff/current/collaboration_handoff_bundle.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "18a0af39f75025e5faaa0341b8bc11feccbbc99f245ac908552161d4112bf861",
+      "mtime_epoch": 1780360835,
+      "size_bytes": 11351,
+      "summary": "Collaboration handoff bundle JSON generated from current research export and quality audit artifacts."
+    },
+    {
+      "type": "html",
+      "path": "outputs/collaboration_handoff/current/collaboration_handoff_bundle.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "ab2bc83b337ef7d75289c9605e9e0fe45e7cddce0502a76aecd71415eb5bb625",
+      "mtime_epoch": 1780360835,
+      "size_bytes": 1818,
+      "summary": "Canonical Chinese collaboration handoff report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "5af2212dcaaff1651a1b06cacc05c6c98bc4dba07e9cfebb9c17e7581ea390cf",
+      "mtime_epoch": 1780360836,
+      "size_bytes": 16853,
+      "summary": "Product shell route registry including /governance/handoff."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "9566de2e64cd4049d05b39228602dac5a95faf90a46aae3bf6744cc3afab27e6",
+      "mtime_epoch": 1780360836,
+      "size_bytes": 398065,
+      "summary": "Product shell payload including collaboration handoff artifact."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "cbff7c3335e7969a0ed8edfab0132ff630494f48243b4f65646fbb1863dd574a",
+      "mtime_epoch": 1780360836,
+      "size_bytes": 273117,
+      "summary": "Artifact index including collaboration handoff JSON/HTML."
+    }
+  ]
+}

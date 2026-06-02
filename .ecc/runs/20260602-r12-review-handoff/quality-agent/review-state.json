@@ -1,0 +1,11 @@
+{
+  "review_id": "20260602-r12-review-handoff",
+  "status": "passed",
+  "reviewed_at": "2026-06-02T08:10:00+08:00",
+  "reviewed_snapshot_type": "committed",
+  "quality_reviewed_commit": "cc4a16c93aaf8ba6aa0a7d5943aca173dde90c4a",
+  "working_tree_dirty": false,
+  "fix_required_before_next_phase": false,
+  "findings_count": 0,
+  "unresolved_findings_count": 0
+}

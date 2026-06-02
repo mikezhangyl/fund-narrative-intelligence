@@ -1,0 +1,24 @@
+{
+  "requested_decisions": [
+    {
+      "decision_id": "R12-HANDOFF-REVIEW-001",
+      "decision_type": "review_current_research_pack",
+      "rationale": "Review current research export evidence, citations, and analyst-note state before any trusted-state promotion.",
+      "responsible_role": "reviewer",
+      "target_ref": {
+        "object_id": "narrative_research_export_pack",
+        "object_type": "artifact"
+      }
+    },
+    {
+      "decision_id": "R12-HANDOFF-ARCH-001",
+      "decision_type": "review_quality_gate_boundary",
+      "rationale": "Confirm the handoff bundle preserves evidence requirements and does not weaken promotion gates.",
+      "responsible_role": "architect",
+      "target_ref": {
+        "object_id": "collaboration_handoff_bundle",
+        "object_type": "artifact"
+      }
+    }
+  ]
+}
