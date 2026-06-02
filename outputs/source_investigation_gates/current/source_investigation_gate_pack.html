@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>R13 来源调查 Gate Pack</title>
+<style>
+body { margin: 0; background: #f7f8fa; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { max-width: 1240px; margin: 0 auto; padding: 32px 20px 48px; }
+h1 { font-size: 30px; margin: 0 0 16px; }
+h2 { font-size: 20px; margin: 28px 0 12px; }
+.summary { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d8dee8; border-radius: 8px; overflow: hidden; margin-top: 12px; }
+th, td { border-bottom: 1px solid #edf0f5; padding: 10px 12px; text-align: left; vertical-align: top; font-size: 13px; }
+th { background: #eef2f7; color: #323f4b; }
+</style>
+</head>
+<body>
+<main class="page">
+<h1>R13 来源调查 Gate Pack</h1>
+<section class="summary">
+<p><strong>Issue:</strong> 3</p>
+<p><strong>候选来源:</strong> 12</p>
+<p><strong>Trial First:</strong> 3</p>
+<p><strong>Controlled Pilot:</strong> 1</p>
+<p><strong>Developer work is blocked:</strong> 3</p>
+<p>决策过程：公开官方信息只能形成 trial gate，不足以派发 provider adapter 实现；缺 credentials、合同、权限、redistribution/display rights 时，developer work is blocked。</p>
+</section>
+<section><h2>MIK-240: China paid provider trial checklist: iFinD, Choice, Wind</h2><p><strong>Recommendation:</strong> {&#x27;decision&#x27;: &#x27;trial_first&#x27;, &#x27;trial_target&#x27;: &#x27;choice_financial_terminal&#x27;, &#x27;reason&#x27;: &#x27;Choice has public contact/API evidence and cross-platform Python/C++ support; PM still needs vendor quote, redistribution terms, and credentialed docs.&#x27;}</p><p><strong>Developer work is blocked:</strong> Credentials, API docs, entitlement package, redistribution terms, and vendor quote are required.</p><table><thead><tr><th>source_id</th><th>name</th><th>decision_label</th><th>access_label</th><th>cost_band</th><th>missing_information</th></tr></thead><tbody><tr><td>choice_financial_terminal</td><td>Choice</td><td>Trial First</td><td></td><td>vendor_quote_required</td><td>endpoint entitlement list, qps/rate limit, historical depth, redistribution/display terms, cost band/vendor quote, credentialed API docs</td></tr><tr><td>wind_financial_terminal</td><td>Wind</td><td>Later</td><td></td><td>vendor_quote_required</td><td>news entitlement package, redistribution/display terms, cost band/vendor quote, credentialed API docs</td></tr><tr><td>ifind_financial_terminal</td><td>iFinD</td><td>Later</td><td></td><td>vendor_quote_required</td><td>endpoint entitlement list, qps/rate limit, historical depth, redistribution/display terms, cost band/vendor quote, credentialed API docs</td></tr></tbody></table></section>
+<section><h2>MIK-241: Global paid news analytics trial checklist</h2><p><strong>Recommendation:</strong> {&#x27;decision&#x27;: &#x27;ranked_trial_targets&#x27;, &#x27;professional_news_candidate&#x27;: &#x27;lseg_reuters_news&#x27;, &#x27;news_analytics_candidate&#x27;: &#x27;ravenpack_news_analytics&#x27;, &#x27;lower_cost_developer_api_candidate&#x27;: &#x27;benzinga_news_api&#x27;, &#x27;reason&#x27;: &#x27;Use LSEG/Reuters for professional raw/news service, RavenPack for event analytics, and Benzinga as a lower-cost developer API candidate.&#x27;}</p><p><strong>Developer work is blocked:</strong> Provider docs, credentials, entitled endpoints, and display/redistribution rights are required.</p><table><thead><tr><th>source_id</th><th>name</th><th>decision_label</th><th>access_label</th><th>cost_band</th><th>missing_information</th></tr></thead><tbody><tr><td>lseg_reuters_news</td><td>LSEG / Reuters</td><td>Trial First</td><td></td><td></td><td>credentialed docs, trial credentials, production pricing, redistribution/display rights, China coverage sample</td></tr><tr><td>ravenpack_news_analytics</td><td>RavenPack / Bigdata.com</td><td>Analytics Candidate</td><td></td><td></td><td>credentialed docs, trial credentials, production pricing, redistribution/display rights, China coverage sample</td></tr><tr><td>alphasense_market_intelligence</td><td>AlphaSense</td><td>Later</td><td></td><td></td><td>credentialed docs, trial credentials, production pricing, redistribution/display rights, China coverage sample</td></tr><tr><td>benzinga_news_api</td><td>Benzinga</td><td>Trial First</td><td></td><td></td><td>credentialed docs, trial credentials, production pricing, redistribution/display rights, China coverage sample</td></tr><tr><td>finnhub_news_api</td><td>Finnhub</td><td>Later</td><td></td><td></td><td>credentialed docs, trial credentials, production pricing, redistribution/display rights, China coverage sample</td></tr></tbody></table></section>
+<section><h2>MIK-242: China community and social source access investigation</h2><p><strong>Recommendation:</strong> {&#x27;decision&#x27;: &#x27;controlled_pilot_only_for_weibo_official_api&#x27;, &#x27;reason&#x27;: &#x27;Only official API/commercial access can enter a controlled heat-signal pilot; Xueqiu and EastMoney Guba should not be crawled until permission is confirmed.&#x27;}</p><p><strong>Developer work is blocked:</strong> No crawler implementation until permission, robots/TOS, login, anti-bot, and retention status are confirmed.</p><table><thead><tr><th>source_id</th><th>name</th><th>decision_label</th><th>access_label</th><th>cost_band</th><th>missing_information</th></tr></thead><tbody><tr><td>xueqiu</td><td>雪球</td><td>Do Not Implement</td><td>High-risk/Do Not Crawl</td><td></td><td></td></tr><tr><td>eastmoney_guba</td><td>东方财富股吧</td><td>Do Not Implement</td><td>Unknown</td><td></td><td></td></tr><tr><td>weibo</td><td>微博</td><td>Controlled Pilot</td><td>Official API</td><td></td><td></td></tr><tr><td>stocktwits_reference</td><td>Stocktwits reference pattern</td><td>Do Not Implement</td><td>Commercial Access</td><td></td><td></td></tr></tbody></table></section>
+</main>
+</body>
+</html>

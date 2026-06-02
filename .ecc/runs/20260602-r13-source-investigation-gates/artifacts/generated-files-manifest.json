@@ -1,0 +1,64 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "16418fb9f237b6542f7c1a2d8166f1c3ab23144c0c614f42a8dfac26fa958b92",
+      "mtime_epoch": 1780377777,
+      "size_bytes": 18624,
+      "summary": "MIK-240/241/242 source investigation gate pack JSON."
+    },
+    {
+      "type": "html",
+      "path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "7e94ce45367ee6637be537e83401acfed5e9277429566e34c1dcb3c23a25a90c",
+      "mtime_epoch": 1780377777,
+      "size_bytes": 6118,
+      "summary": "Canonical Chinese MIK-240/241/242 source investigation gate report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "b0857439ddd8d684080ed85d4149557da79b77ce3ed757947667e76d4b4b546c",
+      "mtime_epoch": 1780377786,
+      "size_bytes": 21802,
+      "summary": "Product shell route registry including investigation gates."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "1c72f86f93ae37775b47bb57c9b1b575d0293219c5a4c40f1fb20254f9a40a69",
+      "mtime_epoch": 1780377786,
+      "size_bytes": 406365,
+      "summary": "Product shell payload including investigation gates."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "beacfbecb23608a7f408355ac21eb4a852957d0eac26f7dd40e600c861b34de9",
+      "mtime_epoch": 1780377786,
+      "size_bytes": 276068,
+      "summary": "Artifact index including investigation gate pack."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/artifact_index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "164bf78b2f118676dc3e92216c9c84c97000eaaf587cc7bc7da61b2c98781c95",
+      "mtime_epoch": 1780377786,
+      "size_bytes": 123224,
+      "summary": "Artifact index Chinese preview including investigation gate pack."
+    }
+  ]
+}

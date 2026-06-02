@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T05:11:22.009666+00:00",
+  "generated_at": "2026-06-02T05:23:06.149975+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -540,6 +540,32 @@
       },
       "data_source": {
         "degradation_status": "ok",
+        "freshness_status": "artifact_reported",
+        "html_path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.html",
+        "json_path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.json",
+        "source": "outputs/source_investigation_gates/current/",
+        "type": "generated_artifact"
+      },
+      "label_en": "R13 source investigation gates",
+      "label_zh": "R13 来源调查 Gate Pack",
+      "owner_service": "FNI",
+      "path": "/sources/investigation-gates",
+      "route_id": "source_investigation_gates"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
         "freshness_status": "generated",
         "html_path": "artifact_browser.html",
         "json_path": "outputs/product_shell/round8-current/artifact_index.json",
@@ -582,9 +608,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 0,
-    "generated_artifact_route_count": 20,
+    "generated_artifact_route_count": 21,
     "live_api_route_count": 2,
-    "route_count": 22
+    "route_count": 23
   },
   "version": "product-shell-route-registry-v1"
 }

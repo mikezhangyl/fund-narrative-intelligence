@@ -1,0 +1,444 @@
+{
+  "decision_principles": [
+    "Do not assign gateway/provider implementation until credentials, vendor docs, and rights metadata exist.",
+    "Do not crawl login-only, CAPTCHA-protected, or anti-bot-heavy community pages.",
+    "Social/community sources remain heat_signal_only and never trusted_fact."
+  ],
+  "generated_at": "2026-06-02T05:22:57+00:00",
+  "issue_sections": [
+    {
+      "candidates": [
+        {
+          "api_availability": "Choice Quant API; official page lists Python, C++, C#, R, Matlab support and Linux/Mac support for C++/Python.",
+          "contact_trial_path": "choiceinfo@eastmoney.com / 400-620-1818",
+          "cost_band": "vendor_quote_required",
+          "decision_label": "Trial First",
+          "endpoint_categories": [
+            "news",
+            "announcements/disclosures",
+            "research/briefs",
+            "sector/concept events",
+            "company events",
+            "macro/policy data",
+            "entity tags"
+          ],
+          "expected_coverage": "China market terminal/data service; exact news/research endpoint coverage requires vendor package.",
+          "historical_depth": "vendor_docs_required",
+          "missing_information": [
+            "endpoint entitlement list",
+            "qps/rate limit",
+            "historical depth",
+            "redistribution/display terms",
+            "cost band/vendor quote",
+            "credentialed API docs"
+          ],
+          "name": "Choice",
+          "official_source_links": [
+            {
+              "title": "Choice data terminal/API",
+              "url": "https://choice.eastmoney.com/"
+            },
+            {
+              "title": "Choice Quant API login/docs",
+              "url": "https://quantapi.eastmoney.com/Flow?from=web"
+            }
+          ],
+          "qps_rate_limit": "vendor_docs_required",
+          "redistribution_terms": "vendor_contract_required",
+          "source_id": "choice_financial_terminal"
+        },
+        {
+          "api_availability": "Wind Client API and data API pages advertise API access to Wind data.",
+          "contact_trial_path": "Service@wind.com.cn / +86 400-820-9463 / +86 021-20518200",
+          "cost_band": "vendor_quote_required",
+          "decision_label": "Later",
+          "endpoint_categories": [
+            "news",
+            "announcements/disclosures",
+            "research/briefs",
+            "sector/concept events",
+            "company events",
+            "macro/policy data",
+            "entity tags"
+          ],
+          "expected_coverage": "China-first terminal with global company, market, sector, macro, fund, and news coverage by package.",
+          "historical_depth": "vendor_docs_required",
+          "missing_information": [
+            "news entitlement package",
+            "redistribution/display terms",
+            "cost band/vendor quote",
+            "credentialed API docs"
+          ],
+          "name": "Wind",
+          "official_source_links": [
+            {
+              "title": "Wind Client API",
+              "url": "https://www.wind.com.cn/mobile/ClientApi/zh.html"
+            },
+            {
+              "title": "Wind Data API",
+              "url": "https://www.wind.com.cn/mobile/WDS/sapi/zh.html"
+            }
+          ],
+          "qps_rate_limit": "vendor_docs_required",
+          "redistribution_terms": "vendor_contract_required",
+          "source_id": "wind_financial_terminal"
+        },
+        {
+          "api_availability": "iFinD quant/data API docs describe SDK/HTTP API access; package availability needs vendor confirmation.",
+          "contact_trial_path": "PM vendor/contact confirmation required; public partner/API pages exist.",
+          "cost_band": "vendor_quote_required",
+          "decision_label": "Later",
+          "endpoint_categories": [
+            "news",
+            "research/briefs",
+            "sector/concept events",
+            "company events",
+            "macro/policy data",
+            "entity tags"
+          ],
+          "expected_coverage": "China institutional financial data, intelligent news/event processing, industrial chain and research datasets.",
+          "historical_depth": "vendor_docs_required",
+          "missing_information": [
+            "endpoint entitlement list",
+            "qps/rate limit",
+            "historical depth",
+            "redistribution/display terms",
+            "cost band/vendor quote",
+            "credentialed API docs"
+          ],
+          "name": "iFinD",
+          "official_source_links": [
+            {
+              "title": "iFinD platform",
+              "url": "https://aifind.com/"
+            },
+            {
+              "title": "iFinD partner platform",
+              "url": "https://partners.51ifind.com/"
+            },
+            {
+              "title": "iFinD quant API FAQ",
+              "url": "https://quantapi.51ifind.com/gwstatic/static/ds_web/quantapi-web/help-center/faq.html"
+            }
+          ],
+          "qps_rate_limit": "vendor_docs_required",
+          "redistribution_terms": "vendor_contract_required",
+          "source_id": "ifind_financial_terminal"
+        }
+      ],
+      "developer_gate": {
+        "implementation_issue_allowed": false,
+        "next_owner": "PM/vendor_contact_then_gateway",
+        "reason": "Credentials, API docs, entitlement package, redistribution terms, and vendor quote are required."
+      },
+      "linear_id": "MIK-240",
+      "recommendation": {
+        "decision": "trial_first",
+        "reason": "Choice has public contact/API evidence and cross-platform Python/C++ support; PM still needs vendor quote, redistribution terms, and credentialed docs.",
+        "trial_target": "choice_financial_terminal"
+      },
+      "title": "China paid provider trial checklist: iFinD, Choice, Wind"
+    },
+    {
+      "candidates": [
+        {
+          "api_access": "Structured JSON news service; streaming and request-response API surfaces.",
+          "chinese_china_coverage": "Reuters and third-party global news; China coverage depends on package.",
+          "decision_label": "Trial First",
+          "historical_archive": "trial_or_vendor_docs_required",
+          "latency": "trial_required",
+          "metadata_support": "topic codes, timestamps, PermID, relevance/confidence, sentiment, significance, dedupe",
+          "missing_information": [
+            "credentialed docs",
+            "trial credentials",
+            "production pricing",
+            "redistribution/display rights",
+            "China coverage sample"
+          ],
+          "name": "LSEG / Reuters",
+          "official_source_links": [
+            {
+              "title": "LSEG / Reuters source 1",
+              "url": "https://developers.lseg.com/en/product/news/news_service_rdp"
+            },
+            {
+              "title": "LSEG / Reuters source 2",
+              "url": "https://www.lseg.com/en/data-analytics/financial-data/financial-news-coverage/news-coverage/"
+            }
+          ],
+          "pricing_model": "vendor_quote_or_self_serve_tier_required",
+          "redistribution_display_rights": "vendor_contract_required",
+          "source_id": "lseg_reuters_news",
+          "trial_path": "Request details/free trial through LSEG News Service pages."
+        },
+        {
+          "api_access": "Analytics/data product; API/package details require trial confirmation.",
+          "chinese_china_coverage": "40,000+ news/social sources with multi-language global coverage; China coverage needs trial sample.",
+          "decision_label": "Analytics Candidate",
+          "historical_archive": "trial_or_vendor_docs_required",
+          "latency": "trial_required",
+          "metadata_support": "event/entity metadata, relevance, novelty, sentiment, topic tagging",
+          "missing_information": [
+            "credentialed docs",
+            "trial credentials",
+            "production pricing",
+            "redistribution/display rights",
+            "China coverage sample"
+          ],
+          "name": "RavenPack / Bigdata.com",
+          "official_source_links": [
+            {
+              "title": "RavenPack / Bigdata.com source 1",
+              "url": "https://www.ravenpack.com/products/edge/data/news-analytics"
+            }
+          ],
+          "pricing_model": "vendor_quote_or_self_serve_tier_required",
+          "redistribution_display_rights": "vendor_contract_required",
+          "source_id": "ravenpack_news_analytics",
+          "trial_path": "Request a trial from RavenPack News Analytics."
+        },
+        {
+          "api_access": "Developer docs describe GraphQL/API access and ingestion/connectors.",
+          "chinese_china_coverage": "Filings, transcripts, broker research, expert calls, news, trade journals, regulatory docs.",
+          "decision_label": "Later",
+          "historical_archive": "trial_or_vendor_docs_required",
+          "latency": "trial_required",
+          "metadata_support": "search/document metadata; event/sentiment support not proven from public docs",
+          "missing_information": [
+            "credentialed docs",
+            "trial credentials",
+            "production pricing",
+            "redistribution/display rights",
+            "China coverage sample"
+          ],
+          "name": "AlphaSense",
+          "official_source_links": [
+            {
+              "title": "AlphaSense source 1",
+              "url": "https://www.alpha-sense.com/contact/"
+            },
+            {
+              "title": "AlphaSense source 2",
+              "url": "https://developer.alpha-sense.com/api/next/getting-started"
+            }
+          ],
+          "pricing_model": "vendor_quote_or_self_serve_tier_required",
+          "redistribution_display_rights": "vendor_contract_required",
+          "source_id": "alphasense_market_intelligence",
+          "trial_path": "Contact sales/support; API docs direct API trial setup through AlphaSense support."
+        },
+        {
+          "api_access": "REST, TCP push, websocket, and documented newsfeed endpoints.",
+          "chinese_china_coverage": "North America-focused news, transcripts, filings, alternative datasets.",
+          "decision_label": "Trial First",
+          "historical_archive": "trial_or_vendor_docs_required",
+          "latency": "trial_required",
+          "metadata_support": "ticker/source/news metadata; sentiment/event analytics require endpoint confirmation",
+          "missing_information": [
+            "credentialed docs",
+            "trial credentials",
+            "production pricing",
+            "redistribution/display rights",
+            "China coverage sample"
+          ],
+          "name": "Benzinga",
+          "official_source_links": [
+            {
+              "title": "Benzinga source 1",
+              "url": "https://www.benzinga.com/apis"
+            },
+            {
+              "title": "Benzinga source 2",
+              "url": "https://docs.benzinga.com/introduction/introduction"
+            }
+          ],
+          "pricing_model": "vendor_quote_or_self_serve_tier_required",
+          "redistribution_display_rights": "vendor_contract_required",
+          "source_id": "benzinga_news_api",
+          "trial_path": "Email licensing@benzinga.com, call 877-440-9464, or request API access."
+        },
+        {
+          "api_access": "Documented market-news REST endpoint.",
+          "chinese_china_coverage": "Global market APIs with news, filings, transcripts, fundamentals, estimates by tier.",
+          "decision_label": "Later",
+          "historical_archive": "trial_or_vendor_docs_required",
+          "latency": "trial_required",
+          "metadata_support": "news endpoint metadata; filings/transcripts available depending on tier",
+          "missing_information": [
+            "credentialed docs",
+            "trial credentials",
+            "production pricing",
+            "redistribution/display rights",
+            "China coverage sample"
+          ],
+          "name": "Finnhub",
+          "official_source_links": [
+            {
+              "title": "Finnhub source 1",
+              "url": "https://www.finnhub.io/docs/api/market-news"
+            },
+            {
+              "title": "Finnhub source 2",
+              "url": "https://api.finnhub.io/pricing"
+            }
+          ],
+          "pricing_model": "vendor_quote_or_self_serve_tier_required",
+          "redistribution_display_rights": "vendor_contract_required",
+          "source_id": "finnhub_news_api",
+          "trial_path": "Self-serve API key/pricing, contact sales for production permissions."
+        }
+      ],
+      "developer_gate": {
+        "implementation_issue_allowed": false,
+        "next_owner": "PM/vendor_contact_then_gateway",
+        "reason": "Provider docs, credentials, entitled endpoints, and display/redistribution rights are required."
+      },
+      "linear_id": "MIK-241",
+      "recommendation": {
+        "decision": "ranked_trial_targets",
+        "lower_cost_developer_api_candidate": "benzinga_news_api",
+        "news_analytics_candidate": "ravenpack_news_analytics",
+        "professional_news_candidate": "lseg_reuters_news",
+        "reason": "Use LSEG/Reuters for professional raw/news service, RavenPack for event analytics, and Benzinga as a lower-cost developer API candidate."
+      },
+      "title": "Global paid news analytics trial checklist",
+      "trial_smoke_query_set": {
+        "required_fields": [
+          "headline",
+          "published_at",
+          "source",
+          "entity_metadata",
+          "sentiment_or_event_metadata",
+          "permitted_url_or_story_id"
+        ],
+        "symbols": [
+          "AAPL",
+          "NVDA",
+          "TSLA",
+          "BABA",
+          "TSM"
+        ],
+        "topics": [
+          "AI semiconductors",
+          "China EV",
+          "Fed policy",
+          "supply chain disruption"
+        ],
+        "window": "last_24h_and_last_7d"
+      }
+    },
+    {
+      "candidates": [
+        {
+          "access_label": "High-risk/Do Not Crawl",
+          "anti_bot_risk": "high",
+          "controlled_pilot_allowed": false,
+          "decision_label": "Do Not Implement",
+          "name": "雪球",
+          "official_source_links": [
+            {
+              "title": "雪球 source 1",
+              "url": "https://xueqiu.com/about/terms"
+            },
+            {
+              "title": "雪球 source 2",
+              "url": "https://xueqiu.com/about/faq"
+            }
+          ],
+          "output_role": "heat_signal_only",
+          "permission_status": "No official heat-signal API confirmed from public review.",
+          "retention_display_restrictions": "must be confirmed before pilot",
+          "risk_notes": "login/terms risk; do not crawl until commercial/API permission exists",
+          "source_id": "xueqiu",
+          "trust_tier": "heat_signal_only"
+        },
+        {
+          "access_label": "Unknown",
+          "anti_bot_risk": "high",
+          "controlled_pilot_allowed": false,
+          "decision_label": "Do Not Implement",
+          "name": "东方财富股吧",
+          "official_source_links": [
+            {
+              "title": "东方财富股吧 source 1",
+              "url": "https://guba.eastmoney.com/"
+            },
+            {
+              "title": "东方财富股吧 source 2",
+              "url": "https://about.eastmoney.com/home/protocol"
+            }
+          ],
+          "output_role": "heat_signal_only",
+          "permission_status": "Public community pages exist; no provider-neutral official API confirmed.",
+          "retention_display_restrictions": "must be confirmed before pilot",
+          "risk_notes": "community/TOS and anti-bot risk require PM legal/vendor review",
+          "source_id": "eastmoney_guba",
+          "trust_tier": "heat_signal_only"
+        },
+        {
+          "access_label": "Official API",
+          "anti_bot_risk": "medium",
+          "controlled_pilot_allowed": true,
+          "decision_label": "Controlled Pilot",
+          "name": "微博",
+          "official_source_links": [
+            {
+              "title": "微博 source 1",
+              "url": "https://docs.x.com/developer-guidelines"
+            },
+            {
+              "title": "微博 source 2",
+              "url": "https://docs.x.com/x-api/fundamentals/rate-limits"
+            }
+          ],
+          "output_role": "heat_signal_only",
+          "permission_status": "Official API path exists, but finance-topic access, rate limits, retention, and display terms need confirmation.",
+          "retention_display_restrictions": "must be confirmed before pilot",
+          "risk_notes": "official API only; no browser scraping",
+          "source_id": "weibo",
+          "trust_tier": "heat_signal_only"
+        },
+        {
+          "access_label": "Commercial Access",
+          "anti_bot_risk": "medium",
+          "controlled_pilot_allowed": false,
+          "decision_label": "Do Not Implement",
+          "name": "Stocktwits reference pattern",
+          "official_source_links": [
+            {
+              "title": "Stocktwits reference pattern source 1",
+              "url": "https://finnhub.io/"
+            }
+          ],
+          "output_role": "heat_signal_only",
+          "permission_status": "Use as a global reference pattern for heat-only access where official/commercial access exists.",
+          "retention_display_restrictions": "must be confirmed before pilot",
+          "risk_notes": "commercial or official API only",
+          "source_id": "stocktwits_reference",
+          "trust_tier": "heat_signal_only"
+        }
+      ],
+      "developer_gate": {
+        "implementation_issue_allowed": false,
+        "next_owner": "PM/vendor_contact_then_gateway",
+        "reason": "No crawler implementation until permission, robots/TOS, login, anti-bot, and retention status are confirmed."
+      },
+      "linear_id": "MIK-242",
+      "recommendation": {
+        "decision": "controlled_pilot_only_for_weibo_official_api",
+        "reason": "Only official API/commercial access can enter a controlled heat-signal pilot; Xueqiu and EastMoney Guba should not be crawled until permission is confirmed."
+      },
+      "title": "China community and social source access investigation"
+    }
+  ],
+  "status": "completed",
+  "summary": {
+    "candidate_count": 12,
+    "controlled_pilot_count": 1,
+    "developer_blocked_count": 3,
+    "issue_count": 3,
+    "trial_first_count": 3
+  },
+  "version": "source-investigation-gate-pack-v1"
+}

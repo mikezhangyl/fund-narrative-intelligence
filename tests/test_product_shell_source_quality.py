@@ -91,7 +91,7 @@ def test_route_registry_includes_source_quality_dashboard_route():
     assert route["data_source"]["json_path"] == (
         "outputs/product_shell/round8-current/source_quality_dashboard.json"
     )
-    assert registry["summary"]["route_count"] == 22
+    assert registry["summary"]["route_count"] == 23
 
 
 def test_route_registry_includes_source_decision_matrix_route():
@@ -135,6 +135,28 @@ def test_route_registry_includes_tushare_news_permission_smoke_route():
     )
     assert route["data_source"]["html_path"] == (
         "outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.html"
+    )
+
+
+def test_route_registry_includes_source_investigation_gate_route():
+    registry = build_product_shell_route_registry(
+        artifact_index_path="outputs/product_shell/artifact_index.json",
+    )
+
+    route = next(
+        route
+        for route in registry["routes"]
+        if route["route_id"] == "source_investigation_gates"
+    )
+
+    assert route["path"] == "/sources/investigation-gates"
+    assert route["owner_service"] == "FNI"
+    assert route["data_source"]["type"] == "generated_artifact"
+    assert route["data_source"]["json_path"] == (
+        "outputs/source_investigation_gates/current/source_investigation_gate_pack.json"
+    )
+    assert route["data_source"]["html_path"] == (
+        "outputs/source_investigation_gates/current/source_investigation_gate_pack.html"
     )
 
 

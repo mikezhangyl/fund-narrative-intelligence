@@ -247,6 +247,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="source_investigation_gates",
+            path="/sources/investigation-gates",
+            label_zh="R13 来源调查 Gate Pack",
+            label_en="R13 source investigation gates",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/source_investigation_gates/current/",
+            json_path="outputs/source_investigation_gates/current/source_investigation_gate_pack.json",
+            html_path="outputs/source_investigation_gates/current/source_investigation_gate_pack.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="artifacts",
             path="/artifacts",
             label_zh="产物浏览器",

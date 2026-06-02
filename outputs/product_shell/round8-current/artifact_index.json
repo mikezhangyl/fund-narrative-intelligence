@@ -6945,10 +6945,24 @@
       "warning_count": 0
     },
     {
+      "artifact_id": "ART_ba964c02c5",
+      "artifact_type": "tushare_news_permission_smoke",
+      "freshness_status": "Blocked",
+      "generated_at": "2026-06-02T05:10:36+00:00",
+      "html_path": "outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.html",
+      "json_path": "outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.json",
+      "run_id": "current",
+      "source_mode": "generated_artifact",
+      "status": "Blocked",
+      "superseded": false,
+      "surface": "Tushare News Permission Smoke",
+      "warning_count": 0
+    },
+    {
       "artifact_id": "ART_db365f1d06",
       "artifact_type": "source_quality_dashboard",
       "freshness_status": "degraded",
-      "generated_at": "2026-06-02T02:29:01+00:00",
+      "generated_at": "2026-06-02T05:11:22+00:00",
       "html_path": "outputs/product_shell/round8-current/source_quality_dashboard.html",
       "json_path": "outputs/product_shell/round8-current/source_quality_dashboard.json",
       "run_id": "round8-current",
@@ -6962,7 +6976,7 @@
       "artifact_id": "ART_c8e257234f",
       "artifact_type": "route_registry",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-02T02:29:01.370383+00:00",
+      "generated_at": "2026-06-02T05:11:22.009666+00:00",
       "html_path": "outputs/product_shell/round8-current/route_registry.html",
       "json_path": "outputs/product_shell/round8-current/route_registry.json",
       "run_id": "round8-current",
@@ -6976,7 +6990,7 @@
       "artifact_id": "ART_7c5a672725",
       "artifact_type": "artifact_index",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-02T02:29:01.649434+00:00",
+      "generated_at": "2026-06-02T05:11:22.285460+00:00",
       "html_path": "outputs/product_shell/round8-current/artifact_index.html",
       "json_path": "outputs/product_shell/round8-current/artifact_index.json",
       "run_id": "round8-current",
@@ -6984,13 +6998,13 @@
       "status": "unknown",
       "superseded": false,
       "surface": "Artifact index",
-      "warning_count": 60
+      "warning_count": 62
     },
     {
       "artifact_id": "ART_ede2f575bd",
       "artifact_type": "narrative_data",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-02T02:29:01.651466+00:00",
+      "generated_at": "2026-06-02T05:11:22.287545+00:00",
       "html_path": "outputs/product_shell/round8-current/narrative_data.html",
       "json_path": "outputs/product_shell/round8-current/narrative_data.json",
       "run_id": "round8-current",
@@ -7004,7 +7018,7 @@
       "artifact_id": "ART_095cab5d36",
       "artifact_type": "config_preflight",
       "freshness_status": "ok",
-      "generated_at": "2026-06-02T02:29:01.651652+00:00",
+      "generated_at": "2026-06-02T05:11:22.287725+00:00",
       "html_path": "outputs/product_shell/round8-current/config_preflight.html",
       "json_path": "outputs/product_shell/round8-current/config_preflight.json",
       "run_id": "round8-current",
@@ -7018,7 +7032,7 @@
       "artifact_id": "ART_bf6182f460",
       "artifact_type": "product_shell",
       "freshness_status": "unknown",
-      "generated_at": "2026-06-02T02:29:01.653088+00:00",
+      "generated_at": "2026-06-02T05:11:22.289360+00:00",
       "html_path": "",
       "json_path": "outputs/product_shell/round8-current/product_shell.json",
       "run_id": "round8-current",
@@ -7029,21 +7043,21 @@
       "warning_count": 0
     },
     {
-      "artifact_id": "ART_ba964c02c5",
-      "artifact_type": "tushare_news_permission_smoke",
-      "freshness_status": "Blocked",
-      "generated_at": "2026-06-02T05:10:36+00:00",
-      "html_path": "outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.html",
-      "json_path": "outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.json",
+      "artifact_id": "ART_086b2ce5af",
+      "artifact_type": "source_investigation_gate_pack",
+      "freshness_status": "completed",
+      "generated_at": "2026-06-02T05:22:57+00:00",
+      "html_path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.html",
+      "json_path": "outputs/source_investigation_gates/current/source_investigation_gate_pack.json",
       "run_id": "current",
       "source_mode": "generated_artifact",
-      "status": "Blocked",
+      "status": "completed",
       "superseded": false,
-      "surface": "Tushare News Permission Smoke",
+      "surface": "Source Investigation Gate Pack",
       "warning_count": 0
     }
   ],
-  "generated_at": "2026-06-02T05:11:22.285460+00:00",
+  "generated_at": "2026-06-02T05:23:06.433328+00:00",
   "output_root": "outputs",
   "redaction_policy": {
     "excluded_path_categories": [
@@ -7052,11 +7066,11 @@
     ]
   },
   "summary": {
-    "artifact_count": 503,
-    "html_link_count": 94,
-    "json_link_count": 503,
+    "artifact_count": 504,
+    "html_link_count": 95,
+    "json_link_count": 504,
     "stale_or_superseded_count": 344,
-    "warning_count": 62
+    "warning_count": 64
   },
   "version": "product-shell-artifact-index-v1"
 }
