@@ -91,7 +91,29 @@ def test_route_registry_includes_source_quality_dashboard_route():
     assert route["data_source"]["json_path"] == (
         "outputs/product_shell/round8-current/source_quality_dashboard.json"
     )
-    assert registry["summary"]["route_count"] == 20
+    assert registry["summary"]["route_count"] == 21
+
+
+def test_route_registry_includes_source_decision_matrix_route():
+    registry = build_product_shell_route_registry(
+        artifact_index_path="outputs/product_shell/artifact_index.json",
+    )
+
+    route = next(
+        route
+        for route in registry["routes"]
+        if route["route_id"] == "narrative_source_decision_matrix"
+    )
+
+    assert route["path"] == "/sources/decision-matrix"
+    assert route["owner_service"] == "FNI"
+    assert route["data_source"]["type"] == "generated_artifact"
+    assert route["data_source"]["json_path"] == (
+        "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.json"
+    )
+    assert route["data_source"]["html_path"] == (
+        "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.html"
+    )
 
 
 def test_build_product_shell_cli_writes_source_quality_dashboard(tmp_path):

@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Paid provider commercial terms and permission-specific API docs require PM investigation before gateway implementation.",
+    "Social/community heat sources must remain candidate-only until trusted evidence corroborates them."
+  ]
+}

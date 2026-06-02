@@ -223,6 +223,18 @@ def build_product_shell_route_registry(
             freshness_status="generated",
         ),
         _route(
+            route_id="narrative_source_decision_matrix",
+            path="/sources/decision-matrix",
+            label_zh="叙事来源决策矩阵",
+            label_en="Narrative source decision matrix",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/narrative_source_decision_matrix/current/",
+            json_path="outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.json",
+            html_path="outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="artifacts",
             path="/artifacts",
             label_zh="产物浏览器",

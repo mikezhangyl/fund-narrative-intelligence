@@ -1,0 +1,74 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "6b3b2d079f2a353a15011cff2f8ef6ad333ba918f230a6c16e8377cc812f1235",
+      "mtime_epoch": 1780365474,
+      "size_bytes": 22902,
+      "summary": "R13 narrative source decision matrix JSON."
+    },
+    {
+      "type": "html",
+      "path": "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "6aefd9bc0ad3faf19f842d6ef039e3671be4f0c102cbd072cc5bed22cd16d080",
+      "mtime_epoch": 1780365474,
+      "size_bytes": 7776,
+      "summary": "Canonical Chinese R13 narrative source decision matrix report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "feef8743f24a6fd008cdcc1946f323524b4ce73116761f1ccbc547e356618559",
+      "mtime_epoch": 1780365496,
+      "size_bytes": 19825,
+      "summary": "Product shell route registry including source decision matrix route."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/route_registry.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "7e6c508022c382633b5833a3583cb4d33b4beb471a40627ffd935fd1f2b0815b",
+      "mtime_epoch": 1780365496,
+      "size_bytes": 4494,
+      "summary": "Product shell route registry Chinese preview."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "1f23c3afc4590c527e4c3aa0e8e93e91f708a7e5d49f3f1567db919f37995982",
+      "mtime_epoch": 1780365496,
+      "size_bytes": 403024,
+      "summary": "Product shell payload including source decision matrix route."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "f8cef08f69d3f46ab551b16a76f575559eac9d85b6996af4224150fd1cd98e0e",
+      "mtime_epoch": 1780365496,
+      "size_bytes": 274864,
+      "summary": "Artifact index including source decision matrix artifacts."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/artifact_index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "ed55bb5bb1b72e372c78197fa36f6311f136bd6a7dad7598bf324d3d6617584f",
+      "mtime_epoch": 1780365496,
+      "size_bytes": 122641,
+      "summary": "Artifact index Chinese preview including source decision matrix artifacts."
+    }
+  ]
+}

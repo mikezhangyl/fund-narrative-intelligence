@@ -1,0 +1,11 @@
+{
+  "review_id": "20260602-r13-source-decision-matrix",
+  "status": "passed",
+  "reviewed_at": "2026-06-02T10:45:00+00:00",
+  "reviewed_snapshot_type": "committed",
+  "quality_reviewed_commit": "3228ba781390c6c9a1d574585b0fb8465128326a",
+  "working_tree_dirty": false,
+  "findings_count": 0,
+  "unresolved_findings_count": 0,
+  "fix_required_before_next_phase": false
+}
