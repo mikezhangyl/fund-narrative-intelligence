@@ -84,6 +84,54 @@ def test_provider_rows_encode_permissions_owner_and_non_dev_ready_gates():
     assert providers["captcha_or_login_only_pages"]["dev_ready"] is False
 
 
+def test_licensed_provider_evaluation_pack_has_trial_api_contract_and_source_links():
+    matrix = build_narrative_source_decision_matrix()
+    licensed_group = next(
+        group
+        for group in matrix["source_groups"]
+        if group["group_id"] == "licensed_news_market_intelligence"
+    )
+
+    for provider in licensed_group["providers"]:
+        evaluation = provider["evaluation_pack"]
+
+        assert evaluation["trial_contact_path"]
+        assert evaluation["api_availability"]
+        assert evaluation["cost_contract_notes"]
+        assert evaluation["market_coverage"]
+        assert set(evaluation["dataset_categories"]).issubset(
+            {
+                "raw_news",
+                "machine_readable_news",
+                "event_sentiment_analytics",
+                "transcripts",
+                "broker_research",
+                "filings",
+                "market_data_context",
+            }
+        )
+        assert evaluation["official_source_links"]
+        assert all(link["url"].startswith("https://") for link in evaluation["official_source_links"])
+
+    providers = {provider["provider_id"]: provider for provider in licensed_group["providers"]}
+
+    assert "Client API" in providers["wind_financial_terminal"]["evaluation_pack"]["api_availability"]
+    assert "choiceinfo@eastmoney.com" in (
+        providers["choice_financial_terminal"]["evaluation_pack"]["trial_contact_path"]
+    )
+    assert "apisupport@alphasense.com" in (
+        providers["alphasense_market_intelligence"]["evaluation_pack"]["trial_contact_path"]
+    )
+    assert providers["benzinga_news"]["evaluation_pack"]["dataset_categories"] == [
+        "raw_news",
+        "transcripts",
+        "filings",
+    ]
+    assert providers["finnhub_news"]["evaluation_pack"]["cost_contract_notes"] == (
+        "Published self-serve and paid tiers exist; confirm news and transcript permissions for production use."
+    )
+
+
 def test_architecture_contract_is_explicit_enough_for_next_implementation():
     contract = build_narrative_source_decision_matrix()["architecture_contract"]
 
@@ -143,6 +191,9 @@ def test_source_decision_matrix_html_is_chinese_and_names_boundaries():
     assert "不绕过 CAPTCHA" in html
     assert "Gateway-owned" in html
     assert "PM investigation required" in html
+    assert "Provider trial/API 评估" in html
+    assert "choiceinfo@eastmoney.com" in html
+    assert "apisupport@alphasense.com" in html
     assert "社交/社区仅作为热度或候选信号" in html
     assert "FNI 不直接访问 provider" in html
 

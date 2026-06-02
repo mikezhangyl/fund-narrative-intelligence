@@ -1,0 +1,54 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "cfbe018f7f6ca51424e08c65e17a4f9dd3637c63b3020fad00fec26f219330ac",
+      "mtime_epoch": 1780367316,
+      "size_bytes": 33236,
+      "summary": "R13 provider evaluation pack JSON."
+    },
+    {
+      "type": "html",
+      "path": "outputs/narrative_source_decision_matrix/current/narrative_source_decision_matrix.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "f7630274d68af5431860024af54b427daddd34318ee67ed44677005481ce1a58",
+      "mtime_epoch": 1780367316,
+      "size_bytes": 12514,
+      "summary": "Canonical Chinese source decision matrix with provider trial/API evaluation table."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "fe0ff1b2254bdcd36bc3c91852a984bd7930e7373995b8a5c23bc45055424744",
+      "mtime_epoch": 1780367341,
+      "size_bytes": 274864,
+      "summary": "Artifact index refreshed after provider evaluation pack update."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/artifact_index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "cc4d2724983d8de73e8f6b34598a522600efe863714081faf7d6afe71a2965af",
+      "mtime_epoch": 1780367341,
+      "size_bytes": 122641,
+      "summary": "Artifact index Chinese preview refreshed after provider evaluation pack update."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "f8019c06bef38d6a1b706cde7c0f516f3b8a1dc42f3ad538568af1900bd1f399",
+      "mtime_epoch": 1780367341,
+      "size_bytes": 403024,
+      "summary": "Product shell payload refreshed after provider evaluation pack update."
+    }
+  ]
+}

@@ -115,7 +115,7 @@
       "status": "social_heat_requires_permission_review"
     }
   ],
-  "generated_at": "2026-06-02T01:57:54.427243+00:00",
+  "generated_at": "2026-06-02T02:28:36.959841+00:00",
   "source_groups": [
     {
       "boundary_decision": "third_party_paid_provider_owned_until_gateway_contract",
@@ -132,6 +132,32 @@
           "dataset_notes": "raw news, disclosures, terminal research context depending on licensed package",
           "decision_label": "Paid Trial",
           "dev_ready": false,
+          "evaluation_pack": {
+            "api_availability": "Wind Client API and enterprise data API are advertised for accessing Wind financial data.",
+            "cost_contract_notes": "Enterprise contract required; pricing and news entitlements require sales confirmation.",
+            "dataset_categories": [
+              "raw_news",
+              "market_data_context",
+              "filings",
+              "broker_research"
+            ],
+            "market_coverage": "China-first with global market, macro, industry, security, fund, and news coverage.",
+            "official_source_links": [
+              {
+                "title": "Wind Financial Terminal",
+                "url": "https://www.wind.com.cn/portal/zh/WFT/index.html"
+              },
+              {
+                "title": "Wind Client API",
+                "url": "https://www.wind.com.cn/mobile/ClientApi/zh.html"
+              },
+              {
+                "title": "Wind Data API service",
+                "url": "https://www.wind.com.cn/mobile/WDS/sapi/zh.html"
+              }
+            ],
+            "trial_contact_path": "Apply for trial / sales contact through Wind product pages or Service@wind.com.cn."
+          },
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -150,6 +176,24 @@
           "dataset_notes": "China market news and terminal datasets pending PM package review",
           "decision_label": "Paid Trial",
           "dev_ready": false,
+          "evaluation_pack": {
+            "api_availability": "Choice Quant API is advertised with function-call access and Python/C++ support.",
+            "cost_contract_notes": "Contract package required; confirm news, research, and API quota entitlements.",
+            "dataset_categories": [
+              "market_data_context",
+              "raw_news",
+              "broker_research",
+              "filings"
+            ],
+            "market_coverage": "China-first terminal and data service across stocks, funds, bonds, macro, industry, and company data.",
+            "official_source_links": [
+              {
+                "title": "Choice data terminal and API",
+                "url": "https://choice.eastmoney.com/"
+              }
+            ],
+            "trial_contact_path": "Contact Choice data service at choiceinfo@eastmoney.com or 400-620-1818."
+          },
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -168,6 +212,27 @@
           "dataset_notes": "China market terminal/news package pending PM trial checklist",
           "decision_label": "Paid Trial",
           "dev_ready": false,
+          "evaluation_pack": {
+            "api_availability": "iFinD quant/data API documentation exists; exact package and entitlement require vendor confirmation.",
+            "cost_contract_notes": "Enterprise contract required; confirm Linux/API availability and news/research entitlements.",
+            "dataset_categories": [
+              "market_data_context",
+              "raw_news",
+              "broker_research"
+            ],
+            "market_coverage": "China-first institutional financial data, terminal, research, macro, and alternative-data cooperation.",
+            "official_source_links": [
+              {
+                "title": "iFinD partner platform",
+                "url": "https://partners.51ifind.com/"
+              },
+              {
+                "title": "iFinD quant API FAQ",
+                "url": "https://quantapi.51ifind.com/gwstatic/static/ds_web/quantapi-web/help-center/faq.html"
+              }
+            ],
+            "trial_contact_path": "Use iFinD partner/cooperation channel first; PM must obtain vendor contact and package details."
+          },
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -186,6 +251,27 @@
           "dataset_notes": "global raw news and licensed news API scope pending PM contact",
           "decision_label": "Paid Trial",
           "dev_ready": false,
+          "evaluation_pack": {
+            "api_availability": "Reuters/LSEG News Service supports structured JSON, streaming, and request-response API surfaces.",
+            "cost_contract_notes": "Enterprise contract and entitlement required; archives and redistribution terms must be confirmed.",
+            "dataset_categories": [
+              "raw_news",
+              "machine_readable_news",
+              "event_sentiment_analytics"
+            ],
+            "market_coverage": "Global Reuters and third-party news with metadata, topic codes, timestamps, sentiment, and significance.",
+            "official_source_links": [
+              {
+                "title": "LSEG News Service developer portal",
+                "url": "https://developers.lseg.com/en/product/news/news_service_rdp"
+              },
+              {
+                "title": "LSEG Real Time News",
+                "url": "https://www.lseg.com/en/data-analytics/financial-data/financial-news-coverage/political-news-feeds-analysis/real-time-news"
+              }
+            ],
+            "trial_contact_path": "Request details / free trial through LSEG product and developer portal pages."
+          },
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -204,6 +290,23 @@
           "dataset_notes": "event/sentiment analytics scope pending PM trial package",
           "decision_label": "Paid Trial",
           "dev_ready": false,
+          "evaluation_pack": {
+            "api_availability": "News analytics product provides entity/event analytics; API/package details require trial confirmation.",
+            "cost_contract_notes": "Enterprise contract required; confirm source coverage, history, redistribution, and usage limits.",
+            "dataset_categories": [
+              "machine_readable_news",
+              "event_sentiment_analytics",
+              "raw_news"
+            ],
+            "market_coverage": "Global news and social-media analytics with relevance, novelty, sentiment, topic, and event scoring.",
+            "official_source_links": [
+              {
+                "title": "RavenPack News Analytics",
+                "url": "https://www.ravenpack.com/products/edge/data/news-analytics"
+              }
+            ],
+            "trial_contact_path": "Request a trial from RavenPack News Analytics product page."
+          },
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -222,6 +325,32 @@
           "dataset_notes": "transcripts, research, and market-intelligence scope pending contract review",
           "decision_label": "Paid Trial",
           "dev_ready": false,
+          "evaluation_pack": {
+            "api_availability": "AlphaSense developer docs describe API access; platform also lists ingestion API/connectors.",
+            "cost_contract_notes": "Subscription/package required; confirm API availability, content export rights, and broker research access.",
+            "dataset_categories": [
+              "transcripts",
+              "broker_research",
+              "filings",
+              "raw_news"
+            ],
+            "market_coverage": "Global market intelligence: filings, transcripts, broker research, expert calls, news, trade journals, and regulatory documents.",
+            "official_source_links": [
+              {
+                "title": "AlphaSense contact",
+                "url": "https://www.alpha-sense.com/contact/"
+              },
+              {
+                "title": "AlphaSense API docs",
+                "url": "https://developer.alpha-sense.com/api/next/getting-started/"
+              },
+              {
+                "title": "AlphaSense pricing/content overview",
+                "url": "https://prod.alpha-sense.com/pricing/"
+              }
+            ],
+            "trial_contact_path": "Contact AlphaSense sales/support; API docs say to reach apisupport@alphasense.com to begin a trial."
+          },
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -240,6 +369,31 @@
           "dataset_notes": "news API feasibility pending PM package review",
           "decision_label": "Paid Trial",
           "dev_ready": false,
+          "evaluation_pack": {
+            "api_availability": "REST, TCP push, websocket, and documented newsfeed endpoints are available by subscription.",
+            "cost_contract_notes": "Subscription/API key required; confirm redistribution, display rights, and endpoint entitlements.",
+            "dataset_categories": [
+              "raw_news",
+              "transcripts",
+              "filings"
+            ],
+            "market_coverage": "North America-focused market news, stock news, transcripts, press releases, SEC filings, and alternative datasets.",
+            "official_source_links": [
+              {
+                "title": "Benzinga APIs",
+                "url": "https://www.benzinga.com/apis"
+              },
+              {
+                "title": "Benzinga News API docs",
+                "url": "https://docs.benzinga.com/api-reference/news-api/overview"
+              },
+              {
+                "title": "Benzinga Stock News API",
+                "url": "https://www.benzinga.com/apis/in/cloud-product/stock-news-api/"
+              }
+            ],
+            "trial_contact_path": "Email licensing@benzinga.com, call 877-440-9464, or request access from Benzinga API pages."
+          },
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -258,6 +412,32 @@
           "dataset_notes": "news API feasibility and permission tier pending PM review",
           "decision_label": "Paid Trial",
           "dev_ready": false,
+          "evaluation_pack": {
+            "api_availability": "Documented REST market-news endpoint and SDK examples are available.",
+            "cost_contract_notes": "Published self-serve and paid tiers exist; confirm news and transcript permissions for production use.",
+            "dataset_categories": [
+              "raw_news",
+              "transcripts",
+              "filings",
+              "market_data_context"
+            ],
+            "market_coverage": "Global market API with news, filings, transcripts, fundamentals, estimates, and alternative data depending on tier.",
+            "official_source_links": [
+              {
+                "title": "Finnhub home",
+                "url": "https://finnhub.io/"
+              },
+              {
+                "title": "Finnhub market news API docs",
+                "url": "https://www.finnhub.io/docs/api/market-news"
+              },
+              {
+                "title": "Finnhub pricing",
+                "url": "https://api.finnhub.io/pricing"
+              }
+            ],
+            "trial_contact_path": "Start from Finnhub self-serve API key and pricing page; contact sales for production tiers."
+          },
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -276,6 +456,22 @@
           "dataset_notes": "requires PM permission/live-smoke investigation before integration",
           "decision_label": "Backlog",
           "dev_ready": false,
+          "evaluation_pack": {
+            "api_availability": "Tushare Pro API availability is score/permission gated by endpoint.",
+            "cost_contract_notes": "Permission points and frequency tiers apply; endpoint-specific news rights need live smoke confirmation.",
+            "dataset_categories": [
+              "raw_news",
+              "market_data_context"
+            ],
+            "market_coverage": "China market data community/API; news availability depends on endpoint permission.",
+            "official_source_links": [
+              {
+                "title": "Tushare permission model",
+                "url": "https://tushare.pro/document/1?doc_id=108"
+              }
+            ],
+            "trial_contact_path": "PM must verify Tushare account score/permission and whether target news endpoints are enabled."
+          },
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -305,6 +501,7 @@
           "dataset_notes": "",
           "decision_label": "Can-Do",
           "dev_ready": true,
+          "evaluation_pack": {},
           "freshness_expectation": "same_day_when_gateway_live",
           "identifier_mapping_need": "A-share symbol, company name, announcement id",
           "integration_path": "Gateway source-events adapter already smoke-tested; FNI consumes governed source events.",
@@ -323,6 +520,7 @@
           "dataset_notes": "",
           "decision_label": "Can-Do",
           "dev_ready": true,
+          "evaluation_pack": {},
           "freshness_expectation": "same_day_when_gateway_live",
           "identifier_mapping_need": "CIK, ticker, accession number",
           "integration_path": "Gateway source-events adapter already smoke-tested; FNI consumes governed source events.",
@@ -341,6 +539,7 @@
           "dataset_notes": "",
           "decision_label": "Crawl Pilot",
           "dev_ready": true,
+          "evaluation_pack": {},
           "freshness_expectation": "same_day_after_review",
           "identifier_mapping_need": "exchange symbol, announcement id",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -359,6 +558,7 @@
           "dataset_notes": "",
           "decision_label": "Crawl Pilot",
           "dev_ready": true,
+          "evaluation_pack": {},
           "freshness_expectation": "same_day_after_review",
           "identifier_mapping_need": "HK ticker, issuer id",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -377,6 +577,7 @@
           "dataset_notes": "",
           "decision_label": "Crawl Pilot",
           "dev_ready": true,
+          "evaluation_pack": {},
           "freshness_expectation": "daily_or_on_demand",
           "identifier_mapping_need": "company domain, ticker, legal entity",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -395,6 +596,7 @@
           "dataset_notes": "",
           "decision_label": "Crawl Pilot",
           "dev_ready": true,
+          "evaluation_pack": {},
           "freshness_expectation": "daily_or_weekly",
           "identifier_mapping_need": "agency, policy topic, industry tags",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -424,6 +626,7 @@
           "dataset_notes": "",
           "decision_label": "Crawl Pilot",
           "dev_ready": true,
+          "evaluation_pack": {},
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -442,6 +645,7 @@
           "dataset_notes": "",
           "decision_label": "Crawl Pilot",
           "dev_ready": true,
+          "evaluation_pack": {},
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -460,6 +664,7 @@
           "dataset_notes": "",
           "decision_label": "Avoid",
           "dev_ready": false,
+          "evaluation_pack": {},
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -489,6 +694,7 @@
           "dataset_notes": "mention count, entity mentions, topics, freshness, source health",
           "decision_label": "Backlog",
           "dev_ready": false,
+          "evaluation_pack": {},
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -507,6 +713,7 @@
           "dataset_notes": "China community heat only after permission/risk status is clear",
           "decision_label": "Backlog",
           "dev_ready": false,
+          "evaluation_pack": {},
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",
@@ -525,6 +732,7 @@
           "dataset_notes": "official API/licensed/compliant access only; no stealth or proxy evasion",
           "decision_label": "Backlog",
           "dev_ready": false,
+          "evaluation_pack": {},
           "freshness_expectation": "",
           "identifier_mapping_need": "",
           "integration_path": "Requires owner-specific adapter contract before implementation.",

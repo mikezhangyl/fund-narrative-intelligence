@@ -4,6 +4,10 @@ from datetime import UTC, datetime
 from html import escape
 from typing import Any
 
+from src.scanners.narrative_source_provider_evaluations import (
+    licensed_provider_evaluation,
+)
+
 
 def build_narrative_source_decision_matrix(
     *,
@@ -117,6 +121,7 @@ def render_narrative_source_decision_matrix_html(matrix: dict[str, Any]) -> str:
             "</section>",
             _groups_table(_list(matrix.get("source_groups"))),
             _providers_table(_list(matrix.get("source_groups"))),
+            _licensed_evaluation_table(_list(matrix.get("source_groups"))),
             _contract_table(_mapping(matrix.get("architecture_contract"))),
             "</main>",
             "</body>",
@@ -147,6 +152,7 @@ def _source_groups() -> list[dict[str, Any]]:
                     blocking_gate="PM investigation required",
                     dataset_notes="raw news, disclosures, terminal research context depending on licensed package",
                     recommended_trial_role="china_first_candidate_pending_pm_trial",
+                    evaluation_pack=licensed_provider_evaluation("wind_financial_terminal"),
                     dev_ready=False,
                 ),
                 _provider(
@@ -160,6 +166,7 @@ def _source_groups() -> list[dict[str, Any]]:
                     blocking_gate="PM investigation required",
                     dataset_notes="China market news and terminal datasets pending PM package review",
                     recommended_trial_role="china_first_candidate_pending_pm_trial",
+                    evaluation_pack=licensed_provider_evaluation("choice_financial_terminal"),
                     dev_ready=False,
                 ),
                 _provider(
@@ -173,6 +180,7 @@ def _source_groups() -> list[dict[str, Any]]:
                     blocking_gate="PM investigation required",
                     dataset_notes="China market terminal/news package pending PM trial checklist",
                     recommended_trial_role="china_first_candidate_pending_pm_trial",
+                    evaluation_pack=licensed_provider_evaluation("ifind_financial_terminal"),
                     dev_ready=False,
                 ),
                 _provider(
@@ -186,6 +194,7 @@ def _source_groups() -> list[dict[str, Any]]:
                     blocking_gate="PM investigation required",
                     dataset_notes="global raw news and licensed news API scope pending PM contact",
                     recommended_trial_role="global_raw_news_candidate_pending_pm_trial",
+                    evaluation_pack=licensed_provider_evaluation("lseg_reuters_news"),
                     dev_ready=False,
                 ),
                 _provider(
@@ -199,6 +208,7 @@ def _source_groups() -> list[dict[str, Any]]:
                     blocking_gate="PM investigation required",
                     dataset_notes="event/sentiment analytics scope pending PM trial package",
                     recommended_trial_role="global_news_analytics_candidate_pending_pm_trial",
+                    evaluation_pack=licensed_provider_evaluation("ravenpack_news_analytics"),
                     dev_ready=False,
                 ),
                 _provider(
@@ -211,6 +221,7 @@ def _source_groups() -> list[dict[str, Any]]:
                     "low",
                     blocking_gate="PM investigation required",
                     dataset_notes="transcripts, research, and market-intelligence scope pending contract review",
+                    evaluation_pack=licensed_provider_evaluation("alphasense_market_intelligence"),
                     dev_ready=False,
                 ),
                 _provider(
@@ -223,6 +234,7 @@ def _source_groups() -> list[dict[str, Any]]:
                     "low",
                     blocking_gate="PM investigation required",
                     dataset_notes="news API feasibility pending PM package review",
+                    evaluation_pack=licensed_provider_evaluation("benzinga_news"),
                     dev_ready=False,
                 ),
                 _provider(
@@ -235,6 +247,7 @@ def _source_groups() -> list[dict[str, Any]]:
                     "low",
                     blocking_gate="PM investigation required",
                     dataset_notes="news API feasibility and permission tier pending PM review",
+                    evaluation_pack=licensed_provider_evaluation("finnhub_news"),
                     dev_ready=False,
                 ),
                 _provider(
@@ -247,6 +260,7 @@ def _source_groups() -> list[dict[str, Any]]:
                     "medium",
                     blocking_gate="PM investigation required",
                     dataset_notes="requires PM permission/live-smoke investigation before integration",
+                    evaluation_pack=licensed_provider_evaluation("tushare_news_permissions"),
                     dev_ready=False,
                 ),
             ],
@@ -447,6 +461,7 @@ def _provider(
     identifier_mapping_need: str = "",
     retention_policy: str = "metadata_and_permitted_excerpt",
     integration_path: str = "",
+    evaluation_pack: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "provider_id": provider_id,
@@ -465,6 +480,7 @@ def _provider(
         "identifier_mapping_need": identifier_mapping_need,
         "retention_policy": retention_policy,
         "integration_path": integration_path or "Requires owner-specific adapter contract before implementation.",
+        "evaluation_pack": evaluation_pack or {},
     }
 
 
@@ -570,6 +586,48 @@ def _providers_table(groups: list[Any]) -> str:
         "Provider / source 评估",
         [_mapping(provider) for provider in providers],
         ("provider_id", "name", "decision_label", "owner_service", "output_role", "anti_bot_risk", "blocking_gate"),
+    )
+
+
+def _licensed_evaluation_table(groups: list[Any]) -> str:
+    licensed_group = next(
+        (
+            _mapping(group)
+            for group in groups
+            if _mapping(group).get("group_id") == "licensed_news_market_intelligence"
+        ),
+        {},
+    )
+    rows = []
+    for provider in _list(licensed_group.get("providers")):
+        mapped = _mapping(provider)
+        evaluation = _mapping(mapped.get("evaluation_pack"))
+        rows.append(
+            {
+                "provider": mapped.get("name"),
+                "trial_contact_path": evaluation.get("trial_contact_path"),
+                "api_availability": evaluation.get("api_availability"),
+                "cost_contract_notes": evaluation.get("cost_contract_notes"),
+                "dataset_categories": ", ".join(
+                    str(category) for category in _list(evaluation.get("dataset_categories"))
+                ),
+                "official_source_links": ", ".join(
+                    str(_mapping(link).get("url"))
+                    for link in _list(evaluation.get("official_source_links"))
+                ),
+            }
+        )
+    return _table(
+        "Provider trial/API 评估",
+        rows,
+        (
+            "provider",
+            "trial_contact_path",
+            "api_availability",
+            "cost_contract_notes",
+            "dataset_categories",
+            "official_source_links",
+        ),
     )
 
 
