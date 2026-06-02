@@ -44,6 +44,7 @@ def test_route_registry_declares_product_pages_and_data_sources():
         "replay_stability_evaluation",
         "replay_alert_review",
         "collaboration_handoff",
+        "backup_restore_archive",
         "portfolio_workspace",
         "workspace_state",
         "production_readiness",
@@ -52,9 +53,9 @@ def test_route_registry_declares_product_pages_and_data_sources():
         "config_preflight",
     ]
     assert registry["summary"] == {
-        "route_count": 18,
+        "route_count": 19,
         "live_api_route_count": 2,
-        "generated_artifact_route_count": 16,
+        "generated_artifact_route_count": 17,
         "fixture_demo_route_count": 0,
         "degraded_route_count": 0,
     }
@@ -265,7 +266,7 @@ def test_product_shell_home_and_artifact_browser_use_registry_and_index(tmp_path
     browser = render_artifact_browser_html(shell)
 
     assert shell["version"] == "product-shell-v1"
-    assert shell["summary"]["route_count"] == 18
+    assert shell["summary"]["route_count"] == 19
     assert shell["summary"]["artifact_count"] == 1
     assert shell["summary"]["narrative_count"] == 2
     assert "<h1>Fund Narrative Intelligence 产品首页</h1>" in home
@@ -301,7 +302,7 @@ def test_build_product_shell_cli_writes_registry_index_home_and_browser(tmp_path
     )
 
     assert exit_code == 0
-    assert json.loads((shell_dir / "route_registry.json").read_text())["summary"]["route_count"] == 18
+    assert json.loads((shell_dir / "route_registry.json").read_text())["summary"]["route_count"] == 19
     assert json.loads((shell_dir / "artifact_index.json").read_text())["summary"]["artifact_count"] == 1
     assert (shell_dir / "narrative_data.json").exists()
     assert (shell_dir / "narrative_data.html").exists()

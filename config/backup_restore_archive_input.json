@@ -1,0 +1,18 @@
+{
+  "include_paths": [
+    "outputs/product_shell/round8-current/workspace_state.json",
+    "outputs/product_shell/round8-current/route_registry.json",
+    "outputs/product_shell/round8-current/product_shell.json",
+    "outputs/product_shell/round8-current/release_manifest.json",
+    "outputs/collaboration_handoff/current/collaboration_handoff_bundle.json",
+    "outputs/narrative_research_workbench/current/narrative_research_export_pack.json",
+    "outputs/historical_replay/current/historical_replay_run.json",
+    "outputs/historical_replay/current/replay_stability_evaluation.json",
+    "outputs/historical_replay/current/replay_alert_review.json"
+  ],
+  "release_metadata": {
+    "compatibility": "local-deterministic",
+    "release_id": "r12-collaboration-readiness-local",
+    "version": "2026.06.02"
+  }
+}

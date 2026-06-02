@@ -91,7 +91,7 @@ def test_route_registry_includes_source_quality_dashboard_route():
     assert route["data_source"]["json_path"] == (
         "outputs/product_shell/round8-current/source_quality_dashboard.json"
     )
-    assert registry["summary"]["route_count"] == 18
+    assert registry["summary"]["route_count"] == 19
 
 
 def test_build_product_shell_cli_writes_source_quality_dashboard(tmp_path):

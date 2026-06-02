@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T00:40:35.985278+00:00",
+  "generated_at": "2026-06-02T00:53:10.562002+00:00",
   "global_client_policy": {
     "business_logic_location": "service_or_artifact_only",
     "provider_access_allowed": false,
@@ -333,6 +333,32 @@
       "data_source": {
         "degradation_status": "ok",
         "freshness_status": "artifact_reported",
+        "html_path": "outputs/backup_restore_archive/current/backup_restore_archive.html",
+        "json_path": "outputs/backup_restore_archive/current/backup_restore_archive_manifest.json",
+        "source": "outputs/backup_restore_archive/current/",
+        "type": "generated_artifact"
+      },
+      "label_en": "Backup restore and portable release archive",
+      "label_zh": "备份恢复与便携发布归档",
+      "owner_service": "FNI",
+      "path": "/governance/backup-restore",
+      "route_id": "backup_restore_archive"
+    },
+    {
+      "client_policy": {
+        "forbidden_logic": [
+          "provider_access",
+          "narrative_scoring",
+          "quality_scoring",
+          "portfolio_aggregation",
+          "trading_recommendation"
+        ],
+        "provider_access_allowed": false,
+        "score_recomputation_allowed": false
+      },
+      "data_source": {
+        "degradation_status": "ok",
+        "freshness_status": "artifact_reported",
         "html_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.html",
         "json_path": "outputs/portfolio_narrative_workspace/round6-final/portfolio_narrative_workspace.json",
         "source": "outputs/portfolio_narrative_workspace/",
@@ -478,9 +504,9 @@
   "summary": {
     "degraded_route_count": 0,
     "fixture_demo_route_count": 0,
-    "generated_artifact_route_count": 16,
+    "generated_artifact_route_count": 17,
     "live_api_route_count": 2,
-    "route_count": 18
+    "route_count": 19
   },
   "version": "product-shell-route-registry-v1"
 }

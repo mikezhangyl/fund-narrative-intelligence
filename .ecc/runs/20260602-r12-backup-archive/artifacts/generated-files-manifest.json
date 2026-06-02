@@ -1,0 +1,64 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/backup_restore_archive/current/backup_restore_archive_manifest.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "7aeb19b2aa4517a43347fe73ed5ebcf099efd01c556a9bb61bf04a72d41078ac",
+      "mtime_epoch": 1780361590,
+      "size_bytes": 4482,
+      "summary": "Backup restore archive integrity manifest."
+    },
+    {
+      "type": "html",
+      "path": "outputs/backup_restore_archive/current/backup_restore_archive.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "7325902040712bece832e4d56d151393cb32a9c07a83947912f592f3785fd210",
+      "mtime_epoch": 1780361590,
+      "size_bytes": 2868,
+      "summary": "Canonical Chinese backup restore report."
+    },
+    {
+      "type": "zip",
+      "path": "outputs/backup_restore_archive/current/backup_restore_archive.zip",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "2eec8f50aca36470a8bcef7ee92fe7594db1758dcc48eff9480ba4082874c8b7",
+      "mtime_epoch": 1780361590,
+      "size_bytes": 46561,
+      "summary": "Portable backup restore zip archive."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "15ff36ec26b2e51bedbd46337df5baf17ce011d5d1b4f2096c59fc624887d7bf",
+      "mtime_epoch": 1780361590,
+      "size_bytes": 17829,
+      "summary": "Product shell route registry including /governance/backup-restore."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "e76d421262aa3a9541c15bc1687f7361d7f6faffbf1ed5099b8aab440ab6d0c4",
+      "mtime_epoch": 1780361590,
+      "size_bytes": 399648,
+      "summary": "Product shell payload including backup restore archive artifact."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "committed",
+      "checksum_sha256": "9166f3b2c95214924eb4951ebe5e849c782c8e2f25fe5c31d3ce0cb83e9e5dfb",
+      "mtime_epoch": 1780361590,
+      "size_bytes": 273644,
+      "summary": "Artifact index including backup restore archive outputs."
+    }
+  ]
+}

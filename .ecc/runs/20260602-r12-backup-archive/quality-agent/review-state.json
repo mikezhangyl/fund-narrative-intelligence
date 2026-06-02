@@ -1,0 +1,11 @@
+{
+  "review_id": "20260602-r12-backup-archive",
+  "status": "passed",
+  "reviewed_at": "2026-06-02T08:35:00+08:00",
+  "reviewed_snapshot_type": "committed",
+  "quality_reviewed_commit": "6457518711f50a9c52ce671723bb3a5a0bedef73",
+  "working_tree_dirty": false,
+  "fix_required_before_next_phase": false,
+  "findings_count": 0,
+  "unresolved_findings_count": 0
+}

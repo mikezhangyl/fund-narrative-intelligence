@@ -1,0 +1,113 @@
+{
+  "archive": {
+    "format": "zip",
+    "zip_path": "outputs/backup_restore_archive/current/backup_restore_archive.zip"
+  },
+  "excluded_files": [],
+  "generated_at": "2026-06-02T00:53:10.495015+00:00",
+  "included_files": [
+    {
+      "checksum_sha256": "18a0af39f75025e5faaa0341b8bc11feccbbc99f245ac908552161d4112bf861",
+      "path": "outputs/collaboration_handoff/current/collaboration_handoff_bundle.json",
+      "size_bytes": 11351
+    },
+    {
+      "checksum_sha256": "57d8432822334381c6c3fafbfa7935adbea81c2c7f87394f5e8ebd64e89514de",
+      "path": "outputs/historical_replay/current/historical_replay_run.json",
+      "size_bytes": 9269
+    },
+    {
+      "checksum_sha256": "8989b75f2d589d4b9ec493e8701ccb5e3af87e56f02af9fec60ff502cde679c7",
+      "path": "outputs/historical_replay/current/replay_alert_review.json",
+      "size_bytes": 4046
+    },
+    {
+      "checksum_sha256": "c5a84427e841f3d47b5ddeb7f639a61931cf539a6beec319e4b5868198d15012",
+      "path": "outputs/historical_replay/current/replay_stability_evaluation.json",
+      "size_bytes": 1526
+    },
+    {
+      "checksum_sha256": "0e7498b0950d57f69600f9a1383bf3a197254fd98bcb53e5a3a50729ec021d78",
+      "path": "outputs/narrative_research_workbench/current/narrative_research_export_pack.json",
+      "size_bytes": 14683
+    },
+    {
+      "checksum_sha256": "9566de2e64cd4049d05b39228602dac5a95faf90a46aae3bf6744cc3afab27e6",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "size_bytes": 398065
+    },
+    {
+      "checksum_sha256": "8f645817f2b7d7395c384bc8fe9e1ba4cf9fbcedb02a9bfdea3b40463064ff89",
+      "path": "outputs/product_shell/round8-current/release_manifest.json",
+      "size_bytes": 2997
+    },
+    {
+      "checksum_sha256": "5af2212dcaaff1651a1b06cacc05c6c98bc4dba07e9cfebb9c17e7581ea390cf",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "size_bytes": 16853
+    },
+    {
+      "checksum_sha256": "99e625fb12fb0c56d6de5710451f89df83dcd392bec8ae4e7eea817b2fb50715",
+      "path": "outputs/product_shell/round8-current/workspace_state.json",
+      "size_bytes": 1679
+    }
+  ],
+  "integrity_manifest": {
+    "algorithm": "sha256",
+    "files": [
+      {
+        "checksum_sha256": "18a0af39f75025e5faaa0341b8bc11feccbbc99f245ac908552161d4112bf861",
+        "path": "outputs/collaboration_handoff/current/collaboration_handoff_bundle.json"
+      },
+      {
+        "checksum_sha256": "57d8432822334381c6c3fafbfa7935adbea81c2c7f87394f5e8ebd64e89514de",
+        "path": "outputs/historical_replay/current/historical_replay_run.json"
+      },
+      {
+        "checksum_sha256": "8989b75f2d589d4b9ec493e8701ccb5e3af87e56f02af9fec60ff502cde679c7",
+        "path": "outputs/historical_replay/current/replay_alert_review.json"
+      },
+      {
+        "checksum_sha256": "c5a84427e841f3d47b5ddeb7f639a61931cf539a6beec319e4b5868198d15012",
+        "path": "outputs/historical_replay/current/replay_stability_evaluation.json"
+      },
+      {
+        "checksum_sha256": "0e7498b0950d57f69600f9a1383bf3a197254fd98bcb53e5a3a50729ec021d78",
+        "path": "outputs/narrative_research_workbench/current/narrative_research_export_pack.json"
+      },
+      {
+        "checksum_sha256": "9566de2e64cd4049d05b39228602dac5a95faf90a46aae3bf6744cc3afab27e6",
+        "path": "outputs/product_shell/round8-current/product_shell.json"
+      },
+      {
+        "checksum_sha256": "8f645817f2b7d7395c384bc8fe9e1ba4cf9fbcedb02a9bfdea3b40463064ff89",
+        "path": "outputs/product_shell/round8-current/release_manifest.json"
+      },
+      {
+        "checksum_sha256": "5af2212dcaaff1651a1b06cacc05c6c98bc4dba07e9cfebb9c17e7581ea390cf",
+        "path": "outputs/product_shell/round8-current/route_registry.json"
+      },
+      {
+        "checksum_sha256": "99e625fb12fb0c56d6de5710451f89df83dcd392bec8ae4e7eea817b2fb50715",
+        "path": "outputs/product_shell/round8-current/workspace_state.json"
+      }
+    ]
+  },
+  "release_metadata": {
+    "compatibility": "local-deterministic",
+    "release_id": "r12-collaboration-readiness-local",
+    "version": "2026.06.02"
+  },
+  "restore_contract": {
+    "compatibility_version": "backup-restore-archive-v1",
+    "current_state_overwrite_allowed_without_validation": false,
+    "restore_validation_required": true,
+    "rollback_supported": true
+  },
+  "summary": {
+    "excluded_file_count": 0,
+    "included_file_count": 9,
+    "warning_count": 0
+  },
+  "version": "backup-restore-archive-v1"
+}

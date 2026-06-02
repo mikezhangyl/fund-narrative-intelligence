@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "Archive scope is selected current artifacts, not every historical output.",
+    "Restore operation remains a validation contract; destructive restore is not automated."
+  ]
+}

@@ -151,6 +151,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="backup_restore_archive",
+            path="/governance/backup-restore",
+            label_zh="备份恢复与便携发布归档",
+            label_en="Backup restore and portable release archive",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/backup_restore_archive/current/",
+            json_path="outputs/backup_restore_archive/current/backup_restore_archive_manifest.json",
+            html_path="outputs/backup_restore_archive/current/backup_restore_archive.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="portfolio_workspace",
             path="/workspace/portfolio",
             label_zh="组合叙事工作台",
