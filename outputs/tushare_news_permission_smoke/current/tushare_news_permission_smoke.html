@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tushare news 权限与 live smoke</title>
+<style>
+body { margin: 0; background: #f7f8fa; color: #1f2933; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 48px; }
+h1 { font-size: 30px; margin: 0 0 16px; }
+h2 { font-size: 20px; margin: 28px 0 12px; }
+.summary { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 16px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d8dee8; border-radius: 8px; overflow: hidden; }
+th, td { border-bottom: 1px solid #edf0f5; padding: 10px 12px; text-align: left; vertical-align: top; font-size: 13px; }
+th { background: #eef2f7; color: #323f4b; }
+</style>
+</head>
+<body>
+<main class="page">
+<h1>Tushare news 权限与 live smoke</h1>
+<section class="summary">
+<p><strong>总体状态:</strong> Blocked</p>
+<p><strong>src 数:</strong> 6</p>
+<p><strong>Dev-Ready:</strong> 0</p>
+<p><strong>Paid Permission Required:</strong> 0</p>
+<p><strong>Blocked:</strong> 6</p>
+<p><strong>No Data:</strong> 0</p>
+<p>本检查只使用现有本地 env/token 与 Gateway news briefs 路径，不新增认证机制，不把 news integration 直接放进 FNI。</p>
+</section>
+<section><h2>src smoke 结果</h2><table><thead><tr><th>src</th><th>状态</th><th>Rows</th><th>失败原因</th><th>样例标题</th></tr></thead><tbody><tr><td>sina</td><td>Blocked</td><td>0</td><td>No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: &lt;urlopen error [Errno 61] Connection refused&gt;</td><td></td></tr><tr><td>wallstreetcn</td><td>Blocked</td><td>0</td><td>No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: &lt;urlopen error [Errno 61] Connection refused&gt;</td><td></td></tr><tr><td>10jqka</td><td>Blocked</td><td>0</td><td>No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: &lt;urlopen error [Errno 61] Connection refused&gt;</td><td></td></tr><tr><td>eastmoney</td><td>Blocked</td><td>0</td><td>No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: &lt;urlopen error [Errno 61] Connection refused&gt;</td><td></td></tr><tr><td>yicai</td><td>Blocked</td><td>0</td><td>No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: &lt;urlopen error [Errno 61] Connection refused&gt;</td><td></td></tr><tr><td>cls</td><td>Blocked</td><td>0</td><td>No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: &lt;urlopen error [Errno 61] Connection refused&gt;</td><td></td></tr></tbody></table></section>
+</main>
+</body>
+</html>

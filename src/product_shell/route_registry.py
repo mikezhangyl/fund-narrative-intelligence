@@ -235,6 +235,18 @@ def build_product_shell_route_registry(
             freshness_status="artifact_reported",
         ),
         _route(
+            route_id="tushare_news_permission_smoke",
+            path="/sources/tushare-news-smoke",
+            label_zh="Tushare news 权限与 live smoke",
+            label_en="Tushare news permission smoke",
+            owner_service="FNI",
+            data_source_type="generated_artifact",
+            source="outputs/tushare_news_permission_smoke/current/",
+            json_path="outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.json",
+            html_path="outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.html",
+            freshness_status="artifact_reported",
+        ),
+        _route(
             route_id="artifacts",
             path="/artifacts",
             label_zh="产物浏览器",

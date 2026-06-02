@@ -1,0 +1,82 @@
+{
+  "degradation_events": [],
+  "environment_diagnostics": {
+    "gateway_provider_loaded": true,
+    "market_data_gateway_configured": true
+  },
+  "generated_at": "2026-06-02T05:10:36+00:00",
+  "input": {
+    "end_datetime": "2026-06-02 23:59:59",
+    "limit": 5,
+    "source_provider": "tushare",
+    "src_values": [
+      "sina",
+      "wallstreetcn",
+      "10jqka",
+      "eastmoney",
+      "yicai",
+      "cls"
+    ],
+    "start_datetime": "2026-06-01 00:00:00"
+  },
+  "policy": {
+    "fni_integration_assignment_allowed": false,
+    "new_auth_mechanism_created": false,
+    "provider_access_boundary": "stock-data-gateway",
+    "uses_existing_auth_path_only": true
+  },
+  "src_results": [
+    {
+      "failure_reason": "No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: <urlopen error [Errno 61] Connection refused>",
+      "row_count": 0,
+      "sample_rows": [],
+      "src": "sina",
+      "status": "Blocked"
+    },
+    {
+      "failure_reason": "No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: <urlopen error [Errno 61] Connection refused>",
+      "row_count": 0,
+      "sample_rows": [],
+      "src": "wallstreetcn",
+      "status": "Blocked"
+    },
+    {
+      "failure_reason": "No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: <urlopen error [Errno 61] Connection refused>",
+      "row_count": 0,
+      "sample_rows": [],
+      "src": "10jqka",
+      "status": "Blocked"
+    },
+    {
+      "failure_reason": "No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: <urlopen error [Errno 61] Connection refused>",
+      "row_count": 0,
+      "sample_rows": [],
+      "src": "eastmoney",
+      "status": "Blocked"
+    },
+    {
+      "failure_reason": "No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: <urlopen error [Errno 61] Connection refused>",
+      "row_count": 0,
+      "sample_rows": [],
+      "src": "yicai",
+      "status": "Blocked"
+    },
+    {
+      "failure_reason": "No provider succeeded for news_briefs: local-market-data-gateway: gateway request failed: <urlopen error [Errno 61] Connection refused>",
+      "row_count": 0,
+      "sample_rows": [],
+      "src": "cls",
+      "status": "Blocked"
+    }
+  ],
+  "status": "Blocked",
+  "summary": {
+    "blocked_count": 6,
+    "dev_ready_count": 0,
+    "no_data_count": 0,
+    "paid_permission_required_count": 0,
+    "row_count": 0,
+    "src_count": 6
+  },
+  "version": "tushare-news-permission-smoke-v1"
+}

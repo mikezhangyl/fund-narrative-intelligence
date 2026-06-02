@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "The live smoke did not reach Tushare because the gateway on 127.0.0.1:8700 was not running.",
+    "A gateway-backed rerun is required before assigning any Tushare news integration work."
+  ]
+}

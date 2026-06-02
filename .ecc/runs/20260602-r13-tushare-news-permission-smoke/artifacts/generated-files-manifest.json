@@ -1,0 +1,64 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "json",
+      "path": "outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "e23115dbedb7232e428893417186d053fa18cf3d936123b61e96c9437c715272",
+      "mtime_epoch": 1780377036,
+      "size_bytes": 2582,
+      "summary": "MIK-239 Tushare news permission smoke JSON."
+    },
+    {
+      "type": "html",
+      "path": "outputs/tushare_news_permission_smoke/current/tushare_news_permission_smoke.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "e27e15d7fde847eab8868cd81bd0b07e0433759c630dd6dde26999ea1881f09f",
+      "mtime_epoch": 1780377036,
+      "size_bytes": 2847,
+      "summary": "Canonical Chinese MIK-239 Tushare news permission smoke report."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/route_registry.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "9efbf53f9913edfc5aabb6be1c33d9804de5befc4a197ad309b3c904a665b339",
+      "mtime_epoch": 1780377082,
+      "size_bytes": 20821,
+      "summary": "Product shell route registry including Tushare news smoke route."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/product_shell.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "ead447a0c00a3432cf3d5206023a6603a9b28c7523ea9fc740d529e4ef788bcc",
+      "mtime_epoch": 1780377082,
+      "size_bytes": 404701,
+      "summary": "Product shell payload including Tushare news smoke route."
+    },
+    {
+      "type": "json",
+      "path": "outputs/product_shell/round8-current/artifact_index.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "e5e4e925d0399d29288fda8e93aa5f1bd8dca27c375977e088b7de9b777fdfdf",
+      "mtime_epoch": 1780377082,
+      "size_bytes": 275465,
+      "summary": "Artifact index including Tushare news smoke artifacts."
+    },
+    {
+      "type": "html",
+      "path": "outputs/product_shell/round8-current/artifact_index.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "checksum_sha256": "380aab52c5137a1824ddf2bc5085ec518dd6223739ac0e1729212562a18b97d3",
+      "mtime_epoch": 1780377082,
+      "size_bytes": 122932,
+      "summary": "Artifact index Chinese preview including Tushare news smoke artifacts."
+    }
+  ]
+}
