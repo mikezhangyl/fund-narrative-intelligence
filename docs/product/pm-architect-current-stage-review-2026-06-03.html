@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PM/Architect 当前阶段正式复审 - 2026-06-03</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #d8e0ea;
+      --soft: #f6f8fb;
+      --ok: #0f766e;
+      --warn: #b45309;
+      --bad: #b91c1c;
+    }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.62;
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 72px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      line-height: 1.22;
+    }
+    h2 {
+      margin-top: 34px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 22px;
+    }
+    h3 {
+      margin-top: 24px;
+      font-size: 18px;
+    }
+    p, li, td, th {
+      font-size: 15px;
+    }
+    code {
+      padding: 1px 5px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--soft);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+    pre {
+      padding: 16px;
+      overflow: auto;
+      border-radius: 8px;
+      color: #edf2ff;
+      background: #111827;
+      font-size: 13px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--soft);
+    }
+    .meta {
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .decision {
+      margin: 22px 0;
+      padding: 16px 18px;
+      border-left: 4px solid var(--ok);
+      background: #edf9f6;
+    }
+    .warning {
+      margin: 22px 0;
+      padding: 16px 18px;
+      border-left: 4px solid var(--warn);
+      background: #fff8ed;
+    }
+    .status-ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+    .status-warn {
+      color: var(--warn);
+      font-weight: 700;
+    }
+    .status-bad {
+      color: var(--bad);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>PM/Architect 当前阶段正式复审</h1>
+    <p class="meta">日期：2026-06-03；对象：FNI 当前 <code>main</code>；复审范围：产品壳、真实叙事数据入口、来源质量、gateway 边界、当前 artifacts。</p>
+
+    <section class="decision">
+      <strong>总结论：</strong>当前 FNI 可以接受为下一阶段开发底座。它已经具备本地产品壳、artifact 浏览、release/preflight、真实叙事 artifact 入口、来源质量展示和 gateway 边界控制。但它还不能被称为生产级 live narrative discovery 产品。
+    </section>
+
+    <h2>验证</h2>
+    <pre><code>uv run pytest tests/test_product_shell.py \
+  tests/test_product_shell_release.py \
+  tests/test_product_shell_source_quality.py \
+  tests/test_product_shell_workspace_store.py \
+  tests/test_fresh_narrative_digest.py \
+  tests/test_narrative_source_gateway_consumer.py \
+  tests/test_narrative_source_boundary.py \
+  tests/test_tushare_news_permission_smoke.py \
+  tests/test_source_investigation_gate_pack.py -q</code></pre>
+    <p>结果：<code>60 passed</code>。</p>
+    <p>针对性 <code>ruff check</code> 通过。</p>
+
+    <h2>验收表</h2>
+    <table>
+      <thead>
+        <tr><th>区域</th><th>结论</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>产品壳</td>
+          <td class="status-ok">通过</td>
+          <td>本地 shell、artifact browser、config preflight、release manifest、acceptance checklist 都已生成；checklist 为 <code>pass</code>。</td>
+        </tr>
+        <tr>
+          <td>真实叙事数据入口</td>
+          <td class="status-warn">通过但有限制</td>
+          <td>入口能展示 Narrative Service / FNI 既有真实 artifact，但不是“今天实时叙事发现”能力。</td>
+        </tr>
+        <tr>
+          <td>来源质量</td>
+          <td class="status-warn">通过但需补强</td>
+          <td>dashboard 正确显示 <code>degraded</code> 和 blocked sources；后续要把每个 gateway source kind 都作为 coverage row 展示。</td>
+        </tr>
+        <tr>
+          <td>gateway 边界</td>
+          <td class="status-ok">通过</td>
+          <td>FNI 只消费 gateway contract/probe/artifact；外部采集继续属于 <code>stock-data-gateway</code>。</td>
+        </tr>
+        <tr>
+          <td>当前 artifacts</td>
+          <td class="status-ok">通过</td>
+          <td>足够支撑下一阶段本地产品和 operator workflow 开发。</td>
+        </tr>
+        <tr>
+          <td>Tushare news live smoke</td>
+          <td class="status-bad">当前阻塞</td>
+          <td>当前 artifact 显示 gateway connection refused；这不阻塞本地 release，但阻塞 live news source 宣称。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>关键发现</h2>
+    <h3>1. 产品壳已经能支撑下一阶段</h3>
+    <p><code>outputs/product_shell/round8-current/</code> 下已有首页、artifact browser、route registry、config preflight、release manifest、acceptance checklist、source quality dashboard、workspace state/export 和 narrative data。当前 checklist 为 <code>pass</code>，release manifest 为 <code>ok</code>。</p>
+
+    <h3>2. 真实叙事数据入口不是 live discovery</h3>
+    <p><code>narrative_data.html/json</code> 能把现有叙事、映射、证据包、质量审计和服务健康聚到一个入口，这是产品上的进步。但它的口径是 existing artifacts，不是实时采集今天全市场新叙事。</p>
+
+    <h3>3. 来源质量 dashboard 的降级是合理信号</h3>
+    <p>当前来源质量 dashboard status 为 <code>degraded</code>，这符合事实：SEC EDGAR 可以是 trusted fact，但公网媒体和社交/社区类来源仍然有 robots/TOS、节奏、禁止行为等风险。产品应该显示这些风险，而不是隐藏它们。</p>
+
+    <h3>4. gateway 边界清楚</h3>
+    <p>FNI 没有继续新增 SEC/CNINFO/news/social 直接采集适配器。这个方向必须保持：FNI 做消费、报告、探针和产品面；gateway 做外部采集、凭证、限速、缓存、标准化。</p>
+
+    <h3>5. Fresh narrative digest 现在是 contract，不是生产 feed</h3>
+    <p><code>fresh_narrative_digest</code> 当前能输出候选状态、证据链接和 trust state，但仍是 <code>candidate_untrusted</code> 口径。它可以作为下一阶段 UI/工作流入口，不能作为可信实时叙事结论。</p>
+
+    <section class="warning">
+      <strong>最大 caveat：</strong>Tushare news smoke 当前为 <code>Blocked</code>，原因是本地 gateway 请求被拒绝。这个不影响 demo release，但意味着 live news 入口还没有被本次复审接受。
+    </section>
+
+    <h2>下一阶段建议</h2>
+    <ol>
+      <li>补强 source-quality dashboard：每个 gateway source kind 都要有独立 coverage row。</li>
+      <li>把 fresh narrative digest 做成正式产品 surface，但所有未证实项保持 <code>candidate_untrusted</code>。</li>
+      <li>增加显式 live conformance lane：本地 release 不依赖凭证，live source check 作为 operator action 单独运行。</li>
+      <li>再往后进入 narrative drill-down、source-event timeline/search、review queue 和 workspace persistence 的深层工作流。</li>
+    </ol>
+
+    <h2>最终结论</h2>
+    <p>接受当前阶段。当前 FNI 已经从“脚本和报告集合”进入“本地产品控制台 + artifact-backed 数据入口 + 来源质量治理”的阶段。下一步应进入 operator workflow 和 source-aware narrative review，而不是在 FNI 内继续扩外部数据源。</p>
+  </main>
+</body>
+</html>

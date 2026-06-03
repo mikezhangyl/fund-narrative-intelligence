@@ -351,3 +351,10 @@ completed Linear issues, keeps partial shell/release items open, and reaffirms
 that real external source-event collection belongs in `stock-data-gateway`.
 The auxiliary Markdown note is
 `docs/product/pm-architect-stage-review-round4-round13-2026-06-02.md`.
+
+The current-stage PM/Architect review for the product shell, real narrative
+data entry, source quality, gateway boundary, and next-stage readiness is
+documented in
+`docs/product/pm-architect-current-stage-review-2026-06-03.html`.
+The auxiliary Markdown note is
+`docs/product/pm-architect-current-stage-review-2026-06-03.md`.
