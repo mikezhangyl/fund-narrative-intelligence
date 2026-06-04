@@ -18,13 +18,36 @@ page_size = 20
 
 ## 删除状态
 
-用户要求“归档后删除 Done US”。本次没有执行 Linear issue 删除或归档，因为当前可用 Linear 工具只暴露 issue 读取/更新，以及 comment、attachment、customer need、status update 等对象的删除能力，没有暴露 issue delete/archive 工具。
+用户要求“归档后删除 Done US”。Linear MCP 工具没有暴露 issue delete/archive 能力，因此删除通过 Linear 浏览器 UI 完成。
 
-因此：
+执行结果：
 
 * 已完成：在 repo 中保存 Done issue 归档说明和完整清单。
-* 未完成：Linear Done issue 删除/归档。
-* 未执行替代操作：没有把 Done issue 改到其他状态，也没有删除评论或附件来冒充 issue 删除。
+* 已完成：通过 Linear UI 删除 `130` 条已归档 Done 叶子 issue。
+* 已保留：`27` 条父级 requirement pack / epic / 风险项，避免删除父项时连带删除仍有结构价值或子项关系的 issue。
+* 未执行：没有执行永久删除；Linear UI 删除后显示为 `Issue deleted` / `Restore issue` 状态即可。
+
+保留的 Done issue：
+
+```text
+MIK-243, MIK-222, MIK-221,
+MIK-176, MIK-175, MIK-174, MIK-173, MIK-172, MIK-171, MIK-170, MIK-169,
+MIK-160, MIK-159,
+MIK-134, MIK-133, MIK-132, MIK-131, MIK-130, MIK-129,
+MIK-87, MIK-86,
+MIK-69, MIK-68,
+MIK-60, MIK-52,
+MIK-33, MIK-32
+```
+
+复核口径：
+
+```text
+project = Fund Narrative Intelligence
+state = Done
+includeArchived = false
+remaining_count = 27
+```
 
 ## 阶段笔记
 
