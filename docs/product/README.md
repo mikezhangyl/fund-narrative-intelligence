@@ -358,3 +358,11 @@ documented in
 `docs/product/pm-architect-current-stage-review-2026-06-03.html`.
 The auxiliary Markdown note is
 `docs/product/pm-architect-current-stage-review-2026-06-03.md`.
+
+Narrative source expansion is now open-source-first for the current phase:
+free public sources, official disclosure sources, and low-risk crawler pilots
+take priority over paid terminals/news providers. The canonical strategy is
+documented in
+`docs/product/open-source-first-narrative-data-strategy-2026-06-04.html`.
+The auxiliary Markdown note is
+`docs/product/open-source-first-narrative-data-strategy-2026-06-04.md`.
