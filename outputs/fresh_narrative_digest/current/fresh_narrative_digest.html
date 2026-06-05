@@ -21,13 +21,14 @@ th { background: #eef2f7; color: #323f4b; }
 <main class="page">
 <h1>今日叙事监控摘要</h1>
 <section class="summary">
-<p><strong>状态:</strong> ok</p>
-<p><strong>原始事件:</strong> 12</p>
-<p><strong>去重事件:</strong> 10</p>
-<p><strong>摘要项:</strong> 3</p>
+<p><strong>状态:</strong> degraded</p>
+<p><strong>原始事件:</strong> 6</p>
+<p><strong>去重事件:</strong> 6</p>
+<p><strong>摘要项:</strong> 2</p>
 <p>本摘要用于叙事监控和证据复核，不生成交易建议。</p>
 </section>
-<section><h2>摘要项</h2><table><thead><tr><th>叙事</th><th>状态</th><th>事件</th><th>来源质量</th><th>原因</th><th>证据</th></tr></thead><tbody><tr><td>半导体 A股</td><td>accelerating</td><td>3</td><td>candidate_untrusted</td><td>3 source events in the selected window.</td><td>tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52, tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f, tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7</td></tr><tr><td>AI infrastructure</td><td>cooling</td><td>5</td><td>candidate_untrusted</td><td>0 source events in the selected window.</td><td>sec_edgar:0000320193:0001140361-26-023363, sec_edgar:0000320193:0001140361-26-023149, sec_edgar:0000320193:0001921094-26-000555, sec_edgar:0000320193:0001140361-26-020871, sec_edgar:0000320193:0001140361-26-020298</td></tr><tr><td>股东会</td><td>cooling</td><td>2</td><td>candidate_untrusted</td><td>0 source events in the selected window.</td><td>cninfo:000001:000001:2026-05-22:北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书, cninfo:000001:000001:2026-05-22:2025年年度股东会决议公告</td></tr></tbody></table></section>
+<section><h2>摘要项</h2><table><thead><tr><th>叙事</th><th>状态</th><th>事件</th><th>来源质量</th><th>原因</th><th>证据</th></tr></thead><tbody><tr><td>股东会</td><td>cooling</td><td>2</td><td>candidate_untrusted</td><td>0 source events in the selected window.</td><td>cninfo:000001:000001:2026-05-22:北京市海问律师事务所关于平安银行股份有限公司2025年年度股东会的法律意见书, cninfo:000001:000001:2026-05-22:2025年年度股东会决议公告</td></tr><tr><td>solar</td><td>cooling</td><td>4</td><td>context_only</td><td>0 source events in the selected window.</td><td>industry_media:pv_tech_news:https://www.pv-tech.org/?p=170248, industry_media:pv_tech_news:https://www.pv-tech.org/?p=170241, industry_media:pv_tech_news:https://www.pv-tech.org/?p=170245, industry_media:pv_tech_news:https://www.pv-tech.org/?p=170142</td></tr></tbody></table></section>
+<section><h2>输入缺口</h2><table><thead><tr><th>来源类型</th><th>状态</th><th>原因</th><th>降级事件</th></tr></thead><tbody><tr><td>官方披露文件</td><td>missing</td><td>Gateway probe returned no source-event rows for this source kind.</td><td>NO_SOURCE_EVENTS</td></tr><tr><td>政策/监管/行业官方来源</td><td>missing</td><td>Gateway probe returned no source-event rows for this source kind.</td><td>NO_SOURCE_EVENTS</td></tr><tr><td>新闻上下文</td><td>missing</td><td>Gateway probe returned no source-event rows for this source kind.</td><td>NO_SOURCE_EVENTS</td></tr><tr><td>开放新闻索引</td><td>degraded</td><td>Gateway returned structured degraded input for this source kind.</td><td>{&#x27;code&#x27;: &#x27;REQUEST_TIMEOUT&#x27;, &#x27;message&#x27;: &#x27;Unable to fetch open news index.&#x27;, &#x27;source_kind&#x27;: &#x27;open_news_index&#x27;}, {&#x27;code&#x27;: &#x27;ALL_SOURCES_DEGRADED&#x27;, &#x27;message&#x27;: &#x27;All requested source-event providers returned degraded results.&#x27;}</td></tr><tr><td>社交热度</td><td>degraded</td><td>Gateway returned structured degraded input for this source kind.</td><td>{&#x27;code&#x27;: &#x27;SOCIAL_SOURCE_DISABLED&#x27;, &#x27;message&#x27;: &#x27;Social heat sources are disabled by default.&#x27;, &#x27;source_kind&#x27;: &#x27;social_heat&#x27;}, {&#x27;code&#x27;: &#x27;ALL_SOURCES_DEGRADED&#x27;, &#x27;message&#x27;: &#x27;All requested source-event providers returned degraded results.&#x27;}</td></tr></tbody></table></section>
 </main>
 </body>
 </html>

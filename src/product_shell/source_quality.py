@@ -7,15 +7,29 @@ from pathlib import Path
 from typing import Any
 
 REVIEW_SOURCE = "docs/product/pm-architect-stage-review-round4-round13-2026-06-02.html"
+EXPECTED_GATEWAY_SOURCE_KINDS = (
+    "official_filings",
+    "official_disclosures",
+    "official_sources",
+    "news_context",
+    "open_news_index",
+    "industry_media",
+    "social_heat",
+)
+OFFICIAL_SOURCE_KINDS = {"official_filings", "official_disclosures", "official_sources"}
 VALUE_DISPLAY = {
     "ok": "正常",
     "degraded": "已降级",
     "blocked": "已阻塞",
     "missing": "缺失",
+    "not_configured": "未配置",
     "available": "可用",
     "stale": "过期",
     "official_filings": "官方披露文件",
     "official_disclosures": "官方公告披露",
+    "official_sources": "政策/监管/行业官方来源",
+    "open_news_index": "开放新闻索引",
+    "industry_media": "行业媒体",
     "generated_artifacts": "生成产物",
     "social_heat": "社交热度",
     "news_context": "新闻上下文",
@@ -25,8 +39,11 @@ VALUE_DISPLAY = {
     "trusted_fact": "可信事实",
     "Trusted Fact": "可信事实",
     "candidate_untrusted": "未验证候选",
+    "context_only": "上下文信号",
+    "heat_signal_only": "热度信号",
     "unknown": "未知",
     "none": "无",
+    "metadata_only": "仅元数据",
     "metadata_and_public_document_reference": "元数据与公开文档引用",
     "metadata_and_permitted_excerpt": "元数据与允许展示的摘要",
     "metadata_only_until_reviewed": "复核前仅元数据",
@@ -45,6 +62,10 @@ VALUE_DISPLAY = {
     "reliability": "来源可靠性",
     "schema_v2": "来源结构 v2",
     "gateway_probe": "网关探测",
+    "gateway_source_kind": "Gateway 来源类型",
+    "governance_source": "治理来源",
+    "GATEWAY_PROBE_NOT_CONFIGURED": "Gateway 探测产物未配置",
+    "GATEWAY_SOURCE_KIND_MISSING": "Gateway 来源类型缺失",
     "Gateway owns acquisition; FNI displays generated contracts, probes, and reports.": (
         "采集由 stock-data-gateway 负责；FNI 只展示生成后的契约、探测和报告。"
     ),
@@ -113,6 +134,9 @@ def build_source_quality_dashboard(
         "status": "degraded" if missing_artifacts or stale_artifacts or degraded_sources else "ok",
         "summary": {
             "source_count": len(sources),
+            "gateway_source_kind_count": sum(
+                1 for source in sources if source["row_type"] == "gateway_source_kind"
+            ),
             "trusted_fact_count": sum(1 for source in sources if source["trust_tier"] == "trusted_fact"),
             "degraded_source_count": degraded_sources,
             "missing_artifact_count": missing_artifacts,
@@ -196,6 +220,8 @@ def _source_rows(
         rows.append(
             {
                 "source_id": source_id,
+                "row_type": "governance_source",
+                "source_kind": _source_group(source_id, source_type),
                 "display_name": str(decision.get("display_name") or score.get("display_name") or source_id),
                 "source_group": _source_group(source_id, source_type),
                 "source_type": source_type,
@@ -205,13 +231,194 @@ def _source_rows(
                 "license_scope": str(decision.get("license_scope") or ""),
                 "retention_policy": str(decision.get("retention_policy") or ""),
                 "anti_bot_risk": str(decision.get("anti_bot_risk") or ""),
+                "row_count": 0,
+                "last_successful_probe_at": "",
+                "last_probe_at": _latest_generated_at(artifacts),
                 "degradation_events": degradation_events,
                 "last_generated_at": _latest_generated_at(artifacts),
                 "artifact_paths": artifact_paths,
                 "status": status,
             }
         )
+    rows.extend(
+        _gateway_source_kind_rows(
+            gateway_probe=gateway_probe,
+            artifacts=artifacts,
+            artifact_paths=artifact_paths,
+        )
+    )
     return rows
+
+
+def _gateway_source_kind_rows(
+    *,
+    gateway_probe: dict[str, Any],
+    artifacts: list[dict[str, Any]],
+    artifact_paths: dict[str, str],
+) -> list[dict[str, Any]]:
+    probe_available = bool(gateway_probe)
+    by_kind = {
+        str(result.get("source_kind") or _mapping(result.get("meta")).get("source_kind") or ""): result
+        for result in _list(gateway_probe.get("source_results"))
+        if str(result.get("source_kind") or _mapping(result.get("meta")).get("source_kind") or "")
+    }
+    return [
+        _gateway_source_kind_row(
+            source_kind=source_kind,
+            result=_mapping(by_kind.get(source_kind)),
+            probe_available=probe_available,
+            artifacts=artifacts,
+            artifact_paths=artifact_paths,
+        )
+        for source_kind in EXPECTED_GATEWAY_SOURCE_KINDS
+    ]
+
+
+def _gateway_source_kind_row(
+    *,
+    source_kind: str,
+    result: dict[str, Any],
+    probe_available: bool,
+    artifacts: list[dict[str, Any]],
+    artifact_paths: dict[str, str],
+) -> dict[str, Any]:
+    row = _mapping(_first_gateway_row(result))
+    meta = _mapping(result.get("meta"))
+    row_count = _gateway_row_count(result)
+    degradation_events = _gateway_degradation_events(result, probe_available)
+    status = _gateway_status(source_kind, result, row_count, degradation_events, probe_available)
+    trust_tier = _gateway_trust_tier(source_kind, row, meta)
+    if status != "ok" and trust_tier == "trusted_fact":
+        trust_tier = "candidate_untrusted"
+    return {
+        "source_id": f"gateway_{source_kind}",
+        "row_type": "gateway_source_kind",
+        "source_kind": source_kind,
+        "display_name": source_kind,
+        "source_group": _gateway_source_group(source_kind),
+        "source_type": "gateway_source_event",
+        "owner_service": str(row.get("owner_service") or meta.get("owner_service") or "stock-data-gateway"),
+        "trust_tier": trust_tier,
+        "source_quality_label": _gateway_source_quality_label(source_kind, row, meta, trust_tier),
+        "license_scope": str(row.get("license_scope") or meta.get("license_scope") or "metadata_only"),
+        "retention_policy": str(
+            row.get("retention_policy")
+            or meta.get("retention_policy")
+            or _default_retention_policy(source_kind)
+        ),
+        "anti_bot_risk": str(row.get("anti_bot_risk") or meta.get("anti_bot_risk") or _default_anti_bot_risk(source_kind)),
+        "row_count": row_count,
+        "last_successful_probe_at": _latest_generated_at(artifacts) if status == "ok" else "",
+        "last_probe_at": _latest_generated_at(artifacts),
+        "degradation_events": degradation_events,
+        "last_generated_at": _latest_generated_at(artifacts),
+        "artifact_paths": artifact_paths,
+        "status": status,
+    }
+
+
+def _first_gateway_row(result: dict[str, Any]) -> dict[str, Any]:
+    rows = _list(result.get("rows"))
+    return _mapping(rows[0]) if rows else {}
+
+
+def _gateway_row_count(result: dict[str, Any]) -> int:
+    explicit = result.get("row_count")
+    if isinstance(explicit, int):
+        return explicit
+    if isinstance(explicit, str) and explicit.isdigit():
+        return int(explicit)
+    return len(_list(result.get("rows")))
+
+
+def _gateway_degradation_events(result: dict[str, Any], probe_available: bool) -> list[str]:
+    if not result:
+        return ["GATEWAY_SOURCE_KIND_MISSING"] if probe_available else ["GATEWAY_PROBE_NOT_CONFIGURED"]
+    events = _strings(result.get("degradation_events"))
+    warning = str(result.get("warning") or "")
+    if warning:
+        events.append(warning)
+    return _unique(events)
+
+
+def _gateway_status(
+    source_kind: str,
+    result: dict[str, Any],
+    row_count: int,
+    degradation_events: list[str],
+    probe_available: bool,
+) -> str:
+    if not probe_available:
+        return "not_configured"
+    if not result:
+        return "missing"
+    result_status = str(result.get("status") or "")
+    if degradation_events or result_status == "degraded":
+        return "degraded"
+    if result_status == "failed":
+        return "blocked"
+    if row_count <= 0:
+        return "missing"
+    if source_kind == "social_heat":
+        return "degraded" if degradation_events else "ok"
+    return "ok"
+
+
+def _gateway_trust_tier(source_kind: str, row: dict[str, Any], meta: dict[str, Any]) -> str:
+    raw = str(
+        row.get("source_trust_tier")
+        or row.get("trust_tier")
+        or meta.get("trust_tier")
+        or _source_quality_scalar(row)
+        or ""
+    )
+    if source_kind == "social_heat":
+        return "heat_signal_only"
+    if source_kind in OFFICIAL_SOURCE_KINDS:
+        return raw if raw in {"trusted_fact", "candidate_untrusted", "blocked"} else "trusted_fact"
+    if source_kind in {"news_context", "open_news_index", "industry_media"}:
+        return "context_only" if raw in {"", "trusted_fact", "candidate_untrusted"} else raw
+    return raw or "candidate_untrusted"
+
+
+def _source_quality_scalar(row: dict[str, Any]) -> str:
+    value = row.get("source_quality")
+    if isinstance(value, str):
+        return value
+    return str(_mapping(value).get("label") or "")
+
+
+def _gateway_source_quality_label(
+    source_kind: str,
+    row: dict[str, Any],
+    meta: dict[str, Any],
+    trust_tier: str,
+) -> str:
+    if source_kind == "social_heat":
+        return "heat_signal_only"
+    row_quality = row.get("source_quality")
+    if isinstance(row_quality, dict):
+        return str(row_quality.get("label") or trust_tier)
+    if isinstance(row_quality, str) and row_quality:
+        return row_quality if source_kind in OFFICIAL_SOURCE_KINDS else trust_tier
+    meta_quality = _mapping(meta.get("source_quality"))
+    return str(meta_quality.get("label") or trust_tier)
+
+
+def _default_retention_policy(source_kind: str) -> str:
+    if source_kind == "social_heat":
+        return "metadata_only_until_reviewed"
+    if source_kind in OFFICIAL_SOURCE_KINDS:
+        return "metadata_and_public_document_reference"
+    return "metadata_and_permitted_excerpt"
+
+
+def _default_anti_bot_risk(source_kind: str) -> str:
+    if source_kind in OFFICIAL_SOURCE_KINDS:
+        return "low"
+    if source_kind == "social_heat":
+        return "medium"
+    return "medium"
 
 
 def _gateway_degradation_by_group(gateway_probe: dict[str, Any]) -> dict[str, list[str]]:
@@ -364,11 +571,27 @@ def _source_table(sources: list[Any]) -> str:
         return "<section><h2>来源</h2><p>没有可展示来源；请先生成来源治理与可靠性产物。</p></section>"
     header = "".join(
         f"<th>{_html_text(label)}</th>"
-        for label in ("来源", "分组", "类型", "负责人", "信任层级", "质量", "授权", "留存", "反爬", "状态", "降级")
+        for label in (
+            "来源",
+            "来源类型",
+            "分组",
+            "类型",
+            "负责人",
+            "信任层级",
+            "质量",
+            "授权",
+            "留存",
+            "反爬",
+            "行数",
+            "最近成功探测",
+            "状态",
+            "降级",
+        )
     )
     body = "".join(
         "<tr>"
         f"<td>{_html_text(_display_value(row.get('display_name')))}</td>"
+        f"<td>{_html_text(_display_value(row.get('source_kind')))}</td>"
         f"<td>{_html_text(_display_value(row.get('source_group')))}</td>"
         f"<td>{_html_text(_display_value(row.get('source_type')))}</td>"
         f"<td>{_html_text(row.get('owner_service'))}</td>"
@@ -377,6 +600,8 @@ def _source_table(sources: list[Any]) -> str:
         f"<td>{_html_text(_display_value(row.get('license_scope')))}</td>"
         f"<td>{_html_text(_display_value(row.get('retention_policy')))}</td>"
         f"<td>{_html_text(_display_value(row.get('anti_bot_risk')))}</td>"
+        f"<td>{_html_text(row.get('row_count'))}</td>"
+        f"<td>{_html_text(row.get('last_successful_probe_at'))}</td>"
         f"<td>{_html_text(_display_value(row.get('status')))}</td>"
         f"<td>{_html_text(_display_degradation_events(row.get('degradation_events')))}</td>"
         "</tr>"
@@ -446,6 +671,10 @@ def _list(value: Any) -> list[Any]:
 
 def _strings(value: Any) -> list[str]:
     return [str(item) for item in value] if isinstance(value, list) else []
+
+
+def _unique(values: list[str]) -> list[str]:
+    return list(dict.fromkeys(value for value in values if value))
 
 
 def _utc_now() -> str:

@@ -19,6 +19,66 @@
       "checksum_sha256": "1d4725563e08081d35bdc30ce986332ea0666515cfc8001e0446e1a1572d6935",
       "mtime_epoch": 1780639918,
       "size_bytes": 5390
+    },
+    {
+      "type": "fresh_digest_json",
+      "path": "outputs/fresh_narrative_digest/current/fresh_narrative_digest.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Fresh narrative digest generated from the Gateway source-event probe, including missing/degraded input diagnostics.",
+      "checksum_sha256": "62e76c067bf0d15332c08dd13a59d91e53386ffc9086c909461f64af32106250",
+      "mtime_epoch": 1780646136,
+      "size_bytes": 8465
+    },
+    {
+      "type": "fresh_digest_html",
+      "path": "outputs/fresh_narrative_digest/current/fresh_narrative_digest.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese HTML fresh narrative digest generated from Gateway source events.",
+      "checksum_sha256": "c5ca809e03ba72888ed0efe475f16ed0465dce0f1dd3245c3a6b4b032549b7a3",
+      "mtime_epoch": 1780646136,
+      "size_bytes": 3693
+    },
+    {
+      "type": "candidate_inbox_json",
+      "path": "outputs/narrative_candidate_inbox/current/narrative_candidate_inbox.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Candidate narrative inbox generated from Gateway source events without automatic trust promotion.",
+      "checksum_sha256": "f40bd5a67d054fee9236919d53faaf746aa274e2cefa04bb35591f4c79a5f3e0",
+      "mtime_epoch": 1780646136,
+      "size_bytes": 6715
+    },
+    {
+      "type": "candidate_inbox_html",
+      "path": "outputs/narrative_candidate_inbox/current/narrative_candidate_inbox.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese HTML candidate narrative inbox generated from Gateway source events.",
+      "checksum_sha256": "4a73554dee2e3a7a72a1f593745d56de705313f18cba04ab8174193595dc4039",
+      "mtime_epoch": 1780646136,
+      "size_bytes": 3830
+    },
+    {
+      "type": "coverage_gap_json",
+      "path": "outputs/narrative_source_coverage_gap/current/narrative_source_coverage_gap.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Gateway source coverage gap report for M20 backlog planning.",
+      "checksum_sha256": "1687b60fdcdfc5a2ca21e3ea442601cf5c0d01e6910b323c52209fc5cae6f015",
+      "mtime_epoch": 1780646136,
+      "size_bytes": 5529
+    },
+    {
+      "type": "coverage_gap_html",
+      "path": "outputs/narrative_source_coverage_gap/current/narrative_source_coverage_gap.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese HTML Gateway source coverage gap report for M20 backlog planning.",
+      "checksum_sha256": "5ab516c4d56ecbec0eb2f78193c528134a793e65c01e304dbc6f48b9e1472d9b",
+      "mtime_epoch": 1780646136,
+      "size_bytes": 4159
     }
   ]
 }
