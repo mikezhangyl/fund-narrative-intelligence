@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import json
 
-from scripts import run_fresh_narrative_digest
+from scripts import run_fresh_narrative_digest, run_narrative_candidate_inbox
 from src.product_shell.route_registry import build_product_shell_route_registry
 from src.scanners.fresh_narrative_digest import (
     build_fresh_narrative_digest,
+    build_narrative_candidate_inbox,
     render_fresh_narrative_digest_html,
+    render_narrative_candidate_inbox_html,
 )
 
 
@@ -105,6 +107,116 @@ def test_fresh_narrative_digest_cli_reads_gateway_probe_and_writes_json_html(tmp
     assert "<h1>今日叙事监控摘要</h1>" in html
 
 
+def test_fresh_narrative_digest_preserves_gateway_gaps_and_trust_boundaries():
+    probe = _gateway_probe_payload()
+    digest = build_fresh_narrative_digest(
+        source_events=run_fresh_narrative_digest.extract_source_events_from_probe(probe),
+        source_results=probe["source_results"],
+        generated_at="2026-06-05T10:00:00+00:00",
+        window_start="2026-06-05T00:00:00+00:00",
+        window_end="2026-06-05T23:59:59+00:00",
+        fixture_mode=True,
+    )
+
+    assert digest["status"] == "degraded"
+    assert digest["summary"]["coverage_gap_count"] == 3
+    assert digest["source_coverage"]["expected_source_kinds"] == [
+        "official_filings",
+        "official_disclosures",
+        "official_sources",
+        "news_context",
+        "open_news_index",
+        "industry_media",
+        "social_heat",
+    ]
+    assert {
+        gap["source_kind"]: gap["coverage_status"] for gap in digest["source_coverage"]["gaps"]
+    } == {
+        "official_disclosures": "missing",
+        "open_news_index": "degraded",
+        "social_heat": "degraded",
+    }
+    open_news = next(item for item in digest["items"] if item["narrative_key"] == "apple-ai")
+    assert open_news["trust_state"] == "context_only"
+    assert open_news["source_quality_metadata"]["best_trust_tier"] == "context_only"
+    official = next(item for item in digest["items"] if item["narrative_key"] == "us-official-filings")
+    assert official["trust_state"] == "trusted_fact"
+    assert "degraded_input" in digest["daily_digest_sections"]
+    assert digest["daily_digest_sections"]["degraded_input"] == [
+        "official_disclosures",
+        "open_news_index",
+        "social_heat",
+    ]
+
+
+def test_narrative_candidate_inbox_groups_events_without_promoting_trust():
+    probe = _gateway_probe_payload()
+    inbox = build_narrative_candidate_inbox(
+        source_events=run_fresh_narrative_digest.extract_source_events_from_probe(probe),
+        source_results=probe["source_results"],
+        generated_at="2026-06-05T10:00:00+00:00",
+        fixture_mode=True,
+    )
+
+    assert inbox["version"] == "narrative-candidate-inbox-v1"
+    assert inbox["status"] == "degraded"
+    assert inbox["summary"]["candidate_count"] == 3
+    assert inbox["summary"]["coverage_gap_count"] == 3
+    assert all(candidate["candidate_status"] == "candidate_untrusted" for candidate in inbox["candidates"])
+    assert all(candidate["promotion_allowed"] is False for candidate in inbox["candidates"])
+    official = next(candidate for candidate in inbox["candidates"] if candidate["narrative_key"] == "us-official-filings")
+    assert official["support_class"] == "official_fact_backed"
+    assert "仍需人工复核" in official["why_untrusted"]
+    heat = next(candidate for candidate in inbox["candidates"] if candidate["narrative_key"] == "retail-heat")
+    assert heat["support_class"] == "heat_signal_only"
+
+
+def test_narrative_candidate_inbox_html_is_chinese():
+    html = render_narrative_candidate_inbox_html(
+        build_narrative_candidate_inbox(
+            source_events=run_fresh_narrative_digest.extract_source_events_from_probe(
+                _gateway_probe_payload()
+            ),
+            source_results=_gateway_probe_payload()["source_results"],
+            generated_at="2026-06-05T10:00:00+00:00",
+            fixture_mode=True,
+        )
+    )
+
+    assert "<h1>候选叙事收件箱</h1>" in html
+    assert "不会自动升级为可信叙事" in html
+    assert "官方事实支撑候选" in html
+    assert "热度信号候选" in html
+
+
+def test_narrative_candidate_inbox_cli_writes_json_html(tmp_path):
+    input_path = tmp_path / "gateway_probe.json"
+    input_path.write_text(
+        json.dumps(_gateway_probe_payload(), ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    exit_code = run_narrative_candidate_inbox.main(
+        [
+            "--input",
+            str(input_path),
+            "--output-dir",
+            str(tmp_path / "candidate_inbox"),
+        ]
+    )
+
+    payload = json.loads(
+        (tmp_path / "candidate_inbox" / "narrative_candidate_inbox.json").read_text()
+    )
+    html = (
+        tmp_path / "candidate_inbox" / "narrative_candidate_inbox.html"
+    ).read_text()
+
+    assert exit_code == 0
+    assert payload["summary"]["candidate_count"] == 3
+    assert "<h1>候选叙事收件箱</h1>" in html
+
+
 def test_crawler_adapter_contract_is_fixture_safe_and_excludes_browser_rendering():
     digest = build_fresh_narrative_digest(
         source_events=[],
@@ -186,4 +298,89 @@ def _event(
         "license_scope": "metadata_only",
         "retention_policy": "metadata_and_excerpt",
         "degradation_events": degradation_events or [],
+    }
+
+
+def _gateway_probe_payload() -> dict[str, object]:
+    return {
+        "generated_at": "2026-06-05T09:00:00+00:00",
+        "fixture_mode": True,
+        "source_results": [
+            {
+                "source_kind": "official_filings",
+                "status": "completed",
+                "row_count": 1,
+                "degradation_events": [],
+                "rows": [
+                    _event(
+                        "EVT_OFFICIAL",
+                        "Apple 10-K AI infrastructure risk",
+                        "US official filings",
+                        "AAPL",
+                        trust_tier="trusted_fact",
+                    )
+                    | {"source_kind": "official_filings"}
+                ],
+            },
+            {
+                "source_kind": "official_disclosures",
+                "status": "missing",
+                "row_count": 0,
+                "degradation_events": [],
+                "rows": [],
+            },
+            {
+                "source_kind": "official_sources",
+                "status": "completed",
+                "row_count": 1,
+                "degradation_events": [],
+                "rows": [],
+            },
+            {
+                "source_kind": "news_context",
+                "status": "completed",
+                "row_count": 1,
+                "degradation_events": [],
+                "rows": [],
+            },
+            {
+                "source_kind": "open_news_index",
+                "status": "degraded",
+                "row_count": 1,
+                "degradation_events": ["REQUEST_TIMEOUT"],
+                "rows": [
+                    _event(
+                        "EVT_NEWS",
+                        "Apple AI supply chain coverage",
+                        "Apple AI",
+                        "AAPL",
+                        trust_tier="trusted_fact",
+                    )
+                    | {"source_kind": "open_news_index", "degradation_events": ["REQUEST_TIMEOUT"]}
+                ],
+            },
+            {
+                "source_kind": "industry_media",
+                "status": "completed",
+                "row_count": 1,
+                "degradation_events": [],
+                "rows": [],
+            },
+            {
+                "source_kind": "social_heat",
+                "status": "degraded",
+                "row_count": 1,
+                "degradation_events": ["SOCIAL_SOURCE_DISABLED"],
+                "rows": [
+                    _event(
+                        "EVT_HEAT",
+                        "Retail chatter on Apple AI",
+                        "Retail heat",
+                        "AAPL",
+                        trust_tier="trusted_fact",
+                    )
+                    | {"source_kind": "social_heat", "degradation_events": ["SOCIAL_SOURCE_DISABLED"]}
+                ],
+            },
+        ],
     }

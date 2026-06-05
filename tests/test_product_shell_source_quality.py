@@ -6,6 +6,8 @@ from pathlib import Path
 from scripts import build_product_shell
 from src.product_shell.route_registry import build_product_shell_route_registry
 from src.product_shell.source_quality import (
+    EXPECTED_GATEWAY_SOURCE_KINDS,
+    _gateway_source_group,
     build_source_quality_dashboard,
     render_source_quality_dashboard_html,
 )
@@ -25,12 +27,29 @@ def test_source_quality_dashboard_combines_existing_source_artifacts(tmp_path):
     assert dashboard["generated_at"] == "2026-06-02T10:00:00+00:00"
     assert dashboard["status"] == "degraded"
     assert dashboard["summary"] == {
-        "source_count": 3,
-        "trusted_fact_count": 1,
-        "degraded_source_count": 2,
+        "source_count": 10,
+        "gateway_source_kind_count": 7,
+        "trusted_fact_count": 2,
+        "degraded_source_count": 8,
         "missing_artifact_count": 0,
         "stale_artifact_count": 0,
     }
+    source_kind_rows = [
+        row for row in dashboard["sources"] if row["row_type"] == "gateway_source_kind"
+    ]
+    assert [row["source_kind"] for row in source_kind_rows] == list(EXPECTED_GATEWAY_SOURCE_KINDS)
+    official_kind = next(row for row in source_kind_rows if row["source_kind"] == "official_filings")
+    assert official_kind["owner_service"] == "stock-data-gateway"
+    assert official_kind["trust_tier"] == "trusted_fact"
+    assert official_kind["row_count"] == 3
+    assert official_kind["status"] == "ok"
+    social_kind = next(row for row in source_kind_rows if row["source_kind"] == "social_heat")
+    assert social_kind["trust_tier"] == "heat_signal_only"
+    assert social_kind["source_quality_label"] == "heat_signal_only"
+    assert social_kind["status"] == "degraded"
+    missing_kind = next(row for row in source_kind_rows if row["source_kind"] == "open_news_index")
+    assert missing_kind["status"] == "missing"
+    assert missing_kind["degradation_events"] == ["GATEWAY_SOURCE_KIND_MISSING"]
     assert dashboard["consumer_policy"] == {
         "provider_access_allowed": False,
         "reliability_recomputation_allowed": False,
@@ -57,7 +76,8 @@ def test_source_quality_dashboard_degrades_when_artifacts_are_missing(tmp_path):
 
     assert dashboard["status"] == "degraded"
     assert dashboard["summary"]["missing_artifact_count"] == 4
-    assert dashboard["sources"] == []
+    assert dashboard["summary"]["gateway_source_kind_count"] == 7
+    assert {source["status"] for source in dashboard["sources"]} == {"not_configured"}
     assert all(artifact["status"] == "missing" for artifact in dashboard["artifacts"])
 
 
@@ -76,8 +96,16 @@ def test_source_quality_dashboard_html_is_chinese_and_cites_review_source(tmp_pa
     assert "采集由 stock-data-gateway 负责" in html
     assert "pm-architect-stage-review-round4-round13-2026-06-02.html" in html
     assert "不重新计算来源可靠性分" in html
+    assert "官方披露文件" in html
+    assert "社交热度" in html
+    assert "heat_signal_only" not in html
     assert "Owner" not in html
-    assert "official_filings" not in html
+
+
+def test_source_quality_groups_gateway_m20_source_kinds():
+    assert _gateway_source_group("official_sources") == "official_disclosures"
+    assert _gateway_source_group("open_news_index") == "news_context"
+    assert _gateway_source_group("industry_media") == "news_context"
 
 
 def test_route_registry_includes_source_quality_dashboard_route():

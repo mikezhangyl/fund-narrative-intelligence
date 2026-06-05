@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any, Callable
 from urllib.error import HTTPError, URLError
-from urllib.parse import urljoin
+from urllib.parse import urlencode, urljoin
 from urllib.request import Request, urlopen
 
 from src import local_env
@@ -18,7 +18,18 @@ GatewayHttpFetcher = Callable[
     tuple[int, dict[str, Any]],
 ]
 
-SOURCE_KIND_PATHS = {
+UNIFIED_SOURCE_EVENTS_PATH = "/api/v1/market-data/narrative/source-events"
+SOURCE_KINDS = (
+    "official_filings",
+    "official_disclosures",
+    "official_sources",
+    "news_context",
+    "open_news_index",
+    "industry_media",
+    "social_heat",
+)
+SOURCE_KIND_PATHS = {source_kind: UNIFIED_SOURCE_EVENTS_PATH for source_kind in SOURCE_KINDS}
+LEGACY_SOURCE_KIND_PATHS = {
     "official_filings": "/api/v1/market-data/narrative/source-events/official-filings",
     "official_disclosures": "/api/v1/market-data/narrative/source-events/official-disclosures",
     "news_context": "/api/v1/market-data/narrative/source-events/news-context",
@@ -77,15 +88,37 @@ class NarrativeSourceGatewayClient:
         symbols: list[str] | None = None,
         query: str | None = None,
         limit: int = 10,
+        source_provider: str | None = None,
+        entity_id: str | None = None,
+        start_time: str | None = None,
+        end_time: str | None = None,
+        trust_tier: str | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         if source_kind not in SOURCE_KIND_PATHS:
             raise ValueError(f"unsupported narrative source kind: {source_kind}")
-        request_body = _request_body(symbols=symbols, query=query, limit=limit)
-        path = SOURCE_KIND_PATHS[source_kind]
+        request_query = _request_query(
+            source_kind=source_kind,
+            symbols=symbols,
+            query=query,
+            limit=limit,
+            source_provider=source_provider,
+            entity_id=entity_id,
+            start_time=start_time,
+            end_time=end_time,
+            trust_tier=trust_tier,
+            cursor=cursor,
+        )
         status, payload = self.fetcher(
-            "POST",
-            urljoin(self.base_url.rstrip("/") + "/", path.lstrip("/")),
-            request_body,
+            "GET",
+            _url_with_query(
+                urljoin(
+                    self.base_url.rstrip("/") + "/",
+                    UNIFIED_SOURCE_EVENTS_PATH.lstrip("/"),
+                ),
+                request_query,
+            ),
+            None,
             self.timeout_seconds,
         )
         if status < 200 or status >= 300:
@@ -95,13 +128,14 @@ class NarrativeSourceGatewayClient:
         rows = _rows_from_payload(payload)
         normalized_rows = [normalize_gateway_source_event(row) for row in rows]
         meta = payload.get("meta") if isinstance(payload.get("meta"), dict) else {}
+        degradation_events = _result_degradation_events(normalized_rows, meta=meta)
         return {
             "source_kind": source_kind,
-            "status": "completed" if normalized_rows else "missing",
+            "status": _result_status(normalized_rows, meta=meta),
             "row_count": len(normalized_rows),
             "rows": normalized_rows,
             "meta": meta,
-            "degradation_events": _result_degradation_events(normalized_rows),
+            "degradation_events": degradation_events,
         }
 
 
@@ -121,7 +155,7 @@ def normalize_gateway_source_event(row: dict[str, Any]) -> dict[str, Any]:
     normalized = validate_source_event(
         {
             "event_id": str(row["source_event_id"]),
-            "source_type": str(row["source_type"]),
+            "source_type": _v1_source_type(row),
             "provider": f"gateway_{row['source_provider']}",
             "source_url": str(row["source_url"]),
             "event_time": str(row["event_time"]),
@@ -161,18 +195,38 @@ def normalize_gateway_source_event(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _request_body(
+def _request_query(
     *,
+    source_kind: str,
     symbols: list[str] | None,
     query: str | None,
     limit: int,
+    source_provider: str | None = None,
+    entity_id: str | None = None,
+    start_time: str | None = None,
+    end_time: str | None = None,
+    trust_tier: str | None = None,
+    cursor: str | None = None,
 ) -> dict[str, Any]:
-    body: dict[str, Any] = {"limit": max(1, int(limit))}
+    body: dict[str, Any] = {"source_kind": source_kind, "limit": max(1, int(limit))}
     if symbols is not None:
-        body = {**body, "symbols": list(symbols)}
+        body = {**body, "symbol": ",".join(str(symbol) for symbol in symbols if str(symbol))}
     if query is not None:
-        body = {**body, "query": query}
+        body = {**body, "keyword": query}
+    optional = {
+        "source_provider": source_provider,
+        "entity_id": entity_id,
+        "start_time": start_time,
+        "end_time": end_time,
+        "trust_tier": trust_tier,
+        "cursor": cursor,
+    }
+    body = {**body, **{key: value for key, value in optional.items() if value}}
     return body
+
+
+def _url_with_query(url: str, query: dict[str, Any]) -> str:
+    return f"{url}?{urlencode(query)}"
 
 
 def _rows_from_payload(payload: dict[str, Any]) -> list[dict[str, Any]]:
@@ -187,13 +241,44 @@ def _rows_from_payload(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return list(rows)
 
 
-def _result_degradation_events(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _result_status(rows: list[dict[str, Any]], *, meta: dict[str, Any]) -> str:
+    if str(meta.get("status") or "").casefold() == "degraded":
+        return "degraded"
+    return "completed" if rows else "missing"
+
+
+def _result_degradation_events(
+    rows: list[dict[str, Any]], *, meta: dict[str, Any]
+) -> list[dict[str, Any]]:
     events: list[dict[str, Any]] = []
+    meta_events = meta.get("degradation_events")
+    if isinstance(meta_events, list):
+        events.extend(event for event in meta_events if isinstance(event, dict))
+    warning = meta.get("warning")
+    if isinstance(warning, dict):
+        events.append(warning)
     for row in rows:
         row_events = row.get("degradation_events")
         if isinstance(row_events, list):
             events.extend(event for event in row_events if isinstance(event, dict))
     return events
+
+
+def _v1_source_type(row: dict[str, Any]) -> str:
+    source_type = str(row["source_type"])
+    if source_type in {"news", "announcement", "filing", "manual", "social", "social_future"}:
+        return source_type
+    provider_metadata = row.get("provider_metadata")
+    source_kind = (
+        str(provider_metadata.get("source_kind") or "")
+        if isinstance(provider_metadata, dict)
+        else ""
+    )
+    if source_type in {"official", "public_official"} or source_kind == "official_sources":
+        return "announcement"
+    if source_type in {"public_industry_media", "industry_media"} or source_kind == "industry_media":
+        return "news"
+    return source_type
 
 
 def _gateway_source_error_message(*, status: int, payload: dict[str, Any]) -> str:
@@ -214,12 +299,16 @@ def _http_fetch(
     json_body: dict[str, Any] | None,
     timeout_seconds: float,
 ) -> tuple[int, dict[str, Any]]:
-    body = json.dumps(json_body or {}).encode("utf-8")
+    method_name = method.upper()
+    body = None if method_name == "GET" else json.dumps(json_body or {}).encode("utf-8")
+    headers = {"Accept": "application/json"}
+    if body is not None:
+        headers["Content-Type"] = "application/json"
     request = Request(
         url,
         data=body,
-        headers={"Accept": "application/json", "Content-Type": "application/json"},
-        method=method,
+        headers=headers,
+        method=method_name,
     )
     try:
         with urlopen(request, timeout=timeout_seconds) as response:

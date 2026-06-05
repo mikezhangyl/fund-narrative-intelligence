@@ -1,5 +1,5 @@
 version: data-capabilities-v1
-updated_at: "2026-06-01"
+updated_at: "2026-06-05"
 purpose: >
   Market-data capability ledger for deciding which datasets each analysis needs,
   whether the platform can acquire them reliably, and what must move into the
@@ -369,7 +369,51 @@ datasets:
       - FNI should consume structured news through the gateway before considering any direct news-site crawling.
 
   narrative_source_events:
-    description: Normalized news, announcement, manual, and future-social source events for candidate narrative intake.
+    description: Unified provider-neutral Gateway source-event query surface for official filings, disclosures, official sources, open news, industry media, and heat-signal context.
+    current_status: unstable
+    acquisition_difficulty: medium
+    gateway_mode: gateway_ready
+    required_fields:
+      - source_event_id
+      - source_type
+      - source_provider
+      - source_url
+      - title
+      - event_time
+      - fetched_at
+      - trust_tier
+      - source_quality
+      - license_scope
+      - retention_policy
+      - metadata_only
+      - degradation_events
+    freshness: source_event_time_window
+    primary_source:
+      provider: gateway
+      endpoint: narrative/source-events
+      access_mode: normalized_gateway
+    fallback_sources:
+      - provider: local_fixture
+        endpoint: data/fixtures/source_events.news_announcement.v1.json
+        access_mode: deterministic_fixture
+        current_status: available_for_tests
+    validation:
+      live_probe_capability: narrative_source_gateway_probe
+    risks:
+      rate_limit: delegated_to_gateway
+      anti_bot: gateway_owned_not_fni
+      operational_cost: provider_permission_dependent
+    analysis_use_cases:
+      - candidate_narrative_intake
+      - narrative_radar_service
+      - evidence_quality_review
+    notes:
+      - "FNI consumes Gateway unified GET /api/v1/market-data/narrative/source-events; it must not call SEC, CNINFO, GDELT, RSS, industry-media, or social providers directly."
+      - "source_kind filters include official filings, official disclosures, official sources, news context, open news index, industry media, and social heat."
+      - Structured Gateway degradation is acceptable for optional sources such as open news index and disabled social heat.
+
+  narrative_source_events_legacy_fixture:
+    description: Legacy local normalized news, announcement, manual, and future-social fixture events for deterministic candidate narrative intake tests.
     current_status: planned
     acquisition_difficulty: medium
     gateway_mode: gateway_planned
@@ -385,16 +429,16 @@ datasets:
       - evidence_claims
     freshness: source_event_time_window
     primary_source:
-      provider: gateway
-      endpoint: source-events
-      access_mode: normalized_gateway
+      provider: local_fixture
+      endpoint: data/fixtures/source_events.news_announcement.v1.json
+      access_mode: deterministic_fixture
     fallback_sources:
       - provider: local_fixture
         endpoint: data/fixtures/source_events.news_announcement.v1.json
         access_mode: deterministic_fixture
         current_status: available_for_tests
     validation:
-      live_probe_capability: narrative_source_events
+      live_probe_capability: local_fixture
     risks:
       rate_limit: delegated_to_gateway
       anti_bot: gateway_owned_not_fni

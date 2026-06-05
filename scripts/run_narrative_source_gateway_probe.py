@@ -9,6 +9,7 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -20,6 +21,7 @@ from src.market_data.providers.local_gateway import (
     DEFAULT_GATEWAY_BASE_URL_ENV,  # noqa: E402
 )
 from src.market_data.providers.narrative_source_gateway import (  # noqa: E402
+    UNIFIED_SOURCE_EVENTS_PATH,
     SOURCE_KIND_PATHS,
     GatewaySourceUnavailableError,
     NarrativeSourceGatewayClient,
@@ -36,9 +38,21 @@ DEFAULT_PROBE_REQUESTS = {
         "symbols": ["000001.SZ"],
         "query": "股东会",
     },
+    "official_sources": {
+        "symbols": [],
+        "query": "Federal Reserve",
+    },
     "news_context": {
         "symbols": [],
         "query": "半导体 A股",
+    },
+    "open_news_index": {
+        "symbols": [],
+        "query": "Apple AI",
+    },
+    "industry_media": {
+        "symbols": [],
+        "query": "solar",
     },
     "social_heat": {
         "symbols": ["AAPL"],
@@ -288,9 +302,10 @@ def _fixture_fetcher(payloads: dict[str, Any]):
 
 
 def _source_kind_for_url(url: str) -> str:
-    for source_kind, path in SOURCE_KIND_PATHS.items():
-        if url.endswith(path):
-            return source_kind
+    parsed = urlparse(url)
+    if parsed.path == UNIFIED_SOURCE_EVENTS_PATH:
+        values = parse_qs(parsed.query).get("source_kind") or [""]
+        return str(values[0]).split(",", maxsplit=1)[0]
     return ""
 
 

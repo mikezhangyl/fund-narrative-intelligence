@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from scripts import run_narrative_source_gateway_probe as probe
@@ -37,18 +38,25 @@ def _gateway_row(**overrides):
 def test_gateway_contract_declares_narrative_source_event_endpoints():
     contract = load_gateway_contract()
 
+    unified = contract.endpoint("gateway_narrative_source_events")
     filing = contract.endpoint("gateway_narrative_official_filings")
     disclosure = contract.endpoint("gateway_narrative_official_disclosures")
     news = contract.endpoint("gateway_narrative_news_context")
     heat = contract.endpoint("gateway_narrative_social_heat")
 
+    assert unified.provider == "gateway"
+    assert unified.method == "GET"
+    assert unified.path == "/api/v1/market-data/narrative/source-events"
+    assert unified.dataset_id == "narrative_source_events"
+    assert unified.required_request_fields == ("source_kind", "limit")
+    assert unified.sample_request["query"]["source_kind"] == "official_filings,official_disclosures"
+    assert unified.sample_request["query"]["keyword"] == "AI infrastructure"
     assert filing.provider == "gateway"
     assert filing.path == "/api/v1/market-data/narrative/source-events/official-filings"
     assert disclosure.dataset_id == "narrative_official_disclosures"
     assert news.dataset_id == "narrative_news_context"
     assert heat.dataset_id == "narrative_social_heat"
-    for endpoint in (filing, disclosure, news, heat):
-        assert endpoint.method == "POST"
+    for endpoint in (unified, filing, disclosure, news, heat):
         assert endpoint.rows_path == "data.rows"
         assert "trust_tier" in endpoint.required_response_fields
         assert "source_quality" in endpoint.required_response_fields
@@ -93,14 +101,46 @@ def test_narrative_source_gateway_client_normalizes_mock_gateway_rows():
     assert result["rows"][0]["trust_tier"] == "official_primary"
     assert result["rows"][0]["source_quality"] == "trusted_fact_candidate"
     assert result["rows"][0]["metadata_only"] is False
-    assert calls == [
-        (
-            "POST",
-            "http://localhost:8700/api/v1/market-data/narrative/source-events/official-filings",
-            {"symbols": ["AAPL"], "query": "Apple", "limit": 5},
-            3.0,
-        )
-    ]
+    assert calls[0][0] == "GET"
+    assert calls[0][2] is None
+    assert calls[0][3] == 3.0
+    parsed = urlparse(calls[0][1])
+    assert parsed.path == "/api/v1/market-data/narrative/source-events"
+    assert parse_qs(parsed.query) == {
+        "source_kind": ["official_filings"],
+        "symbol": ["AAPL"],
+        "keyword": ["Apple"],
+        "limit": ["5"],
+    }
+
+
+def test_narrative_source_gateway_client_preserves_gateway_degraded_status():
+    def fetcher(method, url, body, timeout_seconds):
+        del method, url, body, timeout_seconds
+        return 200, {
+            "data": {"rows": []},
+            "meta": {
+                "status": "degraded",
+                "degradation_events": [
+                    {
+                        "code": "SOCIAL_SOURCE_DISABLED",
+                        "message": "Social source disabled by policy.",
+                    }
+                ],
+                "pagination": {"next_cursor": None},
+            },
+        }
+
+    client = NarrativeSourceGatewayClient(
+        base_url="http://localhost:8700",
+        fetcher=fetcher,
+    )
+
+    result = client.fetch_source_events(source_kind="social_heat", symbols=["AAPL"])
+
+    assert result["status"] == "degraded"
+    assert result["row_count"] == 0
+    assert result["degradation_events"][0]["code"] == "SOCIAL_SOURCE_DISABLED"
 
 
 def test_narrative_source_gateway_client_fails_clearly_when_route_unavailable():
@@ -189,3 +229,15 @@ def test_probe_report_renders_chinese_html_and_json_quality_labels(tmp_path):
     assert "heat_signal_only" in html
     assert "metadata_only" in html
     assert "不能把未支持的候选信号表述为确定事实" in html
+
+
+def test_probe_default_source_kinds_cover_gateway_m20_sources():
+    assert probe.DEFAULT_SOURCE_KINDS == (
+        "official_filings",
+        "official_disclosures",
+        "official_sources",
+        "news_context",
+        "open_news_index",
+        "industry_media",
+        "social_heat",
+    )

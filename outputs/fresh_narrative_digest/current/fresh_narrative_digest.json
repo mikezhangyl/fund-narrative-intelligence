@@ -37,6 +37,23 @@
       "permission_missing"
     ]
   },
+  "daily_digest_sections": {
+    "cooling": [
+      "narrative_076605fb87",
+      "solar"
+    ],
+    "degraded_input": [
+      "official_filings",
+      "official_sources",
+      "news_context",
+      "open_news_index",
+      "social_heat"
+    ],
+    "disputed": [],
+    "heating": [],
+    "new": [],
+    "persistent": []
+  },
   "dedupe_contract": {
     "near_duplicate_policy": "same provider/title/day or explicit dedupe_key",
     "stable_id_inputs": [
@@ -59,136 +76,8 @@
     "stable_entity_id_format": "<ENTITY_TYPE>_<CANONICAL_CODE_OR_HASH>"
   },
   "fixture_mode": false,
-  "generated_at": "2026-06-01T17:47:52+00:00",
+  "generated_at": "2026-06-05T07:55:36+00:00",
   "items": [
-    {
-      "candidate_state": "accelerating",
-      "degradation_events": [],
-      "display_name": "半导体 A股",
-      "entities": {
-        "concepts": [
-          {
-            "name": "半导体 A股",
-            "stable_entity_id": "CONCEPT_CA978112CA"
-          }
-        ],
-        "stocks": [
-          {
-            "display_name": "半导体 A股",
-            "stable_entity_id": "STOCK_半导体 A股",
-            "stock_code": "半导体 A股"
-          }
-        ]
-      },
-      "event_count": 3,
-      "evidence_links": [
-        {
-          "event_time": "2026-06-01 16:44:44",
-          "provider": "gateway_tushare",
-          "source_event_id": "tushare_news:sina:856138633bb54e4ff29ff405ae1c99f7f7101e04023fb9b5c39809961af73b52",
-          "title": "澳大利亚对进口自中国的地层钢锚杆作出反倾销终裁"
-        },
-        {
-          "event_time": "2026-06-01 16:44:31",
-          "provider": "gateway_tushare",
-          "source_event_id": "tushare_news:sina:e68d9435eab4c532552f88145dbc257beb5d26971e3f71a145998a1116be075f",
-          "title": "国新能源：持股5%以上股东减持1.22%股份"
-        },
-        {
-          "event_time": "2026-06-01 16:44:15",
-          "provider": "gateway_tushare",
-          "source_event_id": "tushare_news:sina:76621db8deba64355cbbf9f8de3264cc9975502dc46a66453d25ce525eb3f7a7",
-          "title": "伊朗战事推高能源成本，巴基斯坦通胀升温"
-        }
-      ],
-      "in_window_event_count": 3,
-      "narrative_key": "a",
-      "reason_for_inclusion": "3 source events in the selected window.",
-      "source_quality_metadata": {
-        "best_trust_tier": "candidate_untrusted",
-        "license_scopes": [
-          "context_only"
-        ],
-        "retention_policies": [
-          "metadata_only"
-        ],
-        "source_quality_labels": [
-          "candidate_untrusted"
-        ]
-      },
-      "stable_digest_id": "NDIG_CA978112CA",
-      "trust_state": "candidate_untrusted"
-    },
-    {
-      "candidate_state": "cooling",
-      "degradation_events": [],
-      "display_name": "AI infrastructure",
-      "entities": {
-        "concepts": [
-          {
-            "name": "AI infrastructure",
-            "stable_entity_id": "CONCEPT_1FAE1EA41E"
-          }
-        ],
-        "stocks": [
-          {
-            "display_name": "AAPL",
-            "stable_entity_id": "STOCK_AAPL",
-            "stock_code": "AAPL"
-          }
-        ]
-      },
-      "event_count": 5,
-      "evidence_links": [
-        {
-          "event_time": "2026-05-29",
-          "provider": "gateway_sec_edgar",
-          "source_event_id": "sec_edgar:0000320193:0001140361-26-023363",
-          "title": "FORM 4"
-        },
-        {
-          "event_time": "2026-05-28",
-          "provider": "gateway_sec_edgar",
-          "source_event_id": "sec_edgar:0000320193:0001140361-26-023149",
-          "title": "SD"
-        },
-        {
-          "event_time": "2026-05-27",
-          "provider": "gateway_sec_edgar",
-          "source_event_id": "sec_edgar:0000320193:0001921094-26-000555",
-          "title": "144 filing"
-        },
-        {
-          "event_time": "2026-05-12",
-          "provider": "gateway_sec_edgar",
-          "source_event_id": "sec_edgar:0000320193:0001140361-26-020871",
-          "title": "FORM 4"
-        },
-        {
-          "event_time": "2026-05-08",
-          "provider": "gateway_sec_edgar",
-          "source_event_id": "sec_edgar:0000320193:0001140361-26-020298",
-          "title": "FORM 4"
-        }
-      ],
-      "in_window_event_count": 0,
-      "narrative_key": "ai-infrastructure",
-      "reason_for_inclusion": "0 source events in the selected window.",
-      "source_quality_metadata": {
-        "best_trust_tier": "candidate_untrusted",
-        "license_scopes": [
-          "public_filing"
-        ],
-        "retention_policies": [
-          "metadata_and_raw_payload"
-        ],
-        "source_quality_labels": [
-          "candidate_untrusted"
-        ]
-      },
-      "stable_digest_id": "NDIG_1FAE1EA41E",
-      "trust_state": "candidate_untrusted"
-    },
     {
       "candidate_state": "cooling",
       "degradation_events": [],
@@ -226,6 +115,9 @@
       "in_window_event_count": 0,
       "narrative_key": "narrative_076605fb87",
       "reason_for_inclusion": "0 source events in the selected window.",
+      "source_kinds": [
+        "official_disclosures"
+      ],
       "source_quality_metadata": {
         "best_trust_tier": "candidate_untrusted",
         "license_scopes": [
@@ -235,23 +127,150 @@
           "metadata_only"
         ],
         "source_quality_labels": [
-          "candidate_untrusted"
+          "official_metadata"
         ]
       },
       "stable_digest_id": "NDIG_26E13C7A6D",
       "trust_state": "candidate_untrusted"
+    },
+    {
+      "candidate_state": "cooling",
+      "degradation_events": [],
+      "display_name": "solar",
+      "entities": {
+        "concepts": [
+          {
+            "name": "solar",
+            "stable_entity_id": "CONCEPT_2BFBC118AB"
+          }
+        ],
+        "stocks": []
+      },
+      "event_count": 4,
+      "evidence_links": [
+        {
+          "event_time": "Fri, 05 Jun 2026 02:26:32 +0000",
+          "provider": "gateway_pv_tech",
+          "source_event_id": "industry_media:pv_tech_news:https://www.pv-tech.org/?p=170248",
+          "title": "Naturgy’s GPG brings 360MW of new solar capacity online in Australia"
+        },
+        {
+          "event_time": "Fri, 05 Jun 2026 02:25:35 +0000",
+          "provider": "gateway_pv_tech",
+          "source_event_id": "industry_media:pv_tech_news:https://www.pv-tech.org/?p=170241",
+          "title": "Western Australia commits AU$17.8 million to solar module and battery recycling"
+        },
+        {
+          "event_time": "Fri, 05 Jun 2026 02:21:39 +0000",
+          "provider": "gateway_pv_tech",
+          "source_event_id": "industry_media:pv_tech_news:https://www.pv-tech.org/?p=170245",
+          "title": "Frontier Energy secures AU$110 million equity raise for 132MW solar-plus-storage project in Western Australia"
+        },
+        {
+          "event_time": "Thu, 04 Jun 2026 22:15:04 +0000",
+          "provider": "gateway_pv_tech",
+          "source_event_id": "industry_media:pv_tech_news:https://www.pv-tech.org/?p=170142",
+          "title": "NEM Data Spotlight: Solar generation contracts 21% in May as mid-month pricing spike hits AU$225/MWh"
+        }
+      ],
+      "in_window_event_count": 0,
+      "narrative_key": "solar",
+      "reason_for_inclusion": "0 source events in the selected window.",
+      "source_kinds": [
+        "industry_media"
+      ],
+      "source_quality_metadata": {
+        "best_trust_tier": "context_only",
+        "license_scopes": [
+          "public_context_metadata"
+        ],
+        "retention_policies": [
+          "metadata_only"
+        ],
+        "source_quality_labels": [
+          "context_only"
+        ]
+      },
+      "stable_digest_id": "NDIG_2BFBC118AB",
+      "trust_state": "context_only"
     }
   ],
-  "status": "ok",
+  "source_coverage": {
+    "expected_source_kinds": [
+      "official_filings",
+      "official_disclosures",
+      "official_sources",
+      "news_context",
+      "open_news_index",
+      "industry_media",
+      "social_heat"
+    ],
+    "gaps": [
+      {
+        "coverage_status": "missing",
+        "degradation_events": [
+          "NO_SOURCE_EVENTS"
+        ],
+        "reason": "Gateway probe returned no source-event rows for this source kind.",
+        "source_kind": "official_filings"
+      },
+      {
+        "coverage_status": "missing",
+        "degradation_events": [
+          "NO_SOURCE_EVENTS"
+        ],
+        "reason": "Gateway probe returned no source-event rows for this source kind.",
+        "source_kind": "official_sources"
+      },
+      {
+        "coverage_status": "missing",
+        "degradation_events": [
+          "NO_SOURCE_EVENTS"
+        ],
+        "reason": "Gateway probe returned no source-event rows for this source kind.",
+        "source_kind": "news_context"
+      },
+      {
+        "coverage_status": "degraded",
+        "degradation_events": [
+          "{'code': 'REQUEST_TIMEOUT', 'message': 'Unable to fetch open news index.', 'source_kind': 'open_news_index'}",
+          "{'code': 'ALL_SOURCES_DEGRADED', 'message': 'All requested source-event providers returned degraded results.'}"
+        ],
+        "reason": "Gateway returned structured degraded input for this source kind.",
+        "source_kind": "open_news_index"
+      },
+      {
+        "coverage_status": "degraded",
+        "degradation_events": [
+          "{'code': 'SOCIAL_SOURCE_DISABLED', 'message': 'Social heat sources are disabled by default.', 'source_kind': 'social_heat'}",
+          "{'code': 'ALL_SOURCES_DEGRADED', 'message': 'All requested source-event providers returned degraded results.'}"
+        ],
+        "reason": "Gateway returned structured degraded input for this source kind.",
+        "source_kind": "social_heat"
+      }
+    ],
+    "observed_source_kinds": [
+      "industry_media",
+      "news_context",
+      "official_disclosures",
+      "official_filings",
+      "official_sources",
+      "open_news_index",
+      "social_heat"
+    ]
+  },
+  "status": "degraded",
   "summary": {
-    "deduped_event_count": 10,
+    "coverage_gap_count": 5,
+    "deduped_event_count": 6,
+    "degraded_input_count": 2,
     "degraded_item_count": 0,
-    "digest_item_count": 3,
-    "raw_event_count": 12
+    "digest_item_count": 2,
+    "raw_event_count": 6
   },
   "version": "fresh-narrative-digest-v1",
   "window": {
-    "end": "2026-06-02T23:59:59+00:00",
-    "start": "2026-06-01T00:00:00+00:00"
+    "end": "2026-06-05T23:59:59+00:00",
+    "start": "2026-06-05T00:00:00+00:00"
   }
 }

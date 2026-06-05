@@ -1,0 +1,49 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "command": "python -m pytest tests/test_narrative_source_gateway_consumer.py -q",
+      "result": "7 passed"
+    },
+    {
+      "command": "python -m pytest tests/test_product_shell_source_quality.py tests/test_fresh_narrative_digest.py tests/test_narrative_source_coverage_gap.py -q",
+      "result": "21 passed"
+    },
+    {
+      "command": "python -m pytest tests/test_narrative_source_gateway_consumer.py tests/test_product_shell_source_quality.py tests/test_fresh_narrative_digest.py tests/test_narrative_source_coverage_gap.py tests/test_product_shell.py tests/test_product_shell_release.py -q",
+      "result": "43 passed"
+    },
+    {
+      "command": "python scripts/run_narrative_source_gateway_probe.py --base-url http://127.0.0.1:8700 --timeout-seconds 45 --limit 5 --output-dir outputs/narrative_source_gateway_probe/current",
+      "result": "exit 0; 7 source kinds, 0 failed, 6 rows; open_news_index/social_heat structured degraded"
+    },
+    {
+      "command": "python scripts/run_fresh_narrative_digest.py --input outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json --output-dir outputs/fresh_narrative_digest/current --window-start 2026-06-05T00:00:00+00:00 --window-end 2026-06-05T23:59:59+00:00",
+      "result": "exit 0; degraded; 2 digest items; 5 coverage gaps"
+    },
+    {
+      "command": "python scripts/run_narrative_candidate_inbox.py --input outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json --output-dir outputs/narrative_candidate_inbox/current",
+      "result": "exit 0; degraded; 2 candidates; 5 coverage gaps"
+    },
+    {
+      "command": "python scripts/run_narrative_source_coverage_gap_report.py --input outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json --output-dir outputs/narrative_source_coverage_gap/current",
+      "result": "exit 0; degraded; 2 working, 3 missing, 2 degraded, 1 unsupported"
+    },
+    {
+      "command": "python -m pytest",
+      "result": "684 passed, 1 skipped"
+    },
+    {
+      "command": "python -m ruff check .",
+      "result": "passed"
+    },
+    {
+      "command": "python -m compileall -q src tests scripts",
+      "result": "passed"
+    },
+    {
+      "command": "python -m coverage run -m pytest -q && python -m coverage report",
+      "result": "684 passed, 1 skipped; total coverage 84%"
+    }
+  ]
+}
