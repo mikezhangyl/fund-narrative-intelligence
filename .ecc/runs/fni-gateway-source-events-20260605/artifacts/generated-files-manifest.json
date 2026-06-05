@@ -1,0 +1,24 @@
+{
+  "generated_artifacts": [
+    {
+      "type": "live_probe_json",
+      "path": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.json",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "FNI live probe JSON against stock-data-gateway unified narrative source-events route.",
+      "checksum_sha256": "1231072f5b012a2915a9046f22a916d35a174d902ea5306c188a492ec07a8221",
+      "mtime_epoch": 1780639918,
+      "size_bytes": 41918
+    },
+    {
+      "type": "live_probe_html",
+      "path": "outputs/narrative_source_gateway_probe/current/narrative_source_gateway_probe.html",
+      "owned_by_task": true,
+      "reviewed_snapshot_type": "working_tree",
+      "summary": "Chinese HTML live probe report for Gateway unified narrative source-events consumption.",
+      "checksum_sha256": "1d4725563e08081d35bdc30ce986332ea0666515cfc8001e0446e1a1572d6935",
+      "mtime_epoch": 1780639918,
+      "size_bytes": 5390
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "command": "python -m pytest tests/test_narrative_source_gateway_consumer.py -q",
+      "result": "7 passed"
+    },
+    {
+      "command": "python scripts/run_narrative_source_gateway_probe.py --base-url http://127.0.0.1:8700 --timeout-seconds 45 --limit 5 --output-dir outputs/narrative_source_gateway_probe/current",
+      "result": "exit 0; 7 source kinds, 0 failed, 6 rows; open_news_index/social_heat structured degraded"
+    },
+    {
+      "command": "python -m pytest",
+      "result": "677 passed, 1 skipped"
+    },
+    {
+      "command": "python -m ruff check .",
+      "result": "passed"
+    },
+    {
+      "command": "python -m compileall -q src tests scripts",
+      "result": "passed"
+    },
+    {
+      "command": "python -m coverage run -m pytest -q && python -m coverage report",
+      "result": "677 passed, 1 skipped; total coverage 84%"
+    }
+  ]
+}

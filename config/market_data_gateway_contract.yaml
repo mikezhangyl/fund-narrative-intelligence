@@ -1,5 +1,5 @@
 version: market-data-gateway-contract-v1
-updated_at: "2026-06-01"
+updated_at: "2026-06-05"
 base_path: /api/v1/market-data
 description: >
   Contract expected by this project for a local market-data gateway. The gateway
@@ -758,22 +758,22 @@ endpoints:
         - provider
         - source_url
         - retrieved_at
-  - endpoint_id: gateway_narrative_official_filings
-    dataset_id: narrative_official_filings
+  - endpoint_id: gateway_narrative_source_events
+    dataset_id: narrative_source_events
     provider: gateway
-    endpoint: narrative_source_events_official_filings
-    method: POST
-    path: /api/v1/market-data/narrative/source-events/official-filings
+    endpoint: narrative_source_events
+    method: GET
+    path: /api/v1/market-data/narrative/source-events
     cache_policy: read_through_cache
     required_request_fields:
-      - symbols
-      - query
+      - source_kind
       - limit
     sample_request:
-      json:
-        symbols:
-          - AAPL
-        query: "AI infrastructure"
+      query:
+        source_kind: "official_filings,official_disclosures"
+        symbol: AAPL
+        keyword: "AI infrastructure"
+        trust_tier: trusted_fact
         limit: 5
     response: &narrative_source_event_response
       rows_path: data.rows
@@ -802,6 +802,27 @@ endpoints:
         - source_document_url
         - excerpt
         - provider_metadata
+        - governance
+        - freshness
+        - extraction
+  - endpoint_id: gateway_narrative_official_filings
+    dataset_id: narrative_official_filings
+    provider: gateway
+    endpoint: narrative_source_events_official_filings
+    method: POST
+    path: /api/v1/market-data/narrative/source-events/official-filings
+    cache_policy: read_through_cache
+    required_request_fields:
+      - symbols
+      - query
+      - limit
+    sample_request:
+      json:
+        symbols:
+          - AAPL
+        query: "AI infrastructure"
+        limit: 5
+    response: *narrative_source_event_response
   - endpoint_id: gateway_narrative_official_disclosures
     dataset_id: narrative_official_disclosures
     provider: gateway

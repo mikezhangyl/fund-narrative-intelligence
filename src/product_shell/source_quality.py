@@ -231,9 +231,9 @@ def _gateway_source_group(source_kind: str) -> str:
         return "official_filings"
     if "social" in lower or "heat" in lower:
         return "social_heat"
-    if "news" in lower:
+    if "news" in lower or "industry_media" in lower:
         return "news_context"
-    if "disclosure" in lower or "announcement" in lower:
+    if "disclosure" in lower or "announcement" in lower or "official_sources" in lower:
         return "official_disclosures"
     return "generated_artifacts"
 

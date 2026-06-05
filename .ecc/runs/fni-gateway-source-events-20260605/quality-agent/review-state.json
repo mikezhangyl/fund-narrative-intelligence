@@ -1,0 +1,11 @@
+{
+  "review_id": "fni-gateway-source-events-20260605",
+  "status": "passed",
+  "reviewed_at": "2026-06-05T07:08:53Z",
+  "reviewed_snapshot_type": "working_tree",
+  "quality_reviewed_commit": "f486d396b52c27117c298889c7542c28dde8594b",
+  "working_tree_dirty": true,
+  "findings_count": 0,
+  "unresolved_findings_count": 0,
+  "fix_required_before_next_phase": false
+}

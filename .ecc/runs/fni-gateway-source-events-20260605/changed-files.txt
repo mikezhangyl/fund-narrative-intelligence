@@ -1,0 +1,11 @@
+config/data_capabilities.yaml
+config/market_data_gateway_contract.yaml
+docs/exec-plans/active/fni-gateway-source-events.md
+docs/exec-plans/active/index.md
+docs/memory/current-brief.md
+scripts/report_data_capabilities.py
+scripts/run_narrative_source_gateway_probe.py
+src/market_data/providers/narrative_source_gateway.py
+src/product_shell/source_quality.py
+tests/test_narrative_source_gateway_consumer.py
+tests/test_product_shell_source_quality.py

@@ -81,7 +81,11 @@ CAPABILITY_GROUPS = (
     {
         "group_id": "news",
         "name": "News",
-        "dataset_ids": ("news_briefs", "narrative_source_events"),
+        "dataset_ids": (
+            "news_briefs",
+            "narrative_source_events",
+            "narrative_source_events_legacy_fixture",
+        ),
     },
     {"group_id": "cyq", "name": "CYQ / Cost Basis", "dataset_ids": ("cyq_chips",)},
     {

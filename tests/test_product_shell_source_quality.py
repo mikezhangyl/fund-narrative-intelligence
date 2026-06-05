@@ -6,6 +6,7 @@ from pathlib import Path
 from scripts import build_product_shell
 from src.product_shell.route_registry import build_product_shell_route_registry
 from src.product_shell.source_quality import (
+    _gateway_source_group,
     build_source_quality_dashboard,
     render_source_quality_dashboard_html,
 )
@@ -78,6 +79,12 @@ def test_source_quality_dashboard_html_is_chinese_and_cites_review_source(tmp_pa
     assert "不重新计算来源可靠性分" in html
     assert "Owner" not in html
     assert "official_filings" not in html
+
+
+def test_source_quality_groups_gateway_m20_source_kinds():
+    assert _gateway_source_group("official_sources") == "official_disclosures"
+    assert _gateway_source_group("open_news_index") == "news_context"
+    assert _gateway_source_group("industry_media") == "news_context"
 
 
 def test_route_registry_includes_source_quality_dashboard_route():

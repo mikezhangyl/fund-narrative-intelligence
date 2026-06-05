@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "findings": [],
+  "residual_risks": [
+    "open_news_index may degrade due upstream timeout or rate limiting; this is represented through Gateway structured degradation.",
+    "social_heat remains disabled by default and should not be treated as trusted factual evidence.",
+    "official_sources currently shares the official_disclosures source-quality group; a later UI slice may split policy/regulator/industry official sources into a dedicated group."
+  ]
+}
