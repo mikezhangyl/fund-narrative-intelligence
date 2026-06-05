@@ -19,6 +19,7 @@ The FNI consumer/reporting layer now also covers the M20 downstream artifacts: s
 - Updated source-quality grouping and dashboard rows for `official_sources`, `open_news_index`, `industry_media`, and the full M20 source-kind set.
 - Added candidate inbox and coverage gap report CLIs: `scripts/run_narrative_candidate_inbox.py` and `scripts/run_narrative_source_coverage_gap_report.py`.
 - Updated fresh digest to preserve Gateway missing/degraded input diagnostics and prevent non-official/heat-only source kinds from being treated as trusted facts.
+- Restored the M20 PM strategy document `docs/product/open-source-first-narrative-data-strategy-2026-06-04.html` into the clean PR branch so `MIK-271` and current brief references resolve.
 - Added tests for unified route contract, GET query construction, structured degradation, M20 source-kind coverage, candidate inbox, fresh digest gap diagnostics, and Gateway backlog gap reporting.
 
 ## Live Probe

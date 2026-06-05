@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>免费公开源优先的叙事数据策略 - 2026-06-04</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #d8e0ea;
+      --soft: #f6f8fb;
+      --ok: #0f766e;
+      --warn: #b45309;
+    }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.62;
+    }
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px 24px 72px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      line-height: 1.22;
+    }
+    h2 {
+      margin-top: 34px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 22px;
+    }
+    p, li, td, th {
+      font-size: 15px;
+    }
+    code {
+      padding: 1px 5px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--soft);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--soft);
+    }
+    .meta {
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .decision {
+      margin: 22px 0;
+      padding: 16px 18px;
+      border-left: 4px solid var(--ok);
+      background: #edf9f6;
+    }
+    .warning {
+      margin: 22px 0;
+      padding: 16px 18px;
+      border-left: 4px solid var(--warn);
+      background: #fff8ed;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>免费公开源优先的叙事数据策略</h1>
+    <p class="meta">日期：2026-06-04；适用范围：FNI 与 stock-data-gateway 共享 Linear 项目的叙事数据源路线。</p>
+
+    <section class="decision">
+      <strong>决策：</strong>当前阶段从“付费 provider 优先”调整为“免费公开源 / 官方源 / 低风险爬虫优先”。付费源不删除，但降为 Later，不再作为当前里程碑依赖。
+    </section>
+
+    <h2>边界不变</h2>
+    <ul>
+      <li><code>stock-data-gateway</code> 负责外部采集、爬虫、官方 API、限速、缓存、robots/TOS、source-event 标准化。</li>
+      <li>FNI 负责产品需求、consumer contract、探针、来源质量展示、digest/report 和 review workflow。</li>
+    </ul>
+
+    <h2>为什么改</h2>
+    <p>我们现在要证明的是：能不能稳定发现新的市场叙事线索，并把证据来源和可信度讲清楚。早期不需要复刻机构新闻终端。官方公开源和低风险公开源已经足够支撑 Can-Do 阶段。</p>
+
+    <h2>优先级</h2>
+    <table>
+      <thead>
+        <tr><th>优先级</th><th>来源类别</th><th>例子</th><th>负责方</th><th>信任角色</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>P0</td><td>官方公告/披露</td><td>SEC EDGAR、CNINFO、上交所/深交所公告、HKEX 可行部分</td><td>Gateway</td><td>可信事实元数据与文档引用</td></tr>
+        <tr><td>P0</td><td>政策/监管/行业官方页面</td><td>证监会、交易所、部委、行业协会</td><td>Gateway</td><td>可信宏观/行业事实</td></tr>
+        <tr><td>P1</td><td>公开新闻/RSS/索引源</td><td>GDELT、Google News RSS-style feeds、媒体 RSS、公开 sitemap</td><td>Gateway</td><td>上下文/候选证据</td></tr>
+        <tr><td>P1</td><td>公开行业媒体</td><td>低风险静态文章页、行业网站</td><td>Gateway</td><td>robots/TOS 通过后作为研究上下文</td></tr>
+        <tr><td>P2</td><td>社区/社交热度</td><td>Stocktwits、公开论坛页、允许访问的社区页面</td><td>Gateway</td><td>仅热度信号</td></tr>
+        <tr><td>Later</td><td>付费终端/新闻分析</td><td>Wind、Choice、iFinD、Reuters、RavenPack、AlphaSense</td><td>PM/vendor evaluation</td><td>未来可选 fallback</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Linear 新建方向</h2>
+    <p>共享 milestone：<code>M20 - Open Narrative Source Gateway Capability</code>。</p>
+    <p>Gateway-owned stories 会使用 <code>[GATEWAY]</code> 前缀；FNI-owned follow-up 会使用 <code>[FNI]</code> 前缀，避免 Developer 混淆责任边界。</p>
+
+    <h2>验收口径</h2>
+    <ul>
+      <li>Gateway 至少打通一个官方 trusted fact 源和一个 context/heat 源。</li>
+      <li>每条 source event 都带 source URL、发布时间、抓取时间、hash、license/retention、trust tier、source quality、degradation events。</li>
+      <li>FNI 只通过 gateway contract 消费，不新增直接外部采集。</li>
+      <li>FNI source quality dashboard 能显示每个 gateway source kind 的覆盖状态。</li>
+      <li>Fresh narrative digest 能显示候选叙事、证据链接、可信度和降级原因。</li>
+    </ul>
+
+    <section class="warning">
+      <strong>非目标：</strong>当前阶段不做付费源集成、不做验证码绕过、不做 stealth browser、不做住宅代理、不抓登录/付费内容、不把社区发言当事实。
+    </section>
+  </main>
+</body>
+</html>

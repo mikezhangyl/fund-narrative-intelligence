@@ -26,6 +26,7 @@ Consume stock-data-gateway narrative source events through the unified Gateway A
 - `docs/exec-plans/active/fni-gateway-source-events.md`
 - `docs/exec-plans/active/index.md`
 - `docs/memory/current-brief.md`
+- `docs/product/open-source-first-narrative-data-strategy-2026-06-04.html`
 
 ## Implementation Summary
 

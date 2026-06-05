@@ -3,6 +3,7 @@ config/market_data_gateway_contract.yaml
 docs/exec-plans/active/fni-gateway-source-events.md
 docs/exec-plans/active/index.md
 docs/memory/current-brief.md
+docs/product/open-source-first-narrative-data-strategy-2026-06-04.html
 outputs/fresh_narrative_digest/current/fresh_narrative_digest.html
 outputs/fresh_narrative_digest/current/fresh_narrative_digest.json
 scripts/report_data_capabilities.py
