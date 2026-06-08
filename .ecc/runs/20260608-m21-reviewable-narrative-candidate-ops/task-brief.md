@@ -175,3 +175,34 @@ Verification:
 - `uv run pytest tests/test_source_trust_preflight.py tests/test_source_review_action_ledger.py tests/test_candidate_evidence_detail.py -q`: 18 passed.
 - `uv run ruff check scripts/run_source_trust_preflight.py src/modules/narrative_review/source_trust_preflight.py tests/test_source_trust_preflight.py`: passed.
 - Live preflight for `CAND_26E13C7A6D`: overall `warning`; official source, review action, degradation, and metadata checks passed; source diversity and freshness returned warnings.
+
+## MIK-293 Checkpoint
+
+Implemented standalone operator workflow linking daily digest to candidate review.
+
+Key behavior:
+
+- Added `src/modules/narrative_review/source_operator_workflow.py`.
+- Added `scripts/run_source_operator_workflow.py`.
+- Input is `fresh_narrative_digest.json`, `source_candidate_review_queue.json`,
+  and optional preflight index.
+- Output version is `source-operator-workflow-v1`.
+- Each digest item links to queue row, candidate evidence detail, and trust preflight path when a candidate exists.
+- Stable links use `source_candidate_review_queue.html#<candidate_id>`,
+  `candidate_evidence/<candidate_id>.html`, and `source_trust_preflight/<candidate_id>.html`.
+- Next operator actions include `inspect_evidence`, `watch`, `request_more_evidence`,
+  and `run_trust_preflight`.
+- Degradation/source trust labels are preserved; missing source-event input remains visible as degraded input state.
+- No digest item implies trust without review/preflight.
+
+Artifacts generated locally:
+
+- `outputs/source_operator_workflow/2026-06-08-m21-live/source_operator_workflow.json`
+- `outputs/source_operator_workflow/2026-06-08-m21-live/source_operator_workflow.html`
+
+Verification:
+
+- `uv run pytest tests/test_source_operator_workflow.py -q`: 4 passed.
+- `uv run pytest tests/test_source_operator_workflow.py tests/test_source_trust_preflight.py tests/test_source_candidate_review_queue.py -q`: 13 passed.
+- `uv run ruff check scripts/run_source_operator_workflow.py src/modules/narrative_review/source_operator_workflow.py tests/test_source_operator_workflow.py`: passed.
+- Live workflow: 2 digest items, 2 linked candidates, 0 trusted implied.
