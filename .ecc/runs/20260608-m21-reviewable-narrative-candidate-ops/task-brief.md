@@ -45,3 +45,37 @@ Verification:
 - `uv run ruff check scripts/run_narrative_source_gateway_probe.py src/market_data/providers/narrative_source_gateway.py tests/test_narrative_source_gateway_consumer.py`: passed.
 - Fixture acceptance: 6 pass, 1 degraded, 0 blocking.
 - Live acceptance against local Gateway on `127.0.0.1:8700`: 2 pass, 2 degraded, 3 no_data, 0 blocking.
+
+## MIK-289 Checkpoint
+
+Implemented a source-derived candidate review queue without changing the older
+fund mapping review queue.
+
+Key behavior:
+
+- Added `src/modules/narrative_review/source_queue.py`.
+- Added `scripts/run_source_candidate_review_queue.py`.
+- Input is existing `narrative_candidate_inbox`; optional `fresh_narrative_digest`
+  enriches freshness state and related symbols/markets.
+- Output version is `source-candidate-review-queue-v1`.
+- Each row includes candidate_id, title/topic, candidate_state, freshness_state,
+  source_event_count, source_kind_mix, newest_event_time, related symbols/markets,
+  trust_tier_summary, degradation_flags, review_priority, and stable evidence detail links.
+- Filters are supported for source kind, trust tier, freshness state, market, and candidate state.
+- No row can mark a candidate trusted; `trusted_promotion_allowed` is always false.
+- Chinese HTML separates official-backed, context-only, and heat-only candidates.
+
+Artifacts generated locally:
+
+- `outputs/source_candidate_review_queue/2026-06-08-m21-fixture/source_candidate_review_queue.json`
+- `outputs/source_candidate_review_queue/2026-06-08-m21-fixture/source_candidate_review_queue.html`
+- `outputs/source_candidate_review_queue/2026-06-08-m21-live/source_candidate_review_queue.json`
+- `outputs/source_candidate_review_queue/2026-06-08-m21-live/source_candidate_review_queue.html`
+
+Verification:
+
+- `uv run pytest tests/test_source_candidate_review_queue.py -q`: 4 passed.
+- `uv run pytest tests/test_fresh_narrative_digest.py tests/test_candidate_review_queue.py -q`: 13 passed.
+- `uv run ruff check scripts/run_source_candidate_review_queue.py src/modules/narrative_review/source_queue.py tests/test_source_candidate_review_queue.py`: passed.
+- Fixture queue from MIK-288 fixture probe: 5 candidates, 3 official-backed, 2 context-only, 0 trusted.
+- Live queue from MIK-288 live probe: 2 candidates, 1 official-backed, 1 context-only, 0 trusted.
