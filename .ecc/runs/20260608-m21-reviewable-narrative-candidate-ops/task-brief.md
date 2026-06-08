@@ -79,3 +79,37 @@ Verification:
 - `uv run ruff check scripts/run_source_candidate_review_queue.py src/modules/narrative_review/source_queue.py tests/test_source_candidate_review_queue.py`: passed.
 - Fixture queue from MIK-288 fixture probe: 5 candidates, 3 official-backed, 2 context-only, 0 trusted.
 - Live queue from MIK-288 live probe: 2 candidates, 1 official-backed, 1 context-only, 0 trusted.
+
+## MIK-290 Checkpoint
+
+Implemented candidate evidence drill-down for one source-derived candidate.
+
+Key behavior:
+
+- Added `src/modules/narrative_review/source_evidence.py`.
+- Added `scripts/run_candidate_evidence_detail.py`.
+- Input is `source_candidate_review_queue.json` plus a Gateway probe/source-event payload.
+- Output version is `candidate-evidence-detail-v1`.
+- Evidence rows preserve source_event_id and show source URL, title, event time,
+  provider/domain, source_quality, retention/extraction status, freshness state,
+  degradation_events, and promotion evidence role.
+- Events are grouped by source_kind and trust tier.
+- Missing source_event_id references remain visible as `event_status=missing`
+  with `SOURCE_EVENT_NOT_FOUND`; FNI does not invent missing source facts.
+- Context-only and heat-only evidence are labeled insufficient for trusted promotion alone.
+- The artifact remains read-only and does not perform trusted promotion.
+
+Artifacts generated locally:
+
+- `outputs/candidate_evidence/2026-06-08-m21-fixture/CAND_B4F3DE8BD1.json`
+- `outputs/candidate_evidence/2026-06-08-m21-fixture/CAND_B4F3DE8BD1.html`
+- `outputs/candidate_evidence/2026-06-08-m21-live/CAND_26E13C7A6D.json`
+- `outputs/candidate_evidence/2026-06-08-m21-live/CAND_26E13C7A6D.html`
+
+Verification:
+
+- `uv run pytest tests/test_candidate_evidence_detail.py -q`: 4 passed.
+- `uv run pytest tests/test_candidate_evidence_detail.py tests/test_source_candidate_review_queue.py -q`: 8 passed.
+- `uv run ruff check scripts/run_candidate_evidence_detail.py src/modules/narrative_review/source_evidence.py tests/test_candidate_evidence_detail.py`: passed.
+- Fixture evidence detail: 1 official event, 0 missing, 0 degraded.
+- Live evidence detail: 2 official events, 0 missing, 0 degraded.
