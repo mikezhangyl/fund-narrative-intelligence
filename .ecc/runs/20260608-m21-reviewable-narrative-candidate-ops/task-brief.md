@@ -206,3 +206,32 @@ Verification:
 - `uv run pytest tests/test_source_operator_workflow.py tests/test_source_trust_preflight.py tests/test_source_candidate_review_queue.py -q`: 13 passed.
 - `uv run ruff check scripts/run_source_operator_workflow.py src/modules/narrative_review/source_operator_workflow.py tests/test_source_operator_workflow.py`: passed.
 - Live workflow: 2 digest items, 2 linked candidates, 0 trusted implied.
+
+## MIK-294 Checkpoint
+
+Implemented formal M21 source-derived candidate acceptance report.
+
+Key behavior:
+
+- Added `src/scanners/m21_acceptance_report.py`.
+- Added `scripts/run_m21_acceptance_report.py`.
+- Output version is `m21-source-derived-candidate-acceptance-v1`.
+- Report summarizes live/fixture Gateway source-event consumption, source candidate queue,
+  evidence drill-down, review action ledger, trust preflight, and operator workflow.
+- Includes coverage matrix by source kind and candidate state.
+- Lists artifact paths, verification commands, known degraded sources, risks, and recommended next stories.
+- Separates Can-Do, fixture-only, degraded, blocked, and not implemented.
+- Provides PM/Architect decision language.
+- Does not claim candidates are trusted, predictive, or investment recommendations.
+
+Artifacts generated locally:
+
+- `outputs/m21_acceptance/2026-06-08-source-candidate-review/m21_acceptance_report.json`
+- `outputs/m21_acceptance/2026-06-08-source-candidate-review/m21_acceptance_report.html`
+
+Verification:
+
+- `uv run pytest tests/test_m21_acceptance_report.py -q`: 3 passed.
+- `uv run pytest tests/test_m21_acceptance_report.py tests/test_source_operator_workflow.py tests/test_source_trust_preflight.py tests/test_source_review_action_ledger.py tests/test_candidate_evidence_detail.py tests/test_source_candidate_review_queue.py tests/test_narrative_source_gateway_consumer.py -q`: 38 passed.
+- `uv run ruff check scripts/run_m21_acceptance_report.py src/scanners/m21_acceptance_report.py tests/test_m21_acceptance_report.py`: passed.
+- Acceptance decision: `continue_with_warnings`; blocked=[], degraded=[source_trust_preflight], not_implemented=[automatic_trusted_promotion].
