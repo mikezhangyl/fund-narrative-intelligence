@@ -113,3 +113,35 @@ Verification:
 - `uv run ruff check scripts/run_candidate_evidence_detail.py src/modules/narrative_review/source_evidence.py tests/test_candidate_evidence_detail.py`: passed.
 - Fixture evidence detail: 1 official event, 0 missing, 0 degraded.
 - Live evidence detail: 2 official events, 0 missing, 0 degraded.
+
+## MIK-291 Checkpoint
+
+Implemented append-only source candidate review action ledger.
+
+Key behavior:
+
+- Added `src/modules/narrative_review/source_action_ledger.py`.
+- Added `scripts/run_source_review_action_ledger.py`.
+- Supported actions: `watch`, `needs_more_evidence`, `reject`, `defer`,
+  `ready_for_trust_preflight`.
+- Records include action_id, candidate_id, actor placeholder, action, reason,
+  created_at, idempotency_key, source_artifact_refs, previous_candidate_state,
+  new_candidate_state, and trusted_promotion_allowed=false.
+- Re-running with the same idempotency key does not duplicate records.
+- Terminal `rejected` state rejects later non-idempotent actions.
+- The ledger never emits a trusted state or promotion action.
+- JSON and Chinese HTML summary artifacts are generated.
+
+Artifacts generated locally:
+
+- `outputs/source_review_action_ledger/2026-06-08-m21-live/ledger.json`
+- `outputs/source_review_action_ledger/2026-06-08-m21-live/source_review_action_ledger.json`
+- `outputs/source_review_action_ledger/2026-06-08-m21-live/source_review_action_ledger.html`
+
+Verification:
+
+- `uv run pytest tests/test_source_review_action_ledger.py -q`: 9 passed.
+- `uv run pytest tests/test_source_review_action_ledger.py tests/test_candidate_evidence_detail.py tests/test_source_candidate_review_queue.py -q`: 17 passed.
+- `uv run ruff check scripts/run_source_review_action_ledger.py src/modules/narrative_review/source_action_ledger.py tests/test_source_review_action_ledger.py`: passed.
+- Live ledger action: `ready_for_trust_preflight` for `CAND_26E13C7A6D`, 1 record, 0 trusted actions.
+- Idempotency replay check: second run with same key kept total_action_count=1 and idempotent_replay_count=1.
