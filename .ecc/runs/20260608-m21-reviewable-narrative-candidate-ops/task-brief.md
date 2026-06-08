@@ -145,3 +145,33 @@ Verification:
 - `uv run ruff check scripts/run_source_review_action_ledger.py src/modules/narrative_review/source_action_ledger.py tests/test_source_review_action_ledger.py`: passed.
 - Live ledger action: `ready_for_trust_preflight` for `CAND_26E13C7A6D`, 1 record, 0 trusted actions.
 - Idempotency replay check: second run with same key kept total_action_count=1 and idempotent_replay_count=1.
+
+## MIK-292 Checkpoint
+
+Implemented read-only trust preflight for source-derived candidates.
+
+Key behavior:
+
+- Added `src/modules/narrative_review/source_trust_preflight.py`.
+- Added `scripts/run_source_trust_preflight.py`.
+- Input is source candidate review queue, candidate evidence detail, and review action ledger.
+- Output version is `source-trust-preflight-v1`.
+- Criteria: official/primary source presence, source diversity, entity/symbol clarity,
+  freshness, degradation/contradiction flags, review action state, and evidence metadata.
+- Result statuses are `pass`, `warning`, or `fail`.
+- Context-only and heat-only candidates fail with explicit Chinese reasons.
+- Official-backed candidates can pass only when evidence metadata and
+  `ready_for_trust_preflight` review action state are present.
+- The report is read-only and never performs automatic promotion, LLM judgment, or investment conclusion.
+
+Artifacts generated locally:
+
+- `outputs/source_trust_preflight/2026-06-08-m21-live/CAND_26E13C7A6D.json`
+- `outputs/source_trust_preflight/2026-06-08-m21-live/CAND_26E13C7A6D.html`
+
+Verification:
+
+- `uv run pytest tests/test_source_trust_preflight.py -q`: 5 passed.
+- `uv run pytest tests/test_source_trust_preflight.py tests/test_source_review_action_ledger.py tests/test_candidate_evidence_detail.py -q`: 18 passed.
+- `uv run ruff check scripts/run_source_trust_preflight.py src/modules/narrative_review/source_trust_preflight.py tests/test_source_trust_preflight.py`: passed.
+- Live preflight for `CAND_26E13C7A6D`: overall `warning`; official source, review action, degradation, and metadata checks passed; source diversity and freshness returned warnings.
