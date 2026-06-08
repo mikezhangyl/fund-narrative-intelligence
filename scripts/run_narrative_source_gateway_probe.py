@@ -29,6 +29,7 @@ from src.market_data.providers.narrative_source_gateway import (  # noqa: E402
 
 DEFAULT_SOURCE_KINDS = tuple(SOURCE_KIND_PATHS)
 OUTPUT_STEM = "narrative_source_gateway_probe"
+BLOCKING_ACCEPTANCE_STATUSES = {"blocked", "missing_route", "schema_mismatch"}
 DEFAULT_PROBE_REQUESTS = {
     "official_filings": {
         "symbols": ["AAPL"],
@@ -94,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
         fixture_json=args.fixture_json,
     )
     write_outputs(args.output_dir, report)
-    return 0 if report["summary"]["failed_source_kinds"] == 0 else 1
+    return 0 if report["summary"]["blocking_source_kinds"] == 0 else 1
 
 
 def run_probe(
@@ -112,6 +113,7 @@ def run_probe(
         results = [
             _failure_result(
                 source_kind=source_kind,
+                status="blocked",
                 reason=f"{DEFAULT_GATEWAY_BASE_URL_ENV} is not configured",
             )
             for source_kind in source_kinds
@@ -135,8 +137,22 @@ def run_probe(
                 limit=limit,
             )
             results.append({**result, "failure_reason": ""})
-        except (GatewaySourceUnavailableError, ValueError) as exc:
-            results.append(_failure_result(source_kind=source_kind, reason=str(exc)))
+        except ValueError as exc:
+            results.append(
+                _failure_result(
+                    source_kind=source_kind,
+                    status="schema_mismatch",
+                    reason=str(exc),
+                )
+            )
+        except GatewaySourceUnavailableError as exc:
+            results.append(
+                _failure_result(
+                    source_kind=source_kind,
+                    status=_gateway_failure_status(str(exc)),
+                    reason=str(exc),
+                )
+            )
     return _report(base_url=base_url, source_results=results, fixture_mode=bool(fixture_json))
 
 
@@ -155,6 +171,7 @@ def write_outputs(output_dir: Path, report: dict[str, Any]) -> None:
 def render_html(report: dict[str, Any]) -> str:
     rows = "\n".join(_html_rows(report["source_results"]))
     summary = report["summary"]
+    status_counts = summary.get("acceptance_status_counts") or {}
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -177,16 +194,23 @@ def render_html(report: dict[str, Any]) -> str:
     <div>生成时间：<code>{html.escape(report["generated_at"])}</code></div>
     <div>Gateway：<code>{html.escape(report["base_url"] or "未配置")}</code></div>
     <div>完成来源：<code>{summary["completed_source_kinds"]}</code> / <code>{summary["total_source_kinds"]}</code>，失败来源：<code>{summary["failed_source_kinds"]}</code></div>
+    <div>阻塞来源：<code>{summary["blocking_source_kinds"]}</code>，验收状态：<code>{html.escape(json.dumps(status_counts, ensure_ascii=False, sort_keys=True))}</code></div>
+    <div><a href="./{OUTPUT_STEM}.json">JSON 机器可读文件</a></div>
   </div>
-  <div class="notice">本报告只展示 Gateway 返回的候选来源标签和质量口径，不能把未支持的候选信号表述为确定事实。</div>
+  <div class="notice">本报告只展示 Gateway 返回的候选来源标签和质量口径，不能把未支持的候选信号表述为确定事实。验收状态分为通过、结构化降级、无数据、缺失路由、阻塞和结构不匹配。</div>
   <table>
     <thead>
       <tr>
         <th>来源类型</th>
+        <th>验收状态</th>
         <th>状态</th>
+        <th>owner_service</th>
+        <th>owner 来源</th>
         <th>标题</th>
         <th>trust_tier</th>
         <th>source_quality</th>
+        <th>pagination</th>
+        <th>cache</th>
         <th>license_scope</th>
         <th>retention_policy</th>
         <th>metadata_only</th>
@@ -212,10 +236,15 @@ def _html_rows(source_results: list[dict[str, Any]]) -> list[str]:
             rendered.append(
                 "      <tr>"
                 f"<td><code>{html.escape(str(result.get('source_kind') or ''))}</code></td>"
+                f"<td>{html.escape(_display_acceptance_status(result.get('acceptance_status')))}</td>"
                 f"<td>{html.escape(str(result.get('status') or ''))}</td>"
+                f"<td>{html.escape(str(result.get('owner_service') or ''))}</td>"
+                f"<td><code>{html.escape(str(result.get('owner_service_source') or ''))}</code></td>"
                 f"<td>{html.escape(str(row.get('title') or ''))}</td>"
                 f"<td><code>{html.escape(str(row.get('trust_tier') or ''))}</code></td>"
                 f"<td><code>{html.escape(str(row.get('source_quality') or ''))}</code></td>"
+                f"<td>{html.escape(json.dumps(result.get('pagination_metadata') or {}, ensure_ascii=False, sort_keys=True))}</td>"
+                f"<td>{html.escape(json.dumps(result.get('cache_metadata') or {}, ensure_ascii=False, sort_keys=True))}</td>"
                 f"<td>{html.escape(str(row.get('license_scope') or ''))}</td>"
                 f"<td><code>{html.escape(str(row.get('retention_policy') or ''))}</code></td>"
                 f"<td><code>{html.escape(str(row.get('metadata_only') if 'metadata_only' in row else ''))}</code></td>"
@@ -232,12 +261,16 @@ def _report(
     source_results: list[dict[str, Any]],
     fixture_mode: bool,
 ) -> dict[str, Any]:
-    failed = [result for result in source_results if result.get("status") == "failed"]
-    completed = [
-        result for result in source_results if result.get("status") == "completed"
+    annotated_results = [_with_acceptance_result(result) for result in source_results]
+    failed = [
+        result for result in annotated_results if result.get("acceptance_status") in BLOCKING_ACCEPTANCE_STATUSES
     ]
+    completed = [
+        result for result in annotated_results if result.get("status") == "completed"
+    ]
+    acceptance_status_counts = _acceptance_status_counts(annotated_results)
     return {
-        "version": "narrative-source-gateway-probe-v1",
+        "version": "narrative-source-gateway-acceptance-v2",
         "generated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),
         "base_url": base_url,
         "fixture_mode": fixture_mode,
@@ -245,9 +278,14 @@ def _report(
             "total_source_kinds": len(source_results),
             "completed_source_kinds": len(completed),
             "failed_source_kinds": len(failed),
-            "total_rows": sum(int(result.get("row_count") or 0) for result in source_results),
+            "blocking_source_kinds": len(failed),
+            "acceptance_status_counts": acceptance_status_counts,
+            "usable_source_kinds": acceptance_status_counts.get("pass", 0),
+            "degraded_source_kinds": acceptance_status_counts.get("degraded", 0),
+            "no_data_source_kinds": acceptance_status_counts.get("no_data", 0),
+            "total_rows": sum(int(result.get("row_count") or 0) for result in annotated_results),
         },
-        "source_results": source_results,
+        "source_results": annotated_results,
         "disclosure": {
             "trust_statement": (
                 "FNI reports only gateway-provided trust/source/license labels; "
@@ -258,16 +296,132 @@ def _report(
     }
 
 
-def _failure_result(*, source_kind: str, reason: str) -> dict[str, Any]:
+def _failure_result(*, source_kind: str, status: str = "blocked", reason: str) -> dict[str, Any]:
     return {
         "source_kind": source_kind,
-        "status": "failed",
+        "status": status,
         "row_count": 0,
         "rows": [],
         "meta": {},
         "degradation_events": [{"code": "gateway_unavailable", "message": reason}],
         "failure_reason": reason,
     }
+
+
+def _with_acceptance_result(result: dict[str, Any]) -> dict[str, Any]:
+    meta = result.get("meta") if isinstance(result.get("meta"), dict) else {}
+    rows = result.get("rows") if isinstance(result.get("rows"), list) else []
+    owner_service = _owner_service(result, meta=meta)
+    owner_service_source = _owner_service_source(result, meta=meta)
+    pagination = meta.get("pagination") if isinstance(meta.get("pagination"), dict) else {}
+    cache = meta.get("cache") if isinstance(meta.get("cache"), dict) else {}
+    schema_checks = _schema_checks(
+        result,
+        rows=rows,
+        meta=meta,
+        owner_service=owner_service,
+        pagination=pagination,
+        cache=cache,
+    )
+    acceptance_status = _acceptance_status(result, schema_checks=schema_checks)
+    return {
+        **result,
+        "acceptance_status": acceptance_status,
+        "schema_checks": schema_checks,
+        "owner_service": owner_service,
+        "owner_service_source": owner_service_source,
+        "pagination_metadata": pagination,
+        "cache_metadata": cache,
+    }
+
+
+def _schema_checks(
+    result: dict[str, Any],
+    *,
+    rows: list[Any],
+    meta: dict[str, Any],
+    owner_service: str,
+    pagination: dict[str, Any],
+    cache: dict[str, Any],
+) -> dict[str, bool]:
+    source_kind = str(result.get("source_kind") or "")
+    return {
+        "envelope": isinstance(result.get("status"), str)
+        and isinstance(result.get("row_count"), int)
+        and isinstance(result.get("degradation_events"), list)
+        and isinstance(meta, dict),
+        "rows": isinstance(rows, list) and all(isinstance(row, dict) for row in rows),
+        "source_kind": bool(source_kind)
+        and source_kind in DEFAULT_SOURCE_KINDS
+        and all(str(row.get("source_kind") or "") == source_kind for row in rows if isinstance(row, dict)),
+        "trust_tier": all(bool(str(row.get("trust_tier") or "")) for row in rows if isinstance(row, dict)),
+        "source_quality": all(bool(str(row.get("source_quality") or "")) for row in rows if isinstance(row, dict)),
+        "degradation_events": all(isinstance(row.get("degradation_events"), list) for row in rows if isinstance(row, dict)),
+        "pagination": bool(pagination),
+        "cache": bool(cache),
+        "owner_service": bool(owner_service),
+    }
+
+
+def _acceptance_status(
+    result: dict[str, Any], *, schema_checks: dict[str, bool]
+) -> str:
+    status = str(result.get("status") or "")
+    if status in {"missing_route", "blocked", "schema_mismatch"}:
+        return status
+    if not all(schema_checks.values()):
+        return "schema_mismatch"
+    if status == "degraded":
+        return "degraded"
+    if int(result.get("row_count") or 0) <= 0:
+        return "no_data"
+    return "pass"
+
+
+def _owner_service(result: dict[str, Any], *, meta: dict[str, Any]) -> str:
+    owner = meta.get("owner_service")
+    if isinstance(owner, str) and owner:
+        return owner
+    for row in result.get("rows") or []:
+        if isinstance(row, dict) and isinstance(row.get("owner_service"), str) and row.get("owner_service"):
+            return str(row["owner_service"])
+    return "stock-data-gateway"
+
+
+def _owner_service_source(result: dict[str, Any], *, meta: dict[str, Any]) -> str:
+    owner = meta.get("owner_service")
+    if isinstance(owner, str) and owner:
+        return "gateway_meta"
+    for row in result.get("rows") or []:
+        if isinstance(row, dict) and isinstance(row.get("owner_service"), str) and row.get("owner_service"):
+            return "gateway_row"
+    return "fni_contract_default"
+
+
+def _acceptance_status_counts(results: list[dict[str, Any]]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for result in results:
+        status = str(result.get("acceptance_status") or "unknown")
+        counts[status] = counts.get(status, 0) + 1
+    return counts
+
+
+def _gateway_failure_status(reason: str) -> str:
+    if "HTTP 404" in reason or "ROUTE_NOT_FOUND" in reason:
+        return "missing_route"
+    return "blocked"
+
+
+def _display_acceptance_status(value: Any) -> str:
+    mapping = {
+        "pass": "通过",
+        "degraded": "结构化降级",
+        "no_data": "无数据",
+        "missing_route": "缺失路由",
+        "blocked": "阻塞",
+        "schema_mismatch": "结构不匹配",
+    }
+    return mapping.get(str(value or ""), str(value or ""))
 
 
 def _load_fixture_payloads(path: Path | None) -> dict[str, Any] | None:

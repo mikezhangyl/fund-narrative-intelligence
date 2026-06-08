@@ -172,7 +172,12 @@ def test_probe_report_renders_chinese_html_and_json_quality_labels(tmp_path):
             {
                 "official_filings": {
                     "data": {"rows": [_gateway_row()]},
-                    "meta": {"provider": "gateway"},
+                    "meta": {
+                        "provider": "gateway",
+                        "owner_service": "stock-data-gateway",
+                        "pagination": {"returned": 1, "next_cursor": None},
+                        "cache": {"hit": True, "mode": "read_through_cache"},
+                    },
                 },
                 "social_heat": {
                     "data": {
@@ -195,7 +200,12 @@ def test_probe_report_renders_chinese_html_and_json_quality_labels(tmp_path):
                             )
                         ]
                     },
-                    "meta": {"provider": "gateway"},
+                    "meta": {
+                        "provider": "gateway",
+                        "owner_service": "stock-data-gateway",
+                        "pagination": {"returned": 1, "next_cursor": None},
+                        "cache": {"hit": True, "mode": "read_through_cache"},
+                    },
                 },
             },
             ensure_ascii=False,
@@ -229,6 +239,142 @@ def test_probe_report_renders_chinese_html_and_json_quality_labels(tmp_path):
     assert "heat_signal_only" in html
     assert "metadata_only" in html
     assert "不能把未支持的候选信号表述为确定事实" in html
+
+
+def test_probe_acceptance_report_classifies_gateway_contract_states(tmp_path):
+    fixture_path = tmp_path / "fixture.json"
+    fixture_path.write_text(
+        json.dumps(
+            {
+                "official_filings": {
+                    "data": {"rows": [_gateway_row()]},
+                    "meta": {
+                        "owner_service": "stock-data-gateway",
+                        "pagination": {"returned": 1, "next_cursor": None},
+                        "cache": {"hit": True, "mode": "read_through_cache"},
+                    },
+                },
+                "news_context": {
+                    "data": {"rows": []},
+                    "meta": {
+                        "owner_service": "stock-data-gateway",
+                        "status": "degraded",
+                        "pagination": {"returned": 0, "next_cursor": None},
+                        "cache": {"hit": False, "mode": "read_through_cache"},
+                        "degradation_events": [
+                            {
+                                "code": "UPSTREAM_TIMEOUT",
+                                "message": "Gateway returned structured degradation.",
+                            }
+                        ],
+                    },
+                },
+                "social_heat": {
+                    "data": {"rows": []},
+                    "meta": {
+                        "owner_service": "stock-data-gateway",
+                        "pagination": {"returned": 0, "next_cursor": None},
+                        "cache": {"hit": False, "mode": "disabled"},
+                    },
+                },
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = probe.main(
+        [
+            "--base-url",
+            "http://localhost:8700",
+            "--source-kind",
+            "official_filings",
+            "--source-kind",
+            "news_context",
+            "--source-kind",
+            "social_heat",
+            "--fixture-json",
+            str(fixture_path),
+            "--output-dir",
+            str(tmp_path / "out"),
+        ]
+    )
+
+    assert exit_code == 0
+    payload = json.loads((tmp_path / "out" / "narrative_source_gateway_probe.json").read_text())
+    html = (tmp_path / "out" / "narrative_source_gateway_probe.html").read_text()
+
+    assert payload["version"] == "narrative-source-gateway-acceptance-v2"
+    assert payload["summary"]["acceptance_status_counts"] == {
+        "pass": 1,
+        "degraded": 1,
+        "no_data": 1,
+    }
+    assert payload["summary"]["blocking_source_kinds"] == 0
+    by_kind = {result["source_kind"]: result for result in payload["source_results"]}
+    assert by_kind["official_filings"]["acceptance_status"] == "pass"
+    assert by_kind["official_filings"]["owner_service"] == "stock-data-gateway"
+    assert by_kind["official_filings"]["schema_checks"] == {
+        "envelope": True,
+        "rows": True,
+        "source_kind": True,
+        "trust_tier": True,
+        "source_quality": True,
+        "degradation_events": True,
+        "pagination": True,
+        "cache": True,
+        "owner_service": True,
+    }
+    assert by_kind["official_filings"]["cache_metadata"] == {
+        "hit": True,
+        "mode": "read_through_cache",
+    }
+    assert by_kind["news_context"]["acceptance_status"] == "degraded"
+    assert by_kind["social_heat"]["acceptance_status"] == "no_data"
+    assert "验收状态" in html
+    assert "通过" in html
+    assert "结构化降级" in html
+    assert "无数据" in html
+    assert "JSON 机器可读文件" in html
+    assert "narrative_source_gateway_probe.json" in html
+
+
+def test_probe_acceptance_report_returns_nonzero_for_schema_mismatch(tmp_path):
+    fixture_path = tmp_path / "fixture.json"
+    fixture_path.write_text(
+        json.dumps(
+            {
+                "official_filings": {
+                    "data": {"rows": [_gateway_row()]},
+                    "meta": {
+                        "owner_service": "stock-data-gateway",
+                        "pagination": {"returned": 1, "next_cursor": None},
+                    },
+                },
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = probe.main(
+        [
+            "--base-url",
+            "http://localhost:8700",
+            "--source-kind",
+            "official_filings",
+            "--fixture-json",
+            str(fixture_path),
+            "--output-dir",
+            str(tmp_path / "out"),
+        ]
+    )
+
+    assert exit_code == 1
+    payload = json.loads((tmp_path / "out" / "narrative_source_gateway_probe.json").read_text())
+    assert payload["summary"]["blocking_source_kinds"] == 1
+    assert payload["source_results"][0]["acceptance_status"] == "schema_mismatch"
+    assert payload["source_results"][0]["schema_checks"]["cache"] is False
 
 
 def test_probe_default_source_kinds_cover_gateway_m20_sources():

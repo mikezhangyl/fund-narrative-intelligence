@@ -127,13 +127,16 @@ class NarrativeSourceGatewayClient:
             )
         rows = _rows_from_payload(payload)
         normalized_rows = [normalize_gateway_source_event(row) for row in rows]
+        source_kind_rows = [
+            {**row, "source_kind": source_kind} for row in normalized_rows
+        ]
         meta = payload.get("meta") if isinstance(payload.get("meta"), dict) else {}
-        degradation_events = _result_degradation_events(normalized_rows, meta=meta)
+        degradation_events = _result_degradation_events(source_kind_rows, meta=meta)
         return {
             "source_kind": source_kind,
-            "status": _result_status(normalized_rows, meta=meta),
-            "row_count": len(normalized_rows),
-            "rows": normalized_rows,
+            "status": _result_status(source_kind_rows, meta=meta),
+            "row_count": len(source_kind_rows),
+            "rows": source_kind_rows,
             "meta": meta,
             "degradation_events": degradation_events,
         }

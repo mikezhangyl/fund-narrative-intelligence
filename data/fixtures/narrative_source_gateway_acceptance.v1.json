@@ -1,0 +1,253 @@
+{
+  "official_filings": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-sec-aapl-20260608",
+          "source_type": "filing",
+          "source_provider": "sec_edgar",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/320193/sample.htm",
+          "title": "Apple 8-K filing references AI infrastructure spend",
+          "event_time": "2026-06-08T01:00:00Z",
+          "fetched_at": "2026-06-08T01:01:00Z",
+          "trust_tier": "official_primary",
+          "source_quality": "trusted_fact_candidate",
+          "license_scope": "metadata_and_public_filing_reference",
+          "retention_policy": "metadata_and_permitted_excerpt",
+          "metadata_only": false,
+          "degradation_events": [],
+          "summary": "Official filing metadata fixture for M21 acceptance.",
+          "stock_codes": [
+            "AAPL"
+          ],
+          "narrative_hints": [
+            "AI infrastructure"
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "owner_service": "stock-data-gateway",
+      "pagination": {
+        "returned": 1,
+        "next_cursor": null
+      },
+      "cache": {
+        "hit": true,
+        "mode": "read_through_cache"
+      }
+    }
+  },
+  "official_disclosures": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-cninfo-000001-20260608",
+          "source_type": "announcement",
+          "source_provider": "cninfo",
+          "source_url": "https://static.cninfo.com.cn/finalpage/sample.pdf",
+          "title": "平安银行公告提及数字化运营投入",
+          "event_time": "2026-06-08T02:00:00Z",
+          "fetched_at": "2026-06-08T02:01:00Z",
+          "trust_tier": "official_primary",
+          "source_quality": "trusted_fact_candidate",
+          "license_scope": "metadata_and_public_announcement_reference",
+          "retention_policy": "metadata_and_permitted_excerpt",
+          "metadata_only": true,
+          "degradation_events": [],
+          "summary": "Official disclosure metadata fixture for M21 acceptance.",
+          "stock_codes": [
+            "000001.SZ"
+          ],
+          "narrative_hints": [
+            "数字化运营"
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "owner_service": "stock-data-gateway",
+      "pagination": {
+        "returned": 1,
+        "next_cursor": null
+      },
+      "cache": {
+        "hit": true,
+        "mode": "read_through_cache"
+      }
+    }
+  },
+  "official_sources": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-official-policy-20260608",
+          "source_type": "public_official",
+          "source_provider": "official_public_site",
+          "source_url": "https://www.federalreserve.gov/newsevents/sample.htm",
+          "title": "Official policy source references infrastructure resilience",
+          "event_time": "2026-06-08T03:00:00Z",
+          "fetched_at": "2026-06-08T03:01:00Z",
+          "trust_tier": "official_primary",
+          "source_quality": "trusted_fact_candidate",
+          "license_scope": "metadata_and_public_source_reference",
+          "retention_policy": "metadata_and_permitted_excerpt",
+          "metadata_only": true,
+          "degradation_events": [],
+          "summary": "Official source metadata fixture for M21 acceptance.",
+          "stock_codes": [],
+          "narrative_hints": [
+            "infrastructure resilience"
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "owner_service": "stock-data-gateway",
+      "pagination": {
+        "returned": 1,
+        "next_cursor": null
+      },
+      "cache": {
+        "hit": true,
+        "mode": "read_through_cache"
+      }
+    }
+  },
+  "news_context": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-news-semiconductor-20260608",
+          "source_type": "news",
+          "source_provider": "tushare_news",
+          "source_url": "https://example.com/news/semiconductor-policy",
+          "title": "半导体设备政策新闻进入候选上下文",
+          "event_time": "2026-06-08T04:00:00Z",
+          "fetched_at": "2026-06-08T04:01:00Z",
+          "trust_tier": "context_only",
+          "source_quality": "context_only",
+          "license_scope": "metadata_only",
+          "retention_policy": "metadata_only",
+          "metadata_only": true,
+          "degradation_events": [],
+          "summary": "News context fixture for M21 acceptance.",
+          "stock_codes": [],
+          "narrative_hints": [
+            "半导体设备"
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "owner_service": "stock-data-gateway",
+      "pagination": {
+        "returned": 1,
+        "next_cursor": null
+      },
+      "cache": {
+        "hit": false,
+        "mode": "read_through_cache"
+      }
+    }
+  },
+  "open_news_index": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-open-news-ai-20260608",
+          "source_type": "news",
+          "source_provider": "open_news_index",
+          "source_url": "https://example.com/open-news/apple-ai",
+          "title": "Open news index records Apple AI supply-chain context",
+          "event_time": "2026-06-08T05:00:00Z",
+          "fetched_at": "2026-06-08T05:01:00Z",
+          "trust_tier": "context_only",
+          "source_quality": "context_only",
+          "license_scope": "metadata_only",
+          "retention_policy": "metadata_only",
+          "metadata_only": true,
+          "degradation_events": [],
+          "summary": "Open news index fixture for M21 acceptance.",
+          "stock_codes": [
+            "AAPL"
+          ],
+          "narrative_hints": [
+            "AI infrastructure"
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "owner_service": "stock-data-gateway",
+      "pagination": {
+        "returned": 1,
+        "next_cursor": null
+      },
+      "cache": {
+        "hit": false,
+        "mode": "read_through_cache"
+      }
+    }
+  },
+  "industry_media": {
+    "data": {
+      "rows": [
+        {
+          "source_event_id": "sevt-industry-solar-20260608",
+          "source_type": "industry_media",
+          "source_provider": "industry_media_index",
+          "source_url": "https://example.com/industry/solar-storage",
+          "title": "Industry media tracks solar storage component demand",
+          "event_time": "2026-06-08T06:00:00Z",
+          "fetched_at": "2026-06-08T06:01:00Z",
+          "trust_tier": "context_only",
+          "source_quality": "context_only",
+          "license_scope": "metadata_only",
+          "retention_policy": "metadata_only",
+          "metadata_only": true,
+          "degradation_events": [],
+          "summary": "Industry media fixture for M21 acceptance.",
+          "stock_codes": [],
+          "narrative_hints": [
+            "solar storage"
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "owner_service": "stock-data-gateway",
+      "pagination": {
+        "returned": 1,
+        "next_cursor": null
+      },
+      "cache": {
+        "hit": false,
+        "mode": "read_through_cache"
+      }
+    }
+  },
+  "social_heat": {
+    "data": {
+      "rows": []
+    },
+    "meta": {
+      "owner_service": "stock-data-gateway",
+      "status": "degraded",
+      "pagination": {
+        "returned": 0,
+        "next_cursor": null
+      },
+      "cache": {
+        "hit": false,
+        "mode": "disabled"
+      },
+      "degradation_events": [
+        {
+          "code": "SOCIAL_SOURCE_DISABLED",
+          "message": "Social heat source is disabled by default and is not trusted evidence."
+        }
+      ]
+    }
+  }
+}
