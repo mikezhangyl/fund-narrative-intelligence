@@ -1,11 +1,11 @@
 {
   "task_run_id": "20260608-m21-reviewable-narrative-candidate-ops",
-  "task_state": "planned",
+  "task_state": "ready_for_quality",
   "review_cycle": 0,
   "branch": "codex/m21-reviewable-candidate-ops",
   "worktree": "/Users/mikezhang/Coding/AI-Learning/fund-narrative-intelligence",
   "base_commit": "333cf3d2b688b5d30663675d7ddd49c3c2e2d11d",
-  "head_commit": "333cf3d2b688b5d30663675d7ddd49c3c2e2d11d",
+  "head_commit": "f6137426e777014b978f0e6ddcbd4705fc55a46b",
   "merge_base": "333cf3d2b688b5d30663675d7ddd49c3c2e2d11d",
   "quality_reviewed_commit": null,
   "reviewed_snapshot_type": null,
